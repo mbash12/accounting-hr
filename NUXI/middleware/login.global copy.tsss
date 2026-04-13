@@ -1,0 +1,109 @@
+import { NavigationGuard } from 'vue-router'
+import { checkLoggedin, currentUser } from "~/deps/service.js";
+
+let isCheckingInstallation = false;
+
+const middleware: NavigationGuard = async (to, from) => {
+    if (isCheckingInstallation) {
+        return;
+    }
+
+    isCheckingInstallation = true;
+
+    try {
+        const isPWAInstalled = await checkIfPWAInstalled();
+
+        if (to.path === "/install") {
+            if (isPWAInstalled) {
+                return navigateTo("/");
+            }
+            return;
+        }
+
+        console.log("isPWAInstalled", isPWAInstalled);
+
+        if (!isPWAInstalled) {
+            return navigateTo("/install");
+        }
+
+        await checkLoggedin();
+        const user = currentUser.loggedin;
+
+        if (!user && !to.path.startsWith("/auth")) {
+            return navigateTo({
+                path: "/auth",
+                query: {
+                    redirect: to.fullPath,
+                },
+            });
+        }
+    } finally {
+        isCheckingInstallation = false;
+    }
+};
+
+function checkIfPWAInstalled(): Promise<boolean> {
+    if (process.server) {
+        return Promise.resolve(false);
+    }
+
+    return new Promise((resolve) => {
+        // const isInstalled = localStorage.getItem("isPWAInstalled") === "true";
+
+        // if (isInstalled) {
+        //     resolve(true);
+        //     return;
+        // }
+
+        if (
+            window.matchMedia("(display-mode: standalone)").matches ||
+            (navigator as any).standalone
+        ) {
+            // localStorage.setItem("isPWAInstalled", "true");
+            resolve(true);
+            return;
+        }
+
+        let installPromptFired = false;
+        const installPromptHandler = (e: Event) => {
+            e.preventDefault();
+            installPromptFired = true;
+            window.removeEventListener(
+                "beforeinstallprompt",
+                installPromptHandler
+            );
+        };
+
+        window.addEventListener("beforeinstallprompt", installPromptHandler);
+
+        window.addEventListener("appinstalled", () => {
+            localStorage.setItem("isPWAInstalled", "true");
+            resolve(true);
+        });
+
+        setTimeout(() => {
+            window.removeEventListener(
+                "beforeinstallprompt",
+                installPromptHandler
+            );
+
+            if (installPromptFired) {
+                resolve(false);
+            } else {
+                const isPWA =
+                    document.referrer.startsWith("android-app://") ||
+                    navigator.userAgent.includes(" wv") ||
+                    window.matchMedia("(display-mode: standalone)").matches;
+
+                if (isPWA) {
+                    localStorage.setItem("isPWAInstalled", "true");
+                    resolve(true);
+                } else {
+                    resolve(false);
+                }
+            }
+        }, 1000);
+    });
+}
+
+export default middleware;

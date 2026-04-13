@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->foreignId('tax_id')->nullable()->after('created_by_user_id');
+        });
+
+        Schema::table('products', function (Blueprint $table) {
+            $table->foreign('tax_id')->references('id')->on('taxes')->onDelete('set null');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropForeign(['tax_id']);
+            $table->dropColumn('tax_id');
+        });
+    }
+};

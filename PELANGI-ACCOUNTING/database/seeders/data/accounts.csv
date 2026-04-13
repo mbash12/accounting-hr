@@ -1,0 +1,140 @@
+code,name,description,classification_type,is_header,is_cash_bank,is_active,level,parent_code
+1,Harta,Harta,asset,true,false,true,1,
+100000,Kas & Bank,Kas & Bank,cash_bank,true,true,true,2,1
+10000100,Kas Kecil,Kas Kecil,cash_bank,true,true,true,3,100000
+100001100,Kas Kecil,Kas Kecil,cash_bank,false,true,true,4,10000100
+10000200,Bank Central Asia (Rp.) 369.300.4141,Bank Central Asia (Rp.) 369.300.4141,cash_bank,false,true,true,3,100000
+10000400,Kas Besar,Kas Besar,cash_bank,false,true,true,3,100000
+100100,Deposito,Deposito,cash_bank,false,true,true,3,100000
+109900,Ayat Silang,Ayat Silang,current_asset,false,false,true,2,1
+110000,Piutang,Piutang,account_receivable,true,false,true,2,1
+11000200,Piutang Dagang,Piutang Dagang,account_receivable,false,false,true,3,110000
+11000300,Account Receivable IDR,Account Receivable IDR,account_receivable,false,false,true,3,110000
+11000400,Advance Purchase IDR,Advance Purchase IDR,account_receivable,false,false,true,3,110000
+120000,Persediaan Barang Dagang,Persediaan Barang Dagang,inventory,false,false,true,2,1
+120100,Barang Terkirim,Barang Terkirim,inventory,false,false,true,2,1
+130000,Perlengkapan,Perlengkapan,current_asset,false,false,true,2,1
+140000,PPh Psl 21 Dibayar Dimuka,PPh Psl 21 Dibayar Dimuka,current_asset,false,false,true,2,1
+140100,PPh Psl 25 Dibayar Dimuka,PPh Psl 25 Dibayar Dimuka,current_asset,false,false,true,2,1
+140200,PPh Psl 23 Dibayar Dimuka,PPh Psl 23 Dibayar Dimuka,current_asset,false,false,true,2,1
+140300,Piutang Lain-lain,Piutang Lain-lain,current_asset,false,false,true,2,1
+140400,Piutang Karyawan,Piutang Karyawan,current_asset,false,false,true,2,1
+140500,Uang Muka Lain-lain,Uang Muka Lain-lain,current_asset,false,false,true,2,1
+160000,PPn Masukan,PPn Masukan,current_asset,false,false,true,2,1
+170000,Aktiva Tetap,Aktiva Tetap,fixed_asset,true,false,true,2,1
+17000100,Tanah,Tanah,fixed_asset,false,false,true,3,170000
+17000200,Gedung,Gedung,fixed_asset,false,false,true,3,170000
+17000300,Kendaraan,Kendaraan,fixed_asset,false,false,true,3,170000
+17000400,Peralatan Kantor Gol 1,Peralatan Kantor Gol 1,fixed_asset,false,false,true,3,170000
+17000500,Peralatan Kantor Gol II,Peralatan Kantor Gol II,fixed_asset,false,false,true,3,170000
+171000,Akumulasi Penyusutan Aktiva Tetap,Akumulasi Penyusutan Aktiva Tetap,accumulated_depreciation,true,false,true,2,1
+17100100,Akumulasi Penyusutan Gedung,Akumulasi Penyusutan Gedung,accumulated_depreciation,false,false,true,3,171000
+17100200,Akumulasi Penyusutan Kendaraan,Akumulasi Penyusutan Kendaraan,accumulated_depreciation,false,false,true,3,171000
+17100300,Akumulasi Penyusutan Peralatan Kantor Gol I,Akumulasi Penyusutan Peralatan Kantor Gol I,accumulated_depreciation,false,false,true,3,171000
+17100400,Akumulasi Penyusutan Peralatan Kantor Gol II,Akumulasi Penyusutan Peralatan Kantor Gol II,accumulated_depreciation,false,false,true,3,171000
+180000,Transaksi Aktiva Tetap,Transaksi Aktiva Tetap,other_asset,false,false,true,2,1
+2,Kewajiban,Kewajiban,liability,true,false,true,1,
+200000,Hutang,Hutang,account_payable,true,false,true,2,2
+210100,Hutang Dagang,Hutang Dagang,account_payable,false,false,true,3,200000
+210200,Advance Sales IDR,Advance Sales IDR,account_payable,false,false,true,3,200000
+210300,Uang Muka Penjualan,Uang Muka Penjualan,account_payable,false,false,true,2,2
+220000,Hutang Pembelian Belum Ditagih,Hutang Pembelian Belum Ditagih,current_liability,false,false,true,2,2
+22000100,Hutang Gaji,Hutang Gaji,current_liability,false,false,true,2,2
+220100,PPn Keluaran,PPn Keluaran,current_liability,false,false,true,2,2
+220200,Piutang Lain-lain,Piutang Lain-lain,current_liability,false,false,true,2,2
+220300,Hutang PPh Psl 21,Hutang PPh Psl 21,current_liability,false,false,true,2,2
+220400,Hutang PPh 23,Hutang PPh 23,current_liability,false,false,true,2,2
+220500,Hutang PPh Psl 25/29,Hutang PPh Psl 25/29,current_liability,false,false,true,2,2
+220600,Hutang PPh Final Psl 4(2),Hutang PPh Final Psl 4(2),current_liability,false,false,true,2,2
+220700,Hutang PPN,Hutang PPN,current_liability,false,false,true,2,2
+220800,Hutang Lain-lain,Hutang Lain-lain,current_asset,false,false,true,2,2
+230000,Hutang Jangka Panjang,Hutang Jangka Panjang,current_liability,false,false,true,2,2
+3,Modal,Modal,equity,true,false,true,1,
+300000,Modal,Modal,equity,false,false,true,2,3
+31000100,OPENING BALANCE EQUITY,OPENING BALANCE EQUITY,equity,false,false,true,2,3
+32000200,Deviden,Deviden,equity,false,false,true,2,3
+32000100,Laba ( Rugi ) Ditahan,Laba ( Rugi ) Ditahan,equity,false,false,true,2,3
+4,Pendapatan Usaha,Pendapatan Usaha,revenue,true,false,true,1,
+400000,Pendapatan,Pendapatan,revenue,true,false,true,2,4
+40000100,Penjualan,Penjualan,revenue,false,false,true,3,400000
+40000200,Pendapatan Jasa,Pendapatan Jasa,revenue,false,false,true,3,400000
+40000300,Retur Penjualan,Retur Penjualan,revenue,false,false,true,3,400000
+40000400,Potongan Penjualan,Potongan Penjualan,revenue,false,false,true,3,400000
+41010400,Sales Term Discount IDR,Sales Term Discount IDR,revenue,false,false,true,2,4
+5,Beban Atas Pendapatan,Beban Atas Pendapatan,expense,true,false,true,1,
+500000,COGS,COGS,cogs,false,false,true,2,5
+51000100,Pembelian Barang PPN,Pembelian Barang PPN,cogs,false,false,true,2,5
+51000200,Retur Pembelian Barang,Retur Pembelian Barang,cogs,false,false,true,2,5
+51000300,Diskon Pembelian Barang,Diskon Pembelian Barang,cogs,false,false,true,2,5
+51000400,Pembelian Barang Non PPN,Pembelian Barang Non PPN,cogs,false,false,true,2,5
+6,Beban Operasional,Beban Operasional,expense,true,false,true,1,
+600000,BIAYA PEMASARAN UMUM & ADM,BIAYA PEMASARAN UMUM & ADM,expense,true,false,true,2,6
+610000,Biaya Pemasaran,Biaya Pemasaran,expense,true,false,true,3,600000
+610100,Biaya Iklan,Biaya Iklan,expense,false,false,true,4,610000
+610200,Biaya Komisi,Biaya Komisi,expense,false,false,true,4,610000
+610400,Biaya Entertainment,Biaya Entertainment,expense,false,false,true,4,610000
+619900,Biaya Overhead,Biaya Overhead,expense,false,false,true,4,610000
+612000,Biaya Transport,Biaya Transport,expense,false,false,true,3,600000
+630000,Biaya Penyusutan & Amortisasi,Biaya Penyusutan & Amortisasi,expense,true,false,true,3,600000
+63000100,Biaya Penyusutan Gedung,Biaya Penyusutan Gedung,expense,false,false,true,4,630000
+63000200,Biaya Penyusutan Kendaraan,Biaya Penyusutan Kendaraan,expense,false,false,true,4,630000
+63000300,Biaya Penyusutan Peralatan,Biaya Penyusutan Peralatan,expense,false,false,true,4,630000
+63000400,Biaya Penyusutan Inventaris kantor,Biaya Penyusutan Inventaris kantor,expense,false,false,true,4,630000
+620000,Biaya Umum & Administrasi,Biaya Umum & Administrasi,expense,true,false,true,3,600000
+620100,Gaji & Tunjangan Karyawan,Gaji & Tunjangan Karyawan,expense,true,false,true,4,620000
+62010100,"Biaya Gaji, Lembur & THR","Biaya Gaji, Lembur & THR",expense,true,false,true,5,620100
+620101100,"Biaya Gaji, Lembur & THR","Biaya Gaji, Lembur & THR",expense,false,false,true,6,62010100
+62010900,Biaya PBJS Karyawan,Biaya PBJS Karyawan,expense,false,false,true,5,620100
+62010200,Biaya Bonus Pesangon & Kompensasi,Biaya Bonus Pesangon & Kompensasi,expense,false,false,true,5,620100
+62010300,Biaya Transport Karyawan,Biaya Transport Karyawan,expense,false,false,true,5,620100
+62010400,Biaya Upah & Honorer,Biaya Upah & Honorer,expense,false,false,true,5,620100
+62010500,Biaya Makan dan Minum,Biaya Makan dan Minum,expense,false,false,true,5,620100
+62010600,Biaya Tunjangan Kesehatan,Biaya Tunjangan Kesehatan,expense,false,false,true,5,620100
+62010700,Biaya Asuransi Karyawan,Biaya Asuransi Karyawan,expense,false,false,true,5,620100
+62010800,BPJS Karyawan,BPJS Karyawan,expense,false,false,true,5,620100
+620300,"Beban Utiliti, Adm, Sewa & Lainnya","Beban Utiliti, Adm, Sewa & Lainnya",expense,true,false,true,4,620000
+62030100,Biaya Listrik,Biaya Listrik,expense,false,false,true,5,620300
+62030200,Biaya PAM,Biaya PAM,expense,false,false,true,5,620300
+62030300,Biaya Telekomunikasi,Biaya Telekomunikasi,expense,false,false,true,5,620300
+62030400,Biaya Koran & Majalah,Biaya Koran & Majalah,expense,false,false,true,5,620300
+62030500,"Biaya Ekspedisi, Pos & Materai","Biaya Ekspedisi, Pos & Materai",expense,false,false,true,5,620300
+62030600,Biaya Transport,Biaya Transport,expense,false,false,true,5,620300
+62030700,Biaya Alat Tulis Kantor,Biaya Alat Tulis Kantor,expense,false,false,true,5,620300
+62030800,"STNK, KIR & Pajak Kendaraan","STNK, KIR & Pajak Kendaraan",expense,false,false,true,5,620300
+62031000,Biaya Rumah Tangga,Biaya Rumah Tangga,expense,false,false,true,5,620300
+62031100,Biaya Sewa Gedung,Biaya Sewa Gedung,expense,false,false,true,5,620300
+62031200,Biaya Umum & Adm Lainnya,Biaya Umum & Adm Lainnya,expense,false,false,true,5,620300
+62031300,Biaya Sewa Mesin Fotokopi,Biaya Sewa Mesin Fotokopi,expense,false,false,true,5,620300
+62031400,Biaya Lainnya,Biaya Lainnya,expense,false,false,true,5,620300
+62031600,Bisaya Sewa Kendaraan,Bisaya Sewa Kendaraan,expense,false,false,true,5,620300
+62031700,Biaya Jasa Konsultan,Biaya Jasa Konsultan,expense,false,false,true,5,620300
+620400,Biaya Pemeliharaan dan Perbaikan,Biaya Pemeliharaan dan Perbaikan,expense,true,false,true,4,620000
+62040100,Biaya Pemeliharaan,Biaya Pemeliharaan,expense,false,false,true,5,620400
+62040200,Biaya Pemeliharaan Peralatan Kantor,Biaya Pemeliharaan Peralatan Kantor,expense,false,false,true,5,620400
+62040300,Biaya Pemeliharaan Kendaraan,Biaya Pemeliharaan Kendaraan,expense,false,false,true,5,620400
+62040400,"Biaya BBM, tol & parkir","Biaya BBM, tol & parkir",expense,false,false,true,5,620400
+62011000,BPJS KESEHATAN,BPJS KESEHATAN,expense,false,false,true,2,6
+62011100,BPJS  KESEHATAN KARYAWAN,BPJS  KESEHATAN KARYAWAN,expense,false,false,true,2,6
+62011200,Biaya PPN,Biaya PPN,expense,false,false,true,2,6
+62011300,Biaya Pajak Lainnya,Biaya Pajak Lainnya,expense,false,false,true,2,6
+62011400,Biaya PPh Psl 25/29,Biaya PPh Psl 25/29,expense,false,false,true,2,6
+62011500,Biaya PPh Psl 21,Biaya PPh Psl 21,expense,false,false,true,2,6
+62031500,Retribusi & Sumbangan Lainnya,Retribusi & Sumbangan Lainnya,expense,false,false,true,2,6
+7,Pendapatan & Beban Non Operasional,Pendapatan & Beban Non Operasional,expense,true,false,true,1,
+710000,PENDAPATAN DILUAR USAHA,PENDAPATAN DILUAR USAHA,other_revenue,true,false,true,2,7
+71000100,Pendapatan Jasa Giro,Pendapatan Jasa Giro,other_revenue,false,false,true,3,710000
+71000200,Pendapatan Bunga Deposito,Pendapatan Bunga Deposito,other_revenue,false,false,true,3,710000
+71000300,Penjualan Inventory / Perlengkapan,Penjualan Inventory / Perlengkapan,other_revenue,false,false,true,3,710000
+71009900,Pendapatan Lain-Lain,Pendapatan Lain-Lain,other_revenue,false,false,true,3,710000
+71000400,PPH 4(2),PPH 4(2),other_revenue,false,false,true,2,7
+720000,BIAYA DILUAR USAHA,BIAYA DILUAR USAHA,other_expense,true,false,true,2,7
+72000100,Biaya Bunga Pinjaman Lainnya,Biaya Bunga Pinjaman Lainnya,other_expense,false,false,true,3,720000
+72000200,Biaya Adm Bank & Buku Cek/Giro,Biaya Adm Bank & Buku Cek/Giro,other_expense,false,false,true,3,720000
+72000300,Pajak Jasa Giro,Pajak Jasa Giro,other_expense,false,false,true,3,720000
+72009900,Beban Pembulatan,Beban Pembulatan,other_expense,false,false,true,3,720000
+8,Pendapatan Lain,Pendapatan Lain,revenue,true,false,true,1,
+810000,Gain/Loss Dispossal F.A,Gain/Loss Dispossal F.A,other_expense,false,false,true,2,8
+820000,Gain/Loss Revaluation FA,Gain/Loss Revaluation FA,other_revenue,false,false,true,2,8
+9,Beban Lain,Beban Lain,expense,true,false,true,1,
+91000200,Realize Gain or Loss IDR,Realize Gain or Loss IDR,expense,false,false,true,2,9
+91000300,Unrealize Gain or Loss IDR,Unrealize Gain or Loss IDR,expense,false,false,true,2,9

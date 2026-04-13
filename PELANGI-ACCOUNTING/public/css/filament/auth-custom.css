@@ -1,0 +1,106 @@
+/* Custom Login Page Styles */
+body.fi-auth-page,
+body[class*="auth"] {
+    background-image: url('../auth-bg.png') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    min-height: 100vh !important;
+}
+
+/* Override default auth container */
+.fi-auth-container {
+    padding: 2rem 1rem !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Auth card with two-column layout */
+.fi-auth-card {
+    max-width: 1000px !important;
+    width: 100% !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 1rem !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    overflow: hidden !important;
+    margin: 0 auto !important;
+}
+
+/* Grid layout for two columns */
+.fi-auth-card > div {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    min-height: 600px !important;
+}
+
+/* Left column - form */
+.fi-auth-card > div > div:first-child {
+    padding: 3rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+}
+
+/* Right column - branding */
+.fi-auth-card > div > div:last-child {
+    background: linear-gradient(135deg, rgb(240, 249, 255) 0%, rgb(219, 234, 254) 100%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.fi-auth-card > div > div:last-child::before {
+    content: "" !important;
+    position: absolute !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-auth-card > div > div:last-child > div {
+    position: relative !important;
+    z-index: 1 !important;
+    text-align: center !important;
+    padding: 2rem !important;
+}
+
+.fi-auth-card > div > div:last-child img {
+    width: 6rem !important;
+    height: 6rem !important;
+    margin: 0 auto 1.5rem !important;
+    opacity: 0.8 !important;
+}
+
+.fi-auth-card > div > div:last-child h2 {
+    font-size: 1.5rem !important;
+    font-weight: 600 !important;
+    color: rgb(31, 41, 55) !important;
+    margin-bottom: 1rem !important;
+}
+
+.fi-auth-card > div > div:last-child p {
+    color: rgb(75, 85, 99) !important;
+    max-width: 20rem !important;
+    margin: 0 auto !important;
+    line-height: 1.6 !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 1024px) {
+    .fi-auth-card > div {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .fi-auth-card > div > div:last-child {
+        display: none !important;
+    }
+    
+    .fi-auth-card {
+        max-width: 400px !important;
+    }
+}

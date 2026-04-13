@@ -1,0 +1,472 @@
+/* Logo styling - Constrain to original header height */
+.fi-brand-logo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    height: 100% !important;
+    max-height: 64px !important; /* Original Filament header height */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.fi-brand-logo img {
+    height: 100% !important;
+    max-height: 64px !important; /* Constrain to original header height */
+    width: auto !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Also constrain the topbar height to original */
+.fi-topbar {
+    background-color: #40B6F4 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    height: 64px !important; /* Force original height */
+    min-height: 64px !important;
+    max-height: 64px !important;
+}
+
+/* Hide the original brand completely - but not our logo container */
+.fi-topbar .fi-brand:not(.fi-brand-logo),
+.fi-brand:not(.fi-brand-logo),
+.fi-topbar [class*="brand"]:not(.fi-brand-logo),
+.fi-topbar [data-target*="brand"]:not(.fi-brand-logo),
+.fi-logo:not(.fi-brand-logo) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    left: -9999px !important;
+}
+
+/* Also hide any brand-related elements - but not our logo */
+.fi-topbar a[href*="filament"]:not(.fi-brand-logo),
+.fi-topbar a[href="/"]:not(.fi-brand-logo),
+.fi-topbar .fi-ta-brand:not(.fi-brand-logo) {
+    display: none !important;
+}
+
+/* Ensure our logo container stays visible */
+.fi-brand-logo {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    left: auto !important;
+    width: 260px !important;
+    height: auto !important;
+}
+
+/* Ensure logo doesn't interfere with header layout */
+.fi-brand-logo:has(img) {
+    min-width: auto !important;
+    width: 260px !important;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .fi-brand-logo {
+        max-height: 56px !important;
+    }
+    
+    .fi-brand-logo img {
+        max-height: 56px !important;
+    }
+    
+    .fi-topbar {
+        height: 56px !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .fi-brand-logo {
+        max-height: 48px !important;
+    }
+    
+    .fi-brand-logo img {
+        max-height: 48px !important;
+    }
+    
+    .fi-topbar {
+        height: 48px !important;
+        min-height: 48px !important;
+        max-height: 48px !important;
+    }
+}
+
+/* Global font to Poppins */
+* {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* Main content background */
+.fi-main,
+main,
+.fi-content,
+.fi-page {
+    background-color: #F4F9FE !important;
+}
+
+/* Force light mode and hide theme toggle */
+html, html *, .fi-topbar, .fi-sidebar, body {
+    color-scheme: light !important;
+}
+
+/* Hide theme toggle button */
+.fi-theme-toggle {
+    display: none !important;
+}
+
+/* Hide any theme-related menu items */
+.fi-dropdown-panel [data-theme-toggle],
+.fi-dropdown-panel [data-theme] {
+    display: none !important;
+}
+
+/* Force light mode for all elements - Override any dark mode styles */
+:root:not(.dark),
+:root,
+.light,
+.light * {
+    --tw-bg-opacity: 1 !important;
+    --tw-text-opacity: 1 !important;
+    --tw-border-opacity: 1 !important;
+}
+
+/* Force remove dark class and any dark mode styling */
+html.dark,
+html.dark *,
+.dark,
+.dark * {
+    color-scheme: light !important;
+    background-color: white !important;
+    color: rgb(17, 24, 39) !important;
+}
+
+/* Theme-aware Filament sidebar and header customization */
+
+/* Force all header text to be white */
+.fi-topbar,
+.fi-topbar *,
+.fi-topbar .fi-link,
+.fi-topbar .fi-brand,
+.fi-topbar span,
+.fi-topbar div,
+.fi-topbar button {
+    color: white !important;
+}
+
+/* Header buttons and links with specific styling */
+.fi-topbar .fi-link:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
+}
+
+/* Header search and other controls */
+.fi-topbar input {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    color: white !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.fi-topbar input::placeholder {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Header dropdowns and menus - Dark text on light background */
+.fi-dropdown-panel * {
+    color: rgb(17, 24, 39) !important; /* Dark text for light background */
+}
+
+.fi-dropdown-panel .fi-dropdown-item {
+    color: rgb(17, 24, 39) !important;
+}
+
+.fi-dropdown-panel .fi-dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important; /* Subtle hover */
+    color: rgb(17, 24, 39) !important;
+}
+
+/* User dropdown menu specific styling */
+.fi-user-menu .fi-dropdown-panel .fi-dropdown-item {
+    color: rgb(17, 24, 39) !important; /* Dark text */
+}
+
+.fi-user-menu .fi-dropdown-panel .fi-dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    color: rgb(17, 24, 39) !important;
+}
+
+/* User menu header section with user info */
+.fi-user-menu .fi-dropdown-header * {
+    color: rgb(17, 24, 39) !important; /* Dark text */
+}
+
+/* Specific targeting for logout button and forms */
+.fi-user-menu .fi-dropdown-panel form button,
+.fi-user-menu .fi-dropdown-panel form {
+    color: rgb(17, 24, 39) !important;
+}
+
+/* Force all dropdown text to be dark */
+.fi-dropdown-panel [class*="text-"] {
+    color: rgb(17, 24, 39) !important;
+}
+
+/* Override any remaining white text in dropdowns */
+.fi-dropdown-panel *,
+.fi-dropdown-panel span,
+.fi-dropdown-panel div,
+.fi-dropdown-panel button,
+.fi-dropdown-panel a {
+    color: rgb(17, 24, 39) !important;
+}
+
+/* Fix global search dropdown icons */
+.fi-global-search-results svg,
+.fi-global-search-results [data-icon],
+.fi-global-search-results i {
+    color: #374151 !important;
+    stroke: #374151 !important;
+    fill: #374151 !important;
+}
+
+/* Account Widget - Show user name next to avatar with white text */
+.fi-user-menu .fi-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    color: white !important;
+}
+
+.fi-user-menu .fi-link::after {
+    content: attr(data-user-name) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    color: white !important;
+}
+
+/* Show name only on larger screens */
+@media (min-width: 640px) {
+    .fi-ta-user-menu .fi-ta-link::after {
+        display: inline !important;
+    }
+}
+
+@media (max-width: 639px) {
+    .fi-ta-user-menu .fi-ta-link::after {
+        display: none !important;
+    }
+}
+
+/* Light mode sidebar styling with custom text color */
+.fi-sidebar {
+    background-color: rgb(255 255 255) !important;
+    box-shadow: 2px 0 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.fi-sidebar .fi-sidebar-brand {
+    background-color: rgb(255 255 255) !important;
+    border-bottom: 1px solid rgb(229 231 235) !important;
+}
+
+/* Sidebar text color - #233442 */
+.fi-sidebar .fi-sidebar-heading {
+    color: #233442 !important;
+}
+
+.fi-sidebar *:not(.fi-ta-sidebar-trigger):not(.fi-sidebar-trigger) {
+    color: #233442 !important;
+}
+
+.fi-sidebar .fi-sidebar-item {
+    color: #233442 !important;
+}
+
+.fi-sidebar .fi-sidebar-item.active {
+    color: #233442 !important;
+}
+
+/* Light mode sidebar hover and active states */
+.fi-sidebar .fi-sidebar-item:hover {
+    background-color: rgb(243 244 246) !important;
+}
+
+.fi-sidebar .fi-sidebar-item.active {
+    background-color: rgb(254 243 199) !important; /* Amber 100 for light mode */
+}
+
+/* Ensure theme toggle buttons remain visible */
+.fi-sidebar .fi-ta-sidebar-trigger,
+.fi-sidebar .fi-sidebar-trigger {
+    color: #233442 !important;
+}
+
+/* Subtle transitions for smooth theme switching */
+.fi-sidebar,
+.fi-sidebar .fi-sidebar-item,
+.fi-sidebar .fi-sidebar-brand {
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Custom Login Page Styling */
+.fi-auth-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+}
+
+.fi-auth-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, #40B6F4 0%, #60a5fa 100%) !important;
+}
+
+/* Login form heading */
+.fi-auth-card h1 {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    font-size: 1.875rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Login form subheading */
+.fi-auth-card p {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Form input styling */
+.fi-auth-card .fi-input {
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.fi-auth-card .fi-input:focus {
+    border-color: #40B6F4 !important;
+    box-shadow: 0 0 0 3px rgba(64, 182, 244, 0.1) !important;
+    outline: none !important;
+}
+
+.fi-auth-card .fi-input::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Form labels */
+.fi-auth-card .fi-label {
+    color: #475569 !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Checkbox styling */
+.fi-auth-card .fi-checkbox {
+    accent-color: #40B6F4 !important;
+}
+
+.fi-auth-card .fi-checkbox-label {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+}
+
+/* Submit button styling */
+.fi-auth-card .fi-btn {
+    background: linear-gradient(135deg, #40B6F4 0%, #60a5fa 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.fi-auth-card .fi-btn:hover {
+    background: linear-gradient(135deg, #38b2f2 0%, #3b82f6 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-auth-card .fi-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Error messages */
+.fi-auth-card .fi-form-error {
+    background-color: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
+    color: #dc2626 !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Success messages */
+.fi-auth-card .fi-form-success {
+    background-color: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+    color: #16a34a !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Links in the auth form */
+.fi-auth-card .fi-link {
+    color: #40B6F4 !important;
+    text-decoration: none !important;
+    font-size: 0.875rem !important;
+    transition: color 0.2s ease-in-out !important;
+}
+
+.fi-auth-card .fi-link:hover {
+    color: #38b2f2 !important;
+    text-decoration: underline !important;
+}
+
+/* Login page background */
+.fi-auth-bg {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    min-height: 100vh !important;
+}
+
+/* Logo on login page */
+.fi-auth-card .fi-brand {
+    margin-bottom: 2rem !important;
+}
+
+.fi-auth-card .fi-brand img {
+    max-height: 48px !important;
+    width: auto !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .fi-auth-card {
+        margin: 1rem !important;
+        border-radius: 12px !important;
+    }
+    
+    .fi-auth-card h1 {
+        font-size: 1.5rem !important;
+    }
+}

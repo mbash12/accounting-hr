@@ -1,0 +1,141 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use App\Models\DocumentNumbering;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Pages\Page;
+use Illuminate\Support\Facades\Auth;
+use UnitEnum;
+
+class ManageDocumentNumbering extends Page
+{
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
+    protected static string $view = 'filament.pages.document-numbering.manage-document-numbering';
+
+    protected static ?int $navigationSort = 100;
+
+    public ?array $data = [];
+
+    public function mount(): void
+    {
+        $documentNumberings = DocumentNumbering::where('company_id', Auth::user()->current_company_id)->get();
+        
+        $this->form->fill([
+            'document_numberings' => $documentNumberings->map(function ($doc) {
+                return [
+                    'id' => $doc->id,
+                    'document_type' => $this->getDocumentTypeLabel($doc->document_type),
+                    'document_type_key' => $doc->document_type,
+                    'prefix' => $doc->prefix,
+                    'format_components' => $doc->format_components ?? [],
+                    'next_number' => $doc->next_number,
+                    'is_active' => $doc->is_active,
+                ];
+            })->toArray(),
+        ]);
+    }
+
+    private function getDocumentTypeLabel(string $documentType): string
+    {
+        return match($documentType) {
+            'sales_order' => 'Sales Order',
+            'sales_invoice' => 'Sales Invoice',
+            'sales_return' => 'Sales Return',
+            'purchase_order' => 'Purchase Order',
+            'purchase_invoice' => 'Purchase Invoice',
+            'purchase_return' => 'Purchase Return',
+            'cash_receipt' => 'Cash Receipt',
+            'cash_disbursement' => 'Cash Disbursement',
+            'journal_entry' => 'Journal Entry',
+            'goods_receipt' => 'Goods Receipt',
+            'delivery_document' => 'Delivery Document',
+            'advance_payment' => 'Advance Payment',
+            'advance_receipt' => 'Advance Receipt',
+            default => ucfirst(str_replace('_', ' ', $documentType)),
+        };
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->can('manage_document_numbering');
+    }
+
+    public function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                Forms\Components\Section::make('Document Numbering Formats')
+                    ->description('Manage the document numbering formats for your company')
+                    ->schema([
+                        Forms\Components\Repeater::make('document_numberings')
+                            ->label('')
+                            ->schema([
+                                Forms\Components\Hidden::make('id'),
+                                Forms\Components\Hidden::make('document_type_key'),
+                                Forms\Components\TextInput::make('document_type')
+                                    ->label('Module Name')
+                                    ->required()
+                                    ->disabled(),
+                                Forms\Components\TextInput::make('prefix')
+                                    ->label('Prefix')
+                                    ->maxLength(50),
+                                Forms\Components\CheckboxList::make('format_components')
+                                    ->label('Format Components')
+                                    ->options([
+                                        'prefix' => 'Prefix',
+                                        'year_full' => 'Full Year (2024)',
+                                        'year_short' => 'Short Year (24)',
+                                        'month_full' => 'Full Month (January)',
+                                        'month_medium' => 'Medium Month (Jan)',
+                                        'month_short' => 'Short Month (01)',
+                                        'month_numeric' => 'Numeric Month (1)',
+                                        'number' => 'Number',
+                                    ])
+                                    ->required()
+                                    ->columns(3),
+                                Forms\Components\TextInput::make('next_number')
+                                    ->label('Number')
+                                    ->numeric()
+                                    ->required(),
+                                Forms\Components\Toggle::make('is_active')
+                                    ->label('Auto Generate'),
+                            ])
+                            ->columns(1)
+                            ->collapsible(false)
+                            ->itemLabel(fn (array $state): ?string => $state['document_type'] ?? null)
+                            ->addAction(false)
+                            ->deleteAction(false)
+                            ->reorderable(false),
+                    ]),
+            ])
+            ->statePath('data');
+    }
+
+    public function save(): void
+    {
+        $data = $this->form->getState();
+        
+        foreach ($data['document_numberings'] as $documentData) {
+            DocumentNumbering::where('id', $documentData['id'])
+                ->update([
+                    'prefix' => $documentData['prefix'],
+                    'format_components' => $documentData['format_components'],
+                    'next_number' => $documentData['next_number'],
+                    'is_active' => $documentData['is_active'],
+                ]);
+        }
+
+        $this->getSavedNotification()->send();
+    }
+
+    protected function getSavedNotification(): \Filament\Notifications\Notification
+    {
+        return \Filament\Notifications\Notification::make()
+            ->success()
+            ->title('Document numbering formats updated successfully')
+            ->body('The changes have been saved.');
+    }
+}

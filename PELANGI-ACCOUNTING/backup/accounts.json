@@ -1,0 +1,816 @@
+[
+  {
+    "no_akun": "1,000.00",
+    "nama_akun": "Kas & Bank",
+    "tipe_akun": "Kas/Bank",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "100,001.00",
+        "nama_akun": "Kas Kecil",
+        "tipe_akun": "Kas/Bank",
+        "saldo": 0.00,
+        "children": [
+          {
+            "no_akun": "1,000,011.00",
+            "nama_akun": "Kas Kecil",
+            "tipe_akun": "Kas/Bank",
+            "saldo": 0.00
+          }
+        ]
+      },
+      {
+        "no_akun": "100,002.00",
+        "nama_akun": "Bank Central Asia (Rp.) 369.300.4141",
+        "tipe_akun": "Kas/Bank",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "100,004.00",
+        "nama_akun": "Kas Besar",
+        "tipe_akun": "Kas/Bank",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "1,001.00",
+        "nama_akun": "Deposito",
+        "tipe_akun": "Kas/Bank",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "1,099.00",
+    "nama_akun": "Ayat Silang",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,100.00",
+    "nama_akun": "Piutang",
+    "tipe_akun": "Akun Piutang",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "110,002.00",
+        "nama_akun": "Piutang Dagang",
+        "tipe_akun": "Akun Piutang",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "110,003.00",
+        "nama_akun": "Account Receivable IDR",
+        "tipe_akun": "Akun Piutang",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "110,004.00",
+        "nama_akun": "Advance Purchase IDR",
+        "tipe_akun": "Akun Piutang",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "1,200.00",
+    "nama_akun": "Persediaan Barang Dagang",
+    "tipe_akun": "Persediaan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,201.00",
+    "nama_akun": "Barang Terkirim",
+    "tipe_akun": "Persediaan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,300.00",
+    "nama_akun": "Perlengkapan",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,400.00",
+    "nama_akun": "PPh Psl 21 Dibayar Dimuka",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,401.00",
+    "nama_akun": "PPh Psl 25 Dibayar Dimuka",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,402.00",
+    "nama_akun": "PPh Psl 23 Dibayar Dimuka",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,403.00",
+    "nama_akun": "Piutang Lain-lain",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,404.00",
+    "nama_akun": "Piutang Karyawan",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,405.00",
+    "nama_akun": "Uang Muka Lain-lain",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,600.00",
+    "nama_akun": "PPn Masukan",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "1,700.00",
+    "nama_akun": "Aktiva Tetap",
+    "tipe_akun": "Aktiva Tetap",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "170,001.00",
+        "nama_akun": "Tanah",
+        "tipe_akun": "Aktiva Tetap",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "170,002.00",
+        "nama_akun": "Gedung",
+        "tipe_akun": "Aktiva Tetap",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "170,003.00",
+        "nama_akun": "Kendaraan",
+        "tipe_akun": "Aktiva Tetap",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "170,004.00",
+        "nama_akun": "Peralatan Kantor Gol 1",
+        "tipe_akun": "Aktiva Tetap",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "170,005.00",
+        "nama_akun": "Peralatan Kantor Gol II",
+        "tipe_akun": "Aktiva Tetap",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "1,710.00",
+    "nama_akun": "Akumulasi Penyusutan Aktiva Tetap",
+    "tipe_akun": "Akumulasi Penyusutan",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "171,001.00",
+        "nama_akun": "Akumulasi Penyusutan Gedung",
+        "tipe_akun": "Akumulasi Penyusutan",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "171,002.00",
+        "nama_akun": "Akumulasi Penyusutan Kendaraan",
+        "tipe_akun": "Akumulasi Penyusutan",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "171,003.00",
+        "nama_akun": "Akumulasi Penyusutan Peralatan Kantor Gol I",
+        "tipe_akun": "Akumulasi Penyusutan",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "171,004.00",
+        "nama_akun": "Akumulasi Penyusutan Peralatan Kantor Gol II",
+        "tipe_akun": "Akumulasi Penyusutan",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "1,800.00",
+    "nama_akun": "Transaksi Aktiva Tetap",
+    "tipe_akun": "Aktiva Lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,000.00",
+    "nama_akun": "Hutang",
+    "tipe_akun": "Akun Hutang",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "2,101.00",
+        "nama_akun": "Hutang Dagang",
+        "tipe_akun": "Akun Hutang",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "2,102.00",
+        "nama_akun": "Advance Sales IDR",
+        "tipe_akun": "Akun Hutang",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "2,103.00",
+    "nama_akun": "Uang Muka Penjualan",
+    "tipe_akun": "Akun Hutang",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,200.00",
+    "nama_akun": "Hutang Pembelian Belum Ditagih",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "220,001.00",
+    "nama_akun": "Hutang Gaji",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,201.00",
+    "nama_akun": "PPn Keluaran",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,202.00",
+    "nama_akun": "Piutang Lain-lain",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,203.00",
+    "nama_akun": "Hutang PPh Psl 21",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,204.00",
+    "nama_akun": "Hutang PPh 23",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,205.00",
+    "nama_akun": "Hutang PPh Psl 25/29",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,206.00",
+    "nama_akun": "Hutang PPh Final Psl 4(2)",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,207.00",
+    "nama_akun": "Hutang PPN",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,208.00",
+    "nama_akun": "Hutang Lain-lain",
+    "tipe_akun": "Aktiva Lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "2,300.00",
+    "nama_akun": "Hutang Jangka Panjang",
+    "tipe_akun": "Hutang lancar lainnya",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "3,000.00",
+    "nama_akun": "Modal",
+    "tipe_akun": "Ekuitas",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "310,001.00",
+    "nama_akun": "OPENING BALANCE EQUITY",
+    "tipe_akun": "Ekuitas",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "320,002.00",
+    "nama_akun": "Deviden",
+    "tipe_akun": "Ekuitas",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "320,001.00",
+    "nama_akun": "Laba ( Rugi ) Ditahan",
+    "tipe_akun": "Ekuitas",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "4,000.00",
+    "nama_akun": "Pendapatan",
+    "tipe_akun": "Pendapatan",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "400,001.00",
+        "nama_akun": "Penjualan",
+        "tipe_akun": "Pendapatan",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "400,002.00",
+        "nama_akun": "Pendapatan Jasa",
+        "tipe_akun": "Pendapatan",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "400,003.00",
+        "nama_akun": "Retur Penjualan",
+        "tipe_akun": "Pendapatan",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "400,004.00",
+        "nama_akun": "Potongan Penjualan",
+        "tipe_akun": "Pendapatan",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "410,104.00",
+    "nama_akun": "Sales Term Discount IDR",
+    "tipe_akun": "Pendapatan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "5,000.00",
+    "nama_akun": "COGS",
+    "tipe_akun": "Harga Pokok Penjualan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "510,001.00",
+    "nama_akun": "Pembelian Barang PPN",
+    "tipe_akun": "Harga Pokok Penjualan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "510,002.00",
+    "nama_akun": "Retur Pembelian Barang",
+    "tipe_akun": "Harga Pokok Penjualan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "510,003.00",
+    "nama_akun": "Diskon Pembelian Barang",
+    "tipe_akun": "Harga Pokok Penjualan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "510,004.00",
+    "nama_akun": "Pembelian Barang Non PPN",
+    "tipe_akun": "Harga Pokok Penjualan",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "6,000.00",
+    "nama_akun": "BIAYA PEMASARAN UMUM & ADM",
+    "tipe_akun": "Beban",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "6,100.00",
+        "nama_akun": "Biaya Pemasaran",
+        "tipe_akun": "Beban",
+        "saldo": 0.00,
+        "children": [
+          {
+            "no_akun": "6,101.00",
+            "nama_akun": "Biaya Iklan",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          },
+          {
+            "no_akun": "6,102.00",
+            "nama_akun": "Biaya Komisi",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          },
+          {
+            "no_akun": "6,104.00",
+            "nama_akun": "Biaya Entertainment",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          },
+          {
+            "no_akun": "6,199.00",
+            "nama_akun": "Biaya Overhead",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          }
+        ]
+      },
+      {
+        "no_akun": "6,120.00",
+        "nama_akun": "Biaya Transport",
+        "tipe_akun": "Beban",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "6,300.00",
+        "nama_akun": "Biaya Penyusutan & Amortisasi",
+        "tipe_akun": "Beban",
+        "saldo": 0.00,
+        "children": [
+          {
+            "no_akun": "630,001.00",
+            "nama_akun": "Biaya Penyusutan Gedung",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          },
+          {
+            "no_akun": "630,002.00",
+            "nama_akun": "Biaya Penyusutan Kendaraan",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          },
+          {
+            "no_akun": "630,003.00",
+            "nama_akun": "Biaya Penyusutan Peralatan",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          },
+          {
+            "no_akun": "630,004.00",
+            "nama_akun": "Biaya Penyusutan Inventaris kantor",
+            "tipe_akun": "Beban",
+            "saldo": 0.00
+          }
+        ]
+      },
+      {
+        "no_akun": "6,200.00",
+        "nama_akun": "Biaya Umum & Administrasi",
+        "tipe_akun": "Beban",
+        "saldo": 0.00,
+        "children": [
+          {
+            "no_akun": "6,201.00",
+            "nama_akun": "Gaji & Tunjangan Karyawan",
+            "tipe_akun": "Beban",
+            "saldo": 0.00,
+            "children": [
+              {
+                "no_akun": "620,101.00",
+                "nama_akun": "Biaya Gaji, Lembur & THR",
+                "tipe_akun": "Beban",
+                "saldo": 0.00,
+                "children": [
+                  {
+                    "no_akun": "6,201,011.00",
+                    "nama_akun": "Biaya Gaji, Lembur & THR",
+                    "tipe_akun": "Beban",
+                    "saldo": 0.00
+                  }
+                ]
+              },
+              {
+                "no_akun": "620,109.00",
+                "nama_akun": "Biaya PBJS Karyawan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,102.00",
+                "nama_akun": "Biaya Bonus Pesangon & Kompensasi",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,103.00",
+                "nama_akun": "Biaya Transport Karyawan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,104.00",
+                "nama_akun": "Biaya Upah & Honorer",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,105.00",
+                "nama_akun": "Biaya Makan dan Minum",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,106.00",
+                "nama_akun": "Biaya Tunjangan Kesehatan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,107.00",
+                "nama_akun": "Biaya Asuransi Karyawan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,108.00",
+                "nama_akun": "BPJS Karyawan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              }
+            ]
+          },
+          {
+            "no_akun": "6,203.00",
+            "nama_akun": "Beban Utiliti, Adm, Sewa & Lainnya",
+            "tipe_akun": "Beban",
+            "saldo": 0.00,
+            "children": [
+              {
+                "no_akun": "620,301.00",
+                "nama_akun": "Biaya Listrik",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,302.00",
+                "nama_akun": "Biaya PAM",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,303.00",
+                "nama_akun": "Biaya Telekomunikasi",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,304.00",
+                "nama_akun": "Biaya Koran & Majalah",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,305.00",
+                "nama_akun": "Biaya Ekspedisi, Pos & Materai",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,306.00",
+                "nama_akun": "Biaya Transport",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,307.00",
+                "nama_akun": "Biaya Alat Tulis Kantor",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,308.00",
+                "nama_akun": "STNK, KIR & Pajak Kendaraan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,310.00",
+                "nama_akun": "Biaya Rumah Tangga",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,311.00",
+                "nama_akun": "Biaya Sewa Gedung",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,312.00",
+                "nama_akun": "Biaya Umum & Adm Lainnya",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,313.00",
+                "nama_akun": "Biaya Sewa Mesin Fotokopi",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,314.00",
+                "nama_akun": "Biaya Lainnya",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,316.00",
+                "nama_akun": "Bisaya Sewa Kendaraan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,317.00",
+                "nama_akun": "Biaya Jasa Konsultan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              }
+            ]
+          },
+          {
+            "no_akun": "6,204.00",
+            "nama_akun": "Biaya Pemeliharaan dan Perbaikan",
+            "tipe_akun": "Beban",
+            "saldo": 0.00,
+            "children": [
+              {
+                "no_akun": "620,401.00",
+                "nama_akun": "Biaya Pemeliharaan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,402.00",
+                "nama_akun": "Biaya Pemeliharaan Peralatan Kantor",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,403.00",
+                "nama_akun": "Biaya Pemeliharaan Kendaraan",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              },
+              {
+                "no_akun": "620,404.00",
+                "nama_akun": "Biaya BBM, tol & parkir",
+                "tipe_akun": "Beban",
+                "saldo": 0.00
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "no_akun": "620,110.00",
+    "nama_akun": "BPJS KESEHATAN",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "620,111.00",
+    "nama_akun": "BPJS  KESEHATAN KARYAWAN",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "620,112.00",
+    "nama_akun": "Biaya PPN",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "620,113.00",
+    "nama_akun": "Biaya Pajak Lainnya",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "620,114.00",
+    "nama_akun": "Biaya PPh Psl 25/29",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "620,115.00",
+    "nama_akun": "Biaya PPh Psl 21",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "620,315.00",
+    "nama_akun": "Retribusi & Sumbangan Lainnya",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "7,100.00",
+    "nama_akun": "PENDAPATAN DILUAR USAHA",
+    "tipe_akun": "Pendapatan lain",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "710,001.00",
+        "nama_akun": "Pendapatan Jasa Giro",
+        "tipe_akun": "Pendapatan lain",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "710,002.00",
+        "nama_akun": "Pendapatan Bunga Deposito",
+        "tipe_akun": "Pendapatan lain",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "710,003.00",
+        "nama_akun": "Penjualan Inventory / Perlengkapan",
+        "tipe_akun": "Pendapatan lain",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "710,099.00",
+        "nama_akun": "Pendapatan Lain-Lain",
+        "tipe_akun": "Pendapatan lain",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "710,004.00",
+    "nama_akun": "PPH 4(2)",
+    "tipe_akun": "Pendapatan lain",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "7,200.00",
+    "nama_akun": "BIAYA DILUAR USAHA",
+    "tipe_akun": "Beban lain-lain",
+    "saldo": 0.00,
+    "children": [
+      {
+        "no_akun": "720,001.00",
+        "nama_akun": "Biaya Bunga Pinjaman Lainnya",
+        "tipe_akun": "Beban lain-lain",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "720,002.00",
+        "nama_akun": "Biaya Adm Bank & Buku Cek/Giro",
+        "tipe_akun": "Beban lain-lain",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "720,003.00",
+        "nama_akun": "Pajak Jasa Giro",
+        "tipe_akun": "Beban lain-lain",
+        "saldo": 0.00
+      },
+      {
+        "no_akun": "720,099.00",
+        "nama_akun": "Beban Pembulatan",
+        "tipe_akun": "Beban lain-lain",
+        "saldo": 0.00
+      }
+    ]
+  },
+  {
+    "no_akun": "8,100.00",
+    "nama_akun": "Gain/Loss Dispossal F.A",
+    "tipe_akun": "Beban lain-lain",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "8,200.00",
+    "nama_akun": "Gain/Loss Revaluation FA",
+    "tipe_akun": "Pendapatan lain",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "910,002.00",
+    "nama_akun": "Realize Gain or Loss IDR",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  },
+  {
+    "no_akun": "910,003.00",
+    "nama_akun": "Unrealize Gain or Loss IDR",
+    "tipe_akun": "Beban",
+    "saldo": 0.00
+  }
+]

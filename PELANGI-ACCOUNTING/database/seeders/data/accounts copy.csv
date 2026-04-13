@@ -1,0 +1,178 @@
+code,name,description,classification_type,is_header,is_cash_bank,is_active,level,parent_code
+1,Harta,Asset,asset,true,false,true,1,
+111100000,Kas,Cash,asset,true,false,true,2,1
+111100001,"Kas Kecil","Petty Cash",asset,false,true,true,3,111100000
+111100002,Kas,Kas,asset,false,true,true,3,111100000
+111200000,"Dompet Digital",E-Wallet,asset,true,false,true,2,1
+111200001,Gopay,Gopay,asset,false,true,true,3,111200000
+111200002,Ovo,Ovo,asset,false,true,true,3,111200000
+111200003,ShopeePay,ShopeePay,asset,false,true,true,3,111200000
+111200099,"Dompet Digital Lain","Other E-Wallet",asset,false,true,true,3,111200000
+111300000,Bank,Bank,asset,true,false,true,2,1
+111300001,Bank,Bank,asset,false,true,true,3,111300000
+112000000,"Surat Berharga",Securities,asset,true,false,true,2,1
+112000001,Deposito,Deposito,asset,false,false,true,3,112000000
+113100000,"Piutang Usaha","Piutang Usaha",asset,true,false,true,2,1
+113100001,"Piutang Usaha","Piutang Usaha",asset,false,false,true,3,113100000
+113200000,"Piutang Lain","Other Receivable",asset,true,false,true,2,1
+113200001,"Piutang Belum Terbit Faktur","Account Receivable Have Not Been Invoiced",asset,false,false,true,3,113200000
+113200002,"Piutang Giro","Post-dated Receivable",asset,false,false,true,3,113200000
+113200003,"Piutang Karyawan","Employee Receivable",asset,false,false,true,3,113200000
+113200004,"Piutang Pihak Ketiga","Third Party Receivable",asset,false,false,true,3,113200000
+113200099,"Piutang Lain","Piutang Lain",asset,false,false,true,3,113200000
+113300000,"Cadangan Kerugian Piutang","Allowance For Doubtful Receivable",asset,true,false,true,2,1
+113300001,"Cadangan Kerugian Piutang Usaha","Cadangan Kerugian Piutang Usaha",asset,false,false,true,3,113300000
+113300099,"Cadangan Kerugian Piutang Lainnya","Allowance For Doubtful Other Receivable",asset,false,false,true,3,113300000
+113300100,"Piutang Belum Terbit Faktur","Piutang Belum Terbit Faktur",asset,false,false,true,3,113300000
+114000000,Persediaan,Persediaan,asset,true,false,true,2,1
+114000001,Persediaan,Persediaan,asset,false,false,true,3,114000000
+114000002,"Persediaan Produk","Persediaan Produk",asset,false,false,true,3,114000000
+115000000,"Uang Muka Pengeluaran","Advance Expenditure",asset,true,false,true,2,1
+115000001,"Uang Muka Pengeluaran Umum","General Advance Expenditure",asset,false,false,true,3,115000000
+115000002,"Uang Muka general","Uang Muka general",asset,false,false,true,3,115000000
+116100000,"Biaya Dibayar Dimuka Umum","General Prepaid Expenses",asset,true,false,true,2,1
+116100001,"Sewa Dibayar Dimuka","Prepaid Rent",asset,false,false,true,3,116100000
+116100002,"Asuransi Dibayar Dimuka","Prepaid Insurance",asset,false,false,true,3,116100000
+116100099,"Biaya Dibayar Dimuka Lain","Other Prepaid Expense",asset,false,false,true,3,116100000
+116200000,"Pajak Dibayar Dimuka","Prepaid Taxes",asset,true,false,true,2,1
+116200001,"PPN Masukan","VAT In",asset,false,false,true,3,116200000
+116200002,"PPh Pasal 23-2 Dibayar Dimuka","Prepaid Income Tax Article 23-2",asset,false,false,true,3,116200000
+116200003,"PPh Pasal 23-4 Dibayar Dimuka","Prepaid Income Tax Article 23-4",asset,false,false,true,3,116200000
+116200004,"PPh Pasal 4 ayat 2 Dibayar Dimuka","Prepaid Income Tax Article 4 paragraph 2",asset,false,false,true,3,116200000
+116200005,"PPh Pasal 25 Dibayar Dimuka","Prepaid Income Tax Article 25",asset,false,false,true,3,116200000
+116200006,"Pajak Dibayar Dimuka","Pajak Dibayar Dimuka",asset,false,false,true,3,116200000
+116200007,"PPh 23-2 Dibayar Dimuka","PPh 23-2 Dibayar Dimuka",asset,false,false,true,3,116200000
+116200008,"PPh 4.2 Dibayar Dimuka","PPh 4.2 Dibayar Dimuka",asset,false,false,true,3,116200000
+116200009,"PPh 23-4 Dibayar Dimuka","PPh 23-4 Dibayar Dimuka",asset,false,false,true,3,116200000
+116200010,"PPN Masukan","PPN Masukan",asset,false,false,true,3,116200000
+116200011,"ppnbm20 Dibayar Dimuka","ppnbm20 Dibayar Dimuka",asset,false,false,true,3,116200000
+117000000,"Pendapatan Yang Akan Diterima","Accrued Income",asset,true,false,true,2,1
+117000001,"Pendapatan Yang Akan Diterima","Accrued Income",asset,false,false,true,3,117000000
+118000000,Investasi,Investments,asset,true,false,true,2,1
+118000001,"Investasi Saham","Stock Investment",asset,false,false,true,3,118000000
+119000000,"Harta Lancar","Other Current Assets",asset,true,false,true,2,1
+119000001,"Harta Lancar","Other Current Assets",asset,false,false,true,3,119000000
+121000000,"Harta Tetap","Fixed Assets",asset,true,false,true,2,1
+121000001,Tanah,Land,asset,false,false,true,3,121000000
+121000002,Bangunan,Building,asset,false,false,true,3,121000000
+121000003,"Mesin & Peralatan","Machinery & Equipment",asset,false,false,true,3,121000000
+121000004,Kendaraan,Vehicle,asset,false,false,true,3,121000000
+121000099,"Harta Tetap Lainnya","Other Fixed Assets",asset,false,false,true,3,121000000
+121000100,Tanah,Tanah,asset,false,false,true,3,121000000
+121000101,Gedung,Gedung,asset,false,false,true,3,121000000
+121000102,"Mesin & Peralatan","Mesin & Peralatan",asset,false,false,true,3,121000000
+121000103,Kendaraan,Kendaraan,asset,false,false,true,3,121000000
+121000104,"Harta Lainnya","Harta Lainnya",asset,false,false,true,3,121000000
+122000000,"Akumulasi Penyusutan Harta Tetap","Accumulated Depreciation Of Fixed Assets",asset,true,false,true,2,1
+122000002,"Akumulasi Penyusutan Bangunan","Accumulated Depreciation Of Building",asset,false,false,true,3,122000000
+122000003,"Akumulasi Penyusutan Mesin & Peralatan","Accumulated Depreciation Of Machinery & Equipment",asset,false,false,true,3,122000000
+122000004,"Akumulasi Penyusutan Kendaraan","Accumulated Depreciation Of Vehicle",asset,false,false,true,3,122000000
+122000099,"Akumulasi Penyusutan Harta Tetap Lainnya","Accumulated Depreciation Of Other Fixed Assets",asset,false,false,true,3,122000000
+122000100,"Akumulasi Penyusutan Gedung","Akumulasi Penyusutan Gedung",asset,false,false,true,3,122000000
+122000101,"Akumulasi Penyusutan Mesin & Peralatan","Akumulasi Penyusutan Mesin & Peralatan",asset,false,false,true,3,122000000
+122000102,"Akumulasi Penyusutan Kendaraan","Akumulasi Penyusutan Kendaraan",asset,false,false,true,3,122000000
+122000103,"Akumulasi Penyusutan Harta Lainnya","Akumulasi Penyusutan Harta Lainnya",asset,false,false,true,3,122000000
+2,Kewajiban,Liabilities,liability,true,false,true,1,
+211000000,"Utang Usaha","Utang Usaha",liability,true,false,true,2,2
+211000001,"Utang Usaha","Utang Usaha",liability,false,false,true,3,211000000
+212000000,"Utang Lain","Utang Lain",liability,true,false,true,2,2
+212000001,"Utang Giro","Utang Giro",liability,false,false,true,3,212000000
+212000002,"Utang Belum Ditagih","Utang Belum Ditagih",liability,false,false,true,3,212000000
+212000003,"Uang Muka general","Uang Muka general",liability,false,false,true,3,212000000
+213000000,"Pajak Terutang","Taxes Payable",liability,true,false,true,2,2
+213000001,"PPN Keluaran","VAT Out",liability,false,false,true,3,213000000
+213000002,"PPh Pasal 23-2 Terutang","Income Tax Article 23-2 Payable",liability,false,false,true,3,213000000
+213000003,"PPh Pasal 23-4 Terutang","Income Tax Article 23-4 Payable",liability,false,false,true,3,213000000
+213000004,"PPh Pasal 4 ayat 2 Terutang","Income Tax Article 4 paragraph 2 Payable",liability,false,false,true,3,213000000
+213000005,"PPh Pasal 25 Terutang","Income Tax Article 25 Payable",liability,false,false,true,3,213000000
+213000006,"Pajak Terutang","Pajak Terutang",liability,false,false,true,3,213000000
+213000007,"Utang PPh 23-2","Utang PPh 23-2",liability,false,false,true,3,213000000
+213000008,"Utang PPh 4.2","Utang PPh 4.2",liability,false,false,true,3,213000000
+213000009,"Utang PPh 23-4","Utang PPh 23-4",liability,false,false,true,3,213000000
+213000010,"PPN Keluaran","PPN Keluaran",liability,false,false,true,3,213000000
+213000011,"Utang ppnbm20","Utang ppnbm20",liability,false,false,true,3,213000000
+219000000,"Kewajiban Lancar lainnya","Other Current Liabilities",liability,true,false,true,2,2
+219000010,"Utang Belum Terbit Faktur","Account Payable Have Not Been Invoiced",liability,false,false,true,3,219000000
+219000020,"Utang Konsinyasi","Consignment Payable",liability,false,false,true,3,219000000
+219000030,"Utang Gaji & Upah","Salary Payable",liability,false,false,true,3,219000000
+219000040,"Utang Komisi Penjualan","Sales Commission Payable",liability,false,false,true,3,219000000
+219000050,"Biaya Yang Akan Dibayar","Accrued Expense",liability,false,false,true,3,219000000
+219000060,"Utang Pajak","Tax Payable",liability,false,false,true,3,219000000
+219000070,"Pendapatan Diterima Dimuka","Unearned Revenues",liability,false,false,true,3,219000000
+219000080,"Utang Pihak Ketiga","Third Party Payable",liability,false,false,true,3,219000000
+220000000,"Kewajiban Jangka Panjang","Long-term Liabilities",liability,true,false,true,2,2
+220000001,"Utang Bank","Bank Loans",liability,false,false,true,3,220000000
+220000002,"Utang Pembiayaan","Finance Lease Liabilities",liability,false,false,true,3,220000000
+3,Modal,Equity,equity,true,false,true,1,
+310000000,Modal,Equity,equity,true,false,true,2,3
+310000010,"Modal Disetor","Paid-In Capital",equity,false,false,true,3,310000000
+310000020,"Saham Biasa","Common Stock",equity,false,false,true,3,310000000
+310000030,Prive,Prive,equity,false,false,true,3,310000000
+320000000,Laba,Earning,equity,true,false,true,2,3
+320000010,"Laba Ditahan","Laba Ditahan",equity,false,false,true,3,320000000
+320000020,"Laba Berjalan","Laba Berjalan",equity,false,false,true,3,320000000
+320000030,"Ekuitas Saldo Awal","Historical Balancing",equity,false,false,true,3,320000000
+4,"Pendapatan Usaha",Revenues,revenue,true,false,true,1,
+410000000,Penjualan,Sales,revenue,true,false,true,2,4
+410000001,Penjualan,Penjualan,revenue,false,false,true,3,410000000
+410000099,"Penjualan Jasa","Service Sales",revenue,false,false,true,3,410000000
+410000100,"Penjualan Produk","Penjualan Produk",revenue,false,false,true,3,410000000
+420000000,"Diskon Penjualan","Diskon Penjualan",revenue,true,false,true,2,4
+420000001,"Diskon Penjualan","Diskon Penjualan",revenue,false,false,true,3,420000000
+430000000,"Retur Penjualan","Retur Penjualan",revenue,true,false,true,2,4
+430000001,"Retur Penjualan","Retur Penjualan",revenue,false,false,true,3,430000000
+430000002,"Retur Penjualan Produk","Retur Penjualan Produk",revenue,false,false,true,3,430000000
+490000000,"Pendapatan Usaha Lain","Pendapatan Usaha Lain",revenue,true,false,true,2,4
+490000099,"Pendapatan Usaha Lain","Pendapatan Usaha Lain",revenue,false,false,true,3,490000000
+5,"Beban Atas Pendapatan","Cost of Revenues",expense,true,false,true,1,
+510000000,"Harga Pokok Penjualan Produk","Harga Pokok Penjualan Produk",expense,true,false,true,2,5
+510000001,"Harga Pokok Penjualan Produk","Harga Pokok Penjualan Produk",expense,false,false,true,3,510000000
+520000000,"Beban Pembelian","Purchase Expenses",expense,true,false,true,2,5
+520000001,"Beban Pengiriman","Freight Expenses",expense,false,false,true,3,520000000
+530000000,"Diskon Pembelian","Diskon Pembelian",expense,true,false,true,2,5
+530000001,"Diskon Pembelian","Diskon Pembelian",expense,false,false,true,3,530000000
+540000000,"Retur Pembelian","Retur Pembelian",expense,true,false,true,2,5
+540000001,"Retur Pembelian","Retur Pembelian",expense,false,false,true,3,540000000
+540000002,"Retur Pembelian Produk","Retur Pembelian Produk",expense,false,false,true,3,540000000
+590000000,"Beban Atas Pendapatan Lain","Other Cost Of Revenues",expense,true,false,true,2,5
+590000099,"Beban Atas Pendapatan Lain","Other Cost Of Revenue",expense,false,false,true,3,590000000
+6,"Beban Operasional","Operating Expenses",asset,true,false,true,1,
+610000000,"Beban Pemasaran","Marketing Expenses",asset,true,false,true,2,6
+610000001,"Beban Komisi Penjualan","Sales Commission Expenses",asset,false,false,true,3,610000000
+610000002,"Beban Piutang Tak Tertagih","Bad Debts Expenses",asset,false,false,true,3,610000000
+620000000,"Beban Administrasi Dan Umum","Administration & General Expenses",asset,true,false,true,2,6
+620000001,"Beban Gaji & Upah","Wages and Salaries Expenses",asset,false,false,true,3,620000000
+620000002,"Beban Staff Ahli & Perizinan","Professional and Legal Fees",asset,false,false,true,3,620000000
+620000003,"Beban Sistem & Teknologi","System & Technology Expenses",asset,false,false,true,3,620000000
+620000004,"Beban Sewa","Rent Expenses",asset,false,false,true,3,620000000
+620000005,"Beban Listrik","Electricity Expenses",asset,false,false,true,3,620000000
+620000006,"Beban Air","Water Expenses",asset,false,false,true,3,620000000
+620000007,"Beban Telepon","Communication Expenses",asset,false,false,true,3,620000000
+620000008,"Beban Internet","Internet Expenses",asset,false,false,true,3,620000000
+620000009,"Beban Perlengkapan","Supplies Expenses",asset,false,false,true,3,620000000
+620000099,"Beban Operasional Lainnya","Beban Operasional Lainnya",asset,false,false,true,3,620000000
+7,"Beban Non Operasional","Non Operating Expenses",asset,true,false,true,1,
+710000000,"Beban Non Operasional","Non Operating Expense",asset,true,false,true,2,7
+710000001,"Beban Non Operasional","Non Operating Expense",asset,false,false,true,3,710000000
+710000002,"Beban Penyusutan Gedung","Beban Penyusutan Gedung",asset,false,false,true,3,710000000
+710000003,"Beban Penyusutan Mesin & Peralatan","Beban Penyusutan Mesin & Peralatan",asset,false,false,true,3,710000000
+710000004,"Beban Penyusutan Kendaraan","Beban Penyusutan Kendaraan",asset,false,false,true,3,710000000
+710000005,"Beban Penyusutan Harta Lainnya","Beban Penyusutan Harta Lainnya",asset,false,false,true,3,710000000
+8,"Pendapatan Lain","Other Revenues",asset,true,false,true,1,
+810000000,"Pendapatan Lain","Other Revenues",asset,true,false,true,2,8
+810000001,"Pendapatan Lain","Other Revenues",asset,false,false,true,3,810000000
+810000002,"Pendapatan Bunga / Bagi Hasil","Interest Income",asset,false,false,true,3,810000000
+820000000,"Laba Selisih Kurs","Laba Selisih Kurs",asset,true,false,true,2,8
+820000001,"Laba Selisih Kurs - Unrealize","Laba Selisih Kurs - Unrealize",asset,false,false,true,3,820000000
+820000002,"Laba Selisih Kurs - Realize","Laba Selisih Kurs - Realize",asset,false,false,true,3,820000000
+9,"Beban Lain","Other Expenses",asset,true,false,true,1,
+910000000,"Beban Luar Usaha","Other Expenses",asset,true,false,true,2,9
+910000001,"Beban Administrasi Bank","Bank Administration Expense",asset,false,false,true,3,910000000
+910000002,"Beban Bunga / Bagi Hasil","Interest Expense",asset,false,false,true,3,910000000
+910000099,"Beban Lain","Other Expenses",asset,false,false,true,3,910000000
+920000000,"Rugi Selisih Kurs","Rugi Selisih Kurs",asset,true,false,true,2,9
+920000001,"Rugi Selisih Kurs - Unrealize","Rugi Selisih Kurs - Unrealize",asset,false,false,true,3,920000000
+920000002,"Rugi Selisih Kurs - Realize","Rugi Selisih Kurs - Realize",asset,false,false,true,3,920000000
+990000000,"Beban Pajak","Tax Expenses",asset,true,false,true,2,9
+990000001,"Beban Pajak - Kini","Tax Expense - Current",asset,false,false,true,3,990000000
+990000002,"Beban Pajak - Tangguhan","Tax Expense - Deferred",asset,false,false,true,3,990000000

@@ -1,0 +1,11 @@
+### Sales Orders API - E-Procurement Integration
+@baseUrl = http://127.0.0.1:8001/api
+@bearerToken = inventory_integration_secret
+
+### 1. Get All Sales Orders (by company)
+GET {{baseUrl}}/sales-orders/list?company_id=12
+Authorization: Bearer {{bearerToken}}
+
+### 2. Get Sales Order Detail
+GET {{baseUrl}}/sales-orders/detail?id=63&company_id=12
+Authorization: Bearer {{bearerToken}}

@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Filament\Resources\Companies\Schemas;
+
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\FileUpload;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+
+class CompanyForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Section::make('Company Information')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->columnSpanFull(),
+                        Textarea::make('description')
+                            ->columnSpanFull(),
+                        TextInput::make('tax_id')
+                            ->label('__('Tax ID')'),
+                        FileUpload::make('tax_document')
+                            ->label('__('Tax ID Document')')
+                            ->helperText('Upload document related to tax ID')
+                            ->directory('companies/tax-documents')
+                            ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'])
+                            ->maxSize(5120),
+                        Select::make('business_type_id')
+                            ->relationship('businessType', 'name')
+                            ->required(),
+                    ])
+                    ->columns(2),
+
+                Section::make('Fiscal Settings')
+                    ->schema([
+                        DatePicker::make('fiscal_year_start')
+                            ->required(),
+                        DatePicker::make('fiscal_year_end')
+                            ->required(),
+                        TextInput::make('tax_period')
+                            ->required()
+                            ->default('monthly'),
+                        Toggle::make('is_active')
+                            ->required(),
+                    ])
+                    ->columns(2),
+
+                Section::make('Billing Address')
+                    ->schema([
+                        TextInput::make('billing_address_line_1')
+                            ->label('__('Address Line 1')')
+                            ->columnSpanFull(),
+                        TextInput::make('billing_address_line_2')
+                            ->label('__('Address Line 2')')
+                            ->columnSpanFull(),
+                        TextInput::make('billing_city')
+                            ->label('__('City')'),
+                        TextInput::make('billing_state')
+                            ->label('__('State/Province')'),
+                        TextInput::make('billing_postal_code')
+                            ->label('__('Postal Code')'),
+                        TextInput::make('billing_country')
+                            ->label('__('Country')'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Delivery Address')
+                    ->schema([
+                        TextInput::make('delivery_address_line_1')
+                            ->label('__('Address Line 1')')
+                            ->columnSpanFull(),
+                        TextInput::make('delivery_address_line_2')
+                            ->label('__('Address Line 2')')
+                            ->columnSpanFull(),
+                        TextInput::make('delivery_city')
+                            ->label('__('City')'),
+                        TextInput::make('delivery_state')
+                            ->label('__('State/Province')'),
+                        TextInput::make('delivery_postal_code')
+                            ->label('__('Postal Code')'),
+                        TextInput::make('delivery_country')
+                            ->label('__('Country')'),
+                    ])
+                    ->columns(2),
+
+                Section::make('Additional Information')
+                    ->schema([
+                        FileUpload::make('photo')
+                            ->label('__('Company Logo')')
+                            ->avatar()
+                            ->directory('companies')
+                            ->maxSize(2048),
+                        Select::make('created_by_user_id')
+                            ->relationship('createdByUser', 'name')
+                            ->default(function () {
+                                return auth()->id();
+                            })
+                            ->disabled()
+                            ->required()
+                            ->label('__('Created By')'),
+                    ])
+                    ->columns(2),
+            ]);
+    }
+}

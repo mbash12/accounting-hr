@@ -1,0 +1,1166 @@
+[
+    {
+        "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+        "code": 1,
+        "name": "Harta",
+        "alias_name": "Asset"
+    },
+    {
+        "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+        "code": 2,
+        "name": "Kewajiban",
+        "alias_name": "Liabilities"
+    },
+    {
+        "id": "65b27fb6-c2c9-487d-b770-4f032c3ddba0",
+        "code": 3,
+        "name": "Modal",
+        "alias_name": "Equity"
+    },
+    {
+        "id": "7a9405af-26e9-44d9-900e-b485cd20a2c5",
+        "code": 4,
+        "name": "Pendapatan Usaha",
+        "alias_name": "Revenues"
+    },
+    {
+        "id": "4d0c9f11-ceef-4538-b221-d7acf0c62069",
+        "code": 5,
+        "name": "Beban Atas Pendapatan",
+        "alias_name": "Cost of Revenues"
+    },
+    {
+        "id": "6436bada-5d54-4631-8578-c6e2dbd853a5",
+        "code": 6,
+        "name": "Beban Operasional",
+        "alias_name": "Operating Expenses"
+    },
+    {
+        "id": "3d56ef0a-fb3d-4cd9-aa1d-98d77d4f906c",
+        "code": 7,
+        "name": "Beban Non Operasional",
+        "alias_name": "Non Operating Expenses"
+    },
+    {
+        "id": "9965a9be-38d8-4254-9fc3-d7f09dac12b7",
+        "code": 8,
+        "name": "Pendapatan Lain",
+        "alias_name": "Other Revenues"
+    },
+    {
+        "id": "ff4551ea-6c7c-404a-9eb7-b164dbc1fdd0",
+        "code": 9,
+        "name": "Beban Lain",
+        "alias_name": "Other Expenses"
+    },
+    {
+        "id": "42507978-1947-45ce-ab97-2a3ac305c7b9",
+        "code": 100000000,
+        "name": "Harta",
+        "alias_name": "Asset",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+        "code": 110000000,
+        "name": "Harta Lancar",
+        "alias_name": "Current Asset",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 10000001
+    },
+    {
+        "id": "c0029a43-1fe3-4663-b1f3-2a2d409cb1a8",
+        "code": 111300000,
+        "name": "Bank",
+        "alias_name": "Bank",
+        "cash_flow_type": "undefined",
+        "ratio_type": "cash_equivalents",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 111300002
+    },
+    {
+        "id": "0a1c72ee-f455-4ea4-b52d-934fc5c825f9",
+        "code": 113100000,
+        "name": "Piutang Usaha",
+        "alias_name": "Piutang Usaha",
+        "cash_flow_type": "operating",
+        "ratio_type": "receivables",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 113100002
+    },
+    {
+        "id": "a8ab582b-3ef2-4985-96ea-a01b9c8c9c7a",
+        "code": 114000000,
+        "name": "Persediaan",
+        "alias_name": "Persediaan",
+        "cash_flow_type": "operating",
+        "ratio_type": "inventories",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 114000002
+    },
+    {
+        "id": "80dc90b6-865f-423e-a3ae-c72d1136772b",
+        "code": 120000000,
+        "name": "Harta Tetap",
+        "alias_name": "Fixed Assets",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "parent": {
+            "id": "42507978-1947-45ce-ab97-2a3ac305c7b9",
+            "code": 100000000,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 20000001
+    },
+    {
+        "id": "31543123-8a1f-4f57-82cb-c3a9e92e9df2",
+        "code": 121000000,
+        "name": "Harta Tetap",
+        "alias_name": "Fixed Assets",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "80dc90b6-865f-423e-a3ae-c72d1136772b",
+            "code": 120000000,
+            "name": "Harta Tetap",
+            "alias_name": "Fixed Assets"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 121000105
+    },
+    {
+        "id": "10f76602-fbde-4f52-aabf-fbd3aec6d39c",
+        "code": 122000000,
+        "name": "Akumulasi Penyusutan Harta Tetap",
+        "alias_name": "Accumulated Depreciation Of Fixed Assets",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "80dc90b6-865f-423e-a3ae-c72d1136772b",
+            "code": 120000000,
+            "name": "Harta Tetap",
+            "alias_name": "Fixed Assets"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 122000104
+    },
+    {
+        "id": "0ae083a1-0d93-4e96-b585-555c6dc06293",
+        "code": 111000000,
+        "name": "Kas Dan Setara Kas",
+        "alias_name": "Cash & Equivalent",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 11000001
+    },
+    {
+        "id": "4924676f-af17-47f7-b6e5-89f66a0c244a",
+        "code": 112000000,
+        "name": "Surat Berharga",
+        "alias_name": "Securities",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 112000002
+    },
+    {
+        "id": "3bc40f80-daae-4a03-9152-30d094046250",
+        "code": 113000000,
+        "name": "Piutang",
+        "alias_name": "Account Receivable",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 13000001
+    },
+    {
+        "id": "33ccac7f-c0ad-4e80-9169-a44b8f05bdcf",
+        "code": 115000000,
+        "name": "Uang Muka Pengeluaran",
+        "alias_name": "Advance Expenditure",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 115000002
+    },
+    {
+        "id": "900ac553-68d6-4f62-9394-83b6d9201d15",
+        "code": 116000000,
+        "name": "Biaya Dibayar Dimuka",
+        "alias_name": "Prepaid Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 16000001
+    },
+    {
+        "id": "7141086f-94ed-4825-83cd-5b74db4f6ef5",
+        "code": 117000000,
+        "name": "Pendapatan Yang Akan Diterima",
+        "alias_name": "Accrued Income",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 117000002
+    },
+    {
+        "id": "3043eab4-44a2-4113-a87e-9fb2d000c3c3",
+        "code": 118000000,
+        "name": "Investasi",
+        "alias_name": "Investments",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 118000002
+    },
+    {
+        "id": "13290543-fe86-4ef7-b53a-9eb676750d2b",
+        "code": 119000000,
+        "name": "Harta Lancar",
+        "alias_name": "Other Current Assets",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "cbc89c0f-e944-4c5c-b3a0-109fab0c7b64",
+            "code": 110000000,
+            "name": "Harta Lancar",
+            "alias_name": "Current Asset"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 119000002
+    },
+    {
+        "id": "a560dd01-45ff-49c8-8fec-78cd1de45dfc",
+        "code": 111100000,
+        "name": "Kas",
+        "alias_name": "Cash",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "0ae083a1-0d93-4e96-b585-555c6dc06293",
+            "code": 111000000,
+            "name": "Kas Dan Setara Kas",
+            "alias_name": "Cash & Equivalent"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 111100003
+    },
+    {
+        "id": "21d92299-4ed9-4e91-8029-2c031d87b00c",
+        "code": 111200000,
+        "name": "Dompet Digital",
+        "alias_name": "E-Wallet",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "0ae083a1-0d93-4e96-b585-555c6dc06293",
+            "code": 111000000,
+            "name": "Kas Dan Setara Kas",
+            "alias_name": "Cash & Equivalent"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 111200100
+    },
+    {
+        "id": "8ebb58f5-cd01-4810-bc73-94ff6b077c5c",
+        "code": 113200000,
+        "name": "Piutang Lain",
+        "alias_name": "Other Receivable",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "3bc40f80-daae-4a03-9152-30d094046250",
+            "code": 113000000,
+            "name": "Piutang",
+            "alias_name": "Account Receivable"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 113200100
+    },
+    {
+        "id": "32564dd1-411b-45c9-9499-712f037dbfc5",
+        "code": 113300000,
+        "name": "Cadangan Kerugian Piutang",
+        "alias_name": "Allowance For Doubtful Receivable",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "3bc40f80-daae-4a03-9152-30d094046250",
+            "code": 113000000,
+            "name": "Piutang",
+            "alias_name": "Account Receivable"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 113300100
+    },
+    {
+        "id": "775c2b1e-a225-4237-8606-645861d19b83",
+        "code": 116100000,
+        "name": "Biaya Dibayar Dimuka Umum",
+        "alias_name": "General Prepaid Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "900ac553-68d6-4f62-9394-83b6d9201d15",
+            "code": 116000000,
+            "name": "Biaya Dibayar Dimuka",
+            "alias_name": "Prepaid Expenses"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 116100100
+    },
+    {
+        "id": "69b6987a-f786-4289-9ca1-602b720db651",
+        "code": 116200000,
+        "name": "Pajak Dibayar Dimuka",
+        "alias_name": "Prepaid Taxes",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "900ac553-68d6-4f62-9394-83b6d9201d15",
+            "code": 116000000,
+            "name": "Biaya Dibayar Dimuka",
+            "alias_name": "Prepaid Expenses"
+        },
+        "classification": {
+            "id": "1334a283-2ca3-4729-b1f8-f94d5f1bc97b",
+            "code": 1,
+            "name": "Harta",
+            "alias_name": "Asset"
+        },
+        "next_account_code": 116200012
+    },
+    {
+        "id": "17a8c4f9-f949-410d-a4db-56bab085371a",
+        "code": 200000000,
+        "name": "Kewajiban",
+        "alias_name": "Liabilities",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "22ce5fb9-9605-464b-9ee9-2d832c599b59",
+        "code": 211000000,
+        "name": "Utang Usaha",
+        "alias_name": "Utang Usaha",
+        "cash_flow_type": "operating",
+        "ratio_type": "current_liabilities",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 211000002
+    },
+    {
+        "id": "1bf19e26-2e84-4dd5-9267-056f41e862f9",
+        "code": 212000000,
+        "name": "Utang Lain",
+        "alias_name": "Utang Lain",
+        "cash_flow_type": "operating",
+        "ratio_type": "current_liabilities",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 212000002
+    },
+    {
+        "id": "7839013f-7419-4e24-985b-0c6c2dca7b52",
+        "code": 210000000,
+        "name": "Kewajiban Lancar",
+        "alias_name": "Current Liabilities",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "parent": {
+            "id": "17a8c4f9-f949-410d-a4db-56bab085371a",
+            "code": 200000000,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 10000001
+    },
+    {
+        "id": "2b0fbfad-44f0-4753-8bf3-253aa7b4bf13",
+        "code": 220000000,
+        "name": "Kewajiban Jangka Panjang",
+        "alias_name": "Long-term Liabilities",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "17a8c4f9-f949-410d-a4db-56bab085371a",
+            "code": 200000000,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 220000003
+    },
+    {
+        "id": "05745069-f7f3-43ce-8d5b-d41782796ba2",
+        "code": 213000000,
+        "name": "Pajak Terutang",
+        "alias_name": "Taxes Payable",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "7839013f-7419-4e24-985b-0c6c2dca7b52",
+            "code": 210000000,
+            "name": "Kewajiban Lancar",
+            "alias_name": "Current Liabilities"
+        },
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 213000012
+    },
+    {
+        "id": "d4a64ac8-2bb2-4fa0-8358-4d102940f45b",
+        "code": 219000000,
+        "name": "Kewajiban Lancar lainnya",
+        "alias_name": "Other Current Liabilities",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "7839013f-7419-4e24-985b-0c6c2dca7b52",
+            "code": 210000000,
+            "name": "Kewajiban Lancar",
+            "alias_name": "Current Liabilities"
+        },
+        "classification": {
+            "id": "bf2f0ef8-1ce6-4f56-9df4-3530b9ab687f",
+            "code": 2,
+            "name": "Kewajiban",
+            "alias_name": "Liabilities"
+        },
+        "next_account_code": 219000081
+    },
+    {
+        "id": "c5ca2e4f-b042-45e9-9cd7-c9fa19c1216f",
+        "code": 300000000,
+        "name": "Modal",
+        "alias_name": "Equity",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "65b27fb6-c2c9-487d-b770-4f032c3ddba0",
+            "code": 3,
+            "name": "Modal",
+            "alias_name": "Equity"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "a1300e3b-5981-423b-8b49-cdee879c68aa",
+        "code": 310000000,
+        "name": "Modal",
+        "alias_name": "Equity",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "c5ca2e4f-b042-45e9-9cd7-c9fa19c1216f",
+            "code": 300000000,
+            "name": "Modal",
+            "alias_name": "Equity"
+        },
+        "classification": {
+            "id": "65b27fb6-c2c9-487d-b770-4f032c3ddba0",
+            "code": 3,
+            "name": "Modal",
+            "alias_name": "Equity"
+        },
+        "next_account_code": 310000031
+    },
+    {
+        "id": "17df83ca-ed79-4f5e-9ca1-d670ff7cd68f",
+        "code": 320000000,
+        "name": "Laba",
+        "alias_name": "Earning",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "c5ca2e4f-b042-45e9-9cd7-c9fa19c1216f",
+            "code": 300000000,
+            "name": "Modal",
+            "alias_name": "Equity"
+        },
+        "classification": {
+            "id": "65b27fb6-c2c9-487d-b770-4f032c3ddba0",
+            "code": 3,
+            "name": "Modal",
+            "alias_name": "Equity"
+        },
+        "next_account_code": 320000031
+    },
+    {
+        "id": "3e217e27-fba0-449c-8855-d27e5d0574a5",
+        "code": 400000000,
+        "name": "Pendapatan Usaha",
+        "alias_name": "Revenues",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "7a9405af-26e9-44d9-900e-b485cd20a2c5",
+            "code": 4,
+            "name": "Pendapatan Usaha",
+            "alias_name": "Revenues"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "99082576-936f-4165-955f-a809897d8480",
+        "code": 420000000,
+        "name": "Diskon Penjualan",
+        "alias_name": "Diskon Penjualan",
+        "cash_flow_type": "operating",
+        "ratio_type": "revenues",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "7a9405af-26e9-44d9-900e-b485cd20a2c5",
+            "code": 4,
+            "name": "Pendapatan Usaha",
+            "alias_name": "Revenues"
+        },
+        "next_account_code": 420000002
+    },
+    {
+        "id": "e97f4b96-5943-47a5-8b84-46b63db9b753",
+        "code": 430000000,
+        "name": "Retur Penjualan",
+        "alias_name": "Retur Penjualan",
+        "cash_flow_type": "operating",
+        "ratio_type": "receivables",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "7a9405af-26e9-44d9-900e-b485cd20a2c5",
+            "code": 4,
+            "name": "Pendapatan Usaha",
+            "alias_name": "Revenues"
+        },
+        "next_account_code": 430000002
+    },
+    {
+        "id": "6c81d4f8-f764-4fbb-ba34-f762cc057368",
+        "code": 490000000,
+        "name": "Pendapatan Usaha Lain",
+        "alias_name": "Pendapatan Usaha Lain",
+        "cash_flow_type": "operating",
+        "ratio_type": "revenues",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "7a9405af-26e9-44d9-900e-b485cd20a2c5",
+            "code": 4,
+            "name": "Pendapatan Usaha",
+            "alias_name": "Revenues"
+        },
+        "next_account_code": 490000100
+    },
+    {
+        "id": "01e83fff-555a-4812-8168-5b0a6c4b1be5",
+        "code": 410000000,
+        "name": "Penjualan",
+        "alias_name": "Sales",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "3e217e27-fba0-449c-8855-d27e5d0574a5",
+            "code": 400000000,
+            "name": "Pendapatan Usaha",
+            "alias_name": "Revenues"
+        },
+        "classification": {
+            "id": "7a9405af-26e9-44d9-900e-b485cd20a2c5",
+            "code": 4,
+            "name": "Pendapatan Usaha",
+            "alias_name": "Revenues"
+        },
+        "next_account_code": 410000100
+    },
+    {
+        "id": "57b9c35a-92ff-46d8-aeb1-941b3abeb468",
+        "code": 500000000,
+        "name": "Beban Atas Pendapatan",
+        "alias_name": "Cost of Revenues",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": true,
+        "is_parent": true,
+        "classification": {
+            "id": "4d0c9f11-ceef-4538-b221-d7acf0c62069",
+            "code": 5,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "f1a14fd9-80ea-4fb7-a757-acb64f09c81c",
+        "code": 530000000,
+        "name": "Diskon Pembelian",
+        "alias_name": "Diskon Pembelian",
+        "cash_flow_type": "operating",
+        "ratio_type": "revenues",
+        "is_variable_cost": true,
+        "is_parent": false,
+        "classification": {
+            "id": "4d0c9f11-ceef-4538-b221-d7acf0c62069",
+            "code": 5,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "next_account_code": 530000002
+    },
+    {
+        "id": "021d7c7f-4dc7-48b9-ab96-25058a0b588f",
+        "code": 540000000,
+        "name": "Retur Pembelian",
+        "alias_name": "Retur Pembelian",
+        "cash_flow_type": "operating",
+        "ratio_type": "receivables",
+        "is_variable_cost": true,
+        "is_parent": false,
+        "classification": {
+            "id": "4d0c9f11-ceef-4538-b221-d7acf0c62069",
+            "code": 5,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "next_account_code": 540000002
+    },
+    {
+        "id": "59f1a839-30c0-460e-b353-499ec5d576cc",
+        "code": 520000000,
+        "name": "Beban Pembelian",
+        "alias_name": "Purchase Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": true,
+        "is_parent": false,
+        "parent": {
+            "id": "57b9c35a-92ff-46d8-aeb1-941b3abeb468",
+            "code": 500000000,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "classification": {
+            "id": "4d0c9f11-ceef-4538-b221-d7acf0c62069",
+            "code": 5,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "next_account_code": 520000002
+    },
+    {
+        "id": "4b30d81e-48e1-41ae-97a6-8198c2a31043",
+        "code": 590000000,
+        "name": "Beban Atas Pendapatan Lain",
+        "alias_name": "Other Cost Of Revenues",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": true,
+        "is_parent": false,
+        "parent": {
+            "id": "57b9c35a-92ff-46d8-aeb1-941b3abeb468",
+            "code": 500000000,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "classification": {
+            "id": "4d0c9f11-ceef-4538-b221-d7acf0c62069",
+            "code": 5,
+            "name": "Beban Atas Pendapatan",
+            "alias_name": "Cost of Revenues"
+        },
+        "next_account_code": 590000100
+    },
+    {
+        "id": "d4d0b6d7-3718-43a7-a31e-c9b1aee03ee8",
+        "code": 600000000,
+        "name": "Beban Operasional",
+        "alias_name": "Operating Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "6436bada-5d54-4631-8578-c6e2dbd853a5",
+            "code": 6,
+            "name": "Beban Operasional",
+            "alias_name": "Operating Expenses"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "385e05dc-532b-412c-a07b-01b3f7c4b0d3",
+        "code": 610000000,
+        "name": "Beban Pemasaran",
+        "alias_name": "Marketing Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "d4d0b6d7-3718-43a7-a31e-c9b1aee03ee8",
+            "code": 600000000,
+            "name": "Beban Operasional",
+            "alias_name": "Operating Expenses"
+        },
+        "classification": {
+            "id": "6436bada-5d54-4631-8578-c6e2dbd853a5",
+            "code": 6,
+            "name": "Beban Operasional",
+            "alias_name": "Operating Expenses"
+        },
+        "next_account_code": 610000003
+    },
+    {
+        "id": "50c8b9b0-31a6-47cf-b6f7-06defec4d7d6",
+        "code": 620000000,
+        "name": "Beban Administrasi Dan Umum",
+        "alias_name": "Administration & General Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "d4d0b6d7-3718-43a7-a31e-c9b1aee03ee8",
+            "code": 600000000,
+            "name": "Beban Operasional",
+            "alias_name": "Operating Expenses"
+        },
+        "classification": {
+            "id": "6436bada-5d54-4631-8578-c6e2dbd853a5",
+            "code": 6,
+            "name": "Beban Operasional",
+            "alias_name": "Operating Expenses"
+        },
+        "next_account_code": 620000100
+    },
+    {
+        "id": "496fff0d-f4fb-4887-81d1-189f1c5aa714",
+        "code": 700000000,
+        "name": "Beban Non Operasional",
+        "alias_name": "Non Operating Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "3d56ef0a-fb3d-4cd9-aa1d-98d77d4f906c",
+            "code": 7,
+            "name": "Beban Non Operasional",
+            "alias_name": "Non Operating Expenses"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "cd0c78b3-678f-49f7-8cc9-26ba53fac9fc",
+        "code": 710000000,
+        "name": "Beban Non Operasional",
+        "alias_name": "Non Operating Expense",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "496fff0d-f4fb-4887-81d1-189f1c5aa714",
+            "code": 700000000,
+            "name": "Beban Non Operasional",
+            "alias_name": "Non Operating Expenses"
+        },
+        "classification": {
+            "id": "3d56ef0a-fb3d-4cd9-aa1d-98d77d4f906c",
+            "code": 7,
+            "name": "Beban Non Operasional",
+            "alias_name": "Non Operating Expenses"
+        },
+        "next_account_code": 710000006
+    },
+    {
+        "id": "90d70ad8-aab4-4830-ad1d-b2ee4060d8f9",
+        "code": 800000000,
+        "name": "Pendapatan Lain",
+        "alias_name": "Other Revenues",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "9965a9be-38d8-4254-9fc3-d7f09dac12b7",
+            "code": 8,
+            "name": "Pendapatan Lain",
+            "alias_name": "Other Revenues"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "8d73a032-ecb0-41bd-8644-c96730fc3369",
+        "code": 820000000,
+        "name": "Laba Selisih Kurs",
+        "alias_name": "Laba Selisih Kurs",
+        "cash_flow_type": "operating",
+        "ratio_type": "other_revenues",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "9965a9be-38d8-4254-9fc3-d7f09dac12b7",
+            "code": 8,
+            "name": "Pendapatan Lain",
+            "alias_name": "Other Revenues"
+        },
+        "next_account_code": 820000003
+    },
+    {
+        "id": "a43aeae7-ad61-4fdc-9764-c860a86b479b",
+        "code": 810000000,
+        "name": "Pendapatan Lain",
+        "alias_name": "Other Revenues",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "90d70ad8-aab4-4830-ad1d-b2ee4060d8f9",
+            "code": 800000000,
+            "name": "Pendapatan Lain",
+            "alias_name": "Other Revenues"
+        },
+        "classification": {
+            "id": "9965a9be-38d8-4254-9fc3-d7f09dac12b7",
+            "code": 8,
+            "name": "Pendapatan Lain",
+            "alias_name": "Other Revenues"
+        },
+        "next_account_code": 810000003
+    },
+    {
+        "id": "d2f5e4b8-baad-443b-83c2-28b7c6a4e496",
+        "code": 900000000,
+        "name": "Beban Lain",
+        "alias_name": "Other Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": true,
+        "classification": {
+            "id": "ff4551ea-6c7c-404a-9eb7-b164dbc1fdd0",
+            "code": 9,
+            "name": "Beban Lain",
+            "alias_name": "Other Expenses"
+        },
+        "next_account_code": 1
+    },
+    {
+        "id": "e0f9d6c9-58f2-49ee-818f-2207fb85bc4d",
+        "code": 920000000,
+        "name": "Rugi Selisih Kurs",
+        "alias_name": "Rugi Selisih Kurs",
+        "cash_flow_type": "operating",
+        "ratio_type": "other_revenues",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "classification": {
+            "id": "ff4551ea-6c7c-404a-9eb7-b164dbc1fdd0",
+            "code": 9,
+            "name": "Beban Lain",
+            "alias_name": "Other Expenses"
+        },
+        "next_account_code": 920000003
+    },
+    {
+        "id": "d9e2f106-c24f-426c-8a0d-250b297e8d42",
+        "code": 910000000,
+        "name": "Beban Luar Usaha",
+        "alias_name": "Other Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "d2f5e4b8-baad-443b-83c2-28b7c6a4e496",
+            "code": 900000000,
+            "name": "Beban Lain",
+            "alias_name": "Other Expenses"
+        },
+        "classification": {
+            "id": "ff4551ea-6c7c-404a-9eb7-b164dbc1fdd0",
+            "code": 9,
+            "name": "Beban Lain",
+            "alias_name": "Other Expenses"
+        },
+        "next_account_code": 910000100
+    },
+    {
+        "id": "650a749f-11ba-4334-8fb4-7932dd8beca4",
+        "code": 990000000,
+        "name": "Beban Pajak",
+        "alias_name": "Tax Expenses",
+        "cash_flow_type": "undefined",
+        "ratio_type": "other_current_assets",
+        "is_variable_cost": false,
+        "is_parent": false,
+        "parent": {
+            "id": "d2f5e4b8-baad-443b-83c2-28b7c6a4e496",
+            "code": 900000000,
+            "name": "Beban Lain",
+            "alias_name": "Other Expenses"
+        },
+        "classification": {
+            "id": "ff4551ea-6c7c-404a-9eb7-b164dbc1fdd0",
+            "code": 9,
+            "name": "Beban Lain",
+            "alias_name": "Other Expenses"
+        },
+        "next_account_code": 990000003
+    }
+]
