@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Hash;
 
 class EmployeeForm
 {
@@ -21,6 +22,19 @@ class EmployeeForm
                             ->label(__('Nama'))
                             ->required()
                             ->maxLength(200),
+                        TextInput::make('email')
+                            ->label(__('Email'))
+                            ->email()
+                            ->maxLength(255)
+                            ->unique(ignoreRecord: true),
+                        TextInput::make('password')
+                            ->label(__('Password'))
+                            ->password()
+                            ->revealable()
+                            ->minLength(8)
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->dehydrated(fn (?string $state): bool => filled($state))
+                            ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? Hash::make($state) : null),
                         TextInput::make('employee_id')
                             ->label(__('ID Karyawan'))
                             ->disabled()

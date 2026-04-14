@@ -7,10 +7,7 @@ import {
     loading,
     currentUser,
     updateForm,
-    datetodate,
     getLeaveQuota,
-    api,
-    notify,
 } from "@/deps/service.js";
 import { useRoute } from "vue-router";
 import { leave_types, temp } from "@/deps/store.js";
@@ -21,8 +18,6 @@ const router = useRouter();
 const route = useRoute();
 const state = reactive({
     view_attachment: false,
-    reject_popup: false,
-    reject_reason: null,
     data: null,
     appliedFilter: "absence",
     quota: null,
@@ -78,117 +73,6 @@ const cancel = (update = false) => {
                 }
             }
         });
-};
-const approve = () => {
-    $swal
-        .fire({
-            title: "Apakah anda yakin?",
-            text: "Anda akan menyetujui pengajuan ini",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#12B981",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Ya, setuju!",
-            cancelButtonText: "Tutup",
-        })
-        .then(async (result) => {
-            if (result.isConfirmed) {
-                loading();
-                const data = {};
-                if (state.data?.first_approval == null) {
-                    data["first_approval"] = "approved";
-                    data["first_approved"] = datetodate(new Date());
-                } else if (state.data?.second_approval == null) {
-                    data["second_approval"] = "approved";
-                    data["second_approved"] = datetodate(new Date());
-                    data["status"] = "approved";
-                }
-                const res = await updateForm(state.data.id, data);
-                if (state.data.sub_type == "annual") {
-                    const adj = await api("update_quota", {
-                        route: state.quota.id,
-                        body: {
-                            quota: state.quota.quota,
-                            taken: state.quota.taken + state.data.duration,
-                            balance:
-                                state.quota.quota -
-                                (state.quota.taken + state.data.duration),
-                            user_id: state.quota.user_id,
-                        },
-                    });
-                }
-                if (state.data?.first_approval == null) {
-                    notify({
-                        user_id: state.data?.second_approver?.id,
-                        type: state.data.sub_type,
-                        notif_type: "permit",
-                        title: "Pengajuan Diajukan",
-                        content: `Pengajuan ${
-                            leave_types[state.data.sub_type]
-                        } dengan tanggal ${datetodate(
-                            new Date(state.data.start)
-                        )} - ${datetodate(
-                            new Date(state.data.end)
-                        )} telah diajukan oleh ${
-                            state.data?.user_id?.fullname
-                        } dan disetujui oleh ${currentUser.user?.fullname}`,
-                        payload: state.data?.id,
-                    });
-                } else {
-                    notify({
-                        user_id: state.data?.user_id.id,
-                        type: state.data.sub_type,
-                        notif_type: "permit",
-                        title: "Pengajuan Disetujui",
-                        content: `Pengajuan ${
-                            leave_types[state.data.sub_type]
-                        } dengan tanggal ${datetodate(
-                            new Date(state.data.start)
-                        )} - ${datetodate(
-                            new Date(state.data.end)
-                        )} telah disetujui`,
-                        payload: state.data?.id,
-                    });
-                }
-                loading(false);
-                if (res) {
-                    router.go(-1);
-                }
-            }
-        });
-};
-const reject = async () => {
-    loading();
-    const data = {};
-    if (state.data?.first_approval == null) {
-        data["first_approval"] = "rejected";
-        data["first_reject_reason"] = state.reject_reason;
-        data["status"] = "rejected";
-    } else if (state.data?.second_approval == null) {
-        data["second_approval"] = "rejected";
-        data["second_reject_reason"] = state.reject_reason;
-        data["status"] = "rejected";
-    }
-    const res = await updateForm(state.data.id, data);
-    loading(false);
-    notify({
-        user_id: state.data?.user_id.id,
-        type: state.data.sub_type,
-        notif_type: "permit",
-        title: "Pengajuan Ditolak",
-        content: `Pengajuan ${
-            leave_types[state.data.sub_type]
-        } dengan tanggal ${datetodate(
-            new Date(state.data.start)
-        )} - ${datetodate(new Date(state.data.end))} telah ditolak oleh ${
-            currentUser.user?.fullname
-        } dengan alasan ${state.reject_reason}`,
-        payload: state.data?.id,
-    });
-
-    if (res) {
-        router.go(-1);
-    }
 };
 </script>
 <template>
@@ -517,91 +401,9 @@ const reject = async () => {
                     >Kembali</Button
                 > -->
             </div>
-            <div
-                class="absolute bottom-0 left-0 w-full gap-4 bg-white px-4 py-4 border-t flex flex-col"
-                v-if="
-                    state?.data?.user_id?.id !== currentUser.user?.id &&
-                    (state?.data?.first_approver?.id === currentUser.user?.id ||
-                        state?.data?.second_approver?.id ===
-                            currentUser.user?.id)
-                "
-            >
-                <div
-                    class="flex gap-4"
-                    v-if="
-                        (state?.data?.first_approver?.id ===
-                            currentUser.user?.id &&
-                            state?.data?.first_approval === null) ||
-                        (state?.data?.second_approver?.id ===
-                            currentUser.user?.id &&
-                            state?.data?.second_approval === null)
-                    "
-                >
-                    <Button
-                        block
-                        variant="red"
-                        class="text-14px"
-                        v-if="state?.data?.status === 'submitted'"
-                        @click="state.reject_popup = true"
-                        >Tolak</Button
-                    >
-                    <Button
-                        block
-                        variant="green"
-                        class="text-14px"
-                        v-if="state?.data?.status === 'submitted'"
-                        @click="approve"
-                        >Setujui</Button
-                    >
-                </div>
-                <Button
-                    block
-                    variant="gray"
-                    class="text-14px"
-                    @click="router.go(-1)"
-                    >Kembali</Button
-                >
+            <div class="absolute bottom-0 left-0 w-full gap-4 bg-white px-4 py-4 border-t flex flex-col">
+                <Button block variant="gray" class="text-14px" @click="router.go(-1)">Kembali</Button>
             </div>
         </div>
-        <Transition name="fade">
-            <div
-                class="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center"
-                v-if="state.reject_popup"
-            >
-                <div
-                    class="bg-white max-w-400px w-9/10 p-4 rounded-xl shadow-lg flex flex-col gap-4"
-                >
-                    <span>Penolakan</span>
-                    <InputLongText
-                        v-model="state.reject_reason"
-                        label="Alasan ditolak"
-                    />
-                    <div class="flex gap-4">
-                        <Button
-                            block
-                            @click="state.reject_popup = false"
-                            variant="gray"
-                            >Tutup</Button
-                        >
-                        <Button block @click="reject" variant="danger"
-                            >Kirim</Button
-                        >
-                    </div>
-                </div>
-            </div>
-        </Transition>
     </main>
 </template>
-
-<style>
-.fade-enter-active,
-.fade-leave-active {
-    transition: all 0.3s ease;
-}
-.fade-enter-from {
-    opacity: 0;
-}
-.fade-leave-to {
-    opacity: 0;
-}
-</style>

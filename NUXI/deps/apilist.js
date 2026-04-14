@@ -1,4 +1,19 @@
 export const apilist = {
+  auth_login: {
+      url:"/employeeapi/auth/login",
+      auth:false,
+      method:'POST'
+  },
+  auth_me: {
+      url:"/employeeapi/auth/me",
+      auth:true,
+      method:'GET'
+  },
+  auth_logout: {
+      url:"/employeeapi/auth/logout",
+      auth:true,
+      method:'POST'
+  },
   profile: {
       url:"/v1/records/users",
       auth:true,
@@ -10,12 +25,12 @@ export const apilist = {
       method:'GET'
   },
   get_forms: {
-      url:"/v1/records/forms",
+      url:"/employeeapi/permits",
       auth:true,
       method:'GET'
   },
   upload: {
-      url:"/v3/upload",
+      url:"/employeeapi/upload",
       auth:true,
       method:'POST'
   },
@@ -50,42 +65,27 @@ export const apilist = {
       method:'GET'
   },
   set_form: {
-      url:"/v1/records/forms",
+      url:"/employeeapi/permits",
       auth:true,
       method:'POST'
   },
   update_form: {
-      url:"/v1/records/forms",
-      auth:true,
-      method:'PUT'
-  },
-  get_loans: {
-      url:"/v1/records/loans",
-      auth:true,
-      method:'GET'
-  },
-  set_loan: {
-      url:"/v1/records/loans",
-      auth:true,
-      method:'POST'
-  },
-  update_loan: {
-      url:"/v1/records/loans",
+      url:"/employeeapi/permits",
       auth:true,
       method:'PUT'
   },
   post_manual: {
-    url:"/v1/records/dinas_clocks",
+    url:"/employeeapi/attendances",
     auth:true,
     method:'POST'
   },
   get_dinas_clocks: {
-    url:"/v1/records/dinas_clocks",
+    url:"/employeeapi/attendances",
     auth:true,
     method:'GET'
   },
   update_dinas_clocks: {
-    url:"/v1/records/dinas_clocks",
+    url:"/employeeapi/attendances",
     auth:true,
     method:'PUT'
   },

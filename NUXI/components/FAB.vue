@@ -31,17 +31,6 @@ onClickOutside(target, () => (state.open = false));
             >
                 <button
                     class="flex items-center gap-2 bg-white shadow text-[#EE0C15] px-6 py-2.5 text-xs rounded-full font-semibold"
-                    @click="$router.push('/loan')"
-                >
-                    <Icon
-                        icon="solar:sale-bold-duotone"
-                        width="1.5rem"
-                        height="1.5rem"
-                    />
-                    <span>Buat Pengajuan Hutang</span>
-                </button>
-                <button
-                    class="flex items-center gap-2 bg-white shadow text-[#EE0C15] px-6 py-2.5 text-xs rounded-full font-semibold"
                     @click="$router.push('/permit')"
                 >
                     <Icon

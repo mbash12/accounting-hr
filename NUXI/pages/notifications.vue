@@ -26,7 +26,6 @@ const state = reactive({
     results: 0,
     filters: [
         { value: "permit", text: "Izin" },
-        { value: "loan", text: "Hutang" },
     ],
 });
 watch(

@@ -9,6 +9,25 @@ const doLogout = async () => {
     await checkLoggedin();
     await router.push("/auth");
 }
+const formatJoinDate = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    return date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
+};
+const formatEmployeeStatus = (value) => {
+    const map = {
+        permanent: "Tetap",
+        contract: "Kontrak",
+        internship: "Magang",
+        probation: "Probation",
+    };
+    return map[value] || "-";
+};
 </script>
 
 <template>
@@ -33,16 +52,9 @@ const doLogout = async () => {
                             <div
                                 class="h-100px w-100px rounded-full flex items-center justify-center border-4 border-white shadow-md"
                             >
-                                <img
-                                    :src="currentUser?.auth?.photoURL"
-                                    alt=""
-                                    class="rounded-full w-full h-full object-cover"
-                                    v-if="currentUser?.auth?.photoURL"
-                                />
                                 <Icon
                                     icon="solar:user-circle-bold-duotone"
                                     class="w-full h-full"
-                                    v-else
                                 />
                             </div>
                             <div class="flex-1 flex flex-col items-center">
@@ -61,20 +73,28 @@ const doLogout = async () => {
                         class="bg-white w-full h-full rounded-xl shadow p-4 flex flex-col"
                     >
                         <div class="flex justify-between text-xs py-4 border-b px-2">
+                            <span class="text-gray-500">ID Karyawan</span>
+                            <span>{{ currentUser?.user?.employee_id || "-" }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs py-4 border-b px-2">
                             <span class="text-gray-500">Jabatan</span>
-                            <span>{{ currentUser?.user?.position }}</span>
+                            <span>{{ currentUser?.user?.position || "-" }}</span>
+                        </div>
+                        <div class="flex justify-between text-xs py-4 border-b px-2">
+                            <span class="text-gray-500">Status Karyawan</span>
+                            <span>{{ formatEmployeeStatus(currentUser?.user?.status) }}</span>
                         </div>
                         <div class="flex justify-between text-xs py-4 border-b px-2">
                             <span class="text-gray-500">Tanggal Bergabung</span>
-                            <span>{{ new Date(currentUser?.user?.join_date).toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' }) }}</span>
+                            <span>{{ formatJoinDate(currentUser?.user?.join_date || currentUser?.user?.hire_date) }}</span>
                         </div>
                         <div class="flex justify-between text-xs py-4 border-b px-2">
                             <span class="text-gray-500">Email</span>
-                            <span>{{ currentUser?.user?.email }}</span>
+                            <span>{{ currentUser?.user?.email || "-" }}</span>
                         </div>
                         <div class="flex justify-between text-xs py-4 border-b px-2">
-                            <span class="text-gray-500">Telepon</span>
-                            <span>{{ currentUser?.user?.phone_number }}</span>
+                            <span class="text-gray-500">NIK</span>
+                            <span>{{ currentUser?.user?.nik || "-" }}</span>
                         </div>
                         <span class="flex-1"></span>
                         <span class="font-light text-14px text-[#919294] pb-4 text-center">

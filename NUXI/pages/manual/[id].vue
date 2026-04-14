@@ -4,23 +4,13 @@ import { Icon } from "@iconify/vue";
 import {
     getSingleDinas,
     loading,
-    currentUser,
-    updateDinas,
-    datetodate,
-    getLeaveQuota,
-    api,
-    notify,
 } from "@/deps/service.js";
 import { useRoute, useRouter } from "vue-router";
-import { leave_types, temp } from "@/deps/store.js";
 import { ASSETURL } from "@/deps/env.js";
-const { $swal } = useNuxtApp()
 const router = useRouter();
 const route = useRoute();
 const state = reactive({
     view_attachment: false,
-    reject_popup: false,
-    reject_reason: null,
     data: null,
     location: null,
 });
@@ -32,66 +22,6 @@ onMounted(async () => {
     state.location = JSON.parse(data.location);
     loading(false);
 });
-const approve = () => {
-    $swal.fire({
-        title: "Apakah anda yakin?",
-        text: "Anda akan menyetujui pengajuan ini",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#12B981",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Ya, setuju!",
-        cancelButtonText: "Tutup",
-    }).then(async (result) => {
-        if (result.isConfirmed) {
-            loading();
-            const data = {};
-            if (state.data?.approval == null) {
-                data["status"] = "approved";
-                data["approved_at"] = datetodate(new Date());
-            }
-            const res = await updateDinas(state.data.id, data);
-            // notify({
-            //     user_id: state.data?.user_id.id,
-            //     type: state.data.type,
-            //     notif_type: "permit",
-            //     title: "Pengajuan Disetujui",
-            //     content: `Pengajuan ${
-            //         leave_types[state.data.sub_type]
-            //     } telah disetujui`,
-            //     payload: state.data?.id,
-            // });
-            loading(false);
-            if (res) {
-                router.go(-1);
-            }
-        }
-    });
-};
-const reject = async () => {
-    loading();
-    const data = {};
-    if (state.data?.approved_at == null) {
-        data["reject_reason"] = state.reject_reason;
-        data["status"] = "rejected";
-    }
-    const res = await updateDinas(state.data.id, data);
-    loading(false);
-    // notify({
-    //     user_id: state.data?.user_id.id,
-    //     type: state.data.type,
-    //     notif_type: "permit",
-    //     title: "Pengajuan Ditolak",
-    //     content: `Pengajuan ${
-    //         leave_types[state.data.sub_type]
-    //     } telah ditolak oleh ${currentUser.user?.fullname}`,
-    //     payload: state.data?.id,
-    // });
-
-    if (res) {
-        router.go(-1);
-    }
-};
 </script>
 <template>
     <main class="bg-white">
@@ -291,72 +221,9 @@ const reject = async () => {
                     </div>
                 </div>
             </div>
-            <div
-                class="absolute bottom-0 left-0 w-full gap-4 bg-white px-4 py-4 border-t flex flex-col"
-                v-if="state.data && state.data.status === 'submitted'"
-            >
-                <div class="flex gap-4">
-                    <Button
-                        block
-                        variant="red"
-                        class="text-14px"
-                        @click="state.reject_popup = true"
-                        >Tolak</Button
-                    >
-                    <Button
-                        block
-                        variant="green"
-                        class="text-14px"
-                        @click="approve()"
-                        >Setujui</Button
-                    >
-                </div>
+            <div class="absolute bottom-0 left-0 w-full gap-4 bg-white px-4 py-4 border-t flex flex-col">
+                <Button block variant="gray" class="text-14px" @click="router.go(-1)">Kembali</Button>
             </div>
         </div>
-        <Transition name="fade">
-            <div
-                class="fixed inset-0 w-full h-full bg-black bg-opacity-50 flex items-center justify-center"
-                v-if="state.reject_popup"
-            >
-                <div
-                    class="bg-white max-w-400px w-9/10 p-4 rounded-xl shadow-lg flex flex-col gap-4"
-                >
-                    <strong class="">Alasan Ditolak</strong>
-                    <InputLongText1
-                        v-model="state.reject_reason"
-                        placeholder="Masukkan Alasan"
-                    />
-                    <div class="flex gap-4">
-                        <Button
-                            block
-                            @click="state.reject_popup = false"
-                            variant="gray"
-                            class="text-14px h-45px"
-                            >Kembali</Button
-                        >
-                        <Button
-                            block
-                            @click="reject"
-                            variant="red"
-                            class="text-14px h-45px"
-                            >Tolak</Button
-                        >
-                    </div>
-                </div>
-            </div>
-        </Transition>
     </main>
 </template>
-
-<style>
-.fade-enter-active,
-.fade-leave-active {
-    transition: all 0.3s ease;
-}
-.fade-enter-from {
-    opacity: 0;
-}
-.fade-leave-to {
-    opacity: 0;
-}
-</style>

@@ -3,8 +3,7 @@ import { ref, reactive, onMounted, onUnmounted } from "vue";
 const { $swal } = useNuxtApp();
 import dayjs from "dayjs";
 import {useRouter} from 'vue-router'
-import { submitManual, currentUser, api } from "@/deps/service.js";
-import { APIURL } from "~/deps/env";
+import { submitManualWithPhoto } from "@/deps/service.js";
 const router = useRouter();
 const videoElement = ref(null);
 const canvasElement = ref(null);
@@ -87,27 +86,18 @@ const action = async () => {
 };
 
 const submit = async () => {
-    const formData = new FormData();
-    formData.append('file', state.file);
-    const image = await fetch(APIURL + '/v3/upload', {
-        method: "POST",
-        body: formData,
-    }).then((res) => res.json());
     const date = dayjs(state.form.current_time).format('YYYY-MM-DD');
     const data = {
         type: state.form.type,
         datetime: state.form.current_time,
         date: date,
-        user_id: currentUser.user?.id,
         note: state.form.description,
-        attachment: image.path,
         status: "submitted",
-        approver: currentUser.user?.department_id?.supervisor_id,
         location: JSON.stringify({
             latitude: state.form.latitude,
             longitude: state.form.longitude})
     };
-    let res = await submitManual(data);
+    let res = await submitManualWithPhoto(data, state.file);
     localStorage.removeItem("manual");
     $swal.fire({
         icon: "success",
@@ -116,7 +106,7 @@ const submit = async () => {
         showConfirmButton: false,
         timer: 2000,
     }).then(async () => {
-        router.push("/home");
+        router.push("/manual");
     });
 };
 

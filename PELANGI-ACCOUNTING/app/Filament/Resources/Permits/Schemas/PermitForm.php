@@ -31,10 +31,22 @@ class PermitForm
                             ->label(__('Tipe'))
                             ->options([
                                 'sick' => __('Sakit'),
-                                'annual_leave' => __('Cuti Tahunan'),
-                                'unpaid_leave' => __('Cuti Diluar Tanggungan'),
-                                'maternity_leave' => __('Cuti Melahirkan'),
-                                'other_permit' => __('Izin Lainnya'),
+                                'annual_leave' => __('Cuti Tahunan (Legacy)'),
+                                'unpaid_leave' => __('Cuti Diluar Tanggungan (Legacy)'),
+                                'maternity_leave' => __('Cuti Melahirkan (Legacy)'),
+                                'other_permit' => __('Izin Lainnya (Legacy)'),
+                                'annual' => __('Cuti Tahunan'),
+                                'marry' => __('Cuti Menikah'),
+                                'kids_marry' => __('Cuti Menikahkan Anak'),
+                                'khitan' => __('Cuti Khitan/Baptis Anak'),
+                                'family_death' => __('Cuti Keluarga Inti Meninggal'),
+                                'maternity' => __('Cuti Melahirkan'),
+                                'maternity_husband' => __('Cuti Istri Melahirkan'),
+                                'maternity_death' => __('Cuti Keguguran'),
+                                'force_majure' => __('Izin Bencana Alam'),
+                                'nodn_sick' => __('Sakit Tanpa Surat'),
+                                'sudden' => __('Izin Mendadak'),
+                                'others' => __('Izin'),
                             ])
                             ->required(),
                         DatePicker::make('start_date')

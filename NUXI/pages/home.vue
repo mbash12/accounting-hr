@@ -15,14 +15,6 @@ const getDt = async (next) => {
     }
     getData();
 };
-const switchTab = (val) => {
-    homeState.tab = val;
-    homeState.appliedFilter = "submitted";
-    homeState.dates = null;
-    homeState.page = 1;
-    getData();
-};
-
 const switchStatus = (val) => {
     homeState.appliedFilter = val;
     homeState.page = 1;
@@ -82,11 +74,10 @@ onMounted(async () => {
                 1
             );
     }, 0);
-    if (currentUser.user?.role === "management") {
-        switchTab(1);
-    } else {
-        switchTab(0);
-    }
+    homeState.tab = 0;
+    homeState.appliedFilter = "submitted";
+    homeState.page = 1;
+    getData();
 });
 </script>
 
@@ -172,146 +163,7 @@ onMounted(async () => {
                 class="w-full h-full overflow-auto relative  ide"
             >
                 <div class="px-4 mt-110px trg">
-                    <div
-                        class="w-full bg-white px-4 rounded-t-2xl tb flex gap-4 items-center z-10"
-                    >
-                        <div
-                            class="flex justify-evenly w-full border-b items-end"
-                        >
-                            <button
-                                class="flex flex-col w-[28%] items-center gap-2 h-full px-2 pt-6"
-                                @click="switchTab(0)"
-                                v-if="
-                                    currentUser?.user?.role === 'admin' ||
-                                    currentUser?.user?.role === 'spv' ||
-                                    currentUser?.user?.role === 'staff'
-                                "
-                            >
-                                <img
-                                    src="/tab-01.png"
-                                    alt=""
-                                    class="w-26px h-26px object-contain"
-                                />
-                                <span
-                                    class="leading-4 block text-12px h-32px"
-                                    :class="
-                                        homeState.tab === 0 ? 'font-bold' : ''
-                                    "
-                                    >Pengajuan Izin</span
-                                >
-                                <span
-                                    class="w-full h-1 bg-red-500 transform transition-all duration-300 rounded-t-full"
-                                    :class="
-                                        homeState.tab === 0
-                                            ? 'opacity-100 scale-x-110'
-                                            : 'opacity-0 scale-x-10'
-                                    "
-                                ></span>
-                            </button>
-                            <button
-                                class="flex flex-col w-[28%] items-center gap-2 h-full px-2 pt-6"
-                                @click="switchTab(1)"
-                                v-if="
-                                    currentUser?.user?.role === 'admin' ||
-                                    currentUser?.user?.role === 'spv' ||
-                                    currentUser?.user?.role === 'management'
-                                "
-                            >
-                                <img
-                                    src="/tab-02.png"
-                                    alt=""
-                                    class="w-26px h-26px object-contain"
-                                />
-                                <span
-                                    class="leading-4 block text-12px h-32px"
-                                    :class="
-                                        homeState.tab === 1 ? 'font-bold' : ''
-                                    "
-                                    >Approval Izin</span
-                                >
-                                <span
-                                    class="w-full h-1 bg-red-500 transform transition-all duration-300 rounded-t-full"
-                                    :class="
-                                        homeState.tab === 1
-                                            ? 'opacity-100 scale-x-110'
-                                            : 'opacity-0 scale-x-10'
-                                    "
-                                ></span>
-                            </button>
-                            <button
-                                class="flex flex-col w-[28%] items-center gap-2 h-full px-2 pt-6"
-                                @click="switchTab(3)"
-                                v-if="
-                                    currentUser?.user?.role === 'admin' ||
-                                    currentUser?.user?.role === 'spv'
-                                "
-                            >
-                                <img
-                                    src="/tab-04.png"
-                                    alt=""
-                                    class="w-26px h-26px object-contain"
-                                />
-                                <span
-                                    class="leading-4 block text-12px h-32px"
-                                    :class="
-                                        homeState.tab === 3 ? 'font-bold' : ''
-                                    "
-                                    >Approval Absen</span
-                                >
-                                <span
-                                    class="w-full h-1 bg-red-500 transform transition-all duration-300 rounded-t-full"
-                                    :class="
-                                        homeState.tab === 3
-                                            ? 'opacity-100 scale-x-110'
-                                            : 'opacity-0 scale-x-10'
-                                    "
-                                ></span>
-                            </button>
-                            <button
-                                class="flex flex-col w-[28%] items-center gap-2 h-full px-2 pt-6"
-                                @click="switchTab(2)"
-                                v-if="
-                                    currentUser?.user?.role === 'admin' ||
-                                    currentUser?.user?.role === 'spv' ||
-                                    currentUser?.user?.role === 'staff'
-                                "
-                            >
-                                <img
-                                    src="/tab-03.png"
-                                    alt=""
-                                    class="w-26px h-26px object-contain"
-                                />
-                                <span
-                                    class="leading-4 block text-12px h-32px"
-                                    :class="
-                                        homeState.tab === 2 ? 'font-bold' : ''
-                                    "
-                                    >Hutang</span
-                                >
-                                <span
-                                    class="w-full h-1 bg-red-500 transform transition-all duration-300 rounded-t-full"
-                                    :class="
-                                        homeState.tab === 2
-                                            ? 'opacity-100 scale-x-110'
-                                            : 'opacity-0 scale-x-10'
-                                    "
-                                ></span>
-                            </button>
-                        </div>
-                    </div>
-                    <div
-                        class="font-bold text-sm p-4 text-white sticky top-0 fltr h-60px -mt-60px opacity-0 pointer-events-none flex items-center bg-[#EE0C15]"
-                    >
-                        {{
-                            [
-                                "Pengajuan Izin",
-                                "Approval Izin",
-                                "Hutang",
-                                "Approval Absen",
-                            ][homeState.tab]
-                        }}
-                    </div>
-                    <div class="w-full bg-white px-2 sticky top-60px py-3">
+                    <div class="w-full bg-white px-2 sticky top-0 py-3 rounded-t-2xl">
                         <Segment
                             :options="homeState.filters"
                             v-model="homeState.appliedFilter"
@@ -319,10 +171,7 @@ onMounted(async () => {
                     </div>
                     <div
                         class="w-full bg-white shadow-xl pb-60px min-h-90vh px-4"
-                        v-if="
-                            (homeState.tab == 0 || homeState.tab == 1) &&
-                            homeState.data?.length !== 0
-                        "
+                        v-if="homeState.data?.length !== 0"
                     >
                         <button
                             class="border-b w-full py-4 px-2 flex flex-col gap-2"
@@ -515,197 +364,6 @@ onMounted(async () => {
                                     >
                                 </div>
                             </div>
-                            <div
-                                class="flex gap-3 items-center"
-                                v-if="homeState.tab === 1"
-                            >
-                                <div
-                                    class="flex gap-2 items-center text-gray-500"
-                                >
-                                    <Icon
-                                        icon="solar:user-bold-duotone"
-                                        width="1rem"
-                                        height="1rem"
-                                        class="text-blue-800"
-                                    />
-                                    <span class="text-xs mt-1px">{{
-                                        item.user_id?.fullname
-                                    }}</span>
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                    <div
-                        class="w-full bg-white shadow-xl pb-60px min-h-90vh px-4"
-                        v-if="homeState.tab === 2 && homeState.data?.length > 0"
-                    >
-                        <button
-                            class="border-b w-full py-4 px-2 flex flex-col gap-2"
-                            v-for="(item, i) in homeState.data"
-                            :key="i"
-                            @click="
-                                () => {
-                                    item.status == 'updating'
-                                        ? $router.push(
-                                              `/loan/?update=${item.id}`
-                                          )
-                                        : $router.push(`/loan/${item.id}`);
-                                }
-                            "
-                        >
-                            <div class="flex justify-between w-full">
-                                <span class="text-sm font-bold text-gray-500"
-                                    >Hutang</span
-                                >
-                                <div
-                                    class="flex items-center capitalize text-xs text-gray-500"
-                                >
-                                    <Status
-                                        :status="item.status"
-                                        v-if="item.status != 'approved'"
-                                    />
-                                    <span
-                                        class="text-xs px-2 py-1 rounded-xl"
-                                        v-else
-                                        :class="
-                                            item.payment_status == 'paid'
-                                                ? 'text-green-500 bg-green-100 '
-                                                : 'text-red-500 bg-red-100 '
-                                        "
-                                    >
-                                        {{
-                                            item?.payment_status === "paid"
-                                                ? "Lunas"
-                                                : item?.payment_status === "skip"
-                                                ? "Lewati"
-                                                : "Belum Lunas"
-                                        }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex gap-3 items-center w-full">
-                                <div
-                                    class="flex flex-col gap-2 items-start w-[35%]"
-                                >
-                                    <span
-                                        class="font-semibold text-11px text-[#707888]"
-                                        >Jumlah</span
-                                    >
-                                    <span
-                                        class="text-13px font-semibold text-[#EE0C15]"
-                                        >Rp
-                                        {{
-                                            new Intl.NumberFormat(
-                                                "id-ID"
-                                            ).format(item.amount)
-                                        }}</span
-                                    >
-                                </div>
-                                <div
-                                    class="flex flex-col gap-2 items-start w-[35%]"
-                                >
-                                    <span
-                                        class="font-semibold text-11px text-[#707888]"
-                                        >Sumber</span
-                                    >
-                                    <span
-                                        class="text-13px font-semibold capitalize"
-                                        >{{
-                                            item.source == "bulanan"
-                                                ? "Gaji"
-                                                : "Uang Makan"
-                                        }}</span
-                                    >
-                                </div>
-                                <div
-                                    class="flex flex-col gap-2 items-start w-[30%]"
-                                >
-                                    <span
-                                        class="font-semibold text-11px text-[#707888]"
-                                        >Durasi</span
-                                    >
-                                    <span
-                                        class="text-13px font-semibold capitalize"
-                                        >{{ item.duration }}
-                                        {{
-                                            item.source == "bulanan"
-                                                ? "Bulan"
-                                                : "Minggu"
-                                        }}</span
-                                    >
-                                </div>
-                            </div>
-                        </button>
-                    </div>
-                    <div
-                        class="w-full bg-white shadow-xl pb-60px min-h-90vh px-4"
-                        v-if="homeState.tab === 3 && homeState.data?.length > 0"
-                    >
-                        <button
-                            class="border-b w-full py-4 px-2 flex flex-col gap-2"
-                            v-for="(item, i) in homeState.data"
-                            :key="i"
-                            @click="
-                                () => {
-                                    $router.push(`/manual/${item.id}`);
-                                }
-                            "
-                        >
-                            <div class="flex justify-between w-full">
-                                <div class="flex gap-1 items-center">
-                                    <span
-                                        class="text-sm font-bold text-gray-500"
-                                        >{{ item.datetime }}</span
-                                    >
-                                    <span
-                                        class="text-xs font-bold px-1 rounded uppercase"
-                                        :class="
-                                            item.type == 'in'
-                                                ? 'text-green-500 bg-green-100 '
-                                                : 'text-red-500 bg-red-100 '
-                                        "
-                                    >
-                                        {{ item.type }}
-                                    </span>
-                                </div>
-                                <div
-                                    class="flex items-center capitalize text-xs text-gray-500"
-                                >
-                                    <Status :status="item.status" />
-                                </div>
-                            </div>
-                            <div class="flex gap-3 items-center min-w-0 w-full">
-                                <div
-                                    class="flex gap-2 items-center text-gray-500 min-w-0 w-full"
-                                >
-                                    <Icon
-                                        icon="solar:chat-line-bold-duotone"
-                                        width="1rem"
-                                        height="1rem"
-                                        class="text-blue-800"
-                                    />
-                                    <span
-                                        class="text-xs mt-1px truncate block w-full text-left"
-                                    >
-                                        {{ item.note }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="flex gap-3 items-center">
-                                <div
-                                    class="flex gap-2 items-center text-gray-500"
-                                >
-                                    <Icon
-                                        icon="solar:user-bold-duotone"
-                                        width="1rem"
-                                        height="1rem"
-                                        class="text-blue-800"
-                                    />
-                                    <span class="text-xs mt-1px">{{
-                                        item.user_id.fullname
-                                    }}</span>
-                                </div>
-                            </div>
                         </button>
                     </div>
                     <div
@@ -766,14 +424,7 @@ onMounted(async () => {
                                 </g>
                             </g>
                         </svg>
-                        <span class="text-sm text-gray-400 font-bold">{{
-                            [
-                                "Tidak ada pengajuan",
-                                "Tidak ada persetujuan",
-                                "Tidak ada pengajuan",
-                                "Tidak ada persetujuan",
-                            ][homeState.tab]
-                        }}</span>
+                        <span class="text-sm text-gray-400 font-bold">Tidak ada pengajuan</span>
                     </div>
                 </div>
             </div>
@@ -811,7 +462,6 @@ onMounted(async () => {
         <div
             class="absolute right-5px fab bottom-10px opacity-100"
             style="transform-origin: bottom right"
-            v-show="homeState.tab === 0 || homeState.tab === 2"
         >
             <FAB />
         </div>

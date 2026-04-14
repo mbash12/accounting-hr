@@ -3,9 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\Api;
 use App\Http\Controllers\Api\MasterDataController;
+use App\Http\Controllers\Api\EmployeeApiAuthController;
+use App\Http\Controllers\Api\EmployeeApiAttendanceController;
+use App\Http\Controllers\Api\EmployeeApiPermitController;
+use App\Http\Controllers\Api\EmployeeApiUploadController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\InvoiceSyncController;
+use App\Http\Middleware\EmployeeApiAuth;
 
 Route::prefix('master')->middleware([Api::class])->group(function () {
     Route::get('/coa', [MasterDataController::class, 'coa']);
@@ -38,4 +43,24 @@ Route::prefix('invoice-sync')->middleware([Api::class])->group(function () {
     Route::get('/{syncJobId}/status', [InvoiceSyncController::class, 'status']);
     Route::post('/{syncJobId}/retry', [InvoiceSyncController::class, 'retrySync']);
     Route::post('/{syncJobId}/queue-retry', [InvoiceSyncController::class, 'queueRetry']);
+});
+
+Route::prefix('employeeapi/auth')->group(function () {
+    Route::post('/login', [EmployeeApiAuthController::class, 'login']);
+    Route::middleware([EmployeeApiAuth::class])->group(function () {
+        Route::get('/me', [EmployeeApiAuthController::class, 'me']);
+        Route::post('/logout', [EmployeeApiAuthController::class, 'logout']);
+    });
+});
+
+Route::prefix('employeeapi')->middleware([EmployeeApiAuth::class])->group(function () {
+    Route::post('/upload', [EmployeeApiUploadController::class, 'store']);
+    Route::get('/permits', [EmployeeApiPermitController::class, 'index']);
+    Route::post('/permits', [EmployeeApiPermitController::class, 'store']);
+    Route::get('/permits/{permit}', [EmployeeApiPermitController::class, 'show']);
+    Route::put('/permits/{permit}', [EmployeeApiPermitController::class, 'update']);
+    Route::get('/attendances', [EmployeeApiAttendanceController::class, 'index']);
+    Route::post('/attendances', [EmployeeApiAttendanceController::class, 'store']);
+    Route::get('/attendances/{attendance}', [EmployeeApiAttendanceController::class, 'show']);
+    Route::put('/attendances/{attendance}', [EmployeeApiAttendanceController::class, 'update']);
 });

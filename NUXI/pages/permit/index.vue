@@ -11,11 +11,9 @@ import {
     getSingleForm,
     loading,
     updateForm,
-    notify,
 } from "@/deps/service.js";
-import { getData, temp, leave_types } from "@/deps/store.js";
+import { leave_types } from "@/deps/store.js";
 const { $swal } = useNuxtApp()
-import dayjs from "dayjs";
 
 const route = useRoute();
 const router = useRouter();
@@ -36,25 +34,20 @@ const state = reactive({
         image: null,
     },
     appliedFilter: "absence",
-    filters: [
-        { value: "absence", text: "Tidak Hadir" },
-        { value: "attend", text: "Hadir Khusus" },
-    ],
+    filters: [{ value: "absence", text: "Tidak Hadir" }],
 });
 const getForm = async () => {
     loading();
     const res = await getSingleForm(state.form.id);
-    state.appliedFilter = res?.type;
-    state.form.type = res?.type;
+    state.appliedFilter = "absence";
+    state.form.type = "absence";
     state.form.subtype = {
-        value: res?.sub_type,
-        text: leave_types[res?.sub_type],
+        value: res?.type,
+        text: leave_types[res?.type],
     };
-    state.form.description = res?.description;
+    state.form.description = res?.description ?? res?.reason;
     state.form.reason = res?.reason;
     state.form.image = res?.image;
-    state.first_approver = res?.first_approver?.id;
-    state.second_approver = res?.second_approver?.id;
 
     state.form.date_range = [
         new Date(datetodate(res?.start)),
@@ -72,20 +65,7 @@ const getForm = async () => {
 
     loading(false);
 };
-const types1 = {
-    attend: [
-        {
-            group: "Hadir Khusus",
-            list: [
-                { value: "overtime", text: "Lembur" },
-                // { value: "wfh", text: "Kerja Dari Rumah" },
-                { value: "holiday", text: "Kerja Hari Libur" },
-                { value: "halfday", text: "Izin Setengah Hari" },
-                { value: "late", text: "Izin Masuk Telat" },
-                { value: "early", text: "Izin Pulang Cepat" },
-            ],
-        },
-    ],
+const types = {
     absence: [
         { group: "Cuti", list: [{ value: "annual", text: "Cuti Tahunan" }] },
         {
@@ -116,50 +96,6 @@ const types1 = {
         },
     ],
 };
-const types2 = {
-    attend: [
-        {
-            group: "Hadir Khusus",
-            list: [
-                { value: "overtime", text: "Lembur" },
-                { value: "wfh", text: "Kerja Dari Rumah" },
-                { value: "holiday", text: "Kerja Hari Libur" },
-                { value: "halfday", text: "Izin Setengah Hari" },
-                { value: "late", text: "Izin Masuk Telat" },
-                { value: "early", text: "Izin Pulang Cepat" },
-            ],
-        },
-    ],
-    absence: [
-        { group: "Cuti", list: [{ value: "annual", text: "Cuti Tahunan" }] },
-        {
-            group: "Cuti Khusus",
-            list: [
-                { value: "marry", text: "Cuti Menikah" },
-                { value: "kids_marry", text: "Cuti Menikahkan Anak" },
-                { value: "khitan", text: "Cuti Khitan/Baptis Anak" },
-                { value: "family_death", text: "Cuti Keluarga Inti (Suami, Istri, Orangtua, Mertua, dan Anak) Meninggal" },
-                // {
-                //     value: "inhouse_death",
-                //     text: "Cuti Keluarga Serumah Meninggal",
-                // },
-                { value: "maternity", text: "Cuti Melahirkan" },
-                { value: "maternity_death", text: "Cuti Keguguran" },
-            ],
-        },
-        {
-            group: "Izin",
-            list: [
-                { value: "others", text: "Izin" },
-                { value: "nodn_sick", text: "Sakit Tanpa Surat" },
-                { value: "sick", text: "Sakit Dengan Surat" },
-                { value: "force_majure", text: "Bencana Alam" },
-                { value: "sudden", text: "Izin Mendadak" },
-            ],
-        },
-    ],
-};
-const types = currentUser?.user?.department_id?.id === 1 ? types2 : types1;
 
 watch(
     () => state.appliedFilter,
@@ -246,23 +182,7 @@ const handleSubmit = async (e) => {
     const data = {};
     data.user_id = currentUser.user?.id;
     data.status = "submitted";
-    data.type = state.form.type;
-    if (!state.form.id) {
-        data.first_approver = currentUser.user?.department_id?.supervisor_id;
-        data.sub_type = state.form.subtype?.value;
-        if (data.sub_type == "overtime") {
-            data.second_approver = currentUser.user?.department_id?.hrd_id;
-        } else {
-            data.second_approver =
-                currentUser.user?.department_id?.manager_id ??
-                currentUser.user?.department_id?.hrd_id;
-        }
-    } else {
-        data.first_approval = null;
-        data.second_approval = null;
-        data.first_approved = null;
-        data.second_approved = null;
-    }
+    data.type = state.form.subtype?.value;
     if (state.form.image) {
         data.attachment = state.form.image;
     }
@@ -313,8 +233,6 @@ const handleSubmit = async (e) => {
             .getDate()
             .toString()
             .padStart(2, "0")} 00:00:00`;
-        data.duration_um = "days";
-
         const oneDay = 24 * 60 * 60 * 1000;
         const totalDays = Math.floor((end - start) / oneDay) + 1;
         let hdc = 0;
@@ -385,7 +303,6 @@ const handleSubmit = async (e) => {
         data.start = start;
         data.end = end;
         data.description = state.form.description;
-        data.duration_um = currentUser.user?.overtime_term;
         let starttime =
             Number(state.form.time_start.hours) +
             Number(state.form.time_start.minutes) / 60;
@@ -422,14 +339,12 @@ const handleSubmit = async (e) => {
         data.start = start;
         data.end = end;
         data.description = state.form.description;
-        data.duration_um = "hours";
         data.duration = 0;
     }
 
     if (["halfday"].includes(state.form.subtype?.value)) {
         const date = new Date(state.form.date);
         data.description = state.form.description;
-        data.duration_um = "days";
         data.duration = 1;
         data.start = `${date.getFullYear()}-${(date.getMonth() + 1)
             .toString()
@@ -439,50 +354,10 @@ const handleSubmit = async (e) => {
             .padStart(2, "0")}-${date.getDate().toString()} 00:00:00`;
     }
 
-    if (
-        currentUser?.user?.department_id?.supervisor_id == currentUser?.user?.id
-    ) {
-        data.first_approval = "approved";
-        data.first_approved = datetodate(new Date());
-    }
-
     if (state.form.id) {
         await updateForm(state.form.id, data);
-        await notify({
-            user_id: state.first_approver,
-            type: state.appliedFilter,
-            notif_type: "permit",
-            title: "Pengajuan Diperbarui",
-            content: `Pengajuan ${state.form.subtype?.text} telah diajukan kembali oleh ${currentUser.user?.fullname} pada tanggal ${dayjs().format(
-                "DD/MM/YYYY HH:mm"
-            )} dari ${data.start} sampai ${data.end}`,
-            payload: state.form.id,
-        });
     } else {
-        const id = await submitForm(data);
-        if (currentUser?.user?.id !== state.first_approver) {
-            await notify({
-                user_id: data.first_approver,
-                type: state.appliedFilter,
-                notif_type: "permit",
-                title: "Pengajuan Diajukan",
-                content: `Pengajuan ${state.form.subtype?.text} telah dikirim oleh ${currentUser.user?.fullname} pada tanggal ${dayjs().format(
-                    "DD/MM/YYYY"
-                )} dari ${data.start} sampai ${data.end}`,
-                payload: id,
-            });
-        }else{
-            await notify({
-                user_id: state.second_approvaler,
-                type: state.appliedFilter,
-                notif_type: "permit",
-                title: "Pengajuan Diajukan",
-                content: `Pengajuan ${state.form.subtype?.text} telah dikirim oleh ${currentUser.user?.fullname} pada tanggal ${dayjs().format(
-                    "DD/MM/YYYY HH:mm"
-                )} dari ${data.start} sampai ${data.end}`,
-                payload: id,
-            });
-        }
+        await submitForm(data);
     }
     loading(false);
     $swal.fire({
@@ -514,13 +389,6 @@ onMounted(async () => {
             class="w-full h-full flex flex-col bg-white"
         >
             <Header :title="'Pengajuan Izin'" />
-            <div class="px-2 py-1 border-b">
-                <Segment
-                    :options="state.filters"
-                    v-model="state.appliedFilter"
-                    :disabled="state.form.id !== null"
-                />
-            </div>
             <div class="flex-1 overflow-auto pb-60px">
                 <div class="flex flex-col gap-4 p-4">
                     <InputLeave

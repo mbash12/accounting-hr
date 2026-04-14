@@ -25,6 +25,8 @@ class AttendanceSimulator extends Page implements HasForms
 {
     use InteractsWithForms;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function getNavigationGroup(): ?string
     {
         return __('HR & Payroll');

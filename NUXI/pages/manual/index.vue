@@ -5,7 +5,7 @@ import Segment from "@/components/Segment.vue";
 import Button from "@/components/Button.vue";
 import InputLongText1 from "@/components/InputLongText1.vue";
 import { useRouter } from "vue-router";
-import { submitManual, currentUser, api } from "@/deps/service.js";
+import { currentUser, getDinas } from "@/deps/service.js";
 import dayjs from "dayjs";
 const { $swal } = useNuxtApp()
 
@@ -23,9 +23,81 @@ const state = reactive({
         longitude: null,
     },
     current_time: new Date(),
-    history: null,
-    show_history:false
+    historyRaw: [],
+    history: [],
+    show_history:false,
+    history_loading:false
 });
+
+const toTime = (datetime) => {
+    if (!datetime) return "-";
+    return new Date(datetime).toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+};
+
+const mapHistoryByDay = (records) => {
+    const grouped = {};
+    records.forEach((record) => {
+        const key = record.date ?? dayjs(record.datetime).format("YYYY-MM-DD");
+        if (!grouped[key]) {
+            grouped[key] = {
+                date: key,
+                checkIn: null,
+                checkOut: null,
+                noteIn: null,
+                noteOut: null,
+            };
+        }
+
+        if (record.type === "in") {
+            grouped[key].checkIn = record.datetime;
+            grouped[key].noteIn = record.note ?? grouped[key].noteIn;
+        } else if (record.type === "out") {
+            grouped[key].checkOut = record.datetime;
+            grouped[key].noteOut = record.note ?? grouped[key].noteOut;
+        }
+    });
+
+    return Object.values(grouped).sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+};
+
+const refreshGroupedHistory = () => {
+    state.history = mapHistoryByDay(state.historyRaw);
+};
+
+const getTodayHistory = () => {
+    const today = dayjs().format("YYYY-MM-DD");
+    return state.history.find((item) => item.date === today);
+};
+
+const canCheckIn = () => {
+    const today = getTodayHistory();
+    return !today?.checkIn;
+};
+
+const canCheckOut = () => {
+    const today = getTodayHistory();
+    return Boolean(today?.checkIn) && !today?.checkOut;
+};
+
+const getDayState = (item) => {
+    if (item?.checkIn && item?.checkOut) return "Lengkap";
+    if (item?.checkIn && !item?.checkOut) return "Belum Check Out";
+    return "Belum Check In";
+};
+const displayedHistory = () => {
+    return state.show_history ? state.history : state.history.slice(0, 3);
+};
+const toggleHistory = () => {
+    state.show_history = !state.show_history;
+};
+const historyToggleText = () => {
+    return state.show_history ? "Tampilkan Ringkas" : "Lihat Semua";
+};
 
 const getDeviceLocation = () => {
     if (navigator.geolocation) {
@@ -116,11 +188,10 @@ const getDeviceLocation = () => {
     }
 };
 const getHistory = async () => {
-    const res = await api("get_dinas_clocks", {
-        route: `?filter=user_id,eq,${currentUser.user?.id}&page=1&order=date,desc`,
-    });
-    state.history = res.records;
+    const res = await getDinas({ page: 1 });
+    state.historyRaw = res.records;
     state.results = res.results
+    refreshGroupedHistory();
 };
 onMounted(() => {
     getDeviceLocation();
@@ -131,14 +202,14 @@ onMounted(() => {
     getHistory();
 });
 const loadMore = async () => {
-    if( state.results < state.page * 10) return
+    if (!state.show_history) return;
+    if (state.historyRaw.length >= state.results) return;
     state.page += 1
-    state.show_history = true
-    const res = await api("get_dinas_clocks", {
-        route: `?filter=user_id,eq,${currentUser.user?.id}&page=${state.page}&order=date,asc`,
-    });
-    state.history = state.history.concat(res.records)
-    state.show_history = false
+    state.history_loading = true
+    const res = await getDinas({ page: state.page });
+    state.historyRaw = state.historyRaw.concat(res.records)
+    refreshGroupedHistory();
+    state.history_loading = false
 }
 const submit = async (type) => {
     if(state.form.description == null){
@@ -240,7 +311,6 @@ const submit = async (type) => {
                 <div
                     class="flex flex-col gap-4 bg-white rounded-2xl"
                     style="box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1)"
-                    v-if="!state.show_history"
                 >
                     <div class="">
                         <div class="flex flex-col gap-2 p-4">
@@ -277,12 +347,16 @@ const submit = async (type) => {
                                 <button
                                     class="flex-1 h-50px rounded-full bg-[#12D325] text-white font-bold"
                                     @click="submit('in')"
+                                    :disabled="!canCheckIn()"
+                                    :class="{ 'opacity-50 pointer-events-none': !canCheckIn() }"
                                 >
                                     Check in
                                 </button>
                                 <button
                                     class="flex-1 h-50px rounded-full bg-[#F10A13] border-[#FFB7BA] text-white font-bold"
                                     @click="submit('out')"
+                                    :disabled="!canCheckOut()"
+                                    :class="{ 'opacity-50 pointer-events-none': !canCheckOut() }"
                                 >
                                     Check out
                                 </button>
@@ -290,58 +364,72 @@ const submit = async (type) => {
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col bg-[#FEFEFE] rounded-2xl py-4">
+                <div class="flex flex-col bg-[#FEFEFE] rounded-2xl py-4 mb-4">
                     <div class="flex justify-between p-4">
                         <span class="text-17px font-bold text-[#404040]"
                             >Riwayat Absensi</span
                         >
                         <span class="flex-1"></span>
                         <span class="text-14px text-[#F10A13]"
-                            @click="state.show_history = !state.show_history"
-                            >Lihat Semua</span
+                            @click="toggleHistory"
+                            >{{ historyToggleText() }}</span
                         >
                     </div>
-                    <div
-                        class="flex justify-between p-4 border-b"
-                        v-for="h in state.history"
-                    >
-                        <!-- v-for="h in state.history" -->
-                        <div class="flex flex-col">
-                            <div class="flex justify-between">
-                                <span class="text-sm font-bold text-gray-500">{{
-                                    h.type == "in" ? "Check In" : "Check Out"
-                                }}</span>
-                            </div>
-                            <div
-                                class="flex gap-3 items-center text-xs text-gray-500"
-                            >
-                                <span>{{ h.note }}</span>
-                            </div>
-                        </div>
-
+                    <div class="px-4 pb-2 flex flex-col gap-3">
                         <div
-                            class="flex flex-col items-end gap-1 text-xs text-gray-400"
+                            class="border rounded-xl p-3 bg-white shadow-sm"
+                            v-for="h in displayedHistory()"
                         >
-                            <span>{{ h.datetime }}</span>
-                            <span
-                                class="capitalize"
-                                :class="{
-                                    'text-green-500': h.status == 'approved',
-                                    'text-red-500': h.status == 'rejected',
-                                    'text-yellow-500': h.status == 'submitted',
-                                }"
-                            >
-                                {{ h.status }}
-                            </span>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-bold text-gray-700">
+                                    {{
+                                        new Date(h.date).toLocaleDateString("id-ID", {
+                                            day: "2-digit",
+                                            month: "long",
+                                            year: "numeric",
+                                        })
+                                    }}
+                                </span>
+                                <span
+                                    class="text-10px px-2 py-1 rounded-full font-semibold"
+                                    :class="
+                                        h.checkIn && h.checkOut
+                                            ? 'bg-green-100 text-green-700'
+                                            : h.checkIn
+                                            ? 'bg-yellow-100 text-yellow-700'
+                                            : 'bg-gray-100 text-gray-600'
+                                    "
+                                >
+                                    {{ getDayState(h) }}
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mb-2">
+                                <div class="bg-green-50 rounded-lg p-2">
+                                    <div class="text-10px text-green-700 font-semibold">CHECK IN</div>
+                                    <div class="text-sm text-gray-800 font-bold">{{ toTime(h.checkIn) }}</div>
+                                    <div class="text-11px text-gray-500 mt-1 truncate">
+                                        {{ h.noteIn || "-" }}
+                                    </div>
+                                </div>
+                                <div class="bg-red-50 rounded-lg p-2">
+                                    <div class="text-10px text-red-700 font-semibold">CHECK OUT</div>
+                                    <div class="text-sm text-gray-800 font-bold">{{ toTime(h.checkOut) }}</div>
+                                    <div class="text-11px text-gray-500 mt-1 truncate">
+                                        {{ h.noteOut || "-" }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-center p-4" v-if="state.show_history && state.results > state.page * 10">
+                    <div class="flex justify-center p-4" v-if="state.show_history && state.historyRaw.length < state.results">
                         <button
                             class="flex-1 h-50px rounded-full bg-[#F10A13] border-[#FFB7BA] text-white font-bold"
                             @click="loadMore()"
+                            :disabled="state.history_loading"
+                            :class="{ 'opacity-50 pointer-events-none': state.history_loading }"
                         >
-                            Tampilkan Lebih Banyak
+                            {{ state.history_loading ? "Memuat..." : "Tampilkan Lebih Banyak" }}
                         </button>
 
                     </div>

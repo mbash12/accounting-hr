@@ -1,10 +1,9 @@
 import { reactive } from "vue";
 import { apilist } from "./apilist";
 import { APIURL } from "./env";
-import { signOut } from "firebase/auth";
-import { getCurrentUser } from "vuefire";
 import { getTokens } from "./firebase.js";
 
+const AUTH_STORAGE_KEY = "nuxi_auth_token";
 
 export const currentUser = reactive({
     auth: null,
@@ -18,27 +17,46 @@ export const store = reactive({
 export const loading = (state = true) => {
     store.isLoading = state;
 };
+const getAuthToken = () => {
+    if (typeof window === "undefined") return null;
+    return localStorage.getItem(AUTH_STORAGE_KEY);
+};
+const setAuthToken = (token) => {
+    if (typeof window === "undefined") return;
+    if (token) {
+        localStorage.setItem(AUTH_STORAGE_KEY, token);
+    } else {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+    }
+};
 export const checkLoggedin = async () => {
-    const auth = await getCurrentUser();
-    if (!auth) return currentUser;
-    currentUser.auth = auth;
-    const user = await getUserData(currentUser.auth?.email);
-    if (!user || user.code || user?.error) {
+    const token = getAuthToken();
+    if (!token) {
         currentUser.auth = null;
+        currentUser.user = null;
+        currentUser.loggedin = false;
         return currentUser;
     }
-    currentUser.user = user?.records[0];
+
+    currentUser.auth = { accessToken: token };
+    const profile = await api("auth_me");
+    if (!profile || profile?.message === "Unauthorized") {
+        setAuthToken(null);
+        currentUser.auth = null;
+        currentUser.user = null;
+        currentUser.loggedin = false;
+        return currentUser;
+    }
+    currentUser.user = profile?.employee;
     currentUser.loggedin = true;
     return currentUser;
 };
 export const logout = () => {
-    signOut(currentUser.auth?.auth);
-    setTimeout(() => {
-        currentUser.auth = null;
-        currentUser.user = null;
-        currentUser.loggedin = false;
-    }, 1000);
-    return;
+    api("auth_logout").catch(() => null);
+    setAuthToken(null);
+    currentUser.auth = null;
+    currentUser.user = null;
+    currentUser.loggedin = false;
 };
 export const api = async (key, options = {}) => {
     const api_bp = apilist[key];
@@ -60,12 +78,14 @@ export const api = async (key, options = {}) => {
     }
 
     if (api_bp.auth) {
-        const authData = currentUser.auth;
-        therest.headers["X-JWT"] = `Bearer ${authData.accessToken}`;
+        const token = getAuthToken() ?? currentUser.auth?.accessToken;
+        if (token) {
+            therest.headers["Authorization"] = `Bearer ${token}`;
+        }
     }
-
-    therest.headers["X-API-KEY"] = "GDb5Yd5P2t2qEXj5jx4R6XEy";
-    if (options.body instanceof File) {
+    if (options.body instanceof FormData) {
+        therest.body = options.body;
+    } else if (options.body instanceof File) {
         const formData = new FormData();
         const uploadName = options.upload ?? "file";
         formData.append(uploadName, options.body);
@@ -86,7 +106,11 @@ export const api = async (key, options = {}) => {
         });
 
         const result = await response.json();
-        if (result.code === 1012 || result.title === "Unauthorized") {
+        if (
+            result.code === 1012 ||
+            result.title === "Unauthorized" ||
+            result.message === "Unauthorized"
+        ) {
             logout();
             setTimeout(() => {
                 location.reload();
@@ -118,10 +142,21 @@ export const datetodate = (date, time = false) => {
         return `${y}-${m}-${dt} ${hh}:${mm}:${ss}`;
     }
 };
-const getUserData = async (email) => {
-    return await api("profile", {
-        params: { join: "departments", filter: `email,eq,${email}` },
+export const loginWithPassword = async (email, password) => {
+    const result = await api("auth_login", {
+        body: { email, password },
     });
+
+    if (!result?.token || !result?.employee) {
+        return { ok: false, data: result };
+    }
+
+    setAuthToken(result.token);
+    currentUser.auth = { accessToken: result.token };
+    currentUser.user = result.employee;
+    currentUser.loggedin = true;
+
+    return { ok: true, data: result };
 };
 export const getFaqData = async () => {
     return await api("faq", { params: { join: "faqs" } });
@@ -131,135 +166,201 @@ export const uploadImage = async (file) => {
 };
 
 export const getLeaveQuota = async (user_id) => {
-    const joinDate = new Date(currentUser.user?.join_date); // Parse the join date string
-    const eligible =
-        joinDate <=
-        new Date(new Date().setFullYear(new Date().getFullYear() - 1));
-    if (eligible) {
-        const quota = await api("get_quota", {
-            route: `?filter=year,eq,${new Date().getFullYear()}&filter=user_id,eq,${user_id}`,
-        });
-        if (quota?.records.length) {
-            return quota.records[0];
-        } else if (eligible) {
-            const joinDate = new Date(currentUser.user?.join_date);
-            const currentDate = new Date();
-            const endOfYear = new Date(currentDate.getFullYear(), 11, 31);
-            const monthsDifference =
-                (endOfYear -
-                    new Date(
-                        joinDate.getFullYear() + 1,
-                        joinDate.getMonth(),
-                        joinDate.getDate()
-                    )) /
-                (1000 * 60 * 60 * 24 * 30);
-            const leaveQuota = Math.min(Math.floor(monthsDifference), 12);
-            await api("set_quota", {
-                body: {
-                    user_id: user_id,
-                    year: new Date().getFullYear(),
-                    quota: leaveQuota,
-                    taken: 0,
-                    balance: leaveQuota,
-                },
-            });
-            const quota = await api("get_quota", {
-                params: { user_id: user_id, year: new Date().getFullYear() },
-            });
-            return quota.records[0];
-        }
-    } else {
-        return null;
-    }
+    return {
+        id: null,
+        user_id,
+        quota: 12,
+        taken: 0,
+        balance: 12,
+    };
 };
 export const getNationalHolidays = async () => {
-    const holidays = await api("get_holidays", {
-        params: { year: new Date().getFullYear(), limit: 100 },
-    });
-    if (holidays?.records.length) {
-        return holidays.records;
-    } else {
-        const settings = await api("get_settings", { route: "1" });
-        const _holidays = await fetch(settings.holiday_source).then(
-            (response) => response.json()
-        );
-        if (_holidays) {
-            const hld = _holidays
-                .filter((holiday) => holiday.is_national_holiday)
-                .filter((holiday) => {
-                    const date = new Date(holiday.holiday_date);
-                    const day = date.getDay();
-                    return day !== 0 && day !== 6;
-                })
-                .map((holiday) => {
-                    return {
-                        year: holiday.holiday_date.split("-")[0],
-                        description: holiday.holiday_name,
-                        date: holiday.holiday_date,
-                    };
-                });
-            await api("set_holidays", {
-                body: hld,
-            });
-            const holidays = await api("get_holidays", {
-                route: `?filter=year,eq,${new Date().getFullYear()}`,
-            });
-            return holidays.records;
-        }
-        return [];
+    return [];
+};
+
+const mapStatusToAccounting = (status) => {
+    if (status === "submitted") return "pending";
+    return status;
+};
+
+const mapStatusToApp = (status) => {
+    if (status === "pending") return "submitted";
+    return status;
+};
+
+const normalizeStoragePath = (path) => {
+    if (!path || typeof path !== "string") return path;
+    return path.replace(/^\/?storage\//, "");
+};
+
+const mapAccountingPermitToApp = (permit) => {
+    const start = permit.start ?? `${permit.start_date} 00:00:00`;
+    const end = permit.end ?? `${permit.end_date} 00:00:00`;
+
+    return {
+        id: permit.id,
+        type: "absence",
+        sub_type: permit.type ?? "others",
+        status: mapStatusToApp(permit.status),
+        description: permit.reason ?? null,
+        reason: permit.reason ?? null,
+        duration: Number(permit.duration ?? 1),
+        duration_um: "days",
+        start,
+        end,
+        attachment: permit.attachment_path,
+        user_id: {
+            id: permit.employee_id,
+            fullname: currentUser.user?.fullname,
+        },
+        created_at: permit.created_at,
+    };
+};
+
+const mapAppPermitToAccounting = (payload) => {
+    return {
+        type: payload.sub_type ?? payload.type ?? "others",
+        start_date: (payload.start || "").slice(0, 10),
+        end_date: (payload.end || payload.start || "").slice(0, 10),
+        reason: payload.description ?? payload.reason ?? null,
+        attachment_path: normalizeStoragePath(payload.attachment) ?? null,
+        status: mapStatusToAccounting(payload.status ?? "submitted"),
+    };
+};
+
+const mapAttendanceStatusToAccounting = (status) => {
+    if (!status || status === "submitted" || status === "approved") return "present";
+    if (status === "rejected") return "absent";
+    return status;
+};
+
+const mapAttendanceStatusToApp = (status) => {
+    if (status === "present" || status === "late" || status === "permit" || status === "leave") {
+        return "approved";
     }
+    if (status === "absent") return "rejected";
+    return "submitted";
+};
+
+const mapAccountingAttendanceToApp = (attendance) => {
+    const isIn = Boolean(attendance.check_in);
+    const datetime = attendance.check_in ?? attendance.check_out;
+
+    return {
+        id: attendance.id,
+        type: isIn ? "in" : "out",
+        datetime,
+        date: attendance.date,
+        note: attendance.notes,
+        status: mapAttendanceStatusToApp(attendance.status),
+        attachment: isIn ? attendance.photo_in_path : attendance.photo_out_path,
+        location: JSON.stringify({
+            latitude: isIn ? attendance.lat_in : attendance.lat_out,
+            longitude: isIn ? attendance.lng_in : attendance.lng_out,
+        }),
+        user_id: {
+            id: attendance.employee_id,
+            fullname: currentUser.user?.fullname,
+        },
+    };
+};
+
+const mapAppAttendanceToAccounting = (payload) => {
+    const isIn = payload.type === "in";
+    let location = {
+        latitude: payload.latitude,
+        longitude: payload.longitude,
+    };
+    if (payload.location) {
+        if (typeof payload.location === "string") {
+            try {
+                location = JSON.parse(payload.location);
+            } catch (_error) {
+                location = {
+                    latitude: payload.latitude,
+                    longitude: payload.longitude,
+                };
+            }
+        } else {
+            location = payload.location;
+        }
+    }
+
+    return {
+        date: (payload.date || payload.datetime || "").slice(0, 10),
+        check_in: isIn ? payload.datetime : null,
+        check_out: isIn ? null : payload.datetime,
+        lat_in: isIn ? location?.latitude ?? null : null,
+        lng_in: isIn ? location?.longitude ?? null : null,
+        lat_out: isIn ? null : location?.latitude ?? null,
+        lng_out: isIn ? null : location?.longitude ?? null,
+        status: mapAttendanceStatusToAccounting(payload.status),
+        photo_in_path: isIn ? normalizeStoragePath(payload.attachment) ?? null : null,
+        photo_out_path: isIn ? null : normalizeStoragePath(payload.attachment) ?? null,
+        notes: payload.note ?? null,
+    };
 };
 
 export const submitForm = async (data) => {
-    return await api("set_form", { body: data });
+    return await api("set_form", { body: mapAppPermitToAccounting(data) });
 };
 
 export const getForms = async (params) => {
-    return await api("get_forms", { params: params });
+    const mappedParams = {
+        ...params,
+        status: mapStatusToAccounting(params?.status),
+    };
+    const result = await api("get_forms", { params: mappedParams });
+    return {
+        ...result,
+        records: (result?.records ?? []).map(mapAccountingPermitToApp),
+    };
 };
 export const getDinas = async (params) => {
-    return await api("get_dinas_clocks", { params: params });
+    const result = await api("get_dinas_clocks", { params });
+    return {
+        ...result,
+        records: (result?.records ?? []).map(mapAccountingAttendanceToApp),
+    };
 };
 export const getSingleForm = async (id) => {
-    return await api("get_forms", { route: id, params: { join: "users" } });
+    const result = await api("get_forms", { route: id });
+    return mapAccountingPermitToApp(result);
 };
 export const getSingleDinas = async (id) => {
-    return await api("get_dinas_clocks", { route: id, params: { join: "users" } });
+    const result = await api("get_dinas_clocks", { route: id });
+    return mapAccountingAttendanceToApp(result);
 };
 
 export const updateForm = async (id, data) => {
-    return await api("update_form", { body: data, route: id });
+    return await api("update_form", {
+        body: mapAppPermitToAccounting(data),
+        route: id,
+    });
 };
 export const updateDinas = async (id, data) => {
-    return await api("update_dinas_clocks", { body: data, route: id });
+    return await api("update_dinas_clocks", {
+        body: mapAppAttendanceToAccounting(data),
+        route: id,
+    });
 };
 
 export const submitManual = async (data) => {
-    return await api("post_manual", { body: data });
+    return await api("post_manual", { body: mapAppAttendanceToAccounting(data) });
 };
-
-export const submitHutang = async (data) => {
-    return await api("post_loan", { body: data });
+export const submitManualWithPhoto = async (data, file) => {
+    const mapped = mapAppAttendanceToAccounting(data);
+    const formData = new FormData();
+    Object.entries(mapped).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+            formData.append(key, String(value));
+        }
+    });
+    if (file) {
+        formData.append("photo", file);
+    }
+    return await api("post_manual", { body: formData });
 };
-
-
-export const getLoans = async (params) => {
-    return await api("get_loans", { params: params });
-}
-
-export const getSingleLoan = async (id) => {
-    return await api("get_loans", { route: id, params: { join: "users" } });
-}
-
-export const setLoan = async (data) => {
-    return await api("set_loan", { body: data });
-}
-
-export const updateLoan = async (id, data) => {
-    return await api("update_loan", { body: data, route: id });
-}
-
-
 export const setToken = async (user_id, token) => {
     return await api("set_token", { body: { user_id: user_id, token: token } });
 };

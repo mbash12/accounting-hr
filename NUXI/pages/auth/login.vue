@@ -1,16 +1,8 @@
 <script setup>
-import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import {
-    GoogleAuthProvider,
-    getAuth,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-} from "firebase/auth";
 import { Icon } from "@iconify/vue";
-import { grant, checkLoggedin, loading } from "@/deps/service.js";
+import { loginWithPassword, loading } from "@/deps/service.js";
 import Swal from "sweetalert2";
-const auth = getAuth();
 
 const router = useRouter();
 
@@ -29,30 +21,20 @@ const handleLogin = async () => {
         return;
     }
     loading(true);
-    const auth = getAuth();
     try {
-        await signInWithEmailAndPassword(
-            auth,
-            state.email,
-            state.password
-        );
-        const isLoggedin = await checkLoggedin();
+        const isLoggedin = await loginWithPassword(state.email, state.password);
         loading(false);
-        if (!isLoggedin) {
+        if (!isLoggedin?.ok) {
             Swal.fire("Eror!", "Akun tidak terdaftar", "error");
-            logout();
             return;
         }
         router.push("/");
         
     } catch (error) {
         loading(false);
-        error.value = error;
         Swal.fire("Eror!", "Email atau Password salah", "error");
     }
 };
-
-onMounted(async () => {});
 </script>
 
 <template>

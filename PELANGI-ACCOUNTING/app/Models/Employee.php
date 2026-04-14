@@ -44,6 +44,8 @@ class Employee extends Model
 
     protected $fillable = [
         'name',
+        'email',
+        'password',
         'employee_id',
         'nik',
         'npwp',
@@ -63,6 +65,10 @@ class Employee extends Model
         'created_by_user_id',
     ];
 
+    protected $hidden = [
+        'password',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -71,6 +77,7 @@ class Employee extends Model
             'is_active' => 'boolean',
             'company_id' => 'integer',
             'created_by_user_id' => 'integer',
+            'password' => 'hashed',
         ];
     }
 

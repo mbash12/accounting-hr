@@ -9,18 +9,8 @@
           <span class="text-[#565656] font-light text-16px">Silahkan login terlebih dahulu</span>
         </div>
         <Button
-          class="w-full flex items-center justify-center h-60px gap-4 flex-shrink-0"
-          variant="red"
-          @click="signInWithGoogle"
-        >
-          <div class="bg-white rounded-full p-1.5 w-35px h-35px flex items-center justify-center">
-            <Icon icon="flat-color-icons:google" width="1.5rem" height="1.5rem" />
-          </div>
-          Lanjutkan dengan Google
-        </Button>
-        <Button
           class="w-full flex items-center justify-center h-60px gap-4  flex-shrink-0"
-          variant="white"
+          variant="red"
           @click="navigateTo('/auth/login')"
         >
           <div class="bg-[#FFEDED] rounded-full p-1.5 w-35px h-35px flex items-center justify-center">
@@ -41,40 +31,14 @@
   </template>
   
   <script setup>
-  import { ref, onMounted } from 'vue';
-  import { useFirebaseAuth, getCurrentUser } from 'vuefire';
-  import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+  import { onMounted } from 'vue';
   import { Icon } from '@iconify/vue';
-  import { checkLoggedin, grant } from '@/deps/service';
-  import Swal from 'sweetalert2';
-  
-  const auth = useFirebaseAuth();
-  const googleAuthProvider = new GoogleAuthProvider();
-  const error = ref(null);
-  
-  const signInWithGoogle = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleAuthProvider);
-      const user = result.user;
-      const usr = await checkLoggedin();
-      if (!usr.loggedin) {
-        await Swal.fire("Gagal!", "Email Belum Terdaftar", "error");
-        return;
-      }
-      await navigateTo('/home');
-      setTimeout(() => {
-        grant();
-      }, 3000);
-    } catch (reason) {
-      await Swal.fire("Gagal!", reason.message, "error");
-      error.value = reason;
-    }
-  };
+  import { checkLoggedin } from '@/deps/service';
   
   onMounted(async () => {
     try {
-      const user = await getCurrentUser();
-      if (user) {
+      const user = await checkLoggedin();
+      if (user?.loggedin) {
         await navigateTo('/home');
       }
     } catch (err) {
