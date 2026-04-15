@@ -265,6 +265,54 @@ const mapAccountingAttendanceToApp = (attendance) => {
     };
 };
 
+const mapAccountingAttendanceToAppEntries = (attendance) => {
+    const baseUser = {
+        id: attendance.employee_id,
+        fullname: currentUser.user?.fullname,
+    };
+    const entries = [];
+
+    if (attendance.check_in) {
+        entries.push({
+            id: attendance.id,
+            type: "in",
+            datetime: attendance.check_in,
+            date: attendance.date,
+            note: attendance.notes,
+            status: mapAttendanceStatusToApp(attendance.status),
+            attachment: attendance.photo_in_path,
+            location: JSON.stringify({
+                latitude: attendance.lat_in,
+                longitude: attendance.lng_in,
+            }),
+            user_id: baseUser,
+        });
+    }
+
+    if (attendance.check_out) {
+        entries.push({
+            id: attendance.id,
+            type: "out",
+            datetime: attendance.check_out,
+            date: attendance.date,
+            note: attendance.notes,
+            status: mapAttendanceStatusToApp(attendance.status),
+            attachment: attendance.photo_out_path,
+            location: JSON.stringify({
+                latitude: attendance.lat_out,
+                longitude: attendance.lng_out,
+            }),
+            user_id: baseUser,
+        });
+    }
+
+    if (!entries.length) {
+        entries.push(mapAccountingAttendanceToApp(attendance));
+    }
+
+    return entries;
+};
+
 const mapAppAttendanceToAccounting = (payload) => {
     const isIn = payload.type === "in";
     let location = {
@@ -320,7 +368,7 @@ export const getDinas = async (params) => {
     const result = await api("get_dinas_clocks", { params });
     return {
         ...result,
-        records: (result?.records ?? []).map(mapAccountingAttendanceToApp),
+        records: (result?.records ?? []).flatMap(mapAccountingAttendanceToAppEntries),
     };
 };
 export const getSingleForm = async (id) => {

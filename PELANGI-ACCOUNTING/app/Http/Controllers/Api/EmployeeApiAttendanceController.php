@@ -71,11 +71,22 @@ class EmployeeApiAttendanceController extends Controller
             }
         }
 
-        $attendance = Attendance::create([
-            'employee_id' => $employee->id,
-            ...$validated,
-            'status' => $validated['status'] ?? 'present',
-        ]);
+        $attendance = Attendance::query()
+            ->where('employee_id', $employee->id)
+            ->whereDate('date', $validated['date'])
+            ->first();
+
+        $payload = $this->nonNullPayload($validated);
+
+        if ($attendance) {
+            $attendance->update($payload);
+        } else {
+            $attendance = Attendance::create([
+                'employee_id' => $employee->id,
+                ...$payload,
+                'status' => $payload['status'] ?? 'present',
+            ]);
+        }
 
         return response()->json($attendance->id);
     }
@@ -137,5 +148,13 @@ class EmployeeApiAttendanceController extends Controller
             'created_at' => $attendance->created_at,
             'updated_at' => $attendance->updated_at,
         ];
+    }
+
+    private function nonNullPayload(array $validated): array
+    {
+        return array_filter(
+            $validated,
+            static fn ($value) => $value !== null
+        );
     }
 }
