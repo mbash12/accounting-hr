@@ -48,6 +48,7 @@ Pusat pemrosesan gaji bulanan.
 - **Otomatisasi**: Tombol "Generate Payslip" akan mengumpulkan data absensi, lembur, izin, dan iuran BPJS/Pajak secara instan.
 - **Opsi Potongan**: Tersedia pilihan untuk mengaktifkan atau menonaktifkan pemotongan gaji akibat keterlambatan secara otomatis.
 - **Status**: Draft (dalam pengecekan), Diproses (siap dibayar), dan Diposting (sudah masuk pembukuan).
+- **Export BCA**: Fitur export data payroll ke format CSV standar BCA (Multi-Transfer) untuk kemudahan upload ke bank.
 
 ### H. Kuota Cuti
 Manajemen saldo cuti tahunan karyawan.
@@ -57,13 +58,15 @@ Manajemen saldo cuti tahunan karyawan.
 ### I. THR (Tunjangan Hari Raya)
 Modul khusus untuk menghitung dan mengelola pembayaran THR tahunan.
 - **Otomatisasi Perhitungan**: Sistem menghitung THR berdasarkan masa kerja (>= 12 bulan = 1 bulan gaji, < 12 bulan = pro-rata).
-- **PPh21**: Pajak THR dihitung secara otomatis menggunakan metode TER.
+- **PPh21 Kontrol**: Tersedia opsi (checkbox) untuk mengaktifkan atau menonaktifkan perhitungan pajak PPh21 pada THR.
 - **Integrasi Akuntansi**: Posting THR akan mendebit akun **Beban THR** dan mengkredit **Utang Gaji** serta **Utang PPh21**.
+- **Recalculate**: Fitur untuk menghitung ulang nilai THR jika terjadi perubahan data karyawan sebelum diposting.
+- **Export BCA**: Export data pembayaran THR ke format CSV BCA.
 
 ### J. Bonus
 Modul untuk pengelolaan bonus atau insentif karyawan di luar gaji rutin.
 - **Input Manual**: User dapat menambahkan daftar karyawan penerima bonus beserta nominalnya.
-- **PPh21**: Sistem menghitung otomatis potongan pajak atas bonus tersebut.
+- **PPh21 Kontrol**: Tersedia opsi untuk menghitung otomatis potongan pajak atas bonus atau dibayarkan secara gross.
 - **Integrasi Akuntansi**: Posting Bonus akan mendebit akun **Beban Bonus** dan mengkredit **Utang Gaji** serta **Utang PPh21**.
 
 ## 3. Fitur Kepatuhan (Indonesian Compliance)
@@ -80,12 +83,12 @@ Sistem menggunakan **Metode TER (Tarif Efektif Rata-rata)** terbaru sesuai regul
 Sistem menghitung THR otomatis sesuai regulasi:
 - Masa kerja >= 12 bulan: 1 kali Gaji Pokok.
 - Masa kerja < 12 bulan: Dihitung secara proporsional (pro-rata).
-- Terintegrasi dengan PPh21 (TER 2024).
+- Terintegrasi dengan PPh21 (TER 2024) dengan opsi toggle pajak.
 
 ## 4. Alur Kerja Integrasi Akuntansi
-Setelah payroll/THR/Bonus selesai diperiksa, langkah terakhir adalah **Posting ke Jurnal**. Proses ini akan:
+Setelah payroll/THR selesai diperiksa, langkah terakhir adalah **Posting ke Jurnal**. Proses ini akan:
 1. Membuat entri jurnal di modul Akuntansi secara otomatis.
-2. Mendebit akun biaya yang sesuai (**Beban Gaji**, **Beban THR**, **Beban Bonus**, atau **Beban BPJS**).
+2. Mendebit akun biaya yang sesuai (**Beban Gaji**, **Beban THR**, atau **Beban BPJS**).
 3. Mengkredit **Utang Gaji** (bersih), **Utang PPh21**, dan **Utang BPJS**.
 Hal ini memastikan sinkronisasi antara operasional HR dan laporan keuangan perusahaan.
 
@@ -93,6 +96,3 @@ Hal ini memastikan sinkronisasi antara operasional HR dan laporan keuangan perus
 Terdapat grup menu **Laporan HR & Payroll** yang menyediakan:
 - **Laporan Payroll**: Rekapitulasi gaji total per periode, berguna untuk basis transfer bank.
 - **Laporan Kehadiran**: Ringkasan performa kehadiran karyawan dalam satu bulan (Total hadir, terlambat, izin).
-
----
-*Dokumentasi ini disusun untuk memberikan panduan operasional bagi User dan Project Manager sistem Pelangi Accounting.*

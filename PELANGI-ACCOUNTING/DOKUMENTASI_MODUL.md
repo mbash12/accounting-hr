@@ -117,12 +117,6 @@
 - Pencatatan penerimaan barang
 - Pelacakan pemenuhan PO
 
-**Penerimaan Barang dengan Validasi Halal**
-- Penerimaan barang dengan validasi sertifikasi halal
-- Pengecekan kelengkapan dokumen halal
-- Validasi kehalalan produk dari pemasok
-- Pelacakan sertifikasi halal per produk
-
 **Daftar Hutang Usaha**
 - Laporan umur hutang pemasok
 - Ringkasan hutang tertagih
@@ -132,76 +126,6 @@
 - Pencatatan pengeluaran pembayaran
 - Alokasi pembayaran faktur
 - Pelacakan metode pembayaran
-
-**Supplier Queueing**
-- Manajemen antrian pemasok
-- Penjadwalan pengiriman pemasok
-- Prioritas pemasok
-- Pelacakan kinerja pemasok
-
----
-
-### 6. Operasional Retail
-**Pemesanan (Ordering)**
-- Pembuatan pesanan barang ke pemasok
-- Manajemen daftar pesanan
-- Pelacakan status pengiriman
-- Integrasi dengan stok
-
-**Permintaan Material (Material Requisition)**
-- Pembuatan permintaan material internal
-- Alur persetujuan permintaan
-- Pelacakan pemenuhan permintaan
-- Transfer antar-departemen
-
-**Transfer Antar Toko (IST - Inter Store Transfer)**
-- Transfer barang antar cabang/toko
-- Otorisasi transfer
-- Pelacakan status transfer
-- Penyesuaian stok otomatis
-
-**Transfer Antar Departemen (IDT - Inter Department Transfer)**
-- Transfer barang antar departemen
-- Manajemen permintaan internal
-- Pelacakan perpindahan barang
-- Penyesuaian stok departemen
-
-**Retur Barang (Goods Return)**
-- Manajemen retur barang ke pemasok
-- Dokumen retur
-- Penggantian atau pengembalian dana
-- Pelacakan alasan retur
-
-**Stock Opname (Stock Take)**
-- Pelaksanaan stock opname
-- Pencatatan selisih stok
-- Penyesuaian stok setelah stock opname
-- Laporan hasil stock opname
-- Validasi stok fisik vs sistem
-
-**Pengecekkan Harga (Price Checker)**
-- Pengecekan harga jual produk
-- Validasi harga aktual vs sistem
-- Pelacakan perubahan harga
-- Deteksi kesalahan harga
-
-**Pembuatan Kartu Harga (Price Card Creation)**
-- Pembuatan kartu harga untuk display
-- Template kartu harga
-- Cetak kartu harga berdasarkan aturan
-- Integrasi dengan perubahan harga
-
-**Pembuatan POP (POP Creation)**
-- Pembuatan material Point of Purchase
-- Desain dan template promosi
-- Manajemen material promosi toko
-- Pelacakan penggunaan POP
-
-**Pemantauan Kekosongan Barang (Out of Shelf Monitoring)**
-- Deteksi kekosongan rak/display
-- Notifikasi stok habis
-- Pelacakan ketersediaan produk
-- Rekomendasi replenishment
 
 ---
 
@@ -252,6 +176,13 @@
 - Perhitungan BPJS dan pajak
 - Manajemen status (draft, diproses, diposting)
 - Posting ke jurnal
+- **Export BCA Payroll (Format CSV standar bank)**
+
+**THR (Tunjangan Hari Raya)**
+- Perhitungan otomatis berdasarkan masa kerja (pro-rata)
+- Opsi perhitungan pajak PPh21
+- Posting ke jurnal otomatis (Beban THR)
+- Export BCA THR Payout
 
 **Kuota Cuti**
 - Manajemen kuota cuti tahunan
@@ -364,3 +295,4 @@
 - **Dukungan Multi-Perusahaan**: Sebagian besar modul mendukung fungsi multi-perusahaan dengan filter data per-perusahaan
 - **Integrasi**: Modul HR & Payroll terintegrasi dengan Buku Besar melalui posting jurnal otomatis
 - **Hak Akses Pengguna**: Akses ke modul dikontrol melalui hak akses berbasis peran (role-based permissions)
+- **Export Perbankan**: Mendukung format CSV standard BCA untuk mempermudah proses penggajian massal
