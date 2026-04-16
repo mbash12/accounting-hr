@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PayrollPeriods\Tables;
 
 use App\Models\PayrollPeriod;
 use App\Services\PayrollService;
+use App\Services\BcaPayrollService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -87,6 +88,21 @@ class PayrollPeriodsTable
                                 ->title(__('Payroll berhasil diposting ke jurnal'))
                                 ->success()
                                 ->send();
+                        }),
+                    Action::make('exportBca')
+                        ->label(__('Export BCA Payroll'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('info')
+                        ->visible(fn (PayrollPeriod $record): bool => $record->status !== 'draft')
+                        ->action(function (PayrollPeriod $record, BcaPayrollService $service) {
+                            $csv = $service->generateCsv($record);
+                            $filename = 'BCA_Payroll_' . str_replace(' ', '_', $record->name) . '.csv';
+                            
+                            return response()->streamDownload(function () use ($csv) {
+                                echo $csv;
+                            }, $filename, [
+                                'Content-Type' => 'text/csv',
+                            ]);
                         }),
                     EditAction::make(),
                 ])
