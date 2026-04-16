@@ -63,9 +63,10 @@ class DepartmentForm
                                 'Saturday' => __('Sabtu'),
                                 'Sunday' => __('Minggu'),
                             ])
-                            ->columns(4)
+                            ->columns(3)
                             ->default(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
-                            ->required(),
+                            ->required()
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
                 Section::make(__('Sistem'))
@@ -83,7 +84,8 @@ class DepartmentForm
                             ->disabled()
                             ->label(__('Dibuat Oleh')),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->hidden(),
             ]);
     }
 }

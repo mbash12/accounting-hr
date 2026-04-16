@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 use Illuminate\Support\Facades\Hash;
 
 class EmployeeForm
@@ -41,6 +42,8 @@ class EmployeeForm
                             ->placeholder(__('Otomatis')),
                         TextInput::make('nik')
                             ->label(__('NIK (KTP)'))
+                            ->numeric()
+                            ->minLength(16)
                             ->maxLength(16),
                         Select::make('department_id')
                             ->label(__('Departemen'))
@@ -68,9 +71,12 @@ class EmployeeForm
                             ->required(),
                         TextInput::make('basic_salary')
                             ->label(__('Gaji Pokok'))
+                            ->required()
                             ->numeric()
                             ->prefix('IDR')
-                            ->default(0),
+                            ->default(0)
+                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\')'))
+                            ->stripCharacters('.'),
                         Toggle::make('is_active')
                             ->label(__('Aktif'))
                             ->default(true),
@@ -80,6 +86,9 @@ class EmployeeForm
                     ->schema([
                         TextInput::make('npwp')
                             ->label(__('NPWP'))
+                            ->mask('99.999.999.9-999.999')
+                            ->placeholder('00.000.000.0-000.000')
+                            ->regex('/^\d{2}\.\d{3}\.\d{3}\.\d-\d{3}\.\d{3}$/')
                             ->maxLength(20),
                         Select::make('ptkp_status')
                             ->label(__('Status PTKP'))
@@ -102,10 +111,14 @@ class EmployeeForm
                             ->required(),
                         TextInput::make('bpjs_kesehatan_number')
                             ->label(__('No. BPJS Kesehatan'))
-                            ->maxLength(50),
+                            ->numeric()
+                            ->minLength(13)
+                            ->maxLength(13),
                         TextInput::make('bpjs_ketenagakerjaan_number')
                             ->label(__('No. BPJS Ketenagakerjaan'))
-                            ->maxLength(50),
+                            ->numeric()
+                            ->minLength(11)
+                            ->maxLength(11),
                     ])->columns(2),
                 Section::make(__('Rekening Bank'))
                     ->collapsible()
@@ -115,6 +128,7 @@ class EmployeeForm
                             ->maxLength(100),
                         TextInput::make('bank_account_number')
                             ->label(__('Nomor Rekening'))
+                            ->numeric()
                             ->maxLength(50),
                         TextInput::make('bank_account_holder')
                             ->label(__('Nama Pemilik Rekening'))

@@ -49,15 +49,6 @@ class PermitForm
                                 'others' => __('Izin'),
                             ])
                             ->required(),
-                        DatePicker::make('start_date')
-                            ->label(__('Tanggal Mulai'))
-                            ->required(),
-                        DatePicker::make('end_date')
-                            ->label(__('Tanggal Selesai'))
-                            ->required(),
-                        Textarea::make('reason')
-                            ->label(__('Alasan'))
-                            ->columnSpanFull(),
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
@@ -67,11 +58,22 @@ class PermitForm
                             ])
                             ->default('pending')
                             ->required(),
+                        DatePicker::make('start_date')
+                            ->label(__('Tanggal Mulai'))
+                            ->required(),
+                        DatePicker::make('end_date')
+                            ->label(__('Tanggal Selesai'))
+                            ->required(),
                         FileUpload::make('attachment_path')
                             ->label(__('Lampiran (Surat Dokter, dll)'))
                             ->directory('permits')
+                            ->columnSpan(1),
+                        Textarea::make('reason')
+                            ->label(__('Alasan'))
                             ->columnSpanFull(),
-                    ])->columns(2),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
             ]);
     }
 }

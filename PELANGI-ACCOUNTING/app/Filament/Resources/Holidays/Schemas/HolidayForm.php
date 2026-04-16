@@ -26,7 +26,9 @@ class HolidayForm
                         Toggle::make('is_cuti_bersama')
                             ->label(__('Cuti Bersama'))
                             ->default(false),
-                    ])->columns(2),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
             ]);
     }
 }

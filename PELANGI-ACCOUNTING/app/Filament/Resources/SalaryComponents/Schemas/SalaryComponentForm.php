@@ -53,7 +53,9 @@ class SalaryComponentForm
                         Toggle::make('is_active')
                             ->label(__('Aktif'))
                             ->default(true),
-                    ])->columns(2),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
             ]);
     }
 }

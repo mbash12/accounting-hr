@@ -29,7 +29,8 @@ class FaqCategoryForm
                             ->disabled()
                             ->label(__('Perusahaan')),
                     ])
-                    ->columns(2),
+                    ->columns(3)
+                    ->columnSpanFull(),
                 Section::make(__('Daftar Pertanyaan'))
                     ->schema([
                         Repeater::make('faqs')
@@ -50,6 +51,7 @@ class FaqCategoryForm
                             ->columns(1)
                             ->label('')
                     ])
+                    ->columnSpanFull()
             ]);
     }
 }

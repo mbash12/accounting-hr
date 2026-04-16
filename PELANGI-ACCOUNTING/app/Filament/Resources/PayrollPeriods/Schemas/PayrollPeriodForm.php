@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\RawJs;
 
 class PayrollPeriodForm
 {
@@ -25,7 +26,8 @@ class PayrollPeriodForm
                         Toggle::make('apply_attendance_deduction')
                             ->label(__('Terapkan Potongan Kehadiran'))
                             ->helperText(__('Jika aktif, keterlambatan dan pulang cepat akan memotong gaji.'))
-                            ->default(false),
+                            ->default(false)
+                            ->hidden(),
                         Select::make('month')
                             ->label(__('Bulan'))
                             ->options([
@@ -55,17 +57,21 @@ class PayrollPeriodForm
                             ->default('draft')
                             ->disabled()
                             ->required(),
-                    ])->columns(2),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
                 Section::make(__('Ringkasan Payroll'))
                     ->collapsible()
                     ->schema([
-                        TextInput::make('total_gross_salary')->label(__('Total Gaji Bruto'))->disabled()->numeric()->default(0),
-                        TextInput::make('total_deductions')->label(__('Total Potongan'))->disabled()->numeric()->default(0),
-                        TextInput::make('total_net_salary')->label(__('Total Gaji Bersih'))->disabled()->numeric()->default(0),
-                        TextInput::make('total_pph21')->label(__('Total PPh21'))->disabled()->numeric()->default(0),
-                        TextInput::make('total_bpjs_employer')->label(__('Total BPJS (Perusahaan)'))->disabled()->numeric()->default(0),
-                        TextInput::make('total_bpjs_employee')->label(__('Total BPJS (Karyawan)'))->disabled()->numeric()->default(0),
-                    ])->columns(3),
+                        TextInput::make('total_gross_salary')->label(__('Total Gaji Bruto'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),
+                        TextInput::make('total_deductions')->label(__('Total Potongan'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),
+                        TextInput::make('total_net_salary')->label(__('Total Gaji Bersih'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),
+                        TextInput::make('total_pph21')->label(__('Total PPh21'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),
+                        TextInput::make('total_bpjs_employer')->label(__('Total BPJS (Perusahaan)'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),
+                        TextInput::make('total_bpjs_employee')->label(__('Total BPJS (Karyawan)'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
             ]);
     }
 }
