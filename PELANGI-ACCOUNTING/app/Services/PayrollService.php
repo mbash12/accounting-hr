@@ -14,11 +14,212 @@ use App\Models\PayrollPeriod;
 use App\Models\Payslip;
 use App\Models\PayslipItem;
 use App\Models\SalaryComponent;
+use App\Models\BonusCalculation;
+use App\Models\BonusCalculationItem;
+use App\Models\THRCalculation;
+use App\Models\THRCalculationItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PayrollService
 {
+    /**
+     * Calculate THR for all active employees
+     */
+    public function calculateTHRForPeriod(THRCalculation $thr)
+    {
+        return DB::transaction(function () use ($thr) {
+            $companyId = $thr->company_id ?: session('selected_company_id');
+            
+            if (!$companyId || $companyId === 'all') {
+                return $thr;
+            }
+
+            $employees = Employee::where('is_active', true)
+                ->where('company_id', $companyId)
+                ->get();
+
+            $totalAmount = 0;
+            $totalPPh21 = 0;
+
+            // Clear existing items if any
+            $thr->items()->delete();
+
+            foreach ($employees as $employee) {
+                if (!$employee->hire_date) continue;
+
+                $monthsService = (int) $employee->hire_date->diffInMonths($thr->payout_date);
+                $amount = 0;
+
+                if ($monthsService >= 12) {
+                    $amount = $employee->basic_salary;
+                } elseif ($monthsService >= 1) {
+                    $amount = ($monthsService / 12) * $employee->basic_salary;
+                }
+
+                if ($amount > 0) {
+                    // Simple PPh21 for THR (using TER for simplicity in this version)
+                    $pph21 = $thr->is_taxable ? $this->calculatePPh21($employee, $amount) : 0;
+
+                    THRCalculationItem::create([
+                        'thr_calculation_id' => $thr->id,
+                        'employee_id' => $employee->id,
+                        'basic_salary' => $employee->basic_salary,
+                        'months_service' => $monthsService,
+                        'amount' => $amount,
+                        'pph21' => $pph21,
+                        'company_id' => $companyId,
+                    ]);
+
+                    $totalAmount += $amount;
+                    $totalPPh21 += $pph21;
+                }
+            }
+
+            $thr->update([
+                'total_amount' => $totalAmount,
+                'total_pph21' => $totalPPh21,
+                'status' => 'processed',
+                'company_id' => $thr->company_id ?: $companyId,
+            ]);
+
+            return $thr;
+        });
+    }
+
+    /**
+     * Calculate Bonus PPh21 (Placeholder - can be refined)
+     */
+    public function calculateBonusForPeriod(BonusCalculation $bonus)
+    {
+        // Bonus items are usually added manually in UI or imported
+        // This method just updates totals
+        $totalAmount = $bonus->items()->sum('amount');
+        $totalPPh21 = 0;
+
+        foreach ($bonus->items as $item) {
+            $pph21 = $bonus->is_taxable ? $this->calculatePPh21($item->employee, $item->amount) : 0;
+            $item->update(['pph21' => $pph21]);
+            $totalPPh21 += $pph21;
+        }
+
+        $bonus->update([
+            'total_amount' => $totalAmount,
+            'total_pph21' => $totalPPh21,
+            'status' => 'processed',
+        ]);
+
+        return $bonus;
+    }
+
+    /**
+     * Post THR to General Ledger
+     */
+    public function postTHRToLedger(THRCalculation $thr)
+    {
+        return DB::transaction(function () use ($thr) {
+            $mappings = AccountMapping::getMappingsForDocument('payroll', $thr->company_id);
+            
+            $thrExpenseAccount = $mappings['thr_expense'] ?? ($mappings['salary_expense'] ?? null);
+            $salaryPayableAccount = $mappings['salary_payable'] ?? null;
+            $pph21PayableAccount = $mappings['pph21_payable'] ?? null;
+
+            if (!$thrExpenseAccount || !$salaryPayableAccount || !$pph21PayableAccount) {
+                throw new \Exception("THR Account Mappings (Expense, Payable, PPh21) not fully configured.");
+            }
+
+            $description = "THR Posting - " . $thr->name;
+            $entryNumber = $this->generateEntryNumber();
+            
+            $journalEntry = JournalEntry::create([
+                'entry_number' => $entryNumber,
+                'date' => $thr->payout_date,
+                'reference_no' => $thr->name,
+                'description' => $description,
+                'amount' => $thr->total_amount, 
+                'total_amount' => $thr->total_amount,
+                'status' => 'posted',
+                'is_posted' => true,
+                'sub_module' => 'payroll',
+                'reference_type' => get_class($thr),
+                'reference_id' => $thr->id,
+                'posted_by_user_id' => Auth::id(),
+                'posted_at' => now(),
+                'company_id' => $thr->company_id,
+            ]);
+
+            // Debit: THR Expense
+            $this->createJournalItem($journalEntry, $thrExpenseAccount, 'debit', $thr->total_amount);
+
+            // Credit: Salary Payable (Net)
+            $this->createJournalItem($journalEntry, $salaryPayableAccount, 'credit', $thr->total_amount - $thr->total_pph21);
+
+            // Credit: PPh21 Payable
+            $this->createJournalItem($journalEntry, $pph21PayableAccount, 'credit', $thr->total_pph21);
+
+            $thr->update([
+                'journal_entry_id' => $journalEntry->id,
+                'status' => 'posted',
+            ]);
+
+            return $journalEntry;
+        });
+    }
+
+    /**
+     * Post Bonus to General Ledger
+     */
+    public function postBonusToLedger(BonusCalculation $bonus)
+    {
+        return DB::transaction(function () use ($bonus) {
+            $mappings = AccountMapping::getMappingsForDocument('payroll', $bonus->company_id);
+            
+            $bonusExpenseAccount = $mappings['bonus_expense'] ?? ($mappings['salary_expense'] ?? null);
+            $salaryPayableAccount = $mappings['salary_payable'] ?? null;
+            $pph21PayableAccount = $mappings['pph21_payable'] ?? null;
+
+            if (!$bonusExpenseAccount || !$salaryPayableAccount || !$pph21PayableAccount) {
+                throw new \Exception("Bonus Account Mappings (Expense, Payable, PPh21) not fully configured.");
+            }
+
+            $description = "Bonus Posting - " . $bonus->name;
+            $entryNumber = $this->generateEntryNumber();
+            
+            $journalEntry = JournalEntry::create([
+                'entry_number' => $entryNumber,
+                'date' => $bonus->payout_date,
+                'reference_no' => $bonus->name,
+                'description' => $description,
+                'amount' => $bonus->total_amount, 
+                'total_amount' => $bonus->total_amount,
+                'status' => 'posted',
+                'is_posted' => true,
+                'sub_module' => 'payroll',
+                'reference_type' => get_class($bonus),
+                'reference_id' => $bonus->id,
+                'posted_by_user_id' => Auth::id(),
+                'posted_at' => now(),
+                'company_id' => $bonus->company_id,
+            ]);
+
+            // Debit: Bonus Expense
+            $this->createJournalItem($journalEntry, $bonusExpenseAccount, 'debit', $bonus->total_amount);
+
+            // Credit: Salary Payable (Net)
+            $this->createJournalItem($journalEntry, $salaryPayableAccount, 'credit', $bonus->total_amount - $bonus->total_pph21);
+
+            // Credit: PPh21 Payable
+            $this->createJournalItem($journalEntry, $pph21PayableAccount, 'credit', $bonus->total_pph21);
+
+            $bonus->update([
+                'journal_entry_id' => $journalEntry->id,
+                'status' => 'posted',
+            ]);
+
+            return $journalEntry;
+        });
+    }
+
     /**
      * Calculate BPJS for an employee
      */

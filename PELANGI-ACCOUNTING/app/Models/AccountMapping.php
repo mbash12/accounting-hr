@@ -63,6 +63,8 @@ class AccountMapping extends Model
         'write_off' => 'Write Off',
         // Payroll mappings
         'salary_expense' => 'Salary Expense',
+        'thr_expense' => 'THR Expense',
+        'bonus_expense' => 'Bonus Expense',
         'bpjs_expense' => 'BPJS Expense (Employer)',
         'salary_payable' => 'Salary Payable (Net)',
         'pph21_payable' => 'PPh21 Payable',
@@ -91,7 +93,7 @@ class AccountMapping extends Model
         'cash_transfer' => ['cash', 'bank'],
         'receivable_payment' => ['other_charges', 'discount', 'write_off'],
         'payable_payment' => ['other_charges', 'discount', 'write_off'],
-        'payroll' => ['salary_expense', 'bpjs_expense', 'salary_payable', 'pph21_payable', 'bpjs_payable'],
+        'payroll' => ['salary_expense', 'thr_expense', 'bonus_expense', 'bpjs_expense', 'salary_payable', 'pph21_payable', 'bpjs_payable'],
     ];
 
     /**

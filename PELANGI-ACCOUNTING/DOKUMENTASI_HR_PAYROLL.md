@@ -54,6 +54,18 @@ Manajemen saldo cuti tahunan karyawan.
 - **Pengaturan Tahunan**: Input kuota cuti untuk setiap karyawan per tahun (misal: 12 hari).
 - **Monitoring & Penyesuaian**: Menampilkan sisa cuti secara real-time. User dapat menyesuaikan jumlah 'Kuota Terpakai' secara manual jika aplikasi baru mulai digunakan di pertengahan tahun.
 
+### I. THR (Tunjangan Hari Raya)
+Modul khusus untuk menghitung dan mengelola pembayaran THR tahunan.
+- **Otomatisasi Perhitungan**: Sistem menghitung THR berdasarkan masa kerja (>= 12 bulan = 1 bulan gaji, < 12 bulan = pro-rata).
+- **PPh21**: Pajak THR dihitung secara otomatis menggunakan metode TER.
+- **Integrasi Akuntansi**: Posting THR akan mendebit akun **Beban THR** dan mengkredit **Utang Gaji** serta **Utang PPh21**.
+
+### J. Bonus
+Modul untuk pengelolaan bonus atau insentif karyawan di luar gaji rutin.
+- **Input Manual**: User dapat menambahkan daftar karyawan penerima bonus beserta nominalnya.
+- **PPh21**: Sistem menghitung otomatis potongan pajak atas bonus tersebut.
+- **Integrasi Akuntansi**: Posting Bonus akan mendebit akun **Beban Bonus** dan mengkredit **Utang Gaji** serta **Utang PPh21**.
+
 ## 3. Fitur Kepatuhan (Indonesian Compliance)
 
 ### Perhitungan BPJS
@@ -65,14 +77,15 @@ Sistem secara otomatis menghitung porsi yang dibayar Perusahaan dan Karyawan:
 Sistem menggunakan **Metode TER (Tarif Efektif Rata-rata)** terbaru sesuai regulasi pemerintah tahun 2024. Besaran pajak ditentukan langsung dari total penghasilan bruto dan kategori PTKP karyawan.
 
 ### THR (Tunjangan Hari Raya)
-Sistem dapat menghitung THR otomatis dengan logika:
+Sistem menghitung THR otomatis sesuai regulasi:
 - Masa kerja >= 12 bulan: 1 kali Gaji Pokok.
 - Masa kerja < 12 bulan: Dihitung secara proporsional (pro-rata).
+- Terintegrasi dengan PPh21 (TER 2024).
 
 ## 4. Alur Kerja Integrasi Akuntansi
-Setelah payroll selesai diperiksa, langkah terakhir adalah **Posting ke Jurnal**. Proses ini akan:
+Setelah payroll/THR/Bonus selesai diperiksa, langkah terakhir adalah **Posting ke Jurnal**. Proses ini akan:
 1. Membuat entri jurnal di modul Akuntansi secara otomatis.
-2. Mendebit **Beban Gaji** dan **Beban BPJS**.
+2. Mendebit akun biaya yang sesuai (**Beban Gaji**, **Beban THR**, **Beban Bonus**, atau **Beban BPJS**).
 3. Mengkredit **Utang Gaji** (bersih), **Utang PPh21**, dan **Utang BPJS**.
 Hal ini memastikan sinkronisasi antara operasional HR dan laporan keuangan perusahaan.
 
