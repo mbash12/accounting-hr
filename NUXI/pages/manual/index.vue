@@ -364,7 +364,7 @@ const submit = async (type) => {
                         </div>
                     </div>
                 </div>
-                <div class="flex flex-col bg-[#FEFEFE] rounded-2xl py-4 mb-4">
+                <div class="flex flex-col bg-[#FEFEFE] rounded-2xl pb-4 mb-4">
                     <div class="flex justify-between p-4">
                         <span class="text-17px font-bold text-[#404040]"
                             >Riwayat Absensi</span
@@ -375,7 +375,7 @@ const submit = async (type) => {
                             >{{ historyToggleText() }}</span
                         >
                     </div>
-                    <div class="px-4 pb-2 flex flex-col gap-3">
+                    <div class="px-0 pb-2 flex flex-col gap-3">
                         <div
                             class="border rounded-xl p-3 bg-white shadow-sm"
                             v-for="h in displayedHistory()"

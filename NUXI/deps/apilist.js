@@ -20,7 +20,7 @@ export const apilist = {
       method:'GET'
   },
   faq: {
-      url:"/v1/records/faq_categories",
+      url:"/employeeapi/faqs",
       auth:true,
       method:'GET'
   },

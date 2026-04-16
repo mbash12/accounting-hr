@@ -21,7 +21,6 @@ export default defineNuxtConfig({
         baseURL: "/user/",
         buildAssetsDir: "/_nuxt/",
 
-        pageTransition: { name: "page", mode: "out-in" },
         head: {
             title: "PermitHub",
             link: [

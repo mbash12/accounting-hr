@@ -141,7 +141,7 @@ onMounted(async () => {
                                     height="2rem"
                                 />
                             </button>
-                            <button
+                            <!-- <button
                                 class="flex items-center justify-center relative"
                                 @click="$router.push('/notifications')"
                             >
@@ -153,7 +153,7 @@ onMounted(async () => {
                                 <span
                                     class="absolute p-1 rounded-full text-10px font-semibold bg-[#FFA408] shadow border border-white text-black h-3 w-3 flex items-center justify-center top-0 right-0"
                                 ></span>
-                            </button>
+                            </button> -->
                         </div>
                     </div>
                 </div>

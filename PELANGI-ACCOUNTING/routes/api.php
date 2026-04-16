@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Controllers\Api\InvoiceSyncController;
 use App\Http\Middleware\EmployeeApiAuth;
 
+use App\Http\Controllers\Api\FaqController;
+
 Route::prefix('master')->middleware([Api::class])->group(function () {
     Route::get('/coa', [MasterDataController::class, 'coa']);
     Route::get('/vendor', [MasterDataController::class, 'vendor']);
@@ -63,4 +65,6 @@ Route::prefix('employeeapi')->middleware([EmployeeApiAuth::class])->group(functi
     Route::post('/attendances', [EmployeeApiAttendanceController::class, 'store']);
     Route::get('/attendances/{attendance}', [EmployeeApiAttendanceController::class, 'show']);
     Route::put('/attendances/{attendance}', [EmployeeApiAttendanceController::class, 'update']);
+    Route::get('/faqs', [FaqController::class, 'index']);
 });
+
