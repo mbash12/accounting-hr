@@ -409,18 +409,46 @@ class PayrollService
         });
     }
 
+    /**
+     * Calculate the prorate ratio for an employee in a period.
+     * Returns 1.0 (full) if the employee joined before the period starts.
+     * Returns a fraction if the employee joined mid-period.
+     */
+    private function getProrateRatio(Employee $employee, PayrollPeriod $period): float
+    {
+        $hireDate = $employee->hire_date;
+
+        if (! $hireDate || $hireDate->lte($period->start_date)) {
+            return 1.0;
+        }
+
+        // Hire date is after period end — should not happen for active employees, but guard it
+        if ($hireDate->gt($period->end_date)) {
+            return 0.0;
+        }
+
+        $totalDays = $period->start_date->diffInDays($period->end_date) + 1;
+        $workedDays = $hireDate->diffInDays($period->end_date) + 1;
+
+        return $totalDays > 0 ? round($workedDays / $totalDays, 10) : 1.0;
+    }
+
     private function generateSinglePayslip(Employee $employee, PayrollPeriod $period)
     {
-        $basicSalary = $employee->basic_salary;
-        
+        // Prorate: automatically applied when employee joined mid-period
+        $prorateRatio = $this->getProrateRatio($employee, $period);
+        $isProrated = $prorateRatio < 1.0;
+
+        $basicSalary = round((float) $employee->basic_salary * $prorateRatio, 2);
+
         // 1. Regular Allowances & Deductions
         $empComponents = $employee->salaryComponents()->with('salaryComponent')->get()
             ->filter(fn ($comp) => $comp->salaryComponent !== null);
         $allowances = $empComponents->where('salaryComponent.type', 'allowance');
         $deductions = $empComponents->where('salaryComponent.type', 'deduction');
-        
-        $totalAllowance = $allowances->sum('amount');
-        $totalDeduction = $deductions->sum('amount');
+
+        $totalAllowance = round($allowances->sum('amount') * $prorateRatio, 2);
+        $totalDeduction = round($deductions->sum('amount') * $prorateRatio, 2);
         
         // 2. Attendance Deductions (Late & Early Departure)
         $attendanceDeduction = 0;
@@ -439,8 +467,7 @@ class PayrollService
         $overtimePay = $this->calculateOvertime($employee, $period);
         $totalAllowance += $overtimePay;
 
-        // 3. THR (Logic: check if period name or month suggests THR, or add a flag to period)
-        // For now, let's assume if 'THR' is in the period name
+        // 4. THR — not prorated (statutory entitlement based on service months)
         $thrPay = 0;
         if (str_contains(strtoupper($period->name), 'THR')) {
             $thrPay = $this->calculateTHR($employee);
@@ -474,8 +501,24 @@ class PayrollService
             'net_salary' => $netSalary,
             'company_id' => $period->company_id,
         ]);
+
+        // Prorate info line — shown first so it's visible at the top of the payslip
+        if ($isProrated) {
+            $totalDays = $period->start_date->diffInDays($period->end_date) + 1;
+            $workedDays = $employee->hire_date->diffInDays($period->end_date) + 1;
+            PayslipItem::create([
+                'payslip_id' => $payslip->id,
+                'name' => __('Prorata (:worked/:total hari)', [
+                    'worked' => $workedDays,
+                    'total'  => $totalDays,
+                ]),
+                'type' => 'info',
+                'amount' => 0,
+                'company_id' => $period->company_id,
+            ]);
+        }
         
-        // Create Items for individual components
+        // Create Items for individual components (prorated amounts)
         foreach ($empComponents as $comp) {
             if (! $comp->salaryComponent) {
                 continue;
@@ -485,7 +528,7 @@ class PayrollService
                 'salary_component_id' => $comp->salary_component_id,
                 'name' => $comp->salaryComponent->name,
                 'type' => $comp->salaryComponent->type,
-                'amount' => $comp->amount,
+                'amount' => round($comp->amount * $prorateRatio, 2),
                 'company_id' => $period->company_id,
             ]);
         }

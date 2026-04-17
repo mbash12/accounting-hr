@@ -7,6 +7,7 @@ use App\Services\PayrollService;
 use App\Services\BcaPayrollService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -105,6 +106,7 @@ class PayrollPeriodsTable
                             ]);
                         }),
                     EditAction::make(),
+                    DeleteAction::make(),
                 ])
             ])
             ->bulkActions([

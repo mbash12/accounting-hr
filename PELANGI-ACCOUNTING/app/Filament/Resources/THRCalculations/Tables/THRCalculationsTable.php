@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\THRCalculations\Tables;
 
 use App\Models\THRCalculation;
+use App\Services\BcaPayrollService;
 use App\Services\PayrollService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -95,6 +96,21 @@ class THRCalculationsTable
                                     ->persistent()
                                     ->send();
                             }
+                        }),
+                    Action::make('exportBca')
+                        ->label(__('Export BCA Payroll'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('info')
+                        ->visible(fn (THRCalculation $record): bool => $record->status !== 'draft')
+                        ->action(function (THRCalculation $record, BcaPayrollService $service) {
+                            $csv = $service->generateCsvForTHR($record);
+                            $filename = 'BCA_THR_' . str_replace(' ', '_', $record->name) . '.csv';
+
+                            return response()->streamDownload(function () use ($csv) {
+                                echo $csv;
+                            }, $filename, [
+                                'Content-Type' => 'text/csv',
+                            ]);
                         }),
                     EditAction::make(),
                     DeleteAction::make(),

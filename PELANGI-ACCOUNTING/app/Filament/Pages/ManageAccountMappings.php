@@ -213,6 +213,7 @@ class ManageAccountMappings extends Page implements HasForms
             'loss' => 'Beban Lain',
             'write_off' => 'Penghapusan (Write Off)',
             'salary_expense' => 'Beban Gaji',
+            'thr_expense' => 'Beban THR',
             'bpjs_expense' => 'Beban BPJS (Perusahaan)',
             'salary_payable' => 'Utang Gaji (Bersih)',
             'pph21_payable' => 'Utang PPh21',
