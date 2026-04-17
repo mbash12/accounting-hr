@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PayrollPeriods\RelationManagers;
 
 use App\Models\Payslip;
+use Filament\Actions\Action;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -31,6 +32,14 @@ class PayslipsRelationManager extends RelationManager
                 TextColumn::make('gross_salary')->money('IDR'),
                 TextColumn::make('net_salary')->money('IDR'),
             ])
-            ->defaultSort('number', 'asc');
+            ->defaultSort('number', 'asc')
+            ->recordActions([
+                Action::make('downloadSlip')
+                    ->label(__('Download Slip'))
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('success')
+                    ->url(fn (Payslip $record): string => route('payslip.pdf.single', $record->id))
+                    ->openUrlInNewTab(),
+            ]);
     }
 }

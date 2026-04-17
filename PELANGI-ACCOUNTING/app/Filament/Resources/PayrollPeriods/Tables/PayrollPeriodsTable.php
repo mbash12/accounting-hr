@@ -77,6 +77,13 @@ class PayrollPeriodsTable
                                 ->success()
                                 ->send();
                         }),
+                    Action::make('downloadPayslips')
+                        ->label(__('Download Slip Gaji'))
+                        ->icon('heroicon-o-arrow-down-tray')
+                        ->color('success')
+                        ->visible(fn (PayrollPeriod $record): bool => $record->payslips()->exists())
+                        ->url(fn (PayrollPeriod $record): string => route('payslip.pdf.period', $record->id))
+                        ->openUrlInNewTab(),
                     Action::make('postToLedger')
                         ->label(__('Posting ke Jurnal'))
                         ->icon('heroicon-o-book-open')

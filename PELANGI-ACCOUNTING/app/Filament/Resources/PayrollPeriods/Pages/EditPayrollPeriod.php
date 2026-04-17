@@ -37,9 +37,15 @@ class EditPayrollPeriod extends EditRecord
                         ->send();
                     $this->redirect(
                         PayrollPeriodResource::getUrl('edit', ['record' => $period]),
-                        navigate: true,
                     );
                 }),
+            Action::make('downloadPayslips')
+                ->label(__('Download Slip Gaji'))
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
+                ->visible(fn (): bool => $this->record->payslips()->exists())
+                ->url(fn (): string => route('payslip.pdf.period', $this->record->id))
+                ->openUrlInNewTab(),
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),

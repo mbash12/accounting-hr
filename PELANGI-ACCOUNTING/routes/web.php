@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JournalVoucherController;
 use App\Http\Controllers\Api\InvoiceSyncController;
+use App\Http\Controllers\PayslipPdfController;
 use App\Services\InventorySyncService;
 
 use App\Http\Controllers\OpeningBalanceUpdateController;
@@ -21,6 +22,9 @@ Route::middleware(['auth', 'web'])->group(function () {
 
     Route::get('/receivable-payment/{id}/print', [App\Http\Controllers\PaymentPrintController::class, 'printReceivable'])->name('receivable-payment.print');
     Route::get('/payable-payment/{id}/print', [App\Http\Controllers\PaymentPrintController::class, 'printPayable'])->name('payable-payment.print');
+
+    Route::get('/payroll-period/{id}/payslips/pdf', [PayslipPdfController::class, 'downloadByPeriod'])->name('payslip.pdf.period');
+    Route::get('/payslip/{id}/pdf', [PayslipPdfController::class, 'downloadSingle'])->name('payslip.pdf.single');
 
     // Route to update existing opening balance dates
     Route::post('/internal/opening-balances/update-dates', [OpeningBalanceUpdateController::class, 'updateDates'])->name('opening-balances.update-dates');
