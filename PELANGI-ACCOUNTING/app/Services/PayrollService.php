@@ -13,7 +13,6 @@ use App\Models\OvertimeRule;
 use App\Models\PayrollPeriod;
 use App\Models\Payslip;
 use App\Models\PayslipItem;
-use App\Models\SalaryComponent;
 use App\Models\BonusCalculation;
 use App\Models\BonusCalculationItem;
 use App\Models\THRCalculation;
@@ -437,99 +436,145 @@ class PayrollService
     {
         // Prorate: automatically applied when employee joined mid-period
         $prorateRatio = $this->getProrateRatio($employee, $period);
-        $isProrated = $prorateRatio < 1.0;
+        $isProrated   = $prorateRatio < 1.0;
 
         $basicSalary = round((float) $employee->basic_salary * $prorateRatio, 2);
 
-        // 1. Regular Allowances & Deductions
+        // --- 1. Regular Allowances & Deductions ---
+        // Flags on each SalaryComponent drive three independent behaviours:
+        //   is_fixed     → do NOT prorate (statutory flat amount regardless of hire date)
+        //   is_taxable   → count towards the PPh21 taxable base
+        //   is_bpjs_base → count towards the BPJS contribution base
         $empComponents = $employee->salaryComponents()->with('salaryComponent')->get()
             ->filter(fn ($comp) => $comp->salaryComponent !== null);
-        $allowances = $empComponents->where('salaryComponent.type', 'allowance');
-        $deductions = $empComponents->where('salaryComponent.type', 'deduction');
 
-        $totalAllowance = round($allowances->sum('amount') * $prorateRatio, 2);
-        $totalDeduction = round($deductions->sum('amount') * $prorateRatio, 2);
-        
-        // 2. Attendance Deductions (Late & Early Departure)
+        $totalAllowance   = 0.0;
+        $taxableAllowance = 0.0;
+        $bpjsBaseExtra    = 0.0;
+        $componentItems   = [];  // collected so we can create PayslipItems after payslip is saved
+
+        foreach ($empComponents->where('salaryComponent.type', 'allowance') as $comp) {
+            $sc     = $comp->salaryComponent;
+            $amount = $sc->is_fixed
+                ? (float) $comp->amount
+                : round((float) $comp->amount * $prorateRatio, 2);
+
+            $totalAllowance += $amount;
+            if ($sc->is_taxable)   $taxableAllowance += $amount;
+            if ($sc->is_bpjs_base) $bpjsBaseExtra    += $amount;
+
+            $componentItems[] = [
+                'salary_component_id' => $comp->salary_component_id,
+                'name'   => $sc->name,
+                'type'   => 'allowance',
+                'amount' => $amount,
+            ];
+        }
+
+        $totalDeduction = 0.0;
+        foreach ($empComponents->where('salaryComponent.type', 'deduction') as $comp) {
+            $sc     = $comp->salaryComponent;
+            $amount = $sc->is_fixed
+                ? (float) $comp->amount
+                : round((float) $comp->amount * $prorateRatio, 2);
+
+            $totalDeduction += $amount;
+
+            $componentItems[] = [
+                'salary_component_id' => $comp->salary_component_id,
+                'name'   => $sc->name,
+                'type'   => 'deduction',
+                'amount' => $amount,
+            ];
+        }
+
+        // --- 2. Attendance Deductions (Late & Early Departure) ---
         $attendanceDeduction = 0;
         if ($period->apply_attendance_deduction) {
             $attendanceStats = Attendance::where('employee_id', $employee->id)
                 ->whereBetween('date', [$period->start_date, $period->end_date])
                 ->select(DB::raw('SUM(late_minutes) as total_late, SUM(early_departure_minutes) as total_early'))
                 ->first();
-            
-            $totalOffMinutes = ($attendanceStats->total_late ?? 0) + ($attendanceStats->total_early ?? 0);
-            $attendanceDeduction = $totalOffMinutes * 500; // Example: Rp 500 per minute
-            $totalDeduction += $attendanceDeduction;
+
+            $totalOffMinutes     = ($attendanceStats->total_late ?? 0) + ($attendanceStats->total_early ?? 0);
+            $attendanceDeduction = $totalOffMinutes * 500; // Rp 500 per minute
+            $totalDeduction     += $attendanceDeduction;
         }
 
-        // 3. Overtime
+        // --- 3. Overtime (always taxable, not in BPJS base) ---
         $overtimePay = $this->calculateOvertime($employee, $period);
-        $totalAllowance += $overtimePay;
+        if ($overtimePay > 0) {
+            $totalAllowance   += $overtimePay;
+            $taxableAllowance += $overtimePay;
+        }
 
-        // 4. THR — not prorated (statutory entitlement based on service months)
+        // --- 4. THR — statutory, not prorated, taxable ---
         $thrPay = 0;
         if (str_contains(strtoupper($period->name), 'THR')) {
             $thrPay = $this->calculateTHR($employee);
-            $totalAllowance += $thrPay;
+            if ($thrPay > 0) {
+                $totalAllowance   += $thrPay;
+                $taxableAllowance += $thrPay;
+            }
         }
-        
+
+        // --- 5. Final calculations ---
         $grossSalary = $basicSalary + $totalAllowance;
-        
-        // BPJS
-        $bpjsBase = $basicSalary; 
-        $bpjs = $this->calculateBPJS($employee, $bpjsBase);
-        
-        // PPh21 (Monthly)
-        $pph21 = $this->calculatePPh21($employee, $grossSalary);
-        
+
+        // BPJS base = basic salary + components explicitly flagged as BPJS base
+        $bpjsBase = $basicSalary + $bpjsBaseExtra;
+        $bpjs     = $this->calculateBPJS($employee, $bpjsBase);
+
+        // PPh21 base = basic salary + taxable allowances (including taxable overtime/THR)
+        $taxableIncome = $basicSalary + $taxableAllowance;
+        $pph21         = $this->calculatePPh21($employee, $taxableIncome);
+
         $netSalary = $grossSalary - $totalDeduction - $pph21 - $bpjs['total_employee'];
-        
+
         $payslip = Payslip::create([
-            'employee_id' => $employee->id,
-            'payroll_period_id' => $period->id,
-            'basic_salary' => $basicSalary,
-            'total_allowance' => $totalAllowance,
-            'total_deduction' => $totalDeduction,
-            'gross_salary' => $grossSalary,
-            'taxable_income' => $grossSalary,
-            'pph21' => $pph21,
-            'bpjs_kesehatan_employee' => $bpjs['kesehatan']['employee'],
-            'bpjs_kesehatan_employer' => $bpjs['kesehatan']['employer'],
-            'bpjs_ketenagakerjaan_employee' => $bpjs['ketenagakerjaan']['total_employee'],
-            'bpjs_ketenagakerjaan_employer' => $bpjs['ketenagakerjaan']['total_employer'],
-            'net_salary' => $netSalary,
-            'company_id' => $period->company_id,
+            'employee_id'                    => $employee->id,
+            'payroll_period_id'              => $period->id,
+            'basic_salary'                   => $basicSalary,
+            'total_allowance'                => $totalAllowance,
+            'total_deduction'                => $totalDeduction,
+            'gross_salary'                   => $grossSalary,
+            'taxable_income'                 => $taxableIncome,
+            'pph21'                          => $pph21,
+            'bpjs_kesehatan_employee'        => $bpjs['kesehatan']['employee'],
+            'bpjs_kesehatan_employer'        => $bpjs['kesehatan']['employer'],
+            'bpjs_ketenagakerjaan_employee'  => $bpjs['ketenagakerjaan']['total_employee'],
+            'bpjs_ketenagakerjaan_employer'  => $bpjs['ketenagakerjaan']['total_employer'],
+            'net_salary'                     => $netSalary,
+            'company_id'                     => $period->company_id,
         ]);
+
+        // --- 6. Payslip line items ---
 
         // Prorate info line — shown first so it's visible at the top of the payslip
         if ($isProrated) {
-            $totalDays = $period->start_date->diffInDays($period->end_date) + 1;
+            $totalDays  = $period->start_date->diffInDays($period->end_date) + 1;
             $workedDays = $employee->hire_date->diffInDays($period->end_date) + 1;
             PayslipItem::create([
                 'payslip_id' => $payslip->id,
-                'name' => __('Prorata (:worked/:total hari)', [
+                'name'       => __('Prorata (:worked/:total hari)', [
                     'worked' => $workedDays,
                     'total'  => $totalDays,
                 ]),
-                'type' => 'info',
-                'amount' => 0,
+                'type'       => 'info',
+                'amount'     => 0,
                 'company_id' => $period->company_id,
             ]);
         }
-        
-        // Create Items for individual components (prorated amounts)
-        foreach ($empComponents as $comp) {
-            if (! $comp->salaryComponent) {
-                continue;
-            }
+
+        // Component lines (amounts already account for is_fixed flag)
+        foreach ($componentItems as $item) {
             PayslipItem::create([
-                'payslip_id' => $payslip->id,
-                'salary_component_id' => $comp->salary_component_id,
-                'name' => $comp->salaryComponent->name,
-                'type' => $comp->salaryComponent->type,
-                'amount' => round($comp->amount * $prorateRatio, 2),
-                'company_id' => $period->company_id,
+                'payslip_id'          => $payslip->id,
+                'salary_component_id' => $item['salary_component_id'],
+                'name'                => $item['name'],
+                'type'                => $item['type'],
+                'amount'              => $item['amount'],
+                'company_id'          => $period->company_id,
             ]);
         }
 
@@ -647,7 +692,7 @@ class PayrollService
             ->get();
             
         $groupedItems = $items->groupBy(function($item) use ($defaultExpenseAccount) {
-            return $item->salaryComponent->account_id ?? ($defaultExpenseAccount->id ?? 0);
+            return $item->salaryComponent?->account_id ?? ($defaultExpenseAccount?->id ?? 0);
         });
 
         foreach ($groupedItems as $accountId => $compItems) {

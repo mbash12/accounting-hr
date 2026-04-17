@@ -18,14 +18,14 @@ class ImportSalaryComponentsAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('File Data Komponen Gaji')
-                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: code, name, type (allowance/deduction), is_fixed, is_taxable, is_bpjs_base, active_status')
+                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: code, name, type, is_fixed, is_taxable, is_bpjs_base, is_active')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024)
                     ->required()
                     ->reactive(),
             ])
             ->modalHeading('Impor Data Komponen Gaji')
-            ->modalDescription('Unggah file Excel dengan informasi komponen gaji. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalDescription('Unggah file Excel dengan data komponen gaji. Unduh template untuk melihat format yang diharapkan.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Unduh Template')
@@ -41,7 +41,7 @@ class ImportSalaryComponentsAction extends Action
                             Notification::make()
                                 ->danger()
                                 ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template komponen gaji: ' . $e->getMessage())
+                                ->body('Terjadi kesalahan: ' . $e->getMessage())
                                 ->send();
                         }
                     }),

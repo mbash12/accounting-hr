@@ -18,37 +18,27 @@ class SalaryComponentsImport implements ToCollection, WithHeadingRow, WithValida
             : null;
 
         foreach ($rows as $row) {
-            $toBool = fn ($val) => strtolower((string) ($val ?? '')) === 'yes' ||
-                strtolower((string) ($val ?? '')) === 'true' ||
-                (string) ($val ?? '') === '1';
+            $component = SalaryComponent::where('code', (string) $row['code'])
+                ->where('company_id', $companyId)
+                ->first();
 
             $data = [
-                'name'         => (string) $row['name'],
-                'type'         => (string) $row['type'],
-                'is_fixed'     => $toBool($row['is_fixed'] ?? null),
-                'is_taxable'   => $toBool($row['is_taxable'] ?? null),
-                'is_bpjs_base' => $toBool($row['is_bpjs_base'] ?? null),
-                'is_active'    => $toBool($row['active_status'] ?? null),
+                'name'               => (string) $row['name'],
+                'type'               => strtolower((string) $row['type']) === 'potongan' ? 'deduction' : 'allowance',
+                'is_fixed'           => $this->parseBool($row['is_fixed'] ?? null),
+                'is_taxable'         => $this->parseBool($row['is_taxable'] ?? null),
+                'is_bpjs_base'       => $this->parseBool($row['is_bpjs_base'] ?? null),
+                'is_active'          => $this->parseBool($row['is_active'] ?? 'yes'),
                 'created_by_user_id' => Auth::id(),
             ];
 
-            $code = isset($row['code']) ? (string) $row['code'] : null;
-
-            if ($code) {
-                $existing = SalaryComponent::where('code', $code)
-                    ->where('company_id', $companyId)
-                    ->first();
-
-                if ($existing) {
-                    $existing->update($data);
-                    continue;
-                }
-
-                $data['code'] = $code;
+            if ($component) {
+                $component->update($data);
+            } else {
+                $data['code']       = (string) $row['code'];
+                $data['company_id'] = $companyId;
+                SalaryComponent::create($data);
             }
-
-            $data['company_id'] = $companyId;
-            SalaryComponent::create($data);
         }
     }
 
@@ -61,28 +51,34 @@ class SalaryComponentsImport implements ToCollection, WithHeadingRow, WithValida
             'is_fixed'     => isset($data['is_fixed']) ? (string) $data['is_fixed'] : null,
             'is_taxable'   => isset($data['is_taxable']) ? (string) $data['is_taxable'] : null,
             'is_bpjs_base' => isset($data['is_bpjs_base']) ? (string) $data['is_bpjs_base'] : null,
-            'active_status' => isset($data['active_status']) ? (string) $data['active_status'] : null,
+            'is_active'    => isset($data['is_active']) ? (string) $data['is_active'] : null,
         ];
     }
 
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'type' => 'required|in:allowance,deduction',
-            'is_fixed'     => 'nullable|string',
-            'is_taxable'   => 'nullable|string',
-            'is_bpjs_base' => 'nullable|string',
-            'active_status' => 'nullable|string',
+            'code' => 'required|string|max:50',
+            'name' => 'required|string|max:200',
+            'type' => 'required|string|in:allowance,deduction,tunjangan,potongan',
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Nama komponen gaji wajib diisi.',
-            'type.required' => 'Tipe komponen gaji wajib diisi.',
-            'type.in'       => 'Tipe harus salah satu dari: allowance, deduction.',
+            'code.required' => 'Kode komponen wajib diisi.',
+            'code.max'      => 'Kode komponen tidak boleh lebih dari 50 karakter.',
+            'name.required' => 'Nama komponen wajib diisi.',
+            'type.required' => 'Tipe komponen wajib diisi.',
+            'type.in'       => 'Tipe komponen harus berisi "allowance", "deduction", "tunjangan", atau "potongan".',
         ];
+    }
+
+    private function parseBool(mixed $value): bool
+    {
+        if ($value === null) return false;
+        $v = strtolower(trim((string) $value));
+        return in_array($v, ['yes', 'true', '1', 'ya']);
     }
 }

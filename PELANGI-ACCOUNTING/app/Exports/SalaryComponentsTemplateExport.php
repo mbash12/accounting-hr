@@ -11,9 +11,11 @@ class SalaryComponentsTemplateExport implements FromArray, WithHeadings, WithTit
     public function array(): array
     {
         return [
-            ['', 'Tunjangan Makan', 'allowance', 'yes', 'no', 'no', 'yes'],
-            ['', 'Tunjangan Transport', 'allowance', 'yes', 'no', 'no', 'yes'],
-            ['', 'Potongan BPJS Kesehatan', 'deduction', 'no', 'no', 'yes', 'yes'],
+            ['TJB',  'Tunjangan Jabatan',             'allowance', 'yes', 'yes', 'yes', 'yes'],
+            ['TJM',  'Tunjangan Makan',                'allowance', 'no',  'no',  'no',  'yes'],
+            ['TJT',  'Tunjangan Transportasi',         'allowance', 'yes', 'no',  'no',  'yes'],
+            ['BPJSK','BPJS Kesehatan Potongan',        'deduction', 'yes', 'no',  'no',  'yes'],
+            ['BPJTK','BPJS Ketenagakerjaan Potongan',  'deduction', 'yes', 'no',  'no',  'yes'],
         ];
     }
 
@@ -26,7 +28,7 @@ class SalaryComponentsTemplateExport implements FromArray, WithHeadings, WithTit
             'is_fixed',
             'is_taxable',
             'is_bpjs_base',
-            'active_status',
+            'is_active',
         ];
     }
 
