@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class JournalEntry extends Model
 {
@@ -20,6 +21,18 @@ class JournalEntry extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (JournalEntry $journalEntry) {
+            if (Auth::check() && !$journalEntry->created_by_user_id) {
+                $journalEntry->created_by_user_id = Auth::id();
+            }
+        });
+
+        static::updating(function (JournalEntry $journalEntry) {
+            if (Auth::check()) {
+                $journalEntry->updated_by_user_id = Auth::id();
+            }
+        });
+
         static::deleted(function (JournalEntry $journalEntry) {
             $journalEntry->items()->each(function ($item) {
                 $item->delete();
