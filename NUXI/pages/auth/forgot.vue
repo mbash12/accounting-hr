@@ -37,8 +37,9 @@ const handleSubmit = () => {
                 "Link reset password telah dikirim ke email anda",
                 "success"
             ).then(() => {
-                router.push("/auth/login");
+                router.push("/auth");
             })
+
         })
         .catch((error) => {
             loading(false);
