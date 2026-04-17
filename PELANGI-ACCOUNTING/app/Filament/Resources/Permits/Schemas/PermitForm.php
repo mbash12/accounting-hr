@@ -22,7 +22,15 @@ class PermitForm
                             ->relationship(
                                 name: 'employee', 
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => \App\Services\CompanyFilterService::applyCompanyFilter($query)
+                                modifyQueryUsing: function ($query) {
+                                    $companyId = session('selected_company_id');
+                                    if ($companyId) {
+                                        $query->where('company_id', $companyId);
+                                    } elseif (auth()->check()) {
+                                        $ids = auth()->user()->companies()->pluck('companies.id');
+                                        if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                                    }
+                                }
                             )
                             ->required()
                             ->searchable()

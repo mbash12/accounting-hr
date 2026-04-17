@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\Employees\Schemas;
 
+use App\Filament\Forms\Components\NumberInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\RawJs;
 use Illuminate\Support\Facades\Hash;
 
 class EmployeeForm
@@ -50,7 +50,15 @@ class EmployeeForm
                             ->relationship(
                                 name: 'department', 
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => \App\Services\CompanyFilterService::applyCompanyFilter($query)
+                                modifyQueryUsing: function ($query) {
+                                    $companyId = session('selected_company_id');
+                                    if ($companyId) {
+                                        $query->where('company_id', $companyId);
+                                    } elseif (auth()->check()) {
+                                        $ids = auth()->user()->companies()->pluck('companies.id');
+                                        if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                                    }
+                                }
                             )
                             ->searchable()
                             ->preload(),
@@ -69,14 +77,12 @@ class EmployeeForm
                             ])
                             ->default('probation')
                             ->required(),
-                        TextInput::make('basic_salary')
+                        NumberInput::make('basic_salary')
                             ->label(__('Gaji Pokok'))
                             ->required()
-                            ->numeric()
                             ->prefix('IDR')
                             ->default(0)
-                            ->mask(\Filament\Support\RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
+                            ->decimal(false),
                         Toggle::make('is_active')
                             ->label(__('Aktif'))
                             ->default(true),

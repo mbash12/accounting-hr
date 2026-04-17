@@ -59,7 +59,17 @@ class AttendanceSimulator extends Page implements HasForms
             ->components([
                 Select::make('employee_id')
                     ->label(__('Pilih Karyawan untuk Simulasi'))
-                    ->options(fn() => \App\Services\CompanyFilterService::applyCompanyFilter(Employee::where('is_active', true))->pluck('name', 'id'))
+                    ->options(function () {
+                        $companyId = session('selected_company_id');
+                        $query = Employee::where('is_active', true);
+                        if ($companyId) {
+                            $query->where('company_id', $companyId);
+                        } elseif (auth()->check()) {
+                            $ids = auth()->user()->companies()->pluck('companies.id');
+                            if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                        }
+                        return $query->pluck('name', 'id');
+                    })
                     ->required()
                     ->searchable()
                     ->live(),

@@ -74,7 +74,17 @@ class AttendanceReport extends Page implements HasForms
 
                 Select::make('department_id')
                     ->label(__('Departemen'))
-                    ->options(fn() => \App\Services\CompanyFilterService::applyCompanyFilter(Department::query())->pluck('name', 'id'))
+                    ->options(function () {
+                        $companyId = session('selected_company_id');
+                        $query = Department::query();
+                        if ($companyId) {
+                            $query->where('company_id', $companyId);
+                        } elseif (auth()->check()) {
+                            $ids = auth()->user()->companies()->pluck('companies.id');
+                            if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                        }
+                        return $query->pluck('name', 'id');
+                    })
                     ->placeholder(__('Semua Departemen'))
                     ->live(),
             ])

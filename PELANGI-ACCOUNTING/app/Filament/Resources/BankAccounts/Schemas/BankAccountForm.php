@@ -10,7 +10,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\RawJs;
 
 class BankAccountForm
 {
@@ -158,9 +157,7 @@ class BankAccountForm
                         ->decimal(true)
                         ->prefix('Rp')
                         ->default(0)
-                        ->required()
-                        ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                        ->stripCharacters('.'),
+                        ->required(),
                 ])
                 ->columns(2),
 

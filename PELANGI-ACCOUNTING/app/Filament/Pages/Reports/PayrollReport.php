@@ -61,19 +61,34 @@ class PayrollReport extends Page implements HasForms
             ->components([
                 Select::make('payroll_period_id')
                     ->label(__('Periode Payroll'))
-                    ->options(fn() => \App\Services\CompanyFilterService::applyCompanyFilter(PayrollPeriod::query())
-                        ->orderBy('year', 'desc')
-                        ->orderBy('month', 'desc')
-                        ->get()
-                        ->pluck('name', 'id')
-                    )
+                    ->options(function () {
+                        $companyId = session('selected_company_id');
+                        $query = PayrollPeriod::query();
+                        if ($companyId) {
+                            $query->where('company_id', $companyId);
+                        } elseif (auth()->check()) {
+                            $ids = auth()->user()->companies()->pluck('companies.id');
+                            if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                        }
+                        return $query->orderBy('year', 'desc')->orderBy('month', 'desc')->get()->pluck('name', 'id');
+                    })
                     ->required()
                     ->live()
                     ->afterStateUpdated(fn() => $this->validate()),
                 
                 Select::make('department_id')
                     ->label(__('Departemen'))
-                    ->options(fn() => \App\Services\CompanyFilterService::applyCompanyFilter(Department::query())->pluck('name', 'id'))
+                    ->options(function () {
+                        $companyId = session('selected_company_id');
+                        $query = Department::query();
+                        if ($companyId) {
+                            $query->where('company_id', $companyId);
+                        } elseif (auth()->check()) {
+                            $ids = auth()->user()->companies()->pluck('companies.id');
+                            if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                        }
+                        return $query->pluck('name', 'id');
+                    })
                     ->placeholder(__('Semua Departemen'))
                     ->live()
                     ->afterStateUpdated(fn() => $this->validate()),

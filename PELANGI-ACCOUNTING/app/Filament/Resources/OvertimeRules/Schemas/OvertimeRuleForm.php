@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\OvertimeRules\Schemas;
 
+use App\Filament\Forms\Components\NumberInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Support\RawJs;
 
 class OvertimeRuleForm
 {
@@ -26,40 +26,40 @@ class OvertimeRuleForm
                             ->relationship(
                                 name: 'department', 
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => \App\Services\CompanyFilterService::applyCompanyFilter($query)
+                                modifyQueryUsing: function ($query) {
+                                    $companyId = session('selected_company_id');
+                                    if ($companyId) {
+                                        $query->where('company_id', $companyId);
+                                    } elseif (auth()->check()) {
+                                        $ids = auth()->user()->companies()->pluck('companies.id');
+                                        if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                                    }
+                                }
                             )
                             ->searchable()
                             ->preload()
                             ->helperText(__('Opsional: Biarkan kosong untuk berlaku di semua departemen')),
-                        TextInput::make('base_hourly_rate_divisor')
+                        NumberInput::make('base_hourly_rate_divisor')
                             ->label(__('Pembagi Gaji Per Jam'))
                             ->required()
-                            ->numeric()
                             ->default(173.00)
                             ->helperText(__('Standar adalah 173 untuk gaji bulanan'))
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
-                        TextInput::make('workday_first_hour_multiplier')
+                            ->decimal(true),
+                        NumberInput::make('workday_first_hour_multiplier')
                             ->label(__('Pengali Jam Pertama (Hari Kerja)'))
                             ->required()
-                            ->numeric()
                             ->default(1.50)
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
-                        TextInput::make('workday_subsequent_hour_multiplier')
+                            ->decimal(true),
+                        NumberInput::make('workday_subsequent_hour_multiplier')
                             ->label(__('Pengali Jam Berikutnya (Hari Kerja)'))
                             ->required()
-                            ->numeric()
                             ->default(2.00)
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
-                        TextInput::make('holiday_multiplier')
+                            ->decimal(true),
+                        NumberInput::make('holiday_multiplier')
                             ->label(__('Pengali Hari Libur'))
                             ->required()
-                            ->numeric()
                             ->default(2.00)
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
+                            ->decimal(true),
                         Toggle::make('is_default')
                             ->label(__('Default'))
                             ->default(false),

@@ -55,7 +55,22 @@ class HolidayResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return \App\Services\CompanyFilterService::applyCompanyFilter(parent::getEloquentQuery());
+        $selectedCompanyId = session('selected_company_id');
+        $user = auth()->user();
+
+        return parent::getEloquentQuery()
+            ->where(function ($query) use ($selectedCompanyId, $user) {
+                if ($selectedCompanyId) {
+                    $query->where('company_id', $selectedCompanyId);
+                } else {
+                    if ($user) {
+                        $userCompanyIds = $user->companies()->pluck('companies.id');
+                        if ($userCompanyIds->isNotEmpty()) {
+                            $query->whereIn('company_id', $userCompanyIds);
+                        }
+                    }
+                }
+            });
     }
 
     public static function getRelations(): array

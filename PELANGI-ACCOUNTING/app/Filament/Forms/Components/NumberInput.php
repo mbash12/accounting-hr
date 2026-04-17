@@ -12,8 +12,13 @@ class NumberInput extends TextInput
     /**
      * Parse a value (string or numeric) to a clean float.
      * Handles Indonesian format: dots are thousands, comma is decimal.
+     *
+     * When $integerOnly is true, both '.' and ',' are ALWAYS treated as
+     * thousands separators (never as decimal), which removes the ambiguity
+     * for integer-only fields (e.g., product prices with decimal(false)).
+     * When null, the method auto-detects based on the heuristic (backward compatible).
      */
-    public static function parseToFloat($value): float
+    public static function parseToFloat($value, ?bool $integerOnly = null): float
     {
         if ($value === null || $value === '') {
             return 0.0;
@@ -22,13 +27,13 @@ class NumberInput extends TextInput
         if (is_int($value)) {
             return (float) $value;
         }
-        
+
         if (is_float($value)) {
             return $value;
         }
 
         $v = trim((string) $value);
-        
+
         if ($v === '') {
             return 0.0;
         }
@@ -41,42 +46,47 @@ class NumberInput extends TextInput
         $isNegative = str_contains($v, '-');
         $v = str_replace('-', '', $v);
 
-        $lastComma = strrpos($v, ',');
-        $lastDot = strrpos($v, '.');
-
-        if ($lastComma !== false && $lastDot !== false) {
-            if ($lastComma > $lastDot) {
-                $v = str_replace('.', '', $v);
-                $v = str_replace(',', '.', $v);
-            } else {
-                $v = str_replace(',', '', $v);
-            }
-        } elseif ($lastComma !== false) {
-            $digitsAfter = strlen($v) - $lastComma - 1;
-            if ($digitsAfter > 0 && $digitsAfter <= 2) {
-                $v = str_replace('.', '', $v);
-                $v = str_replace(',', '.', $v);
-            } else {
-                $v = str_replace(',', '', $v);
-                $v = str_replace('.', '', $v);
-            }
-        } elseif ($lastDot !== false) {
-            $digitsAfter = strlen($v) - $lastDot - 1;
-            $dotCount = substr_count($v, '.');
-            if ($dotCount > 1) {
-                $v = str_replace('.', '', $v);
-            } elseif ($digitsAfter > 0 && $digitsAfter <= 2) {
-                $v = str_replace(',', '', $v);
-            } else {
-                $v = str_replace('.', '', $v);
-                $v = str_replace(',', '', $v);
-            }
-        } else {
+        if ($integerOnly === true) {
+            // Integer mode: strip all separators unconditionally.
             $v = str_replace([',', '.'], '', $v);
+        } else {
+            $lastComma = strrpos($v, ',');
+            $lastDot = strrpos($v, '.');
+
+            if ($lastComma !== false && $lastDot !== false) {
+                if ($lastComma > $lastDot) {
+                    $v = str_replace('.', '', $v);
+                    $v = str_replace(',', '.', $v);
+                } else {
+                    $v = str_replace(',', '', $v);
+                }
+            } elseif ($lastComma !== false) {
+                $digitsAfter = strlen($v) - $lastComma - 1;
+                if ($digitsAfter > 0 && $digitsAfter <= 2) {
+                    $v = str_replace('.', '', $v);
+                    $v = str_replace(',', '.', $v);
+                } else {
+                    $v = str_replace(',', '', $v);
+                    $v = str_replace('.', '', $v);
+                }
+            } elseif ($lastDot !== false) {
+                $digitsAfter = strlen($v) - $lastDot - 1;
+                $dotCount = substr_count($v, '.');
+                if ($dotCount > 1) {
+                    $v = str_replace('.', '', $v);
+                } elseif ($digitsAfter > 0 && $digitsAfter <= 2) {
+                    $v = str_replace(',', '', $v);
+                } else {
+                    $v = str_replace('.', '', $v);
+                    $v = str_replace(',', '', $v);
+                }
+            } else {
+                $v = str_replace([',', '.'], '', $v);
+            }
         }
 
         $v = preg_replace('/[^0-9.]/', '', $v);
-        
+
         $parts = explode('.', $v);
         if (count($parts) > 2) {
             $v = $parts[0] . '.' . implode('', array_slice($parts, 1));
@@ -224,26 +234,36 @@ class NumberInput extends TextInput
             if ($state === null || $state === '') {
                 return null;
             }
-            
-            return static::parseToFloat($state);
+
+            return static::parseToFloat($state, ! $this->isDecimal);
         });
     }
 
     public function decimal(bool $decimal = true): static
     {
         $this->isDecimal = $decimal;
-        
-        // Use Filament's built-in money mask with Indonesian settings
-        
+
+        // Apply live Indonesian money formatting while user types.
+        // Use single quotes for JS string literals to avoid clashing with the
+        // double-quoted HTML attribute that Blade emits for x-mask:dynamic.
+        $this->mask(
+            RawJs::make($decimal ? "\$money(\$input, ',', '.')" : "\$money(\$input, ',', '.', 0)")
+        );
+
         $this->formatStateUsing(function ($state) use ($decimal) {
             if ($state === null || $state === '') {
                 return null;
             }
-            return number_format((float)$state, $decimal ? 2 : 0, ',', '.');
+
+            // Parse formatted strings safely (e.g. "1.234,56") before re-formatting.
+            // Do NOT force integerOnly here because state coming from the model
+            // (Eloquent decimal:2 cast) is a raw decimal string like "10000.00"
+            // that must be parsed with '.' as the decimal separator.
+            $normalizedValue = static::parseToFloat($state);
+
+            return number_format($normalizedValue, $decimal ? 2 : 0, ',', '.');
         });
-        
-        return $this;
-        
+
         return $this;
     }
 

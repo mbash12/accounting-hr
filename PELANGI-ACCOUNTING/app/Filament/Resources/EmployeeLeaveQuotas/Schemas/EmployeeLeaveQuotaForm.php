@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\EmployeeLeaveQuotas\Schemas;
 
+use App\Filament\Forms\Components\NumberInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Support\RawJs;
 
 class EmployeeLeaveQuotaForm
 {
@@ -23,7 +23,15 @@ class EmployeeLeaveQuotaForm
                             ->relationship(
                                 name: 'employee', 
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => \App\Services\CompanyFilterService::applyCompanyFilter($query)
+                                modifyQueryUsing: function ($query) {
+                                    $companyId = session('selected_company_id');
+                                    if ($companyId) {
+                                        $query->where('company_id', $companyId);
+                                    } elseif (auth()->check()) {
+                                        $ids = auth()->user()->companies()->pluck('companies.id');
+                                        if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
+                                    }
+                                }
                             )
                             ->required()
                             ->searchable()
@@ -35,33 +43,27 @@ class EmployeeLeaveQuotaForm
                             ->default(now()->year)
                             ->minLength(4)
                             ->maxLength(4),
-                        TextInput::make('total_quota')
+                        NumberInput::make('total_quota')
                             ->label(__('Total Kuota (Hari)'))
                             ->required()
-                            ->numeric()
                             ->default(12)
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => self::updateRemaining($get, $set))
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
-                        TextInput::make('used_quota')
+                            ->decimal(false),
+                        NumberInput::make('used_quota')
                             ->label(__('Kuota Terpakai (Hari)'))
                             ->required()
-                            ->numeric()
                             ->default(0)
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => self::updateRemaining($get, $set))
                             ->helperText(__('Sesuaikan manual jika sistem baru digunakan di tengah tahun.'))
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
-                        TextInput::make('remaining_quota')
+                            ->decimal(false),
+                        NumberInput::make('remaining_quota')
                             ->label(__('Sisa Kuota (Hari)'))
                             ->required()
-                            ->numeric()
                             ->readOnly()
                             ->default(12)
-                            ->mask(RawJs::make('$money($input, \',\', \'.\')'))
-                            ->stripCharacters('.'),
+                            ->decimal(false),
                     ])
                     ->columns(3)
                     ->columnSpanFull(),
@@ -85,8 +87,8 @@ class EmployeeLeaveQuotaForm
 
     protected static function updateRemaining(Get $get, Set $set)
     {
-        $total = (int) $get('total_quota');
-        $used = (int) $get('used_quota');
+        $total = (int) NumberInput::parseToFloat($get('total_quota') ?? 0, true);
+        $used = (int) NumberInput::parseToFloat($get('used_quota') ?? 0, true);
         $set('remaining_quota', $total - $used);
     }
 }
