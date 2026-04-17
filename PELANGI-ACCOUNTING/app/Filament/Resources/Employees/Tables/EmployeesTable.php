@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Employees\Tables;
 
+use App\Filament\Actions\ExportEmployeesAction;
+use App\Filament\Actions\ImportEmployeesAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -64,17 +66,19 @@ class EmployeesTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportEmployeesAction::make(),
+                ExportEmployeesAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }

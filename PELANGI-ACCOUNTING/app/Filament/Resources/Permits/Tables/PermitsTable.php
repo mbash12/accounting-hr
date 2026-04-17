@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Permits\Tables;
 
+use App\Filament\Actions\ExportPermitsAction;
+use App\Filament\Actions\ImportPermitsAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -73,17 +75,19 @@ class PermitsTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportPermitsAction::make(),
+                ExportPermitsAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }

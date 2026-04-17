@@ -387,6 +387,13 @@ class PayrollService
     public function generatePayslips(PayrollPeriod $period)
     {
         return DB::transaction(function () use ($period) {
+            // Remove existing payslips (and their items via cascade/manual) before regenerating
+            $existingPayslipIds = $period->payslips()->pluck('id');
+            if ($existingPayslipIds->isNotEmpty()) {
+                PayslipItem::whereIn('payslip_id', $existingPayslipIds)->delete();
+                Payslip::whereIn('id', $existingPayslipIds)->delete();
+            }
+
             $employees = Employee::where('is_active', true)
                 ->where('company_id', $period->company_id)
                 ->get();
@@ -407,7 +414,8 @@ class PayrollService
         $basicSalary = $employee->basic_salary;
         
         // 1. Regular Allowances & Deductions
-        $empComponents = $employee->salaryComponents()->with('salaryComponent')->get();
+        $empComponents = $employee->salaryComponents()->with('salaryComponent')->get()
+            ->filter(fn ($comp) => $comp->salaryComponent !== null);
         $allowances = $empComponents->where('salaryComponent.type', 'allowance');
         $deductions = $empComponents->where('salaryComponent.type', 'deduction');
         
@@ -469,6 +477,9 @@ class PayrollService
         
         // Create Items for individual components
         foreach ($empComponents as $comp) {
+            if (! $comp->salaryComponent) {
+                continue;
+            }
             PayslipItem::create([
                 'payslip_id' => $payslip->id,
                 'salary_component_id' => $comp->salary_component_id,

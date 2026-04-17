@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Attendances\Tables;
 
+use App\Filament\Actions\ExportAttendancesAction;
+use App\Filament\Actions\ImportAttendancesAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -66,17 +68,19 @@ class AttendancesTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportAttendancesAction::make(),
+                ExportAttendancesAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }

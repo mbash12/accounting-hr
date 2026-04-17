@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\EmployeeLeaveQuotas\Tables;
 
+use App\Filament\Actions\ExportEmployeeLeaveQuotasAction;
+use App\Filament\Actions\ImportEmployeeLeaveQuotasAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -47,17 +49,19 @@ class EmployeeLeaveQuotasTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportEmployeeLeaveQuotasAction::make(),
+                ExportEmployeeLeaveQuotasAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }

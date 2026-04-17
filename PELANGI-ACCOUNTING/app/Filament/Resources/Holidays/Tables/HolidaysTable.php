@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Holidays\Tables;
 
+use App\Filament\Actions\ExportHolidaysAction;
+use App\Filament\Actions\ImportHolidaysAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -36,17 +38,19 @@ class HolidaysTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportHolidaysAction::make(),
+                ExportHolidaysAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }

@@ -43,8 +43,10 @@ class EmployeeForm
                         TextInput::make('nik')
                             ->label(__('NIK (KTP)'))
                             ->numeric()
+                            ->rule('digits:16')
                             ->minLength(16)
-                            ->maxLength(16),
+                            ->maxLength(16)
+                            ->helperText(__('NIK harus terdiri dari tepat 16 digit angka.')),
                         Select::make('department_id')
                             ->label(__('Departemen'))
                             ->relationship(
@@ -118,11 +120,13 @@ class EmployeeForm
                         TextInput::make('bpjs_kesehatan_number')
                             ->label(__('No. BPJS Kesehatan'))
                             ->numeric()
+                            ->rule('digits:13')
                             ->minLength(13)
                             ->maxLength(13),
                         TextInput::make('bpjs_ketenagakerjaan_number')
                             ->label(__('No. BPJS Ketenagakerjaan'))
                             ->numeric()
+                            ->rule('digits:11')
                             ->minLength(11)
                             ->maxLength(11),
                     ])->columns(2),

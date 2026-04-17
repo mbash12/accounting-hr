@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SalaryComponents\Tables;
 
+use App\Filament\Actions\ExportSalaryComponentsAction;
+use App\Filament\Actions\ImportSalaryComponentsAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -55,17 +57,19 @@ class SalaryComponentsTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportSalaryComponentsAction::make(),
+                ExportSalaryComponentsAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }

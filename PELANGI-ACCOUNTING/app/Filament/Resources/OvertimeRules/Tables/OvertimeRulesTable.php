@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\OvertimeRules\Tables;
 
+use App\Filament\Actions\ExportOvertimeRulesAction;
+use App\Filament\Actions\ImportOvertimeRulesAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -48,17 +50,19 @@ class OvertimeRulesTable
             ->filters([
                 TrashedFilter::make(),
             ])
-            ->recordActions([
-                ActionGroup::make([
-                    EditAction::make(),
-                    DeleteAction::make(),
-                ]),
-            ])
-            ->bulkActions([
+            ->toolbarActions([
+                ImportOvertimeRulesAction::make(),
+                ExportOvertimeRulesAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
+                ]),
+            ])
+            ->recordActions([
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ]);
     }
