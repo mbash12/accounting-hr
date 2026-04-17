@@ -7,7 +7,7 @@ import PwaUpdateHandler from '@/components/PwaUpdateHandler.vue'
 
 useHead({
   link: [
-    { rel: 'manifest', href: '/user/manifest.json' }
+    { rel: 'manifest', href: '/manifest.json' }
   ]
 })
 

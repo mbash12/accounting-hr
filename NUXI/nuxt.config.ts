@@ -2,12 +2,8 @@
 export default defineNuxtConfig({
     target: "static",
     ssr: false,
-    outDir: "../../public/user/.output",
 
     nitro: {
-        output: {
-            publicDir: "../../public/user",
-        },
         routeRules: {
             "/**": {
                 headers: {
@@ -18,20 +14,20 @@ export default defineNuxtConfig({
     },
 
     app: {
-        baseURL: "/user/",
+        baseURL: "/",
         buildAssetsDir: "/_nuxt/",
 
         head: {
             title: "PermitHub",
             link: [
-                { rel: "icon", type: "image/x-icon", href: "/user/icon.png" },
+                { rel: "icon", type: "image/x-icon", href: "/icon.png" },
             ],
         },
     },
 
     vite: {
         define: {
-            "process.env.BASE_URL": JSON.stringify("/user/"),
+            "process.env.BASE_URL": JSON.stringify("/"),
         },
         build: {
             assetsDir: "_nuxt",
@@ -48,7 +44,6 @@ export default defineNuxtConfig({
                 },
             },
         },
-        base: "/client/user/",
     },
 
     devtools: { enabled: false },
@@ -92,11 +87,11 @@ export default defineNuxtConfig({
         workbox: {
             globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
             importScripts: ["firebase-messaging-sw.js"],
-            navigateFallback: "/user/",
+            navigateFallback: "/",
             cleanupOutdatedCaches: true,
             runtimeCaching: [
               {
-                urlPattern: /^https:\/\/permithub\.pelangiservice\.com\/user\/.*/i,
+                urlPattern: /^https:\/\/permithub\.pelangiservice\.com\/.*/i,
                 handler: 'NetworkFirst',
                 options: {
                   cacheName: 'api-cache',
@@ -118,8 +113,8 @@ export default defineNuxtConfig({
             theme_color: "#F10A13",
             background_color: "#ffffff",
             display: "standalone",
-            scope: "/user/",
-            start_url: "/user/",
+            scope: "/",
+            start_url: "/",
             name: "PermitHub",
             short_name: "PermitHub",
             description: "Aplikasi Absensi PT Pelangi Sentral Kreasi",
