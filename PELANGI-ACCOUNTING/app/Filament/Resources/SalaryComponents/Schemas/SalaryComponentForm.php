@@ -45,6 +45,7 @@ class SalaryComponentForm
                                         $ids = auth()->user()->companies()->pluck('companies.id');
                                         if ($ids->isNotEmpty()) $query->whereIn('company_id', $ids);
                                     }
+                                    $query->where('is_header', false);
                                 }
                             )
                             ->searchable()
