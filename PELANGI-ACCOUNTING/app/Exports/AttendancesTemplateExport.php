@@ -11,9 +11,9 @@ class AttendancesTemplateExport implements FromArray, WithHeadings, WithTitle
     public function array(): array
     {
         return [
-            ['EMP-001', '2025-04-01', '08:00:00', '17:00:00', 0, 0, 'present', ''],
-            ['EMP-001', '2025-04-02', '08:15:00', '17:00:00', 15, 0, 'late', 'Terlambat bus'],
-            ['EMP-002', '2025-04-01', '', '', 0, 0, 'absent', 'Tidak hadir'],
+            ['EMP-001', '2025-04-01', '08:00:00', '17:00:00', 0, 0, 'present', '', 'Datang tepat waktu', 'Pulang normal'],
+            ['EMP-001', '2025-04-02', '08:15:00', '17:00:00', 15, 0, 'late', 'Terlambat bus', 'Terlambat bus', ''],
+            ['EMP-002', '2025-04-01', '', '', 0, 0, 'absent', 'Tidak hadir', '', ''],
         ];
     }
 
@@ -28,6 +28,8 @@ class AttendancesTemplateExport implements FromArray, WithHeadings, WithTitle
             'early_departure_minutes',
             'status',
             'notes',
+            'notes_in',
+            'notes_out',
         ];
     }
 

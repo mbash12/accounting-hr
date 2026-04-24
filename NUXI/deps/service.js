@@ -251,7 +251,9 @@ const mapAccountingAttendanceToApp = (attendance) => {
         type: isIn ? "in" : "out",
         datetime,
         date: attendance.date,
-        note: attendance.notes,
+        note: isIn
+            ? (attendance.notes_in ?? attendance.notes)
+            : (attendance.notes_out ?? attendance.notes),
         status: mapAttendanceStatusToApp(attendance.status),
         attachment: isIn ? attendance.photo_in_path : attendance.photo_out_path,
         location: JSON.stringify({
@@ -278,7 +280,7 @@ const mapAccountingAttendanceToAppEntries = (attendance) => {
             type: "in",
             datetime: attendance.check_in,
             date: attendance.date,
-            note: attendance.notes,
+            note: attendance.notes_in ?? attendance.notes,
             status: mapAttendanceStatusToApp(attendance.status),
             attachment: attendance.photo_in_path,
             location: JSON.stringify({
@@ -295,7 +297,7 @@ const mapAccountingAttendanceToAppEntries = (attendance) => {
             type: "out",
             datetime: attendance.check_out,
             date: attendance.date,
-            note: attendance.notes,
+            note: attendance.notes_out ?? attendance.notes,
             status: mapAttendanceStatusToApp(attendance.status),
             attachment: attendance.photo_out_path,
             location: JSON.stringify({
@@ -345,6 +347,8 @@ const mapAppAttendanceToAccounting = (payload) => {
         status: mapAttendanceStatusToAccounting(payload.status),
         photo_in_path: isIn ? normalizeStoragePath(payload.attachment) ?? null : null,
         photo_out_path: isIn ? null : normalizeStoragePath(payload.attachment) ?? null,
+        notes_in: isIn ? (payload.note ?? null) : null,
+        notes_out: isIn ? null : (payload.note ?? null),
         notes: payload.note ?? null,
     };
 };

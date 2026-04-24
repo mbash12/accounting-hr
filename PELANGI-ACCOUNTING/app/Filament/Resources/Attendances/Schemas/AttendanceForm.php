@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class AttendanceForm
 {
@@ -56,8 +57,11 @@ class AttendanceForm
                             ])
                             ->default('present')
                             ->required(),
-                        Textarea::make('notes')
-                            ->label(__('Catatan'))
+                        Textarea::make('notes_in')
+                            ->label(__('Catatan Masuk'))
+                            ->columnSpanFull(),
+                        Textarea::make('notes_out')
+                            ->label(__('Catatan Keluar'))
                             ->columnSpanFull(),
                     ])->columns(2),
                 Section::make(__('Lokasi & Bukti'))
@@ -70,11 +74,47 @@ class AttendanceForm
                         FileUpload::make('photo_in_path')
                             ->label(__('Foto Masuk'))
                             ->image()
-                            ->directory('attendances'),
+                            ->disk('public')
+                            ->directory('attendances')
+                            ->visibility('public')
+                            ->formatStateUsing(function ($state) {
+                                if (! is_string($state) || $state === '') {
+                                    return $state;
+                                }
+
+                                // Normalize values from API/manual uploads into storage-relative paths.
+                                if (Str::startsWith($state, '/storage/')) {
+                                    return Str::after($state, '/storage/');
+                                }
+
+                                if (Str::contains($state, '/storage/')) {
+                                    return Str::after($state, '/storage/');
+                                }
+
+                                return $state;
+                            }),
                         FileUpload::make('photo_out_path')
                             ->label(__('Foto Keluar'))
                             ->image()
-                            ->directory('attendances'),
+                            ->disk('public')
+                            ->directory('attendances')
+                            ->visibility('public')
+                            ->formatStateUsing(function ($state) {
+                                if (! is_string($state) || $state === '') {
+                                    return $state;
+                                }
+
+                                // Normalize values from API/manual uploads into storage-relative paths.
+                                if (Str::startsWith($state, '/storage/')) {
+                                    return Str::after($state, '/storage/');
+                                }
+
+                                if (Str::contains($state, '/storage/')) {
+                                    return Str::after($state, '/storage/');
+                                }
+
+                                return $state;
+                            }),
                     ])->columns(2),
             ]);
     }

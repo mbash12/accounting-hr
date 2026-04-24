@@ -41,6 +41,8 @@ class AttendancesImport implements ToCollection, WithHeadingRow, WithValidation
                 'early_departure_minutes' => isset($row['early_departure_minutes']) ? (int) $row['early_departure_minutes'] : 0,
                 'status'                  => isset($row['status']) ? (string) $row['status'] : 'present',
                 'notes'                   => isset($row['notes']) ? (string) $row['notes'] : null,
+                'notes_in'                => isset($row['notes_in']) ? (string) $row['notes_in'] : (isset($row['notes']) ? (string) $row['notes'] : null),
+                'notes_out'               => isset($row['notes_out']) ? (string) $row['notes_out'] : null,
                 'created_by_user_id'      => Auth::id(),
             ];
 
@@ -64,6 +66,8 @@ class AttendancesImport implements ToCollection, WithHeadingRow, WithValidation
             'early_departure_minutes' => isset($data['early_departure_minutes']) ? $data['early_departure_minutes'] : null,
             'status'                  => isset($data['status']) ? (string) $data['status'] : null,
             'notes'                   => isset($data['notes']) ? (string) $data['notes'] : null,
+            'notes_in'                => isset($data['notes_in']) ? (string) $data['notes_in'] : null,
+            'notes_out'               => isset($data['notes_out']) ? (string) $data['notes_out'] : null,
         ];
     }
 

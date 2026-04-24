@@ -27,6 +27,8 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
                 'early_departure_minutes'  => $attendance->early_departure_minutes,
                 'status'                   => $attendance->status,
                 'notes'                    => $attendance->notes,
+                'notes_in'                 => $attendance->notes_in,
+                'notes_out'                => $attendance->notes_out,
             ];
         });
     }
@@ -42,6 +44,8 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
             'Pulang Awal (Menit)',
             'Status',
             'Catatan',
+            'Catatan Masuk',
+            'Catatan Keluar',
         ];
     }
 

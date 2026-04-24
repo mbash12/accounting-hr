@@ -18,7 +18,7 @@ class ImportAttendancesAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('File Data Absensi')
-                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: employee_id, date, check_in, check_out, late_minutes, early_departure_minutes, status (present/late/absent/permit/leave), notes')
+                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: employee_id, date, check_in, check_out, late_minutes, early_departure_minutes, status (present/late/absent/permit/leave), notes, notes_in, notes_out')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(2048)
                     ->required()

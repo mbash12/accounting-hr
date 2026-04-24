@@ -45,6 +45,8 @@ class Attendance extends Model
         'photo_in_path',
         'photo_out_path',
         'notes',
+        'notes_in',
+        'notes_out',
         'company_id',
         'created_by_user_id',
     ];
