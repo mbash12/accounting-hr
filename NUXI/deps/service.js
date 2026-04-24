@@ -10,6 +10,55 @@ export const currentUser = reactive({
     user: null,
     loggedin: false,
 });
+
+const normalizeAttendanceSpots = (employee = {}) => {
+    const spots = Array.isArray(employee?.attendance_spots) ? employee.attendance_spots : [];
+    if (spots.length) {
+        return spots
+            .map((spot) => ({
+                id: spot?.id ?? null,
+                name: spot?.name ?? "Spot",
+                latitude: Number(spot?.latitude),
+                longitude: Number(spot?.longitude),
+                radius_meters: Number(spot?.radius_meters),
+            }))
+            .filter(
+                (spot) =>
+                    Number.isFinite(spot.latitude) &&
+                    Number.isFinite(spot.longitude) &&
+                    Number.isFinite(spot.radius_meters) &&
+                    spot.radius_meters > 0
+            );
+    }
+
+    const legacy = employee?.attendance_location;
+    if (
+        legacy &&
+        Number.isFinite(Number(legacy?.latitude)) &&
+        Number.isFinite(Number(legacy?.longitude)) &&
+        Number.isFinite(Number(legacy?.radius_meters)) &&
+        Number(legacy?.radius_meters) > 0
+    ) {
+        return [
+            {
+                id: null,
+                name: "Default Spot",
+                latitude: Number(legacy.latitude),
+                longitude: Number(legacy.longitude),
+                radius_meters: Number(legacy.radius_meters),
+            },
+        ];
+    }
+
+    return [];
+};
+
+const normalizeEmployeePayload = (employee = {}) => {
+    return {
+        ...employee,
+        attendance_spots: normalizeAttendanceSpots(employee),
+    };
+};
 export const store = reactive({
     isLoading: false,
     installed: false,
@@ -47,7 +96,7 @@ export const checkLoggedin = async () => {
         currentUser.loggedin = false;
         return currentUser;
     }
-    currentUser.user = profile?.employee;
+    currentUser.user = normalizeEmployeePayload(profile?.employee ?? {});
     currentUser.loggedin = true;
     return currentUser;
 };
@@ -153,7 +202,7 @@ export const loginWithPassword = async (email, password) => {
 
     setAuthToken(result.token);
     currentUser.auth = { accessToken: result.token };
-    currentUser.user = result.employee;
+    currentUser.user = normalizeEmployeePayload(result.employee ?? {});
     currentUser.loggedin = true;
 
     return { ok: true, data: result };

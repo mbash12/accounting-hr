@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\AttendanceSpot;
 use App\Models\Employee;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class EmployeeApiAttendanceController extends Controller
 {
@@ -77,6 +79,7 @@ class EmployeeApiAttendanceController extends Controller
         ]);
 
         $this->applyLegacyFieldMapping($request, $validated);
+        $this->validateAttendanceLocation($validated, $employee, null);
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('attendances', 'public');
@@ -149,6 +152,7 @@ class EmployeeApiAttendanceController extends Controller
         ]);
 
         $this->applyLegacyFieldMapping($request, $validated);
+        $this->validateAttendanceLocation($validated, $employee, $attendance);
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('attendances', 'public');
@@ -262,6 +266,111 @@ class EmployeeApiAttendanceController extends Controller
         }
 
         return ltrim($path, '/');
+    }
+
+    private function validateAttendanceLocation(array $validated, Employee $employee, ?Attendance $existingAttendance): void
+    {
+        $spots = AttendanceSpot::query()
+            ->where('company_id', $employee->company_id)
+            ->where('is_active', true)
+            ->get(['id', 'name', 'latitude', 'longitude', 'radius_meters']);
+
+        if ($spots->isEmpty()) {
+            return;
+        }
+
+        $this->validateCoordinateWithinRadius(
+            $validated,
+            'check_in',
+            'lat_in',
+            'lng_in',
+            $existingAttendance,
+            $spots
+        );
+
+        $this->validateCoordinateWithinRadius(
+            $validated,
+            'check_out',
+            'lat_out',
+            'lng_out',
+            $existingAttendance,
+            $spots
+        );
+    }
+
+    private function validateCoordinateWithinRadius(
+        array $validated,
+        string $timeField,
+        string $latField,
+        string $lngField,
+        ?Attendance $existingAttendance,
+        \Illuminate\Support\Collection $spots
+    ): void {
+        $isTryingToSubmitTime = array_key_exists($timeField, $validated);
+        $isTryingToSubmitCoordinate = array_key_exists($latField, $validated) || array_key_exists($lngField, $validated);
+        if (!$isTryingToSubmitTime && !$isTryingToSubmitCoordinate) {
+            return;
+        }
+
+        $latitude = $validated[$latField] ?? $existingAttendance?->{$latField};
+        $longitude = $validated[$lngField] ?? $existingAttendance?->{$lngField};
+
+        if (!is_numeric($latitude) || !is_numeric($longitude)) {
+            throw ValidationException::withMessages([
+                $latField => 'Koordinat absensi wajib diisi.',
+            ]);
+        }
+
+        $bestMatch = $spots
+            ->map(function (AttendanceSpot $spot) use ($latitude, $longitude) {
+                $distanceMeters = $this->calculateDistanceMeters(
+                    (float) $latitude,
+                    (float) $longitude,
+                    (float) $spot->latitude,
+                    (float) $spot->longitude
+                );
+
+                return [
+                    'spot' => $spot,
+                    'distance' => $distanceMeters,
+                    'inside' => $distanceMeters <= (float) $spot->radius_meters,
+                ];
+            })
+            ->sortBy('distance')
+            ->first();
+
+        if (!$bestMatch || !$bestMatch['inside']) {
+            $nearestDistance = $bestMatch['distance'] ?? 0;
+            $nearestSpotName = $bestMatch['spot']->name ?? '-';
+            $nearestRadius = $bestMatch['spot']->radius_meters ?? 0;
+            throw ValidationException::withMessages([
+                $latField => sprintf(
+                    'Lokasi absensi di luar semua spot yang diizinkan. Spot terdekat: %s (radius %.0f m, jarak %.0f m).',
+                    $nearestSpotName,
+                    (float) $nearestRadius,
+                    (float) $nearestDistance
+                ),
+            ]);
+        }
+    }
+
+    private function calculateDistanceMeters(
+        float $latitudeA,
+        float $longitudeA,
+        float $latitudeB,
+        float $longitudeB
+    ): float {
+        $earthRadiusMeters = 6371000;
+        $latARad = deg2rad($latitudeA);
+        $latBRad = deg2rad($latitudeB);
+        $deltaLat = deg2rad($latitudeB - $latitudeA);
+        $deltaLng = deg2rad($longitudeB - $longitudeA);
+
+        $hav = sin($deltaLat / 2) ** 2
+            + cos($latARad) * cos($latBRad) * sin($deltaLng / 2) ** 2;
+        $arc = 2 * atan2(sqrt($hav), sqrt(1 - $hav));
+
+        return $earthRadiusMeters * $arc;
     }
 
     private function applyAttendanceMetrics(array &$payload, Employee $employee, ?Attendance $existingAttendance = null): void

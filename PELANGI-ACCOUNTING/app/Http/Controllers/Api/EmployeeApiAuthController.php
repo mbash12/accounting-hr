@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\AttendanceSpot;
 use App\Models\Employee;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -74,7 +75,21 @@ class EmployeeApiAuthController extends Controller
 
     private function transformEmployee(Employee $employee): array
     {
-        $employee->loadMissing('department');
+        $employee->loadMissing('department', 'company');
+        $attendanceSpots = AttendanceSpot::query()
+            ->where('company_id', $employee->company_id)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'latitude', 'longitude', 'radius_meters'])
+            ->map(static fn (AttendanceSpot $spot) => [
+                'id' => $spot->id,
+                'name' => $spot->name,
+                'latitude' => (float) $spot->latitude,
+                'longitude' => (float) $spot->longitude,
+                'radius_meters' => (int) $spot->radius_meters,
+            ])
+            ->values()
+            ->all();
 
         return [
             'id' => $employee->id,
@@ -90,6 +105,7 @@ class EmployeeApiAuthController extends Controller
             'role' => 'staff',
             'department_id' => $employee->department,
             'is_active' => $employee->is_active,
+            'attendance_spots' => $attendanceSpots,
         ];
     }
 }

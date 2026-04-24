@@ -74,6 +74,49 @@ const getTodayHistory = () => {
     return state.history.find((item) => item.date === today);
 };
 
+const toRadians = (value) => (Number(value) * Math.PI) / 180;
+
+const calculateDistanceMeters = (latA, lngA, latB, lngB) => {
+    const earthRadiusMeters = 6371000;
+    const dLat = toRadians(latB - latA);
+    const dLng = toRadians(lngB - lngA);
+    const lat1 = toRadians(latA);
+    const lat2 = toRadians(latB);
+    const hav =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+    return earthRadiusMeters * (2 * Math.atan2(Math.sqrt(hav), Math.sqrt(1 - hav)));
+};
+
+const evaluateAttendanceSpot = (latitude, longitude) => {
+    const spots = Array.isArray(currentUser.user?.attendance_spots)
+        ? currentUser.user.attendance_spots
+        : [];
+    if (!spots.length) return { allowed: true, nearest: null };
+
+    const evaluations = spots
+        .map((spot) => {
+            const distance = calculateDistanceMeters(
+                Number(latitude),
+                Number(longitude),
+                Number(spot.latitude),
+                Number(spot.longitude)
+            );
+            const radius = Number(spot.radius_meters);
+            return {
+                spot,
+                distance,
+                radius,
+                inside: distance <= radius,
+            };
+        })
+        .sort((a, b) => a.distance - b.distance);
+
+    const nearest = evaluations[0] ?? null;
+    const inside = evaluations.some((item) => item.inside);
+    return { allowed: inside, nearest };
+};
+
 const canCheckIn = () => {
     const today = getTodayHistory();
     return !today?.checkIn;
@@ -228,6 +271,22 @@ const submit = async (type) => {
         });
         return;
     }
+
+    const spotValidation = evaluateAttendanceSpot(state.form.latitude, state.form.longitude);
+    if (!spotValidation.allowed) {
+        const nearest = spotValidation.nearest;
+        $swal.fire({
+            icon: "error",
+            title: "Di luar area absensi",
+            text: nearest
+                ? `Spot terdekat ${nearest.spot?.name || "-"} (radius ${Math.round(
+                      nearest.radius
+                  )} m, jarak ${Math.round(nearest.distance)} m).`
+                : "Lokasi saat ini tidak masuk radius spot absensi.",
+        });
+        return;
+    }
+
     const datetime = dayjs(state.current_time).format("YYYY-MM-DD HH:mm:ss");
     const data = {
         type: type,
