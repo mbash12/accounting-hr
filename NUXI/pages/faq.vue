@@ -42,7 +42,7 @@ const toggleSearch = () => {
                     class="text-xs px-4 py-2 rounded-full cursor-pointer font-medium whitespace-nowrap"
                     :class="`${
                         state.current_category?.id == cat?.id
-                            ? 'bg-gradient-to-bl from-[#FF6C69] to-[#F20A13] text-white border border-[#FFB7BA]'
+                            ? 'bg-gradient-to-bl from-[#60a5fa] to-[#40B6F4] text-white border border-[#BFDBFE]'
                             : 'text-gray-500'
                     }`"
                     @click="selectCategory(cat)"
@@ -119,7 +119,7 @@ const toggleSearch = () => {
                         icon="ph:magnifying-glass-duotone"
                         width="1.2rem"
                         height="1.2rem"
-                        :class="state.on_search ? 'text-red-500' : 'text-white'"
+                        :class="state.on_search ? 'text-[#40B6F4]' : 'text-white'"
                     />
                 </div>
                 <input

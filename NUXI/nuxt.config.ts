@@ -18,7 +18,7 @@ export default defineNuxtConfig({
         buildAssetsDir: "/_nuxt/",
 
         head: {
-            title: "PermitHub",
+            title: "Elevate Attendance",
             link: [
                 { rel: "icon", type: "image/x-icon", href: "/icon.png" },
             ],
@@ -109,29 +109,29 @@ export default defineNuxtConfig({
         includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
         filename: "manifest.json",
         manifest: {
-            id: "absensi-pelangi",
-            theme_color: "#F10A13",
+            id: "elevate-attendance",
+            theme_color: "#40B6F4",
             background_color: "#ffffff",
             display: "standalone",
             scope: "/",
             start_url: "/",
-            name: "PermitHub",
-            short_name: "PermitHub",
-            description: "Aplikasi Absensi PT Pelangi Sentral Kreasi",
+            name: "Elevate Attendance",
+            short_name: "Elevate",
+            description: "Aplikasi Elevate Attendance",
             screenshots: [
                 {
                     src: "screenshot.png",
                     sizes: "1024x1024",
                     type: "image/png",
                     form_factor: "wide",
-                    label: "PermitHub",
+                    label: "Elevate Attendance",
                 },
                 {
                     src: "screenshot.png",
                     sizes: "1024x1024",
                     type: "image/png",
                     form_factor: "narrow",
-                    label: "PermitHub",
+                    label: "Elevate Attendance",
                 },
             ],
             icons: [

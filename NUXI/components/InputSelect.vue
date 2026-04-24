@@ -62,7 +62,7 @@ onClickOutside(target, () => (state.open = false));
             >
                 <path
                     d="M1.51563 1.03125L7.51563 7.03125L13.5156 1.03125"
-                    stroke="#F10A13"
+                    stroke="#40B6F4"
                     stroke-width="1.70667"
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -76,7 +76,7 @@ onClickOutside(target, () => (state.open = false));
             >
                 <div
                     class="p-4 text-14px"
-                    :class="option.value === props.modelValue ? 'text-red-500 bg-red-50 font-bold' : ' font-medium'"
+                    :class="option.value === props.modelValue ? 'text-[#40B6F4] bg-[#E0F3FE] font-bold' : ' font-medium'"
                     v-for="option in props.options"
                     :key="option"
                     @click="onChange(option.value)"

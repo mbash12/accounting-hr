@@ -53,8 +53,8 @@ const handleSubmit = () => {
         <div
             class="flex flex-col py-8 gap-4 items-center h-full px-6 max-w-xl mx-auto w-full"
         >
-        <div class="w-220px h-260px mb-10 flex items-center justify-center">
-          <img src="/auth.png" alt="" class="h-full object-contain" />
+        <div class="w-full mb-6 flex items-center justify-center">
+          <img src="/accounting-logo.png" alt="Elevate Attendance Logo" class="h-24 object-contain" />
         </div>
             <div class="flex flex-col gap-5 text-left w-full mb-4 px-2">
                 <span class="font-regualar text-26px text-[#404040]"
@@ -71,7 +71,7 @@ const handleSubmit = () => {
             >
                 <div class="flex items-center h-75px gap-4">
                     <div
-                        class="bg-[#FFEDED] rounded-full p-1.5 w-35px h-35px flex items-center justify-center text-[#F10A13]"
+                        class="bg-[#E0F3FE] rounded-full p-1.5 w-35px h-35px flex items-center justify-center text-[#40B6F4]"
                     >
                         <Icon
                             icon="clarity:email-line"
@@ -95,14 +95,14 @@ const handleSubmit = () => {
                 Submit
             </Button>
             <span
-                class="mt-4 text-[#EE1F25] cursor-pointer"
+                class="mt-4 text-[#40B6F4] cursor-pointer"
                 @click="$router.go(-1)"
                 >Back</span
             >
 
             <span class="flex-1"></span>
             <span class="font-light text-14px text-[#919294] pb-10"
-                >Copyright © PT Pelangi Sentral Kreasi</span
+                >Copyright © Elevate Attendance</span
             >
         </div>
     </main>

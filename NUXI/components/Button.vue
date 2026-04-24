@@ -17,8 +17,8 @@ const props = defineProps({
     }
 });
 const variants = {
-    red: "text-white bg-gradient-to-bl from-[#FF6C69] to-[#F20A13]",
-    white: "bg-white text-[#EE1F25] shadow-md border",
+    red: "text-white bg-gradient-to-bl from-[#60a5fa] to-[#40B6F4]",
+    white: "bg-white text-[#40B6F4] shadow-md border border-[#BFDBFE]",
     gray: "bg-[#F2F2F2] text-black",
     green: "bg-gradient-to-bl from-[#00E717] to-[#00C714] text-white",
 };

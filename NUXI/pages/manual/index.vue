@@ -304,7 +304,7 @@ const submit = async (type) => {
 <template>
     <main class="bg-white">
         <div class="w-full h-full flex flex-col">
-            <div class="w-full h-260px bg-[#F10A13] text-white relative">
+            <div class="w-full h-260px bg-[#40B6F4] text-white relative">
                 <img
                     src="/bg.png"
                     alt=""
@@ -412,7 +412,7 @@ const submit = async (type) => {
                                     Check in
                                 </button>
                                 <button
-                                    class="flex-1 h-50px rounded-full bg-[#F10A13] border-[#FFB7BA] text-white font-bold"
+                                    class="flex-1 h-50px rounded-full bg-[#40B6F4] border-[#BFDBFE] text-white font-bold"
                                     @click="submit('out')"
                                     :disabled="!canCheckOut()"
                                     :class="{ 'opacity-50 pointer-events-none': !canCheckOut() }"
@@ -429,7 +429,7 @@ const submit = async (type) => {
                             >Riwayat Absensi</span
                         >
                         <span class="flex-1"></span>
-                        <span class="text-14px text-[#F10A13]"
+                        <span class="text-14px text-[#40B6F4]"
                             @click="toggleHistory"
                             >{{ historyToggleText() }}</span
                         >
@@ -483,7 +483,7 @@ const submit = async (type) => {
 
                     <div class="flex justify-center p-4" v-if="state.show_history && state.historyRaw.length < state.results">
                         <button
-                            class="flex-1 h-50px rounded-full bg-[#F10A13] border-[#FFB7BA] text-white font-bold"
+                            class="flex-1 h-50px rounded-full bg-[#40B6F4] border-[#BFDBFE] text-white font-bold"
                             @click="loadMore()"
                             :disabled="state.history_loading"
                             :class="{ 'opacity-50 pointer-events-none': state.history_loading }"

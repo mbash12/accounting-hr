@@ -7,7 +7,7 @@ const props = defineProps({
 </script>
 <template>
     <div
-        class="px-4 py-2 items-center bg-[#F10A13] text-white text-sm flex h-55px gap-4 flex-shrink-0"
+        class="px-4 py-2 items-center bg-[#40B6F4] text-white text-sm flex h-55px gap-4 flex-shrink-0"
     >
         <svg
             width="25"

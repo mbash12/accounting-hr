@@ -30,7 +30,7 @@ onClickOutside(target, () => (state.open = false));
                 v-if="state.open"
             >
                 <button
-                    class="flex items-center gap-2 bg-white shadow text-[#EE0C15] px-6 py-2.5 text-xs rounded-full font-semibold"
+                    class="flex items-center gap-2 bg-white shadow text-[#40B6F4] px-6 py-2.5 text-xs rounded-full font-semibold"
                     @click="$router.push('/permit')"
                 >
                     <Icon
@@ -41,7 +41,7 @@ onClickOutside(target, () => (state.open = false));
                     <span>Buat Pengajuan Izin</span>
                 </button>
                 <button
-                    class="flex items-center gap-2 bg-white shadow text-[#EE0C15] px-6 py-2.5 text-xs rounded-full font-semibold"
+                    class="flex items-center gap-2 bg-white shadow text-[#40B6F4] px-6 py-2.5 text-xs rounded-full font-semibold"
                     @click="$router.push('/manual')"
                 >
                     <Icon
@@ -54,7 +54,7 @@ onClickOutside(target, () => (state.open = false));
             </div>
         </Transition>
         <button
-            class="rounded-full text-[#EE0C15] flex items-center justify-center shadow-lg overflow-hidden bg-white z-50"
+            class="rounded-full text-[#40B6F4] flex items-center justify-center shadow-lg overflow-hidden bg-white z-50"
             @click="state.open = !state.open"
         >
             <Icon

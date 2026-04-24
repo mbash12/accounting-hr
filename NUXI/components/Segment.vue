@@ -20,7 +20,7 @@ const onSelect = (e) => {
 <template>
   <div class="flex bg-gray-50 p-1.5 rounded-full relative" :class="props.disabled ? 'cursor-not-allowed bg-gray-100' : ''">
     <div class="relative flex items-center w-full ">
-      <div class="h-38px rounded-full absolute transition-all duration-300 bg-gradient-to-bl from-[#FF6C69] to-[#F20A13] border border-[#FFB7BA]"
+      <div class="h-38px rounded-full absolute transition-all duration-300 bg-gradient-to-bl from-[#60a5fa] to-[#40B6F4] border border-[#BFDBFE]"
            :style="`width:${100 / props.options.length}%; left:${(100 / props.options.length) * (props.options.findIndex(i => i.value === modelValue))}%`"
            
       >

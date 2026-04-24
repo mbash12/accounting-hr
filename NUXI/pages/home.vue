@@ -85,7 +85,7 @@ onMounted(async () => {
     <main>
         <div class="w-full h-full bg-gray-100 overflow-hidden">
             <div class="flex flex-col absolute w-full">
-                <div class="w-full h-230px bg-[#F10A13] text-white relative">
+                <div class="w-full h-230px bg-[#40B6F4] text-white relative">
                     <img
                         src="/bg.png"
                         alt=""

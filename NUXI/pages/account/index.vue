@@ -35,7 +35,7 @@ const formatEmployeeStatus = (value) => {
         <div class="w-full h-full flex flex-col bg-gray-100 overflow-hidden">
             <div class="flex flex-col w-full h-full">
                 <div
-                    class="w-full h-280px bg-[#F10A13] p-4 text-white relative"
+                    class="w-full h-280px bg-[#40B6F4] p-4 text-white relative"
                 >
                 <img
                         src="/bg.png"

@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 
 
 body *{
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   /* font-family: "Open Sans", sans-serif; */
 
 }
@@ -17,10 +17,16 @@ main{
   flex-direction: column;
   position: fixed;
   inset: 0;
-  background: rgba(243, 244, 246, 1)
+  background: #F4F9FE;
 }
 body{
   overflow: hidden;
+}
+
+:root {
+  --theme-primary: #40B6F4;
+  --theme-primary-dark: #3b82f6;
+  --theme-primary-soft: #E0F3FE;
 }
 input,
 textarea,
