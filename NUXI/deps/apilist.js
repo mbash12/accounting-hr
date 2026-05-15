@@ -74,6 +74,21 @@ export const apilist = {
       auth:true,
       method:'PUT'
   },
+  get_overtimes: {
+      url:"/employeeapi/overtimes",
+      auth:true,
+      method:'GET'
+  },
+  set_overtime: {
+      url:"/employeeapi/overtimes",
+      auth:true,
+      method:'POST'
+  },
+  update_overtime: {
+      url:"/employeeapi/overtimes",
+      auth:true,
+      method:'PUT'
+  },
   post_manual: {
     url:"/employeeapi/attendances",
     auth:true,

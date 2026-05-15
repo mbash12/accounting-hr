@@ -42,6 +42,17 @@ onClickOutside(target, () => (state.open = false));
                 </button>
                 <button
                     class="flex items-center gap-2 bg-white shadow text-[#40B6F4] px-6 py-2.5 text-xs rounded-full font-semibold"
+                    @click="$router.push('/overtime/list')"
+                >
+                    <Icon
+                        icon="solar:clock-square-bold-duotone"
+                        width="1.5rem"
+                        height="1.5rem"
+                    />
+                    <span>Riwayat Lembur</span>
+                </button>
+                <button
+                    class="flex items-center gap-2 bg-white shadow text-[#40B6F4] px-6 py-2.5 text-xs rounded-full font-semibold"
                     @click="$router.push('/manual')"
                 >
                     <Icon

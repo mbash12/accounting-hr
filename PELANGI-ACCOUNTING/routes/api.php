@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\EmployeeApiAuthController;
 use App\Http\Controllers\Api\EmployeeApiAttendanceController;
 use App\Http\Controllers\Api\EmployeeApiPermitController;
+use App\Http\Controllers\Api\EmployeeApiOvertimeController;
 use App\Http\Controllers\Api\EmployeeApiUploadController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\SalesOrderController;
@@ -65,6 +66,10 @@ Route::prefix('employeeapi')->middleware([EmployeeApiAuth::class])->group(functi
     Route::post('/attendances', [EmployeeApiAttendanceController::class, 'store']);
     Route::get('/attendances/{attendance}', [EmployeeApiAttendanceController::class, 'show']);
     Route::put('/attendances/{attendance}', [EmployeeApiAttendanceController::class, 'update']);
+    Route::get('/overtimes', [EmployeeApiOvertimeController::class, 'index']);
+    Route::post('/overtimes', [EmployeeApiOvertimeController::class, 'store']);
+    Route::get('/overtimes/{overtimeLog}', [EmployeeApiOvertimeController::class, 'show']);
+    Route::put('/overtimes/{overtimeLog}', [EmployeeApiOvertimeController::class, 'update']);
     Route::get('/faqs', [FaqController::class, 'index']);
 });
 

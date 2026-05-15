@@ -214,6 +214,69 @@ export const uploadImage = async (file) => {
     return await api("upload", { body: file });
 };
 
+const mapOvertimeStatusToAccounting = (status) => {
+    if (status === "submitted") return "draft";
+    return status;
+};
+
+const mapOvertimeStatusToApp = (status) => {
+    if (status === "draft") return "submitted";
+    return status;
+};
+
+const mapAccountingOvertimeToApp = (overtime) => {
+    return {
+        id: overtime.id,
+        employee_id: overtime.employee_id,
+        date: overtime.date,
+        hours: Number(overtime.hours ?? 0),
+        is_holiday: Boolean(overtime.is_holiday),
+        calculated_amount: Number(overtime.calculated_amount ?? 0),
+        status: mapOvertimeStatusToApp(overtime.status),
+        reason: overtime.reason ?? null,
+        created_at: overtime.created_at,
+        updated_at: overtime.updated_at,
+    };
+};
+
+const mapAppOvertimeToAccounting = (payload) => {
+    return {
+        date: payload.date,
+        hours: Number(payload.hours ?? payload.duration ?? 0),
+        is_holiday: Boolean(payload.is_holiday ?? false),
+        reason: payload.reason ?? payload.description ?? null,
+        status: mapOvertimeStatusToAccounting(payload.status ?? "submitted"),
+    };
+};
+
+export const getOvertimes = async (params) => {
+    const mappedParams = {
+        ...params,
+        status: mapOvertimeStatusToAccounting(params?.status),
+    };
+    const result = await api("get_overtimes", { params: mappedParams });
+    return {
+        ...result,
+        records: (result?.records ?? []).map(mapAccountingOvertimeToApp),
+    };
+};
+
+export const getSingleOvertime = async (id) => {
+    const result = await api("get_overtimes", { route: id });
+    return mapAccountingOvertimeToApp(result);
+};
+
+export const submitOvertime = async (data) => {
+    return await api("set_overtime", { body: mapAppOvertimeToAccounting(data) });
+};
+
+export const updateOvertime = async (id, data) => {
+    return await api("update_overtime", {
+        body: mapAppOvertimeToAccounting(data),
+        route: id,
+    });
+};
+
 export const getLeaveQuota = async (user_id) => {
     return {
         id: null,
@@ -224,7 +287,15 @@ export const getLeaveQuota = async (user_id) => {
     };
 };
 export const getNationalHolidays = async () => {
-    return [];
+    try {
+        const result = await api("get_holidays");
+        return (result?.records ?? []).map((h) => ({
+            date: h.date ?? h.holiday_date,
+            name: h.name ?? h.description,
+        }));
+    } catch (_error) {
+        return [];
+    }
 };
 
 const mapStatusToAccounting = (status) => {

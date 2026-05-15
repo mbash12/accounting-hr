@@ -1,0 +1,389 @@
+{
+  "info": {
+    "name": "Elevate Attendance - NUXI API",
+    "description": "HR/Employee API endpoints for NUXI mobile app (Elevate Attendance). Base URL: http://localhost:8000/api\n\nAuth: Bearer token obtained from login endpoint, valid for 7 days.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "employee_token",
+      "value": "",
+      "type": "string",
+      "description": "Set after login. Used for all employee-scoped endpoints."
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"employee@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/employeeapi/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "auth", "login"]
+            },
+            "description": "Authenticate employee. Returns token and employee profile. Token is valid for 7 days."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"token\": \"random-64-char-string\",\n  \"employee\": {\n    \"id\": 1,\n    \"name\": \"John Doe\",\n    \"email\": \"employee@example.com\",\n    \"position\": \"Staff\",\n    \"department\": { \"id\": 1, \"name\": \"IT\" },\n    \"attendance_spots\": []\n  }\n}"
+            },
+            {
+              "name": "Invalid Credentials",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"message\": \"Email atau password tidak valid.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "auth", "me"]
+            },
+            "description": "Get current authenticated employee profile."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"employee\": {\n    \"id\": 1,\n    \"name\": \"John Doe\",\n    \"email\": \"employee@example.com\",\n    \"position\": \"Staff\",\n    \"department\": { \"id\": 1, \"name\": \"IT\" },\n    \"attendance_spots\": []\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/auth/logout",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "auth", "logout"]
+            },
+            "description": "Invalidate current token."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"message\": \"Logged out\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Permits (Izin/Cuti)",
+      "item": [
+        {
+          "name": "List Permits",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/permits?status=pending&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "permits"],
+              "query": [
+                { "key": "status", "value": "pending", "description": "Filter: pending, approved, rejected" },
+                { "key": "page", "value": "1", "description": "Page number, default 1" }
+              ]
+            },
+            "description": "List employee's permits. Paginated 20 per page."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"records\": [\n    {\n      \"id\": 1,\n      \"employee_id\": 1,\n      \"type\": \"annual\",\n      \"start_date\": \"2026-05-20\",\n      \"end_date\": \"2026-05-22\",\n      \"start\": \"2026-05-20 00:00:00\",\n      \"end\": \"2026-05-22 00:00:00\",\n      \"reason\": \"Family vacation\",\n      \"duration\": 3,\n      \"status\": \"pending\",\n      \"attachment_path\": null,\n      \"created_at\": \"2026-05-15T10:00:00.000000Z\",\n      \"updated_at\": \"2026-05-15T10:00:00.000000Z\"\n    }\n  ],\n  \"results\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Permit Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/permits/1",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "permits", "1"]
+            },
+            "description": "Get single permit detail. Only accessible by the permit owner."
+          }
+        },
+        {
+          "name": "Create Permit",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"annual\",\n  \"start_date\": \"2026-05-20\",\n  \"end_date\": \"2026-05-22\",\n  \"reason\": \"Family vacation\",\n  \"attachment_path\": null,\n  \"status\": \"pending\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/employeeapi/permits",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "permits"]
+            },
+            "description": "Submit a new permit request.\n\nValid types: sick, annual_leave, unpaid_leave, maternity_leave, other_permit (legacy), annual, marry, kids_marry, khitan, family_death, maternity, maternity_husband, maternity_death, force_majure, nodn_sick, sudden, others"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "1"
+            }
+          ]
+        },
+        {
+          "name": "Update Permit",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"cancelled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/employeeapi/permits/1",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "permits", "1"]
+            },
+            "description": "Update a permit. Employees can update reason/date fields while status is pending. Admins approve/reject via Filament panel.\n\nValid statuses: pending, approved, rejected"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Attendances",
+      "item": [
+        {
+          "name": "List Attendances",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/attendances?page=1",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "attendances"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Page number, default 1" }
+              ]
+            },
+            "description": "List employee's attendance records. Paginated 10 per page."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"records\": [\n    {\n      \"id\": 1,\n      \"employee_id\": 1,\n      \"date\": \"2026-05-15\",\n      \"check_in\": \"2026-05-15 08:00:00\",\n      \"check_out\": \"2026-05-15 17:00:00\",\n      \"late_minutes\": 0,\n      \"early_departure_minutes\": 0,\n      \"lat_in\": -6.2088,\n      \"lng_in\": 106.8456,\n      \"lat_out\": -6.2088,\n      \"lng_out\": 106.8456,\n      \"status\": \"present\",\n      \"photo_in_path\": null,\n      \"photo_out_path\": null,\n      \"notes\": null,\n      \"notes_in\": null,\n      \"notes_out\": null\n    }\n  ],\n  \"results\": 1\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Attendance Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/attendances/1",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "attendances", "1"]
+            },
+            "description": "Get single attendance detail."
+          }
+        },
+        {
+          "name": "Create Attendance (Manual Check-in/out)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-05-15\",\n  \"type\": \"in\",\n  \"datetime\": \"2026-05-15 08:00:00\",\n  \"latitude\": -6.2088,\n  \"longitude\": 106.8456,\n  \"note\": \"Check-in via mobile\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/employeeapi/attendances",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "attendances"]
+            },
+            "description": "Submit manual attendance.\n\nCompatibility fields (legacy): type (in/out), datetime, latitude, longitude, note, attachment\n\nNew fields: check_in, check_out, lat_in, lng_in, lat_out, lng_out, photo_in_path, photo_out_path, notes, notes_in, notes_out\n\nFile upload: multipart/form-data with 'photo' field (max 10MB).\n\nLocation is validated against active attendance spots for the employee's company."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "1"
+            }
+          ]
+        },
+        {
+          "name": "Update Attendance",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"out\",\n  \"datetime\": \"2026-05-15 17:00:00\",\n  \"latitude\": -6.2088,\n  \"longitude\": 106.8456\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/employeeapi/attendances/1",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "attendances", "1"]
+            },
+            "description": "Update an existing attendance record (e.g., adding check-out)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Upload Photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "",
+                  "description": "Image file (max 10MB)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/employeeapi/upload",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "upload"]
+            },
+            "description": "Upload a file (e.g., photo, attachment). Returns relative path on public disk."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"path\": \"employeeapi/uploads/filename.jpg\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FAQs",
+      "item": [
+        {
+          "name": "List FAQs",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{employee_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/employeeapi/faqs",
+              "host": ["{{base_url}}"],
+              "path": ["employeeapi", "faqs"]
+            },
+            "description": "Get FAQs grouped by category. Scoped to employee's company."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"records\": [\n    {\n      \"id\": 1,\n      \"name\": \"Attendance\",\n      \"sort_order\": 1,\n      \"faqs\": [\n        {\n          \"id\": 1,\n          \"question\": \"How to check in?\",\n          \"answer\": \"Open the app and tap...\"\n        }\n      ]\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
