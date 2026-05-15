@@ -235,7 +235,7 @@ class JournalService
         }
 
         // Credit: Sales Revenue (gross sales before discount)
-        $grossSales = ($invoice->subtotal ?? 0) + ($invoice->discount ?? 0);
+        $grossSales = $invoice->subtotal ?? 0;
         if ($mappings->has('sales') && $grossSales > 0) {
             $this->createJournalItem($journalEntry, $mappings->get('sales'), 'credit', $grossSales);
         }
@@ -339,7 +339,7 @@ class JournalService
         $mappings
     ): void {
         // Debit: Expense or Inventory (subtotal before discount)
-        $grossAmount = ($invoice->subtotal ?? 0) + ($invoice->discount ?? 0);
+        $grossAmount = $invoice->subtotal ?? 0;
         if ($grossAmount > 0 && $mappings->has('purchases')) {
             $this->createJournalItem($journalEntry, $mappings->get('purchases'), 'debit', $grossAmount);
         }
