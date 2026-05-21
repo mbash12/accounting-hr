@@ -99,7 +99,7 @@ class SalesReturnForm
                             })
                             ->columnSpanFull(),
                         Select::make('customer_id')
-                            ->label('Pelanggan')
+                            ->label('Customer')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'customer',
@@ -126,9 +126,9 @@ class SalesReturnForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Contacts\Schemas\ContactForm)->getCodeField('contact_code', 'Kode Kontak')
+                                (new \App\Filament\Resources\Contacts\Schemas\ContactForm)->getCodeField('contact_code', 'Contact Code')
                                     ->unique(\App\Models\Contact::class, 'contact_code', ignoreRecord: true,
                                         modifyRuleUsing: function ($rule) {
                                             // Get the company_id from the session
@@ -147,7 +147,7 @@ class SalesReturnForm
                                     ->label('Email')
                                     ->email(),
                                 TextInput::make('phone')
-                                    ->label('Telepon')
+                                    ->label('Phone')
                                     ->tel(),
                                 Hidden::make('is_customer')
                                     ->default(true),
@@ -166,7 +166,7 @@ class SalesReturnForm
                                 return $contact->id;
                             }),
                         SelectWithModal::make('delivery_document_id')
-                            ->label('Dokumen Pengiriman')
+                            ->label('Delivery Document')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'deliveryDocument',
@@ -202,7 +202,7 @@ class SalesReturnForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->delivery_number)
                             ->searchable()
                             ->preload()
-                            ->placeholder('Pilih Dokumen Pengiriman')
+                            ->placeholder('Select Delivery Document')
                             ->reactive()
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -239,7 +239,7 @@ class SalesReturnForm
                             ->columnSpan(1),
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Nomor Referensi')
+                            ->label('Reference No.')
                             ->columnSpan(1),
                         (new static)->getCodeField()
                             ->unique('sales_returns', 'return_number', ignoreRecord: true,
@@ -258,7 +258,7 @@ class SalesReturnForm
                         Textarea::make('description')
                             ->rows(1)
                             ->maxLength(65535)
-                            ->label('Deskripsi'),
+                            ->label('Description'),
                         Select::make('status')
                             ->label('Status')
                             ->options([
@@ -277,21 +277,21 @@ class SalesReturnForm
                 Repeater::make('items')
                     ->relationship()
                     ->hiddenLabel()
-                    ->addActionLabel('Tambah Item Baru')
+                    ->addActionLabel('Add New Item')
                     ->required()
                     ->table([
-                        TableColumn::make('Produk')->width('35%')->alignment(Alignment::Start),
-                        TableColumn::make('Jumlah')->width('12%')->alignment(Alignment::End),
-                        TableColumn::make('Satuan')->width('13%')->alignment(Alignment::Start),
-                        TableColumn::make('Alasan Retur')->width('30%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('10%')->alignment(Alignment::Start),
+                        TableColumn::make('Product')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('12%')->alignment(Alignment::End),
+                        TableColumn::make('Unit')->width('13%')->alignment(Alignment::Start),
+                        TableColumn::make('Return Reason')->width('30%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('10%')->alignment(Alignment::Start),
                     ])
                     ->schema([
                         Hidden::make('delivery_document_item_id'),
                         Select::make('product_id')
                             ->required()
                             ->searchable(['name', 'code'])
-                            ->label('Produk')
+                            ->label('Product')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'product',
@@ -319,9 +319,9 @@ class SalesReturnForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Kode Produk')
+                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Product Code')
                                     ->unique(
                                         \App\Models\Product::class,
                                         'code',
@@ -340,7 +340,7 @@ class SalesReturnForm
                                         },
                                     ),
                                 Select::make('product_group_id')
-                                    ->label('Kelompok Produk')
+                                    ->label('Product Group')
                                     ->relationship(
                                         "productGroup",
                                         "name",
@@ -357,12 +357,12 @@ class SalesReturnForm
                                     ->required(),
                                 ...RoundedIntegerMoneyInput::schema(
                                     name: 'selling_price',
-                                    label: 'Harga Jual',
+                                    label: 'Selling Price',
                                     required: false,
                                     defaultDecimal: '0.00',
                                 ),
                                 Select::make('unit_id')
-                                    ->label('Satuan')
+                                    ->label('Unit')
                                     ->searchable()
                                     ->options(function () {
                                         $selectedCompanyId = session('selected_company_id');
@@ -375,7 +375,7 @@ class SalesReturnForm
                                         return $q->orderBy('name')->pluck('name', 'id')->toArray();
                                     }),
                                 Textarea::make('description')
-                                    ->label('Deskripsi')
+                                    ->label('Description')
                                     ->rows(2),
                                 Hidden::make('company_id')
                                     ->default(function () {
@@ -393,14 +393,14 @@ class SalesReturnForm
                             }),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
-                            label: 'Jumlah',
+                            label: 'Quantity',
                             required: true,
                             scale: 2,
                             defaultDecimal: '1',
                         ),
                         Select::make('unit_id')
                             ->searchable()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'unit',
@@ -418,10 +418,10 @@ class SalesReturnForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
                         TextInput::make('return_reason')
                             ->required()
-                            ->label('Alasan Retur')
-                            ->placeholder('misalnya, Rusak, Salah barang, Tidak dibutuhkan'),
+                            ->label('Return Reason')
+                            ->placeholder('e.g. Damaged, Wrong item, Not needed'),
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->rows(1)
                             ->maxLength(255),

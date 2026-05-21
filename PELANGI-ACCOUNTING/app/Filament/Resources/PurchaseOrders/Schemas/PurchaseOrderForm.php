@@ -447,7 +447,7 @@ class PurchaseOrderForm
                             }),
                         Select::make('unit_id')
                             ->searchable()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->relationship(
                                 name: 'unit',
                                 titleAttribute: 'name',
@@ -465,7 +465,7 @@ class PurchaseOrderForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
 
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->rows(1),
                         Hidden::make('total')
                             ->default(0)
