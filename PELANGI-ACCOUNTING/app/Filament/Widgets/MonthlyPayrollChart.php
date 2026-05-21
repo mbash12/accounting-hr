@@ -13,7 +13,7 @@ class MonthlyPayrollChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Tren Pengeluaran Gaji (12 Bulan)';
+    protected ?string $heading = 'Salary Expenditure Trend (12 Months)';
     protected static ?int $sort = 22;
     protected int | string | array $columnSpan = 'full';
 

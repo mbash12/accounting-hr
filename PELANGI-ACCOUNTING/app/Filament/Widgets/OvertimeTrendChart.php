@@ -12,7 +12,7 @@ class OvertimeTrendChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Tren Lembur Bulanan';
+    protected ?string $heading = 'Monthly Overtime Trend';
     protected static ?int $sort = 33;
     protected int | string | array $columnSpan = 1;
 

@@ -12,7 +12,7 @@ class ProfitLossChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Laba Rugi (12 Bulan Terakhir)';
+    protected ?string $heading = 'Profit & Loss (Last 12 Months)';
     protected static ?int $sort = 12;
     protected int | string | array $columnSpan = 1;
 
