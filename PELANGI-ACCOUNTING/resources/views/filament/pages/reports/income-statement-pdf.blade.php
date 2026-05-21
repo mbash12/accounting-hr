@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Laporan Laba Rugi</title>
+    <title>Income Statement</title>
     <style>
         body {
             font-family: sans-serif;
@@ -72,7 +72,7 @@
 <body>
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
-        <div class="report-title">Laporan Laba Rugi</div>
+        <div class="report-title">Income Statement</div>
         <div class="report-date">
             Periode {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} s/d {{
             \Carbon\Carbon::parse($end_date)->format('d M Y') }}

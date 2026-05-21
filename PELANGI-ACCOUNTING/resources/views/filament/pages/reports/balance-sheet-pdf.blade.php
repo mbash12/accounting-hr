@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Neraca (Standar)</title>
+    <title>Balance Sheet (Standard)</title>
     <style>
         body {
             font-family: sans-serif;
@@ -72,7 +72,7 @@
 <body>
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
-        <div class="report-title">Neraca (Standar)</div>
+        <div class="report-title">Balance Sheet (Standard)</div>
         <div class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
     </div>
 

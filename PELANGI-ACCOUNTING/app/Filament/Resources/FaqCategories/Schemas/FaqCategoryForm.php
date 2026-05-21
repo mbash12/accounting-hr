@@ -23,7 +23,7 @@ class FaqCategoryForm
                         TextInput::make('sort_order')
                             ->numeric()
                             ->default(0)
-                            ->label(__('Urutan')),
+                            ->label(__('Order')),
                         Select::make('company_id')
                             ->relationship('company', 'name')
                             ->disabled()
@@ -41,11 +41,11 @@ class FaqCategoryForm
                                     ->label(__('Question')),
                                 RichEditor::make('answer')
                                     ->required()
-                                    ->label(__('Jawaban')),
+                                    ->label(__('Answer')),
                                 TextInput::make('sort_order')
                                     ->numeric()
                                     ->default(0)
-                                    ->label(__('Urutan')),
+                                    ->label(__('Order')),
                             ])
                             ->orderColumn('sort_order')
                             ->columns(1)

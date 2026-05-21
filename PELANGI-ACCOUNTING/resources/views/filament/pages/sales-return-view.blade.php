@@ -341,7 +341,7 @@
                         </tr>
                          @if($record->salesInvoice)
                         <tr>
-                            <td class="doc-meta-label">Ref. Faktur:</td>
+                            <td class="doc-meta-label">Invoice Ref.:</td>
                             <td class="doc-meta-value">{{ $record->salesInvoice->invoice_number }}</td>
                         </tr>
                         @endif
@@ -421,11 +421,11 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Kebijakan Retur & Catatan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Kebijakan Retur & Notes</h4>
                     <p class="text-sm text-muted">
                         Semua barang yang dikembalikan harus dalam kondisi dan kemasan asli.
                         <br>
-                        Kredit atau pengembalian dana akan diproses dalam 7-14 hari kerja setelah persetujuan.
+                        Credit atau pengembalian dana akan diproses dalam 7-14 hari kerja setelah persetujuan.
                     </p>
                     @if($record->description)
                         <div style="margin-top: 10px; font-style: italic;" class="text-sm">

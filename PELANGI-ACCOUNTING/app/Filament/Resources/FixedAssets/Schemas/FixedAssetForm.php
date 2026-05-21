@@ -36,13 +36,13 @@ class FixedAssetForm
     {
         return $schema
             ->components([
-                Section::make('Informasi Harta Tetap')
+                Section::make(__('Fixed Asset Information'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
                             ->maxLength(200)
                             ->columnSpanFull(),
-                        (new static)->getCodeField('code', 'Kode Aset')
+                        (new static)->getCodeField('code', __('Asset Code'))
                             ->rule('required')
                             ->rule(function (?FixedAsset $record) {
                                 return function (string $attribute, $value, \Closure $fail) use ($record) {

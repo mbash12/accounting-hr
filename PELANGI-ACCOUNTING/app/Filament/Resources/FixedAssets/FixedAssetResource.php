@@ -23,12 +23,12 @@ class FixedAssetResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return 'Harta Tetap';
+        return __('Fixed Assets');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Harta Tetap';
+        return __('Fixed Assets');
     }
 
     public static function getNavigationSort(): int
@@ -38,7 +38,7 @@ class FixedAssetResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'Harta Tetap';
+        return __('Fixed Assets');
     }
 
     public static function getNavigationGroup(): string

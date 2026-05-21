@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Laporan Arus Kas</title>
+    <title>Cash Flow Statement</title>
     <style>
         body {
             font-family: sans-serif;
@@ -72,7 +72,7 @@
 <body>
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
-        <div class="report-title">Laporan Arus Kas (Metode Tidak Langsung)</div>
+        <div class="report-title">Cash Flow Statement (Indirect Method)</div>
         <div class="report-date">
             Period {{ \Carbon\Carbon::parse($start_date)->isoFormat('MMMM YYYY') }} to {{
             \Carbon\Carbon::parse($end_date)->isoFormat('MMMM YYYY') }}
@@ -83,7 +83,7 @@
         <thead>
             <tr>
                 <th>Description</th>
-                <th class="amount" style="width: 150px;">Saldo</th>
+                <th class="amount" style="width: 150px;">Balance</th>
             </tr>
         </thead>
         <tbody>
@@ -91,7 +91,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: #f9fafb; text-transform: uppercase;">
-                    Arus Kas dari Aktivitas Operasi</td>
+                    Cash Flow from Operating Activities</td>
             </tr>
 
             <!-- P&L Tree -->
@@ -177,7 +177,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: #f9fafb; text-transform: uppercase;">
-                    Arus Kas dari Aktivitas Investasi</td>
+                    Cash Flow from Investing Activities</td>
             </tr>
             @foreach($invTree as $node)
             @include('filament.pages.reports.partials.cash-flow-row-pdf', ['account' => $node, 'level' => 0])
@@ -194,7 +194,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: #f9fafb; text-transform: uppercase;">
-                    Arus Kas dari Aktivitas Pendanaan</td>
+                    Cash Flow from Financing Activities</td>
             </tr>
             @foreach($finTree as $node)
             @include('filament.pages.reports.partials.cash-flow-row-pdf', ['account' => $node, 'level' => 0])

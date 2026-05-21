@@ -158,10 +158,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -176,7 +176,7 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>{{ $error }}</p>
     </div>
     @elseif($company)
@@ -184,7 +184,7 @@
         <!-- Header -->
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name }}</h2>
-            <h1 class="report-title">Neraca (Standar)</h1>
+            <h1 class="report-title">Balance Sheet (Standard)</h1>
             <p class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
         </div>
 
@@ -285,7 +285,7 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>Pilih perusahaan tertentu untuk melihat laporan.</p>
     </div>
     @endif

@@ -2,21 +2,21 @@
     <table width="100%" style="border-collapse:collapse;">
         <tr>
             <td style="width:20%">
-                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Saldo Awal</div>
+                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Opening Balance</div>
                 <div style="font-size:18px;font-weight:600;">
                     IDR {{ number_format($saldoAwal,0,',','.') }}
                 </div>
             </td>
 
             <td style="width:20%">
-                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Mutasi</div>
+                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Transactions</div>
                 <div style="font-size:18px;font-weight:600;">
                     IDR {{ number_format($mutasiBalance,0,',','.') }}
                 </div>
             </td>
 
             <td style="width:20%">
-                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Saldo Akhir</div>
+                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Closing Balance</div>
                 <div style="font-size:18px;font-weight:600;">
                     IDR {{ number_format($saldoAkhir,0,',','.') }}
                 </div>
@@ -30,9 +30,9 @@
             </td>
 
             <td style="width:20%;text-align:right">
-                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Total Kredit</div>
+                <div style="font-size:11px;color:#94a3b8;text-transform:uppercase;">Total Credit</div>
                 <div style="font-size:14px;font-weight:600;">
-                    IDR {{ number_format($totalKredit,0,',','.') }}
+                    IDR {{ number_format($totalCredit,0,',','.') }}
                 </div>
             </td>
         </tr>

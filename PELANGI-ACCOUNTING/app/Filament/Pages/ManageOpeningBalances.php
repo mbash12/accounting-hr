@@ -253,7 +253,7 @@ class ManageOpeningBalances extends Page implements HasForms
             [
                 'entry_number' => $this->generateOpeningBalanceEntryNumber($companyId),
                 'date' => $date,
-                'description' => 'Saldo Awal / Opening Balance',
+                'description' => 'Opening Balance',
                 'amount' => $totalDebit,
                 'total_amount' => $totalDebit,
                 'status' => 'posted',
@@ -290,7 +290,7 @@ class ManageOpeningBalances extends Page implements HasForms
                     'account_id' => $equityAccount->id,
                     'debit' => $difference < 0 ? abs($difference) : 0,
                     'credit' => $difference > 0 ? $difference : 0,
-                    'notes' => 'Selisih Saldo Awal / Opening Balance Equity',
+                    'notes' => 'Opening Balance Equity',
                 ]);
             }
         }
@@ -318,7 +318,7 @@ class ManageOpeningBalances extends Page implements HasForms
                 $q->where('code', 'like', '%3900%')
                     ->orWhere('code', 'like', '%390%')
                     ->orWhere('name', 'like', '%Opening Balance%')
-                    ->orWhere('name', 'like', '%Saldo Awal%')
+                    ->orWhere('name', 'like', '%Opening Balance%')
                     ->orWhere('name', 'like', '%Retained Earnings%')
                     ->orWhere('name', 'like', '%Laba Ditahan%');
             })

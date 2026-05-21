@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Neraca Saldo</title>
+    <title>Trial Balance</title>
     <style>
         body {
             font-family: sans-serif;
@@ -109,7 +109,7 @@
 <body>
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
-        <div class="report-title">Neraca Saldo</div>
+        <div class="report-title">Trial Balance</div>
         <div class="report-date">
             Dari {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }}
             s/d {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
@@ -130,18 +130,18 @@
         <thead>
             <tr>
                 <th rowspan="2" class="left" style="width:60px;">Kode</th>
-                <th rowspan="2" class="left" style="min-width:130px;">Nama Akun</th>
-                <th colspan="2">Saldo Awal</th>
+                <th rowspan="2" class="left" style="min-width:130px;">Account Name</th>
+                <th colspan="2">Opening Balance</th>
                 <th colspan="2">Perubahan</th>
-                <th colspan="2">Saldo Akhir</th>
+                <th colspan="2">Closing Balance</th>
             </tr>
             <tr>
                 <th>Debit</th>
-                <th>Kredit</th>
+                <th>Credit</th>
                 <th>Debit</th>
-                <th>Kredit</th>
+                <th>Credit</th>
                 <th>Debit</th>
-                <th>Kredit</th>
+                <th>Credit</th>
             </tr>
         </thead>
         <tbody>

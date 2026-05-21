@@ -99,7 +99,7 @@ class TransactionsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Buat Transaksi')
-                    ->modalHeading('Buat Transaksi Harta Tetap')
+                    ->modalHeading(__('Create Fixed Asset Transaction'))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['company_id'] = $this->getOwnerRecord()->company_id;
                         $data['created_by_user_id'] = auth()->id();

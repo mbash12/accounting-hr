@@ -158,10 +158,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -180,14 +180,14 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>{{ $reportData['error'] ?? 'Please select a specific company.' }}</p>
     </div>
     @else
     <div class="report-page">
         <div class="report-header">
             <h2 class="report-company-name">{{ $reportData['company']->name }}</h2>
-            <h1 class="report-title">Laporan Arus Kas (Metode Tidak Langsung)</h1>
+            <h1 class="report-title">Cash Flow Statement (Indirect Method)</h1>
             <p class="report-date">Period {{ \Carbon\Carbon::parse($reportData['start_date'])->isoFormat('MMMM YYYY') }}
                 to {{ \Carbon\Carbon::parse($reportData['end_date'])->isoFormat('MMMM YYYY') }}</p>
         </div>
@@ -196,7 +196,7 @@
             <thead>
                 <tr>
                     <th>Description</th>
-                    <th class="right" style="width: 250px;">Saldo</th>
+                    <th class="right" style="width: 250px;">Balance</th>
                 </tr>
             </thead>
             <tbody>
@@ -204,7 +204,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Arus Kas dari Aktivitas Operasi</td>
+                        Cash Flow from Operating Activities</td>
                 </tr>
                 @foreach($reportData['plTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
@@ -292,7 +292,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Arus Kas dari Aktivitas Investasi</td>
+                        Cash Flow from Investing Activities</td>
                 </tr>
                 @foreach($reportData['invTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
@@ -309,7 +309,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Arus Kas dari Aktivitas Pendanaan</td>
+                        Cash Flow from Financing Activities</td>
                 </tr>
                 @foreach($reportData['finTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])

@@ -327,7 +327,7 @@ class JournalEntryForm
                             ->hiddenLabel()
                             ->columnSpan(2),
                         Placeholder::make('balance')
-                            ->label(__('SELISIH'))
+                            ->label(__('DIFFERENCE'))
                             ->content(function (callable $get) {
                                 $items = $get('items') ?? [];
                                 $totals = self::calculateTotalsFromItems($items);

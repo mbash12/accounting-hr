@@ -156,10 +156,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -174,7 +174,7 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>Please select a specific company from the company selector to view the Account Balance Report.</p>
     </div>
     @else
@@ -186,7 +186,7 @@
     <div class="report-page">
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name ?? '' }}</h2>
-            <h1 class="report-title">Laporan Saldo Akun</h1>
+            <h1 class="report-title">Account Balance Report</h1>
             <p class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
         </div>
 
@@ -199,7 +199,7 @@
                 </svg>
                 <input type="text"
                     style="width: 100%; padding: 0.5rem 1rem 0.5rem 2.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 0.875rem;"
-                    placeholder="Cari akun..." wire:model.live.debounce.300ms="search">
+                    placeholder="Search account..." wire:model.live.debounce.300ms="search">
                 @if(!empty($search))
                 <button
                     style="position: absolute; right: 0.5rem; color: #6b7280; background: none; border: none; cursor: pointer;"
@@ -217,9 +217,9 @@
             <thead>
                 <tr>
                     <th style="width: 120px;">Account number</th>
-                    <th>Nama Akun</th>
-                    <th style="width: 150px;">Tipe Akun</th>
-                    <th class="right" style="width: 150px;">Saldo</th>
+                    <th>Account Name</th>
+                    <th style="width: 150px;">Account Type</th>
+                    <th class="right" style="width: 150px;">Balance</th>
                 </tr>
             </thead>
             <tbody>

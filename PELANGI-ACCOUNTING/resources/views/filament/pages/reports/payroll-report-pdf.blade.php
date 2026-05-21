@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Payroll</title>
+    <title>Payroll Report</title>
     <style>
         body { font-family: sans-serif; font-size: 10px; color: #333; }
         .header { text-align: center; margin-bottom: 20px; }
@@ -21,7 +21,7 @@
         <div class="report-title">LAPORAN RINGKASAN PAYROLL</div>
         <div class="report-meta">
             Periode: {{ $period?->name }} 
-            @if($department) | Departemen: {{ $department->name }} @endif
+            @if($department) | Department: {{ $department->name }} @endif
         </div>
     </div>
 
@@ -29,7 +29,7 @@
         <thead>
             <tr>
                 <th>Karyawan</th>
-                <th>Departemen</th>
+                <th>Department</th>
                 <th class="num">Gaji Pokok</th>
                 <th class="num">Tunjangan</th>
                 <th class="num">Potongan</th>

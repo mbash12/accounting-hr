@@ -507,7 +507,7 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Catatan Penerimaan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Notes Penerimaan</h4>
                     <p class="text-sm text-muted">
                         Mohon periksa semua barang saat diterima. Ketidaksesuaian harus dilaporkan dalam 24 jam.
                         <br>
@@ -515,7 +515,7 @@
                     </p>
                     @if($record->description)
                     <div style="margin-top: 10px; font-style: italic;" class="text-sm">
-                        Catatan: {{ $record->description }}
+                        Notes: {{ $record->description }}
                     </div>
                     @endif
                 </div>

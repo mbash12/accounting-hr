@@ -26,9 +26,9 @@ class AttendanceReport extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.attendance-report';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan HR & Payroll';
+    protected static string|UnitEnum|null $navigationGroup = 'HR navigationGroup = 'Laporan HR & Payroll'; Payroll Reports';
 
-    protected static ?string $navigationLabel = 'Laporan Kehadiran';
+    protected static ?string $navigationLabel = 'Attendance Report';
 
     public function getTitle(): string
     {

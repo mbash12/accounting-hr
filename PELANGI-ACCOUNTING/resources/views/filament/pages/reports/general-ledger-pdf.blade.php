@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Buku Besar</title>
+    <title>General Ledger Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,7 +58,7 @@
 <body>
     <div class="header text-center">
         <h1>{{ $company->name }}</h1>
-        <h2>Laporan Buku Besar</h2>
+        <h2>General Ledger Report</h2>
         <p>
             Periode: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} 
             s/d {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
@@ -79,7 +79,7 @@
     @endphp
 
     <div style="margin-top: {{ $index > 0 ? '30px' : '0' }}; margin-bottom: 10px; font-weight: bold; border-top: {{ $index > 0 ? '1px solid #000' : 'none' }}; padding-top: {{ $index > 0 ? '10px' : '0' }};">
-        Akun: {{ $account->code }} - {{ $account->name }}
+        Account: {{ $account->code }} - {{ $account->name }}
     </div>
 
     <table>
@@ -91,7 +91,7 @@
                 <th class="text-left">Keterangan</th>
                 <th class="text-right">Pemasukan (Dr)</th>
                 <th class="text-right">Pengeluaran (Cr)</th>
-                <th class="text-right">Saldo</th>
+                <th class="text-right">Balance</th>
                 <th class="text-center">Terekonsiliasi</th>
             </tr>
         </thead>

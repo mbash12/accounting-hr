@@ -355,7 +355,7 @@
                 <div class="info-value">{{ $employee->employee_id ?? '-' }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Departemen</div>
+                <div class="info-label">Department</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->department?->name ?? '-' }}</div>
             </div>

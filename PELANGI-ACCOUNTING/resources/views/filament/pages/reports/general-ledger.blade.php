@@ -176,7 +176,7 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Perbarui
+                Refresh
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-printer">
                 Print
@@ -194,7 +194,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Informasi</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Information</h3>
         <p>{{ $reportData['error'] }}</p>
     </div>
     @elseif($reportData['company'])
@@ -213,7 +213,7 @@
         {{-- Header --}}
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name }}</h2>
-            <h1 class="report-title">Buku Besar</h1>
+            <h1 class="report-title">General Ledger</h1>
             <p class="report-date">
                 Dari {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}
                 s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
@@ -228,7 +228,7 @@
         @endphp
 
         <div class="report-account-info" style="margin-top: 2rem; border-top: 2px dashed #e5e7eb; padding-top: 1.5rem;">
-            Akun: {{ $account->code }} - {{ $account->name }}
+            Account: {{ $account->code }} - {{ $account->name }}
         </div>
 
         {{-- Table --}}
@@ -241,7 +241,7 @@
                     <th>Keterangan</th>
                     <th>Pemasukan (Dr)</th>
                     <th>Pengeluaran (Cr)</th>
-                    <th>Saldo</th>
+                    <th>Balance</th>
                     <th>Terekonsiliasi</th>
                 </tr>
             </thead>

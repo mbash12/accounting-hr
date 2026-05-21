@@ -52,16 +52,16 @@
             <!-- Filters -->
             <div style="display: flex; gap: 1rem; background: white; border-radius: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb;">
                 <div style="flex: 1;">
-                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Cari Akun</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Cari Account</label>
                     <input
                         type="text"
                         wire:model.live="searchQuery"
-                        placeholder="Cari kode atau nama akun..."
+                        placeholder="Search account code or name..."
                         style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem;"
                     />
                 </div>
                 <div style="width: 200px;">
-                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Tipe Akun</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Account Type</label>
                     <select
                         wire:model.live="filterAccountType"
                         style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem; background: white;"
@@ -89,7 +89,7 @@
                             <thead style="position: sticky; top: 0; z-index: 10;">
                                 <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
                                     <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 120px;">{{ __('Kode') }}</th>
-                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">{{ __('Nama Akun') }}</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">{{ __('Account Name') }}</th>
                                     <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 100px;">{{ __('Tipe') }}</th>
                                     <th style="padding: 0.75rem 1rem; text-align: right; font-size: 0.875rem; font-weight: 600; color: #374151; width: 150px;">{{ __('Debit') }}</th>
                                     <th style="padding: 0.75rem 1rem; text-align: right; font-size: 0.875rem; font-weight: 600; color: #374151; width: 150px;">{{ __('Credit') }}</th>

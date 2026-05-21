@@ -78,7 +78,7 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                {{ __('Unduh PDF') }}
+                {{ __('Download PDF') }}
             </x-filament::button>
         </div>
     </div>
@@ -96,7 +96,7 @@
                 <h1 class="text-2xl font-bold text-blue-900">{{ __('LAPORAN RINGKASAN PAYROLL') }}</h1>
                 <p class="text-gray-600 font-semibold">
                     {{ __('Periode') }}: {{ $reportData['period']?->name }} 
-                    @if($reportData['department']) | {{ __('Departemen') }}: {{ $reportData['department']->name }} @endif
+                    @if($reportData['department']) | {{ __('Department') }}: {{ $reportData['department']->name }} @endif
                 </p>
             </div>
 
@@ -104,7 +104,7 @@
                 <thead>
                     <tr>
                         <th>{{ __('Karyawan') }}</th>
-                        <th>{{ __('Departemen') }}</th>
+                        <th>{{ __('Department') }}</th>
                         <th class="num">{{ __('Gaji Pokok') }}</th>
                         <th class="num">{{ __('Tunjangan') }}</th>
                         <th class="num">{{ __('Potongan') }}</th>
