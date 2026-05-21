@@ -22,14 +22,14 @@ class BonusCalculationsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('year')
-                    ->label(__('Tahun'))
+                    ->label(__('Year'))
                     ->sortable(),
                 TextColumn::make('payout_date')
-                    ->label(__('Tanggal Payout'))
+                    ->label(__('Payout Date'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('status')
@@ -37,8 +37,8 @@ class BonusCalculationsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'draft' => __('Draft'),
-                        'processed' => __('Diproses'),
-                        'posted' => __('Diposting'),
+                        'processed' => __('Processed'),
+                        'posted' => __('Posted'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -54,7 +54,7 @@ class BonusCalculationsTable
             ->recordActions([
                 ActionGroup::make([
                     Action::make('calculateBonus')
-                        ->label(__('Hitung Pajak Bonus'))
+                        ->label(__('Calculate Bonus Tax'))
                         ->icon('heroicon-o-cpu-chip')
                         ->requiresConfirmation()
                         ->visible(fn (BonusCalculation $record): bool => $record->status !== 'posted')
@@ -62,7 +62,7 @@ class BonusCalculationsTable
                             try {
                                 $service->calculateBonusForPeriod($record);
                                 Notification::make()
-                                    ->title(__('Pajak bonus berhasil dihitung'))
+                                    ->title(__('Bonus tax calculated successfully'))
                                     ->success()
                                     ->send();
                             } catch (\Exception $e) {
@@ -75,7 +75,7 @@ class BonusCalculationsTable
                             }
                         }),
                     Action::make('postToLedger')
-                        ->label(__('Posting ke Jurnal'))
+                        ->label(__('Post to Journal'))
                         ->icon('heroicon-o-book-open')
                         ->requiresConfirmation()
                         ->visible(fn (BonusCalculation $record): bool => $record->status === 'processed')
@@ -84,7 +84,7 @@ class BonusCalculationsTable
                             try {
                                 $service->postBonusToLedger($record);
                                 Notification::make()
-                                    ->title(__('Bonus berhasil diposting ke jurnal'))
+                                    ->title(__('Bonus posted to journal successfully'))
                                     ->success()
                                     ->send();
                             } catch (\Exception $e) {

@@ -17,10 +17,10 @@ class OvertimeLogForm
     {
         return $schema
             ->components([
-                Section::make(__('Pengajuan Lembur'))
+                Section::make(__('Overtime Submission'))
                     ->schema([
                         Select::make('employee_id')
-                            ->label(__('Karyawan'))
+                            ->label(__('Employee'))
                             ->relationship(
                                 name: 'employee',
                                 titleAttribute: 'name',
@@ -43,32 +43,32 @@ class OvertimeLogForm
                             ->required()
                             ->disabled($disabled),
                         TextInput::make('hours')
-                            ->label(__('Jam Lembur'))
+                            ->label(__('Overtime Hours'))
                             ->numeric()
                             ->required()
                             ->minValue(0.5)
                             ->step(0.5)
                             ->disabled($disabled),
                         Toggle::make('is_holiday')
-                            ->label(__('Hari Libur'))
+                            ->label(__('Holiday'))
                             ->default(false)
                             ->disabled($disabled),
                         Textarea::make('reason')
-                            ->label(__('Alasan'))
+                            ->label(__('Reason'))
                             ->columnSpanFull()
                             ->disabled($disabled),
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
                                 'draft' => __('Draft'),
-                                'approved' => __('Disetujui'),
-                                'rejected' => __('Ditolak'),
+                                'approved' => __('Approved'),
+                                'rejected' => __('Rejected'),
                             ])
                             ->default('draft')
                             ->required()
                             ->disabled($disabled),
                         TextInput::make('calculated_amount')
-                            ->label(__('Tunjangan Lembur'))
+                            ->label(__('Overtime Allowance'))
                             ->numeric()
                             ->prefix('Rp')
                             ->disabled()

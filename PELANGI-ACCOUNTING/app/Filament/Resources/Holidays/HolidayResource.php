@@ -28,19 +28,19 @@ class HolidayResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Hari Libur');
+        return __('Holiday');
     }
 
     protected static ?int $navigationSort = 5;
 
     public static function getModelLabel(): string
     {
-        return __('Hari Libur');
+        return __('Holiday');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Hari Libur');
+        return __('Holiday');
     }
 
     public static function form(Schema $schema): Schema

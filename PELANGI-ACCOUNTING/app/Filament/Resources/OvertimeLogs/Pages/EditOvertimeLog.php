@@ -34,7 +34,7 @@ class EditOvertimeLog extends EditRecord
                         'approved_by_user_id' => auth()->id(),
                     ]);
                     Notification::make()
-                        ->title(__('Lembur disetujui'))
+                        ->title(__('Overtime approved'))
                         ->success()
                         ->send();
                     $this->redirect($this->getResource()::getUrl('index'));
@@ -51,7 +51,7 @@ class EditOvertimeLog extends EditRecord
                         'approved_by_user_id' => auth()->id(),
                     ]);
                     Notification::make()
-                        ->title(__('Lembur ditolak'))
+                        ->title(__('Overtime rejected'))
                         ->danger()
                         ->send();
                     $this->redirect($this->getResource()::getUrl('index'));

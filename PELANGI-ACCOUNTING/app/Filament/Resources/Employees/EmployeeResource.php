@@ -29,19 +29,19 @@ class EmployeeResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Karyawan');
+        return __('Employee');
     }
 
     protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {
-        return __('Karyawan');
+        return __('Employee');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Karyawan');
+        return __('Employee');
     }
 
     public static function form(Schema $schema): Schema

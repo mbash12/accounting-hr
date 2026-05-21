@@ -12,7 +12,7 @@ class ListAttendances extends ListRecords
 
     public function getTitle(): string
     {
-        return __('Daftar Absensi');
+        return __('Attendance List');
     }
 
     protected function getHeaderActions(): array

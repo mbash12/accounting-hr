@@ -28,19 +28,19 @@ class SalaryComponentResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Komponen Gaji');
+        return __('Salary Components');
     }
 
     protected static ?int $navigationSort = 3;
 
     public static function getModelLabel(): string
     {
-        return __('Komponen Gaji');
+        return __('Salary Components');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Komponen Gaji');
+        return __('Salary Components');
     }
 
     public static function form(Schema $schema): Schema

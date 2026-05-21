@@ -23,19 +23,19 @@ class ItemsRelationManager extends RelationManager
         return $schema
             ->components([
                 Select::make('employee_id')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->relationship('employee', 'name', fn ($query) => $query->where('is_active', true))
                     ->searchable()
                     ->required(),
                 TextInput::make('amount')
-                    ->label(__('Jumlah Bonus'))
+                    ->label(__('Bonus Amount'))
                     ->numeric()
                     ->required(),
                 TextInput::make('pph21')
                     ->label(__('PPh21'))
                     ->numeric()
                     ->disabled()
-                    ->placeholder(__('Akan dihitung otomatis')),
+                    ->placeholder(__('Will be calculated automatically')),
             ]);
     }
 
@@ -45,11 +45,11 @@ class ItemsRelationManager extends RelationManager
             ->recordTitleAttribute('employee.name')
             ->columns([
                 TextColumn::make('employee.name')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('amount')
-                    ->label(__('Jumlah Bonus'))
+                    ->label(__('Bonus Amount'))
                     ->money('IDR')
                     ->sortable(),
                 TextColumn::make('pph21')

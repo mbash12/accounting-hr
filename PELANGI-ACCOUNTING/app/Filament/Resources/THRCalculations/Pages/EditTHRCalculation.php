@@ -16,7 +16,7 @@ class EditTHRCalculation extends EditRecord
     {
         return [
             Action::make('calculateTHR')
-                ->label(__('Hitung THR'))
+                ->label(__('Calculate THR'))
                 ->icon('heroicon-o-cpu-chip')
                 ->requiresConfirmation()
                 ->visible(fn () => $this->record->status !== 'posted')
@@ -28,7 +28,7 @@ class EditTHRCalculation extends EditRecord
                         $this->refreshFormData(['status', 'total_amount', 'total_pph21']);
                         
                         Notification::make()
-                            ->title(__('THR berhasil dihitung'))
+                            ->title(__('THR calculated successfully'))
                             ->success()
                             ->send();
                     } catch (\Exception $e) {
@@ -41,7 +41,7 @@ class EditTHRCalculation extends EditRecord
                     }
                 }),
             Action::make('postToLedger')
-                ->label(__('Posting ke Jurnal'))
+                ->label(__('Post to Journal'))
                 ->icon('heroicon-o-book-open')
                 ->requiresConfirmation()
                 ->visible(fn () => $this->record->status === 'processed')
@@ -53,7 +53,7 @@ class EditTHRCalculation extends EditRecord
                         $this->refreshFormData(['status']);
                         
                         Notification::make()
-                            ->title(__('THR berhasil diposting ke jurnal'))
+                            ->title(__('THR posted to journal successfully'))
                             ->success()
                             ->send();
                     } catch (\Exception $e) {

@@ -28,19 +28,19 @@ class PermitResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Izin / Cuti');
+        return __('Permit / Leave');
     }
 
     protected static ?int $navigationSort = 7;
 
     public static function getModelLabel(): string
     {
-        return __('Izin / Cuti');
+        return __('Permit / Leave');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Izin / Cuti');
+        return __('Permit / Leave');
     }
 
     public static function form(Schema $schema): Schema

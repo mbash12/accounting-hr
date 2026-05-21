@@ -21,7 +21,7 @@ class SalaryComponentsRelationManager extends RelationManager
 
     public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
     {
-        return __('Komponen Gaji');
+        return __('Salary Components');
     }
 
     public function form(Schema $schema): Schema
@@ -29,7 +29,7 @@ class SalaryComponentsRelationManager extends RelationManager
         return $schema
             ->components([
                 Select::make('salary_component_id')
-                    ->label(__('Komponen Gaji'))
+                    ->label(__('Salary Components'))
                     ->options(function () {
                         $companyId = session('selected_company_id');
                         return SalaryComponent::query()
@@ -39,14 +39,14 @@ class SalaryComponentsRelationManager extends RelationManager
                             ->orderBy('name')
                             ->get()
                             ->mapWithKeys(fn ($c) => [
-                                $c->id => "[{$c->code}] {$c->name} (" . ($c->type === 'allowance' ? __('Tunjangan') : __('Potongan')) . ")",
+                                $c->id => "[{$c->code}] {$c->name} (" . ($c->type === 'allowance' ? __('Allowance') : __('Deduction')) . ")",
                             ]);
                     })
                     ->searchable()
                     ->required()
                     ->disabledOn('edit'),
                 TextInput::make('amount')
-                    ->label(__('Jumlah'))
+                    ->label(__('Amount'))
                     ->numeric()
                     ->minValue(0)
                     ->prefix('Rp')
@@ -60,23 +60,23 @@ class SalaryComponentsRelationManager extends RelationManager
             ->recordTitleAttribute('salaryComponent.name')
             ->columns([
                 TextColumn::make('salaryComponent.code')
-                    ->label(__('Kode'))
+                    ->label(__('Code'))
                     ->sortable(),
                 TextColumn::make('salaryComponent.name')
-                    ->label(__('Nama Komponen'))
+                    ->label(__('Component Name'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('salaryComponent.type')
-                    ->label(__('Tipe'))
+                    ->label(__('Type'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'allowance' => __('Tunjangan'),
-                        'deduction' => __('Potongan'),
+                        'allowance' => __('Allowance'),
+                        'deduction' => __('Deduction'),
                         default     => $state,
                     })
                     ->color(fn (string $state): string => $state === 'allowance' ? 'success' : 'danger'),
                 TextColumn::make('amount')
-                    ->label(__('Jumlah'))
+                    ->label(__('Amount'))
                     ->money('IDR')
                     ->sortable(),
             ])

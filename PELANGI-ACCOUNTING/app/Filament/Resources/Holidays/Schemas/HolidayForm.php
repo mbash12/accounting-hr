@@ -14,17 +14,17 @@ class HolidayForm
     {
         return $schema
             ->components([
-                Section::make(__('Detail Hari Libur'))
+                Section::make(__('Holiday Details'))
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Nama'))
+                            ->label(__('Name'))
                             ->required()
                             ->maxLength(200),
                         DatePicker::make('date')
-                            ->label(__('Tanggal'))
+                            ->label(__('Date'))
                             ->required(),
                         Toggle::make('is_cuti_bersama')
-                            ->label(__('Cuti Bersama'))
+                            ->label(__('Collective Leave'))
                             ->default(false),
                     ])
                     ->columns(3)

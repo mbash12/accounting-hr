@@ -17,7 +17,7 @@ class CreatePayrollPeriod extends CreateRecord
         $service->generatePayslips($this->getRecord());
 
         Notification::make()
-            ->title(__('Payslip berhasil dibuat'))
+            ->title(__('Payslip generated successfully'))
             ->success()
             ->send();
     }

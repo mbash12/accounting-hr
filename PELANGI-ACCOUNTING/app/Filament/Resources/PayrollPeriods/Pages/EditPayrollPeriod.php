@@ -25,14 +25,14 @@ class EditPayrollPeriod extends EditRecord
                 ->color('primary')
                 ->requiresConfirmation()
                 ->modalHeading(__('Generate Payslip'))
-                ->modalDescription(__('Tindakan ini akan menghapus payslip yang ada (jika ada) dan membuat ulang untuk semua karyawan aktif. Lanjutkan?'))
+                ->modalDescription(__('This will delete existing payslips (if any) and regenerate them for all active employees. Continue?'))
                 ->visible(fn (): bool => in_array($this->record->status, ['draft', 'processed']))
                 ->action(function (PayrollService $service) {
                     /** @var PayrollPeriod $period */
                     $period = $this->record;
                     $service->generatePayslips($period);
                     Notification::make()
-                        ->title(__('Payslip berhasil dibuat'))
+                        ->title(__('Payslip generated successfully'))
                         ->success()
                         ->send();
                     $this->redirect(
@@ -40,7 +40,7 @@ class EditPayrollPeriod extends EditRecord
                     );
                 }),
             Action::make('downloadPayslips')
-                ->label(__('Download Slip Gaji'))
+                ->label(__('Download Payslip'))
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->visible(fn (): bool => $this->record->payslips()->exists())

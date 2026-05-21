@@ -18,10 +18,10 @@ class AttendanceForm
     {
         return $schema
             ->components([
-                Section::make(__('Detail Kehadiran'))
+                Section::make(__('Attendance Details'))
                     ->schema([
                         Select::make('employee_id')
-                            ->label(__('Karyawan'))
+                            ->label(__('Employee'))
                             ->relationship(
                                 name: 'employee', 
                                 titleAttribute: 'name',
@@ -39,40 +39,40 @@ class AttendanceForm
                             ->searchable()
                             ->preload(),
                         DatePicker::make('date')
-                            ->label(__('Tanggal'))
+                            ->label(__('Date'))
                             ->required()
                             ->default(now()),
                         TimePicker::make('check_in')
-                            ->label(__('Jam Masuk')),
+                            ->label(__('Check-in Time')),
                         TimePicker::make('check_out')
-                            ->label(__('Jam Keluar')),
+                            ->label(__('Check-out Time')),
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
-                                'present' => __('Hadir'),
-                                'late' => __('Terlambat'),
-                                'absent' => __('Alpa'),
-                                'permit' => __('Izin'),
-                                'leave' => __('Cuti'),
+                                'present' => __('Present'),
+                                'late' => __('Late'),
+                                'absent' => __('Absent'),
+                                'permit' => __('Permit'),
+                                'leave' => __('Leave'),
                             ])
                             ->default('present')
                             ->required(),
                         Textarea::make('notes_in')
-                            ->label(__('Catatan Masuk'))
+                            ->label(__('Check-in Notes'))
                             ->columnSpanFull(),
                         Textarea::make('notes_out')
-                            ->label(__('Catatan Keluar'))
+                            ->label(__('Check-out Notes'))
                             ->columnSpanFull(),
                     ])->columns(2),
-                Section::make(__('Lokasi & Bukti'))
+                Section::make(__('Location & Proof'))
                     ->collapsible()
                     ->schema([
-                        TextInput::make('lat_in')->label(__('Lat Masuk'))->numeric(),
-                        TextInput::make('lng_in')->label(__('Lng Masuk'))->numeric(),
-                        TextInput::make('lat_out')->label(__('Lat Keluar'))->numeric(),
-                        TextInput::make('lng_out')->label(__('Lng Keluar'))->numeric(),
+                        TextInput::make('lat_in')->label(__('Check-in Lat'))->numeric(),
+                        TextInput::make('lng_in')->label(__('Check-in Lng'))->numeric(),
+                        TextInput::make('lat_out')->label(__('Check-out Lat'))->numeric(),
+                        TextInput::make('lng_out')->label(__('Check-out Lng'))->numeric(),
                         FileUpload::make('photo_in_path')
-                            ->label(__('Foto Masuk'))
+                            ->label(__('Check-in Photo'))
                             ->image()
                             ->disk('public')
                             ->directory('attendances')
@@ -94,7 +94,7 @@ class AttendanceForm
                                 return $state;
                             }),
                         FileUpload::make('photo_out_path')
-                            ->label(__('Foto Keluar'))
+                            ->label(__('Check-out Photo'))
                             ->image()
                             ->disk('public')
                             ->directory('attendances')

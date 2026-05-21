@@ -28,19 +28,19 @@ class PayrollPeriodResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Periode Payroll');
+        return __('Payroll Period');
     }
 
     protected static ?int $navigationSort = 8;
 
     public static function getModelLabel(): string
     {
-        return __('Periode Payroll');
+        return __('Payroll Period');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Periode Payroll');
+        return __('Payroll Period');
     }
 
     public static function form(Schema $schema): Schema

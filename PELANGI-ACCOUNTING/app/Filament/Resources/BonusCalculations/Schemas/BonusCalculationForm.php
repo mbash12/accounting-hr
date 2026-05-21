@@ -16,41 +16,41 @@ class BonusCalculationForm
     {
         return $schema
             ->components([
-                Section::make(__('Informasi Bonus'))
+                Section::make(__('Bonus Information'))
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Nama'))
+                            ->label(__('Name'))
                             ->required()
                             ->maxLength(200)
-                            ->placeholder(__('Contoh: Bonus Tahunan 2026')),
+                            ->placeholder(__('Example: Annual Bonus 2026')),
                         Select::make('year')
-                            ->label(__('Tahun'))
+                            ->label(__('Year'))
                             ->options(array_combine(range(now()->year - 1, now()->year + 5), range(now()->year - 1, now()->year + 5)))
                             ->default(now()->year)
                             ->required(),
                         DatePicker::make('payout_date')
-                            ->label(__('Tanggal Payout'))
+                            ->label(__('Payout Date'))
                             ->required(),
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
                                 'draft' => __('Draft'),
-                                'processed' => __('Diproses'),
-                                'posted' => __('Diposting'),
+                                'processed' => __('Processed'),
+                                'posted' => __('Posted'),
                             ])
                             ->default('draft')
                             ->disabled()
                             ->required(),
                         Toggle::make('is_taxable')
-                            ->label(__('Hitung Pajak (PPh21)'))
+                            ->label(__('Calculate Tax (PPh21)'))
                             ->default(true),
                         TextInput::make('description')
-                            ->label(__('Deskripsi'))
+                            ->label(__('Description'))
                             ->columnSpan(2),
                     ])
                     ->columns(3)
                     ->columnSpanFull(),
-                Section::make(__('Ringkasan Bonus'))
+                Section::make(__('Bonus Summary'))
                     ->collapsible()
                     ->schema([
                         TextInput::make('total_amount')->label(__('Total Bonus'))->disabled()->numeric()->default(0)->mask(RawJs::make('$money($input, \',\', \'.\')'))->stripCharacters('.'),

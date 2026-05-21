@@ -23,24 +23,24 @@ class EmployeeLeaveQuotasTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('employee.name')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('year')
-                    ->label(__('Tahun'))
+                    ->label(__('Year'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('total_quota')
-                    ->label(__('Total (Hari)'))
+                    ->label(__('Total (Days)'))
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('used_quota')
-                    ->label(__('Terpakai (Hari)'))
+                    ->label(__('Used (Days)'))
                     ->numeric()
                     ->sortable()
                     ->color('danger'),
                 TextColumn::make('remaining_quota')
-                    ->label(__('Sisa (Hari)'))
+                    ->label(__('Remaining (Days)'))
                     ->numeric()
                     ->sortable()
                     ->color('success')

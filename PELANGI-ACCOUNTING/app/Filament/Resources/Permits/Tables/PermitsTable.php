@@ -23,47 +23,47 @@ class PermitsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('employee.name')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('type')
-                    ->label(__('Tipe'))
+                    ->label(__('Type'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'sick' => __('Sakit'),
-                        'annual_leave' => __('Cuti Tahunan (Legacy)'),
-                        'unpaid_leave' => __('Cuti Diluar Tanggungan (Legacy)'),
-                        'maternity_leave' => __('Cuti Melahirkan (Legacy)'),
-                        'other_permit' => __('Izin Lainnya (Legacy)'),
-                        'annual' => __('Cuti Tahunan'),
-                        'marry' => __('Cuti Menikah'),
-                        'kids_marry' => __('Cuti Menikahkan Anak'),
-                        'khitan' => __('Cuti Khitan/Baptis Anak'),
-                        'family_death' => __('Cuti Keluarga Inti Meninggal'),
-                        'maternity' => __('Cuti Melahirkan'),
-                        'maternity_husband' => __('Cuti Istri Melahirkan'),
-                        'maternity_death' => __('Cuti Keguguran'),
-                        'force_majure' => __('Izin Bencana Alam'),
-                        'nodn_sick' => __('Sakit Tanpa Surat'),
-                        'sudden' => __('Izin Mendadak'),
-                        'others' => __('Izin'),
+                        'sick' => __('Sick'),
+                        'annual_leave' => __('Annual Leave (Legacy)'),
+                        'unpaid_leave' => __('Unpaid Leave (Legacy)'),
+                        'maternity_leave' => __('Maternity Leave (Legacy)'),
+                        'other_permit' => __('Other Permit (Legacy)'),
+                        'annual' => __('Annual Leave'),
+                        'marry' => __('Marriage Leave'),
+                        'kids_marry' => __('Child Marriage Leave'),
+                        'khitan' => __('Child Circumcision/Baptism Leave'),
+                        'family_death' => __('Immediate Family Bereavement Leave'),
+                        'maternity' => __('Maternity Leave'),
+                        'maternity_husband' => __('Paternity Leave'),
+                        'maternity_death' => __('Miscarriage Leave'),
+                        'force_majure' => __('Force Majeure / Natural Disaster'),
+                        'nodn_sick' => __('Sick Without Certificate'),
+                        'sudden' => __('Emergency Leave'),
+                        'others' => __('Permit'),
                         default => $state,
                     }),
                 TextColumn::make('start_date')
-                    ->label(__('Mulai'))
+                    ->label(__('Start'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('end_date')
-                    ->label(__('Selesai'))
+                    ->label(__('End'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => __('Menunggu'),
-                        'approved' => __('Disetujui'),
-                        'rejected' => __('Ditolak'),
+                        'pending' => __('Pending'),
+                        'approved' => __('Approved'),
+                        'rejected' => __('Rejected'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {

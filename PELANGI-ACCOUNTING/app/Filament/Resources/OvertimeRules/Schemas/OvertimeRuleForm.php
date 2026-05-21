@@ -15,14 +15,14 @@ class OvertimeRuleForm
     {
         return $schema
             ->components([
-                Section::make(__('Detail Aturan Lembur'))
+                Section::make(__('Overtime Rule Details'))
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Nama'))
+                            ->label(__('Name'))
                             ->required()
                             ->maxLength(100),
                         Select::make('department_id')
-                            ->label(__('Departemen'))
+                            ->label(__('Department'))
                             ->relationship(
                                 name: 'department', 
                                 titleAttribute: 'name',
@@ -38,25 +38,25 @@ class OvertimeRuleForm
                             )
                             ->searchable()
                             ->preload()
-                            ->helperText(__('Opsional: Biarkan kosong untuk berlaku di semua departemen')),
+                            ->helperText(__('Optional: Leave empty to apply to all departments')),
                         NumberInput::make('base_hourly_rate_divisor')
-                            ->label(__('Pembagi Gaji Per Jam'))
+                            ->label(__('Hourly Rate Divisor'))
                             ->required()
                             ->default(173.00)
-                            ->helperText(__('Standar adalah 173 untuk gaji bulanan'))
+                            ->helperText(__('Standard is 173 for monthly salary'))
                             ->decimal(true),
                         NumberInput::make('workday_first_hour_multiplier')
-                            ->label(__('Pengali Jam Pertama (Hari Kerja)'))
+                            ->label(__('First Hour Multiplier (Working Day)'))
                             ->required()
                             ->default(1.50)
                             ->decimal(true),
                         NumberInput::make('workday_subsequent_hour_multiplier')
-                            ->label(__('Pengali Jam Berikutnya (Hari Kerja)'))
+                            ->label(__('Subsequent Hour Multiplier (Working Day)'))
                             ->required()
                             ->default(2.00)
                             ->decimal(true),
                         NumberInput::make('holiday_multiplier')
-                            ->label(__('Pengali Hari Libur'))
+                            ->label(__('Holiday Multiplier'))
                             ->required()
                             ->default(2.00)
                             ->decimal(true),
@@ -64,7 +64,7 @@ class OvertimeRuleForm
                             ->label(__('Default'))
                             ->default(false),
                         Toggle::make('is_active')
-                            ->label(__('Aktif'))
+                            ->label(__('Active'))
                             ->default(true),
                     ])
                     ->columns(3)

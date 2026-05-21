@@ -18,20 +18,20 @@ class ItemsRelationManager extends RelationManager
         return $schema
             ->components([
                 Select::make('employee_id')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->relationship('employee', 'name')
                     ->required()
                     ->disabled(),
                 TextInput::make('basic_salary')
-                    ->label(__('Gaji Pokok'))
+                    ->label(__('Basic Salary'))
                     ->numeric()
                     ->disabled(),
                 TextInput::make('months_service')
-                    ->label(__('Masa Kerja (Bulan)'))
+                    ->label(__('Service Period (Months)'))
                     ->numeric()
                     ->disabled(),
                 TextInput::make('amount')
-                    ->label(__('Jumlah THR'))
+                    ->label(__('THR Amount'))
                     ->numeric()
                     ->required(),
                 TextInput::make('pph21')
@@ -47,14 +47,14 @@ class ItemsRelationManager extends RelationManager
             ->recordTitleAttribute('employee.name')
             ->columns([
                 TextColumn::make('employee.name')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('months_service')
-                    ->label(__('Masa Kerja (Bulan)'))
+                    ->label(__('Service Period (Months)'))
                     ->sortable(),
                 TextColumn::make('amount')
-                    ->label(__('Jumlah THR'))
+                    ->label(__('THR Amount'))
                     ->money('IDR')
                     ->sortable(),
                 TextColumn::make('pph21')

@@ -23,35 +23,35 @@ class SalaryComponentsTable
         return $table
             ->columns([
                 TextColumn::make('code')
-                    ->label(__('Kode'))
+                    ->label(__('Code'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('type')
-                    ->label(__('Tipe'))
+                    ->label(__('Type'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'allowance' => __('Tunjangan'),
-                        'deduction' => __('Potongan'),
+                        'allowance' => __('Allowance'),
+                        'deduction' => __('Deduction'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => $state === 'allowance' ? 'success' : 'danger'),
                 IconColumn::make('is_fixed')
-                    ->label(__('Tetap'))
+                    ->label(__('Fixed'))
                     ->boolean(),
                 IconColumn::make('is_taxable')
-                    ->label(__('Pajak'))
+                    ->label(__('Tax'))
                     ->boolean(),
                 IconColumn::make('is_bpjs_base')
-                    ->label(__('Basis BPJS'))
+                    ->label(__('BPJS Base'))
                     ->boolean(),
                 TextColumn::make('account.name')
-                    ->label(__('Akun GL')),
+                    ->label(__('GL Account')),
                 IconColumn::make('is_active')
-                    ->label(__('Aktif'))
+                    ->label(__('Active'))
                     ->boolean(),
             ])
             ->filters([

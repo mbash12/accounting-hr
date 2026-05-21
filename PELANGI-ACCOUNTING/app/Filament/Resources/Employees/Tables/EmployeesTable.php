@@ -24,28 +24,28 @@ class EmployeesTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('employee_id')
-                    ->label(__('ID Karyawan'))
+                    ->label(__('Employee ID'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('department.name')
-                    ->label(__('Departemen'))
+                    ->label(__('Department'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('position')
-                    ->label(__('Jabatan'))
+                    ->label(__('Position'))
                     ->searchable(),
                 TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'permanent' => __('Tetap'),
-                        'contract' => __('Kontrak'),
-                        'internship' => __('Magang'),
-                        'probation' => __('Masa Percobaan'),
+                        'permanent' => __('Permanent'),
+                        'contract' => __('Contract'),
+                        'internship' => __('Internship'),
+                        'probation' => __('Probation'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -55,11 +55,11 @@ class EmployeesTable
                         'probation' => 'gray',
                     }),
                 IconColumn::make('is_active')
-                    ->label(__('Aktif'))
+                    ->label(__('Active'))
                     ->boolean()
                     ->sortable(),
                 TextColumn::make('basic_salary')
-                    ->label(__('Gaji Pokok'))
+                    ->label(__('Basic Salary'))
                     ->money('IDR')
                     ->sortable(),
             ])

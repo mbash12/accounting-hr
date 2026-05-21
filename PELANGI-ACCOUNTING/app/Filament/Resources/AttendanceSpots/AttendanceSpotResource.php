@@ -25,19 +25,19 @@ class AttendanceSpotResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Spot Absensi');
+        return __('Attendance Spot');
     }
 
     protected static ?int $navigationSort = 8;
 
     public static function getModelLabel(): string
     {
-        return __('Spot Absensi');
+        return __('Attendance Spot');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Spot Absensi');
+        return __('Attendance Spot');
     }
 
     public static function form(Schema $schema): Schema

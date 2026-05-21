@@ -26,28 +26,28 @@ class PayrollPeriodsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('month')
-                    ->label(__('Bulan'))
+                    ->label(__('Month'))
                     ->formatStateUsing(fn (int $state): string => match ($state) {
-                        1 => __('Januari'), 2 => __('Februari'), 3 => __('Maret'), 4 => __('April'),
-                        5 => __('Mei'), 6 => __('Juni'), 7 => __('Juli'), 8 => __('Agustus'),
-                        9 => __('September'), 10 => __('Oktober'), 11 => __('November'), 12 => __('Desember'),
+                        1 => __('January'), 2 => __('February'), 3 => __('March'), 4 => __('April'),
+                        5 => __('May'), 6 => __('June'), 7 => __('July'), 8 => __('August'),
+                        9 => __('September'), 10 => __('October'), 11 => __('November'), 12 => __('December'),
                         default => (string) $state,
                     })
                     ->sortable(),
                 TextColumn::make('year')
-                    ->label(__('Tahun'))
+                    ->label(__('Year'))
                     ->sortable(),
                 TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'draft' => __('Draft'),
-                        'processed' => __('Diproses'),
-                        'posted' => __('Diposting'),
+                        'processed' => __('Processed'),
+                        'posted' => __('Posted'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -56,7 +56,7 @@ class PayrollPeriodsTable
                         'posted' => 'success',
                     }),
                 TextColumn::make('total_net_salary')
-                    ->label(__('Total Gaji Bersih'))
+                    ->label(__('Total Net Salary'))
                     ->money('IDR')
                     ->sortable(),
             ])
@@ -73,19 +73,19 @@ class PayrollPeriodsTable
                         ->action(function (PayrollPeriod $record, PayrollService $service) {
                             $service->generatePayslips($record);
                             Notification::make()
-                                ->title(__('Payslip berhasil dibuat'))
+                                ->title(__('Payslip generated successfully'))
                                 ->success()
                                 ->send();
                         }),
                     Action::make('downloadPayslips')
-                        ->label(__('Download Slip Gaji'))
+                        ->label(__('Download Payslip'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
                         ->visible(fn (PayrollPeriod $record): bool => $record->payslips()->exists())
                         ->url(fn (PayrollPeriod $record): string => route('payslip.pdf.period', $record->id))
                         ->openUrlInNewTab(),
                     Action::make('postToLedger')
-                        ->label(__('Posting ke Jurnal'))
+                        ->label(__('Post to Journal'))
                         ->icon('heroicon-o-book-open')
                         ->requiresConfirmation()
                         ->visible(fn (PayrollPeriod $record): bool => $record->status === 'processed')
@@ -93,7 +93,7 @@ class PayrollPeriodsTable
                         ->action(function (PayrollPeriod $record, PayrollService $service) {
                             $service->postToLedger($record);
                             Notification::make()
-                                ->title(__('Payroll berhasil diposting ke jurnal'))
+                                ->title(__('Payroll posted to journal successfully'))
                                 ->success()
                                 ->send();
                         }),

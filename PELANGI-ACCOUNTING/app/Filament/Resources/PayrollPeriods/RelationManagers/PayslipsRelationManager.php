@@ -35,7 +35,7 @@ class PayslipsRelationManager extends RelationManager
             ->defaultSort('number', 'asc')
             ->recordActions([
                 Action::make('downloadSlip')
-                    ->label(__('Download Slip'))
+                    ->label(__('Download Payslip'))
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('success')
                     ->url(fn (Payslip $record): string => route('payslip.pdf.single', $record->id))

@@ -23,7 +23,7 @@ class OvertimeLogsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('employee.name')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('date')
@@ -31,13 +31,13 @@ class OvertimeLogsTable
                     ->date()
                     ->sortable(),
                 TextColumn::make('hours')
-                    ->label(__('Jam'))
+                    ->label(__('Hours'))
                     ->sortable(),
                 IconColumn::make('is_holiday')
-                    ->label(__('Libur'))
+                    ->label(__('Holiday'))
                     ->boolean(),
                 TextColumn::make('calculated_amount')
-                    ->label(__('Tunjangan'))
+                    ->label(__('Allowance'))
                     ->money('IDR')
                     ->sortable(),
                 TextColumn::make('status')
@@ -45,8 +45,8 @@ class OvertimeLogsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'draft' => __('Draft'),
-                        'approved' => __('Disetujui'),
-                        'rejected' => __('Ditolak'),
+                        'approved' => __('Approved'),
+                        'rejected' => __('Rejected'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -55,7 +55,7 @@ class OvertimeLogsTable
                         'rejected' => 'danger',
                     }),
                 TextColumn::make('reason')
-                    ->label(__('Alasan'))
+                    ->label(__('Reason'))
                     ->limit(50),
             ])
             ->filters([
@@ -63,8 +63,8 @@ class OvertimeLogsTable
                     ->label(__('Status'))
                     ->options([
                         'draft' => __('Draft'),
-                        'approved' => __('Disetujui'),
-                        'rejected' => __('Ditolak'),
+                        'approved' => __('Approved'),
+                        'rejected' => __('Rejected'),
                     ]),
                 TrashedFilter::make(),
             ])
