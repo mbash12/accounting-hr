@@ -130,14 +130,14 @@ class FixedAssetForm
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->label('Perusahaan'),
+                            ->label('Company'),
                         Toggle::make('is_active')
                             ->required()
                             ->default(true)
-                            ->label('Aktif'),
+                            ->label('Active'),
                         Toggle::make('create_acquisition_transaction')
-                            ->label('Buat Transaksi Perolehan')
-                            ->helperText('Buat transaksi perolehan otomatis dengan jurnal')
+                            ->label('Create Acquisition Transaction')
+                            ->helperText('Automatically create acquisition transaction with journal entry')
                             ->default(true)
                             ->visibleOn('create'),
                     ])
