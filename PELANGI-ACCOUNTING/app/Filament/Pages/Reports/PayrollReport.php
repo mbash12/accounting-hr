@@ -25,13 +25,13 @@ class PayrollReport extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.payroll-report';
 
-    protected static string|UnitEnum|null $navigationGroup = 'HR navigationGroup = 'Laporan HR & Payroll'; Payroll Reports';
+    protected static string|UnitEnum|null $navigationGroup = 'HR & Payroll Reports';
 
     protected static ?string $navigationLabel = 'Payroll Report';
 
     public function getTitle(): string
     {
-        return __('Laporan Ringkasan Payroll');
+        return __('Payroll Summary Report');
     }
 
     public function getHeading(): string
