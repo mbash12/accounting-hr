@@ -51,7 +51,7 @@ class SalesReturnItem extends Model
         static::creating(function ($model) {
             if ($model->salesReturn && $model->salesReturn->is_locked) {
                 throw ValidationException::withMessages([
-                    'items' => 'Tidak dapat menambah item baru pada retur yang terkunci.',
+                    'items' => 'Cannot add new item to a locked return.',
                 ]);
             }
         });
@@ -67,7 +67,7 @@ class SalesReturnItem extends Model
                 $newQty = (float) ($model->quantity ?? 0);
                 if ($newQty > $originalQty) {
                     throw ValidationException::withMessages([
-                        'items' => 'Kuantitas tidak boleh ditambah pada retur yang terkunci.',
+                        'items' => 'Quantity cannot be increased on a locked return.',
                     ]);
                 }
             }
@@ -86,7 +86,7 @@ class SalesReturnItem extends Model
                     
                     if (($totalReturned + $model->quantity) > $deliveryItem->quantity) {
                         throw ValidationException::withMessages([
-                            'quantity' => 'Total kuantitas retur tidak boleh melebihi kuantitas pengiriman.',
+                            'quantity' => 'Total return quantity cannot exceed delivery quantity.',
                         ]);
                     }
                 }

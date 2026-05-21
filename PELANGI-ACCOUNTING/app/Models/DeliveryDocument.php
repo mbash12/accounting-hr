@@ -64,8 +64,8 @@ class DeliveryDocument extends Model
             if ($hasLockedReturns) {
                 \Filament\Notifications\Notification::make()
                     ->danger()
-                    ->title('Tidak dapat menghapus')
-                    ->body('Pengiriman memiliki retur yang terkunci.')
+                    ->title('Cannot delete')
+                    ->body('This delivery has locked returns.')
                     ->send();
                 return false;
             }

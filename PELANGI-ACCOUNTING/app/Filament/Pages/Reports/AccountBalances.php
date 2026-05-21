@@ -24,20 +24,20 @@ class AccountBalances extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.account-balances';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan Keuangan';
+    protected static string|UnitEnum|null $navigationGroup = 'Financial Reports';
 
-    protected static ?string $navigationLabel = 'Saldo Akun';
+    protected static ?string $navigationLabel = 'Account Balances';
 
     protected static ?string $title = 'Account Balances';
 
     public function getTitle(): string
     {
-        return 'Laporan Saldo Akun';
+        return 'Account Balances';
     }
 
     public function getHeading(): string
     {
-        return 'Laporan Saldo Akun';
+        return 'Account Balances';
     }
 
     public ?array $data = [];
@@ -58,7 +58,7 @@ class AccountBalances extends Page implements HasForms
         return $form
             ->schema([
                 DatePicker::make('date')
-                    ->label('Tanggal')
+                    ->label('Date')
                     ->required()
                     ->default(now())
                     ->reactive(false)
@@ -100,7 +100,7 @@ class AccountBalances extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Laporan_Saldo_Akun_'.now()->format('Y-m-d').'.pdf');
+        }, 'Account_Balances_'.now()->format('Y-m-d').'.pdf');
     }
 
     public function getAccounts()

@@ -148,7 +148,7 @@ class CashBankService
             
             // $bankAccount = BankAccount::where('account_id', $glAccountId)->first();
             // if (!$bankAccount) {
-            //     throw new InvalidArgumentException('Bank Account tidak ditemukan untuk GL Account ini. Silakan buat Bank Account terlebih dahulu dan hubungkan ke GL Account ini.');
+            //     throw new InvalidArgumentException('Bank Account not found for this GL Account. Please create a Bank Account first and link it to this GL Account.');
             // }
             
             // $this->ensureBankAccountHasLedgerAccount($bankAccount);
@@ -271,7 +271,7 @@ class CashBankService
 
             // $bankAccount = BankAccount::where('account_id', $glAccountId)->first();
             // if (!$bankAccount) {
-            //     throw new InvalidArgumentException('Bank Account tidak ditemukan untuk GL Account ini. Silakan buat Bank Account terlebih dahulu dan hubungkan ke GL Account ini.');
+            //     throw new InvalidArgumentException('Bank Account not found for this GL Account. Please create a Bank Account first and link it to this GL Account.');
             // }
             
             // $this->ensureBankAccountHasLedgerAccount($bankAccount);
@@ -570,7 +570,7 @@ class CashBankService
             if ($ba) {
                 return $ba;
             }
-            throw new InvalidArgumentException('Bank account tidak ditemukan untuk account ini.');
+            throw new InvalidArgumentException('Bank account not found for this account.');
         }
 
         throw new InvalidArgumentException('bank_account_id atau account_id harus diisi.');
@@ -916,7 +916,7 @@ class CashBankService
 
                     $classification = \App\Models\TransactionClassification::find($item['transaction_classification_id']);
                     if (!$classification) {
-                        throw new InvalidArgumentException("Transaction Classification pada item #" . ($index + 1) . " tidak ditemukan.");
+                        throw new InvalidArgumentException("Transaction Classification for item #" . ($index + 1) . " not found.");
                     }
                     
                     if (!$classification->default_account_id) {
@@ -1056,7 +1056,7 @@ class CashBankService
 
                     $classification = \App\Models\TransactionClassification::find($item['transaction_classification_id']);
                     if (!$classification) {
-                        throw new InvalidArgumentException("Transaction Classification pada item #" . ($index + 1) . " tidak ditemukan.");
+                        throw new InvalidArgumentException("Transaction Classification for item #" . ($index + 1) . " not found.");
                     }
                     
                     if (!$classification->default_account_id) {

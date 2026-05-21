@@ -18,7 +18,7 @@ class OpeningBalancesImport implements ToCollection, WithHeadingRow, WithValidat
         $companyId = session('selected_company_id') && session('selected_company_id') !== 'all' ? session('selected_company_id') : null;
 
         if (!$companyId) {
-            throw new \Exception('Company ID tidak ditemukan. Silakan pilih perusahaan terlebih dahulu.');
+            throw new \Exception('Company ID not found. Please select a company first.');
         }
 
         DB::beginTransaction();
@@ -34,11 +34,11 @@ class OpeningBalancesImport implements ToCollection, WithHeadingRow, WithValidat
                     ->first();
 
                 if (!$account) {
-                    throw new \Exception("Account dengan kode {$code} tidak ditemukan.");
+                    throw new \Exception("Account with code {$code} not found.");
                 }
 
                 if ($debitAmount > 0 && $creditAmount > 0) {
-                    throw new \Exception("Account {$code} tidak boleh memiliki debit dan credit bersamaan.");
+                    throw new \Exception("Account {$code} cannot have both debit and credit at the same time.");
                 }
 
                 if ($debitAmount > 0) {
@@ -104,9 +104,9 @@ class OpeningBalancesImport implements ToCollection, WithHeadingRow, WithValidat
     public function customValidationMessages()
     {
         return [
-            'account_code.required' => 'Kode Akun wajib diisi.',
-            'debit_amount.numeric' => 'Jumlah Debit harus berupa angka.',
-            'credit_amount.numeric' => 'Jumlah Credit harus berupa angka.',
+            'account_code.required' => 'Account Code is required.',
+            'debit_amount.numeric' => 'Debit Amount must be a number.',
+            'credit_amount.numeric' => 'Credit Amount must be a number.',
         ];
     }
 }

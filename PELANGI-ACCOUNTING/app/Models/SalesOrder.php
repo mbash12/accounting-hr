@@ -45,8 +45,8 @@ class SalesOrder extends Model
             if ($hasLockedDeliveries || $hasLockedInvoices) {
                 \Filament\Notifications\Notification::make()
                     ->danger()
-                    ->title('Tidak dapat menghapus')
-                    ->body('Pesanan memiliki dokumen pengiriman atau invoice yang terkunci.')
+                    ->title('Cannot delete')
+                    ->body('This order has locked delivery documents or invoices.')
                     ->send();
                 return false;
             }

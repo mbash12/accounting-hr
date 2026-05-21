@@ -24,20 +24,20 @@ class TrialBalance extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.trial-balance';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan Keuangan';
+    protected static string|UnitEnum|null $navigationGroup = 'Financial Reports';
 
-    protected static ?string $navigationLabel = 'Neraca Saldo';
+    protected static ?string $navigationLabel = 'Trial Balance';
 
-    protected static ?string $title = 'Neraca Saldo';
+    protected static ?string $title = 'Trial Balance';
 
     public function getTitle(): string
     {
-        return 'Neraca Saldo';
+        return 'Trial Balance';
     }
 
     public function getHeading(): string
     {
-        return 'Neraca Saldo';
+        return 'Trial Balance';
     }
 
     public ?array $data = [];
@@ -55,12 +55,12 @@ class TrialBalance extends Page implements HasForms
         return $form
             ->schema([
             DatePicker::make('start_date')
-            ->label('Dari Tanggal')
+            ->label('From Date')
             ->required()
             ->default(now()->startOfYear()),
 
             DatePicker::make('end_date')
-            ->label('Sampai Tanggal')
+            ->label('To Date')
             ->required()
             ->default(now())
             ->suffixAction(function () {
@@ -92,7 +92,7 @@ class TrialBalance extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Neraca_Saldo_' . now()->format('Ymd') . '.pdf');
+        }, 'Trial_Balance_' . now()->format('Ymd') . '.pdf');
     }
 
     public function getReportData(): array
@@ -107,7 +107,7 @@ class TrialBalance extends Page implements HasForms
                 'company' => null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'error' => 'Silakan pilih perusahaan tertentu dari pemilih global untuk melihat laporan.',
+                'error' => 'Please select a specific company from the global selector to view the report.',
             ];
         }
 
@@ -287,7 +287,7 @@ class TrialBalance extends Page implements HasForms
 
             $rows->push([
                 'code' => $reCode,
-                'name' => 'Laba Ditahan (Auto Transfer)',
+                'name' => 'Retained Earnings (Auto Transfer)',
                 'open_debit' => $openRetainedDebit,
                 'open_credit' => $openRetainedCredit,
                 'period_debit' => 0,
