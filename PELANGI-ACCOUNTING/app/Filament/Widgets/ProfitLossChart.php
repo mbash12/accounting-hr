@@ -89,13 +89,13 @@ class ProfitLossChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Pendapatan',
+                    'label' => 'Revenue',
                     'data' => $revenues,
                     'backgroundColor' => 'rgba(34, 197, 94, 0.5)',
                     'borderColor' => 'rgb(34, 197, 94)',
                 ],
                 [
-                    'label' => 'Biaya',
+                    'label' => 'Expenses',
                     'data' => $expenses,
                     'backgroundColor' => 'rgba(239, 68, 68, 0.5)',
                     'borderColor' => 'rgb(239, 68, 68)',

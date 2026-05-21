@@ -13,7 +13,7 @@ class ExpenseBreakdownChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Komposisi Biaya Operasional';
+    protected ?string $heading = 'Operating Expense Breakdown';
     protected static ?int $sort = 13;
     protected int | string | array $columnSpan = 1;
 
@@ -47,7 +47,7 @@ class ExpenseBreakdownChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Biaya',
+                    'label' => 'Expenses',
                     'data' => $expenses->pluck('total')->toArray(),
                     'backgroundColor' => [
                         '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'

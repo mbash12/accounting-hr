@@ -60,7 +60,7 @@ class OvertimeTrendChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Jam Lembur',
+                    'label' => 'Overtime Hours',
                     'data' => $data,
                     'fill' => 'start',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
