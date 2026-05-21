@@ -68,14 +68,14 @@
             <table class="tb-table">
                 <thead>
                     <tr>
-                        <th>{{ __('Karyawan') }}</th>
+                        <th>{{ __('Employee') }}</th>
                         <th>{{ __('Department') }}</th>
                         <th class="num">{{ __('Hadir') }}</th>
                         <th class="num">{{ __('Terlambat') }}</th>
                         <th class="num">{{ __('Alpa') }}</th>
-                        <th class="num">{{ __('Izin') }}</th>
-                        <th class="num">{{ __('Cuti') }}</th>
-                        <th class="num font-bold">{{ __('Total Hari Kerja') }}</th>
+                        <th class="num">{{ __('Permit') }}</th>
+                        <th class="num">{{ __('Leave') }}</th>
+                        <th class="num font-bold">{{ __('Total Working Days') }}</th>
                     </tr>
                 </thead>
                 <tbody>

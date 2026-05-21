@@ -28,7 +28,7 @@
     <table>
         <thead>
             <tr>
-                <th>Karyawan</th>
+                <th>Employee</th>
                 <th>Department</th>
                 <th class="num">Gaji Pokok</th>
                 <th class="num">Tunjangan</th>

@@ -345,12 +345,12 @@
     <div class="employee-section">
         <div class="employee-col">
             <div class="info-row">
-                <div class="info-label">Nama Karyawan</div>
+                <div class="info-label">Nama Employee</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->name }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">ID Karyawan</div>
+                <div class="info-label">ID Employee</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->employee_id ?? '-' }}</div>
             </div>
@@ -433,7 +433,7 @@
                 @endif
                 @if($bpjsEmp > 0)
                 <tr>
-                    <td>BPJS (Karyawan)</td>
+                    <td>BPJS (Employee)</td>
                     <td class="amount">{{ fmtRp($bpjsEmp) }}</td>
                 </tr>
                 @endif
@@ -451,13 +451,13 @@
             <tr>
                 <td class="label">Gaji Pokok</td>
                 <td class="value">{{ fmtRp($payslip->basic_salary) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS Kesehatan (Karyawan)</td>
+                <td class="label" style="padding-left:20px;">BPJS Kesehatan (Employee)</td>
                 <td class="value">{{ fmtRp($payslip->bpjs_kesehatan_employee) }}</td>
             </tr>
             <tr>
                 <td class="label">Total Tunjangan</td>
                 <td class="value">{{ fmtRp($payslip->total_allowance) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS Ketenagakerjaan (Karyawan)</td>
+                <td class="label" style="padding-left:20px;">BPJS Ketenagakerjaan (Employee)</td>
                 <td class="value">{{ fmtRp($payslip->bpjs_ketenagakerjaan_employee) }}</td>
             </tr>
             <tr>
@@ -483,7 +483,7 @@
     <div class="slip-footer">
         <div class="sign-col">
             <div class="sign-box"></div>
-            <div class="sign-label">Karyawan</div>
+            <div class="sign-label">Employee</div>
             <div style="margin-top:2px;font-weight:bold;">{{ $employee->name }}</div>
         </div>
         <div class="sign-col"></div>

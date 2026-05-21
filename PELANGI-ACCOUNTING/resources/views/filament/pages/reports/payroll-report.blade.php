@@ -103,7 +103,7 @@
             <table class="tb-table">
                 <thead>
                     <tr>
-                        <th>{{ __('Karyawan') }}</th>
+                        <th>{{ __('Employee') }}</th>
                         <th>{{ __('Department') }}</th>
                         <th class="num">{{ __('Gaji Pokok') }}</th>
                         <th class="num">{{ __('Tunjangan') }}</th>

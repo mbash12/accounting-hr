@@ -36,12 +36,12 @@ class PayrollReport extends Page implements HasForms
 
     public function getHeading(): string
     {
-        return __('Laporan Ringkasan Payroll');
+        return __('Payroll Summary Report');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Laporan HR & Payroll');
+        return __('HR & Payroll Reports');
     }
 
     protected static ?int $navigationSort = 10;
@@ -77,7 +77,7 @@ class PayrollReport extends Page implements HasForms
                     ->afterStateUpdated(fn() => $this->validate()),
                 
                 Select::make('department_id')
-                    ->label(__('Departemen'))
+                    ->label(__('Department'))
                     ->options(function () {
                         $companyId = session('selected_company_id');
                         $query = Department::query();
@@ -89,7 +89,7 @@ class PayrollReport extends Page implements HasForms
                         }
                         return $query->pluck('name', 'id');
                     })
-                    ->placeholder(__('Semua Departemen'))
+                    ->placeholder(__('All Departments'))
                     ->live()
                     ->afterStateUpdated(fn() => $this->validate()),
             ])
@@ -114,7 +114,7 @@ class PayrollReport extends Page implements HasForms
                 'totals' => [],
                 'company' => null,
                 'period' => null,
-                'error' => __('Silakan pilih perusahaan tertentu dari pemilih global.')
+                'error' => __('Please select a specific company from the global selector.')
             ];
         }
 
@@ -168,6 +168,6 @@ class PayrollReport extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Laporan_Payroll_' . ($data['period']?->name ?? 'report') . '.pdf');
+        }, 'Payroll_Report_' . ($data['period']?->name ?? 'report') . '.pdf');
     }
 }

@@ -210,7 +210,7 @@
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Laba(Rugi) Bersih Operasi</td>
+                    <td style="font-weight: bold; color: #1f2937;">Net Operating Profit (Loss)</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @if($reportData['plTotal'] < 0) - {{ number_format(abs($reportData['plTotal']), 0, ',' , '.' )
                             }} @else {{ number_format($reportData['plTotal'], 0, ',' , '.' ) }} @endif </td>
@@ -227,7 +227,7 @@
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Jumlah Penyesuaian Non-Kas</td>
+                    <td style="font-weight: bold; color: #1f2937;">Total Non-Cash Adjustments</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @if($reportData['nonCashTotal'] < 0) - {{ number_format(abs($reportData['nonCashTotal']), 0, ','
                             , '.' ) }} @else {{ number_format($reportData['nonCashTotal'], 0, ',' , '.' ) }} @endif
@@ -253,7 +253,7 @@
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Jumlah Berkurang(Bertambah) pada Operasi Aktiva</td>
+                    <td style="font-weight: bold; color: #1f2937;">Total Decrease (Increase) in Operating Assets</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @if($reportData['opAssetsTotal'] < 0) - {{ number_format(abs($reportData['opAssetsTotal']),
                             0, ',' , '.' ) }} @else {{ number_format($reportData['opAssetsTotal'], 0, ',' , '.' ) }}
@@ -270,7 +270,7 @@
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Jumlah Bertambah (berkurang) pada Operasi Kewajiban
+                    <td style="font-weight: bold; color: #1f2937;">Total Increase (Decrease) in Operating Liabilities
                     </td>
                     <td class="num"
                         style="font-weight: bold; color: {{ $reportData['opLiabTotal'] < 0 ? '#dc2626' : '#1f2937' }};">

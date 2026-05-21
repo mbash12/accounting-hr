@@ -298,7 +298,7 @@
             </svg>
         </div>
         <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
-        <p>Pilih perusahaan tertentu untuk melihat laporan.</p>
+        <p>Select a specific company to view the report.</p>
     </div>
     @endif
 </x-filament-panels::page>

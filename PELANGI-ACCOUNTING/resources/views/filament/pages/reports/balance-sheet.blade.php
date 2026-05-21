@@ -210,7 +210,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Jumlah Aktiva</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Assets</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{
                         number_format($assets->sum('calculated_balance'), 2, ',', '.') }}</td>
                 </tr>
@@ -219,7 +219,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Kewajiban dan Ekuitas</td>
+                        Kewajiban and Equity</td>
                 </tr>
 
                 <!-- Liabilities -->
@@ -237,7 +237,7 @@
                 @endforeach
 
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Jumlah Kewajiban</td>
+                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Total Liabilities</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">{{
                         number_format($liabilities->sum('calculated_balance'), 2, ',', '.') }}</td>
                 </tr>
@@ -257,7 +257,7 @@
                 @endforeach
 
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Jumlah Ekuitas</td>
+                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Total Equity</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">{{
                         number_format($equity->sum('calculated_balance'), 2, ',', '.') }}</td>
                 </tr>
@@ -268,7 +268,7 @@
                 $totalEquity = $equity->sum('calculated_balance');
                 @endphp
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Jumlah Kewajiban dan Ekuitas</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Liabilities and Equity</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalLiabilities +
                         $totalEquity, 2, ',', '.') }}</td>
                 </tr>
@@ -286,7 +286,7 @@
             </svg>
         </div>
         <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
-        <p>Pilih perusahaan tertentu untuk melihat laporan.</p>
+        <p>Select a specific company to view the report.</p>
     </div>
     @endif
 </x-filament-panels::page>

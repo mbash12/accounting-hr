@@ -37,7 +37,7 @@ class AttendanceReport extends Page implements HasForms
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Laporan HR & Payroll');
+        return __('HR & Payroll Reports');
     }
 
     protected static ?int $navigationSort = 11;
@@ -57,23 +57,23 @@ class AttendanceReport extends Page implements HasForms
         return $schema
             ->components([
                 Select::make('month')
-                    ->label(__('Bulan'))
+                    ->label(__('Month'))
                     ->options([
-                        1 => __('Januari'), 2 => __('Februari'), 3 => __('Maret'), 4 => __('April'),
-                        5 => __('Mei'), 6 => __('Juni'), 7 => __('Juli'), 8 => __('Agustus'),
-                        9 => __('September'), 10 => __('Oktober'), 11 => __('November'), 12 => __('Desember'),
+                        1 => __('January'), 2 => __('February'), 3 => __('March'), 4 => __('April'),
+                        5 => __('May'), 6 => __('June'), 7 => __('July'), 8 => __('August'),
+                        9 => __('September'), 10 => __('October'), 11 => __('November'), 12 => __('December'),
                     ])
                     ->required()
                     ->live(),
                 
                 Select::make('year')
-                    ->label(__('Tahun'))
+                    ->label(__('Year'))
                     ->options(array_combine(range(now()->year - 2, now()->year + 1), range(now()->year - 2, now()->year + 1)))
                     ->required()
                     ->live(),
 
                 Select::make('department_id')
-                    ->label(__('Departemen'))
+                    ->label(__('Department'))
                     ->options(function () {
                         $companyId = session('selected_company_id');
                         $query = Department::query();
@@ -85,7 +85,7 @@ class AttendanceReport extends Page implements HasForms
                         }
                         return $query->pluck('name', 'id');
                     })
-                    ->placeholder(__('Semua Departemen'))
+                    ->placeholder(__('All Departments'))
                     ->live(),
             ])
             ->columns(3)
@@ -108,7 +108,7 @@ class AttendanceReport extends Page implements HasForms
             return [
                 'records' => collect(),
                 'company' => null,
-                'error' => __('Silakan pilih perusahaan tertentu.')
+                'error' => __('Please select a specific company.')
             ];
         }
 
@@ -153,6 +153,6 @@ class AttendanceReport extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Laporan_Kehadiran_' . $data['month_name'] . '_' . $data['year'] . '.pdf');
+        }, 'Attendance_Report_' . $data['month_name'] . '_' . $data['year'] . '.pdf');
     }
 }
