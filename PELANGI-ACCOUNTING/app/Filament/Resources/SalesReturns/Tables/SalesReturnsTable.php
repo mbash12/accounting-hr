@@ -24,16 +24,16 @@ class SalesReturnsTable
         return $table
             ->columns([
                 TextColumn::make("return_number")
-                    ->label(__("No. Retur"))
+                    ->label(__("Return No."))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("date")
-                    ->label(__("Tanggal"))
+                    ->label(__("Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("customer.name")
-                    ->label(__("Pelanggan"))
+                    ->label(__("Customer"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("status")
@@ -56,32 +56,32 @@ class SalesReturnsTable
                         },
                     ),
                 TextColumn::make("deliveryDocument.delivery_number")
-                    ->label(__("No. Pengiriman"))
+                    ->label(__("Delivery No."))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("deliveryDocument.salesOrder.order_number")
-                    ->label(__("No. Pesanan Penjualan"))
+                    ->label(__("Sales Order No."))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("job.title")
-                    ->label(__("Proyek"))
+                    ->label(__("Project"))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -99,9 +99,9 @@ class SalesReturnsTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -117,17 +117,17 @@ class SalesReturnsTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('customer')
                     ->form([
                         \Filament\Forms\Components\Select::make('customer_id')
-                            ->label('Pelanggan')
+                            ->label('Customer')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_customer', true);
@@ -169,12 +169,12 @@ class SalesReturnsTable
                             return null;
                         }
                         $customer = \App\Models\Contact::find($data['customer_id']);
-                        return 'Pelanggan: ' . ($customer?->name ?? $data['customer_id']);
+                        return 'Customer: ' . ($customer?->name ?? $data['customer_id']);
                     }),
                 Filter::make('delivery_document')
                     ->form([
                         \Filament\Forms\Components\Select::make('delivery_document_id')
-                            ->label('No. Pengiriman')
+                            ->label('Delivery No.')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\DeliveryDocument::query();
@@ -238,7 +238,7 @@ class SalesReturnsTable
                 ExportSalesReturnWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([

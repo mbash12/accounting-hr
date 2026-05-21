@@ -30,25 +30,25 @@ class SalesDeliveriesTable
         return $table
             ->columns([
                 TextColumn::make("delivery_number")
-                    ->label(__("No. Pengiriman"))
+                    ->label(__("Delivery No."))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("date")
-                    ->label(__("Tanggal"))
+                    ->label(__("Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("customer.name")
-                    ->label(__("Pelanggan"))
+                    ->label(__("Customer"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("delivery_type")
-                    ->label(__("Jenis"))
+                    ->label(__("Type"))
                     ->badge()
                     ->formatStateUsing(
                         fn(string $state): string => match ($state) {
-                            "goods" => __("Barang"),
-                            "document" => __("Dokumen"),
+                            "goods" => __("Goods"),
+                            "document" => __("Document"),
                             default => $state,
                         },
                     )
@@ -81,26 +81,26 @@ class SalesDeliveriesTable
                         },
                     ),
                 TextColumn::make("salesOrder.order_number")
-                    ->label(__("No. Pesanan Penjualan"))
+                    ->label(__("Sales Order No."))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("job.title")
-                    ->label(__("Proyek"))
+                    ->label(__("Project"))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -118,9 +118,9 @@ class SalesDeliveriesTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -136,17 +136,17 @@ class SalesDeliveriesTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('customer')
                     ->form([
                         \Filament\Forms\Components\Select::make('customer_id')
-                            ->label('Pelanggan')
+                            ->label('Customer')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_customer', true);
@@ -188,12 +188,12 @@ class SalesDeliveriesTable
                             return null;
                         }
                         $customer = \App\Models\Contact::find($data['customer_id']);
-                        return 'Pelanggan: ' . ($customer?->name ?? $data['customer_id']);
+                        return 'Customer: ' . ($customer?->name ?? $data['customer_id']);
                     }),
                 Filter::make('sales_order')
                     ->form([
                         \Filament\Forms\Components\Select::make('sales_order_id')
-                            ->label('No. Pesanan Penjualan')
+                            ->label('Sales Order No.')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\SalesOrder::query();
@@ -243,7 +243,7 @@ class SalesDeliveriesTable
             ->recordActions([
                 ActionGroup::make([
                     Action::make('createReturn')
-                        ->label('Buat Retur')
+                        ->label('Create Return')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('warning')
                         ->visible(function (DeliveryDocument $record): bool {
@@ -252,9 +252,9 @@ class SalesDeliveriesTable
                             return (float) ($meta['remaining'] ?? 0) > 0;
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Buat Retur Penjualan')
-                        ->modalDescription('Apakah Anda yakin ingin membuat retur penjualan? Dokumen akan dibuat dengan status terkunci.')
-                        ->modalSubmitActionLabel('Ya, Buat')
+                        ->modalHeading('Create Sales Return')
+                        ->modalDescription('Are you sure you want to create a sales return? The document will be created in locked status.')
+                        ->modalSubmitActionLabel('Yes, Create')
                         ->action(function (DeliveryDocument $record) {
                             $delivery = DeliveryDocument::query()
                                 ->with(['items.product'])
@@ -295,7 +295,7 @@ class SalesDeliveriesTable
                                         'unit_id' => $item['unit_id'],
                                         'quantity' => $item['quantity'],
                                         'description' => $item['description'],
-                                        'return_reason' => 'Retur otomatis dari pengiriman',
+                                        'return_reason' => 'Automatic return from delivery',
                                     ]);
                                 }
 
@@ -322,7 +322,7 @@ class SalesDeliveriesTable
                 \App\Filament\Actions\ExportSalesDeliveryWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([
