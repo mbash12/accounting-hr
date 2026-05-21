@@ -13,11 +13,11 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
 {
     public function collection(): Collection
     {
-        $query = PurchaseOrder::with(['supplier', 'department', 'items.product', 'items.unit', 'items.tax'])
+        $query = PurchaseOrder::with(['supplier', 'items.product', 'items.unit', 'items.tax'])
             ->select([
-                'id', 'purchase_order_no', 'order_type', 'date', 'reference_no', 'description',
+                'id', 'purchase_order_no', 'date', 'reference_no', 'description',
                 'other_charges', 'discount', 'discount_percentage', 'subtotal', 'tax_amount', 'total',
-                'total_amount', 'status', 'supplier_id', 'department_id', 'company_id'
+                'total_amount', 'status', 'supplier_id', 'company_id'
             ]);
 
         $query = CompanyFilterService::applyCompanyFilter($query);
@@ -42,8 +42,6 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
                         'Status' => $order->status,
                         'Kode Pemasok' => $order->supplier ? $order->supplier->contact_code : null,
                         'Nama Pemasok' => $order->supplier ? $order->supplier->name : null,
-                        'Kode Departemen' => $order->department ? $order->department->code : null,
-                        'Nama Departemen' => $order->department ? $order->department->name : null,
                         'Kode Produk' => $item->product ? $item->product->code : null,
                         'Nama Produk' => $item->product ? $item->product->name : null,
                         'Deskripsi Item' => $item->description,
@@ -73,8 +71,6 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
                     'Status' => $order->status,
                     'Kode Pemasok' => $order->supplier ? $order->supplier->contact_code : null,
                     'Nama Pemasok' => $order->supplier ? $order->supplier->name : null,
-                    'Kode Departemen' => $order->department ? $order->department->code : null,
-                    'Nama Departemen' => $order->department ? $order->department->name : null,
                     'Kode Produk' => null,
                     'Nama Produk' => null,
                     'Deskripsi Item' => null,
@@ -109,8 +105,6 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
             'Status',
             'Kode Pemasok',
             'Nama Pemasok',
-            'Kode Departemen',
-            'Nama Departemen',
             'Kode Produk',
             'Nama Produk',
             'Deskripsi Item',

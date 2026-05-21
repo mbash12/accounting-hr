@@ -134,7 +134,7 @@ class ReceivablePaymentsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->label(__('Detail'))
+                        ->label(__('Details'))
                         ->icon('heroicon-o-eye'),
                     ViewJournalVoucherAction::make(),
                     \Filament\Actions\Action::make('print')

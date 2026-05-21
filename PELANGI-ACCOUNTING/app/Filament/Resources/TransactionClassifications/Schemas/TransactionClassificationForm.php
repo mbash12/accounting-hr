@@ -14,15 +14,15 @@ class TransactionClassificationForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make(__("Informasi Klasifikasi Transaksi"))
+            Section::make(__("Transaction Classification Information"))
                 ->schema([
                     TextInput::make("name")
-                        ->label(__("Nama"))
+                        ->label(__("Name"))
                         ->required()
                         ->maxLength(200)
                         ->columnSpanFull(),
                     TextInput::make("code")
-                        ->label(__("Kode"))
+                        ->label(__("Code"))
                         ->required()
                         ->maxLength(50)
                         ->unique(
@@ -51,16 +51,16 @@ class TransactionClassificationForm
                                 }
 
                                 if ($query->exists()) {
-                                    $fail(__('The :attribute code already exists for this company.', ['attribute' => __('Kode')]));
+                                    $fail(__('The :attribute code already exists for this company.', ['attribute' => __('Code')]));
                                 }
                             };
                         }),
                     Textarea::make("description")
-                        ->label(__("Deskripsi"))
+                        ->label(__("Description"))
                         ->rows(3)
                         ->columnSpanFull(),
                     Select::make("classification_type")
-                        ->label(__("Tipe Klasifikasi"))
+                        ->label(__("Classification Type"))
                         ->required()
                         ->options([
                             'operating' => __('Operating'),
@@ -70,7 +70,7 @@ class TransactionClassificationForm
                         ])
                         ->searchable(),
                     Select::make("tax_impact")
-                        ->label(__("Dampak Pajak"))
+                        ->label(__("Tax Impact"))
                         ->options([
                             'taxable' => __('Taxable'),
                             'exempt' => __('Exempt'),
@@ -80,17 +80,17 @@ class TransactionClassificationForm
                         ->nullable()
                         ->searchable(),
                     TextInput::make("reporting_category")
-                        ->label(__("Kategori Pelaporan"))
+                        ->label(__("Reporting Category"))
                         ->maxLength(100)
                         ->nullable(),
                     Toggle::make("is_active")
-                        ->label(__("Aktif"))
+                        ->label(__("Active"))
                         ->default(true)
                         ->required(),
                 ])
                 ->columns(2),
 
-            Section::make(__("Pemetaan Akun"))
+            Section::make(__("Account Mapping"))
                 ->schema([
                     Select::make("company_id")
                         ->relationship(
@@ -129,9 +129,9 @@ class TransactionClassificationForm
                         ->afterStateUpdated(function ($state, callable $set) {
                             $set('default_account_id', null);
                         })
-                        ->label(__("Perusahaan")),
+                        ->label(__("Company")),
                     Select::make("default_account_id")
-                        ->label(__("Akun Default"))
+                        ->label(__("Default Account"))
                         ->getOptionLabelUsing(function ($value) {
                             $account = \App\Models\Account::find($value);
                             return $account ? "{$account->code} - {$account->name}" : $value;

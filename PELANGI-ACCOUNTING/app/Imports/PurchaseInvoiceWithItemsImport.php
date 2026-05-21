@@ -159,7 +159,6 @@ class PurchaseInvoiceWithItemsImport implements ToCollection, WithHeadingRow, Wi
             }
 
             $invoicesData[$invoiceNumber]['items'][] = [
-                'item_name' => (string) $row['nama_produk'] ?: $product->name,
                 'description' => isset($row['deskripsi_item']) ? (string) $row['deskripsi_item'] : null,
                 'quantity' => isset($row['jumlah']) ? (float) $row['jumlah'] : 0,
                 'unit_price' => isset($row['harga_satuan']) ? (float) $row['harga_satuan'] : 0,

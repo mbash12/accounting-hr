@@ -16,16 +16,16 @@ class FaqCategoriesTable
         return $table
             ->columns([
                 TextColumn::make("name")
-                    ->label(__("Kategori"))
+                    ->label(__("Category"))
                     ->searchable(),
                 TextColumn::make("sort_order")
-                    ->label(__("Urutan"))
+                    ->label(__("Sort Order"))
                     ->sortable(),
                 TextColumn::make("faqs_count")
                     ->counts('faqs')
-                    ->label(__("Jumlah FAQ")),
+                    ->label(__("FAQ Count")),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat At"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -59,9 +59,9 @@ class PayablePaymentForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            (new static)->getCodeField('payment_number', __('Nomor Pembayaran')),
+            (new static)->getCodeField('payment_number', __('Payment Number')),
             Select::make("company_id")
-                ->label(__("Perusahaan"))
+                ->label(__("Company"))
                 ->relationship("company", "name")
                 ->default(function () {
                     $selectedCompanyId = session("selected_company_id");
@@ -92,7 +92,7 @@ class PayablePaymentForm
             Section::make()
                 ->schema([
                     Select::make("supplier_id")
-                        ->label(__("Pemasok"))
+                        ->label(__("Supplier"))
                         ->relationship(
                             name: "supplier", 
                             titleAttribute: "name",
@@ -134,16 +134,16 @@ class PayablePaymentForm
                         })
                         ->columnSpan(1),
                     DatePicker::make("payment_date")
-                        ->label(__("Tanggal Pembayaran"))
+                        ->label(__("Payment Date"))
                         ->required()
                         ->default(now())
                         ->columnSpan(1),
                     TextInput::make("reference_no")
                         ->maxLength(255)
-                        ->label(__("Nomor Referensi"))
+                        ->label(__("Reference Number"))
                         ->columnSpan(1),
                     Select::make("bank_account_id")
-                        ->label(__("Akun"))
+                        ->label(__("Account"))
                         ->options(function () {
                             $selectedCompanyId = session('selected_company_id');
                             $query = \App\Models\Account::where('is_header', false)
@@ -169,21 +169,21 @@ class PayablePaymentForm
                         ->required()
                         ->columnSpan(1),
                     Checkbox::make("is_incoming_giro")
-                        ->label(__("Giro Masuk"))
+                        ->label(__("Incoming Giro"))
                         ->default(false)
                         ->columnSpan(1),
                     Textarea::make("description")
                         ->rows(2)
                         ->maxLength(65535)
-                        ->label(__("Deskripsi"))
+                        ->label(__("Description"))
                         ->columnSpan(1),
                 ])
                 ->columns(3)
                 ->columnSpanFull(),
 
             Repeater::make("items")
-                ->label(__("Item Pembayaran"))
-                ->addActionLabel(__("Tambah Faktur"))
+                ->label(__("Payment Items"))
+                ->addActionLabel(__("Add Invoice"))
                 ->defaultItems(1)
                 ->afterStateUpdated(function ($set, $get) {
                     static::refreshTotal($get, $set);
@@ -197,7 +197,7 @@ class PayablePaymentForm
                 ->columnSpan("full")
                 ->schema([
                     Select::make("purchase_invoice_id")
-                        ->label(__("Nomor Faktur"))
+                        ->label(__("Invoice Number"))
                         ->options(function ($get, $record) {
                             $supplierId = $get('../../supplier_id') 
                                 ?? $get('../supplier_id') 
@@ -322,7 +322,7 @@ class PayablePaymentForm
                                     }
                                     
                                     if (!empty($duplicates)) {
-                                        $fail(__('Nomor faktur tidak boleh sama. Faktur ini sudah digunakan pada item :items.', [
+                                        $fail(__('Invoice number cannot be duplicated. This invoice is already used in items: :items.', [
                                             'items' => implode(', ', $duplicates)
                                         ]));
                                     }
@@ -396,7 +396,7 @@ class PayablePaymentForm
                             }
                         }),
                     DatePicker::make("date")
-                        ->label(__("Tanggal"))
+                        ->label(__("Date"))
                         ->disabled()
                         ->dehydrated(true)
                         ->displayFormat('d/m/Y')
@@ -404,12 +404,12 @@ class PayablePaymentForm
                         ->default(null),
                     ...RoundedIntegerMoneyInput::schema(
                         name: 'amount',
-                        label: __('Jumlah'),
+                        label: __('Amount'),
                         required: false,
                         extraInputAttributes: ['disabled' => true, 'style' => 'text-align:right; background-color: #f3f4f6; color: #6b7280;'],
                     ),
                     NumberInput::make("paid_amount")
-                        ->label(__("Jumlah Dibayar"))
+                        ->label(__("Paid Amount"))
                         ->decimal(true)
                         ->default(0)
                         ->disabled()
@@ -417,7 +417,7 @@ class PayablePaymentForm
                         ->hidden()
                         ->extraInputAttributes(["style" => "text-align:right"]),
                     NumberInput::make("discount_amount")
-                        ->label(__("Diskon"))
+                        ->label(__("Discount"))
                         ->decimal(true)
                         ->default(0)
                         ->dehydrated(true)
@@ -451,7 +451,7 @@ class PayablePaymentForm
                         ->extraInputAttributes(["style" => "text-align:right"]),
                     ...RoundedIntegerMoneyInput::schema(
                         name: 'set_payment',
-                        label: __('Nilai Pembayaran'),
+                        label: __('Payment Amount'),
                         required: true,
                         inlineLabel: false,
                         scale: 0,
@@ -463,12 +463,12 @@ class PayablePaymentForm
                             function ($get) {
                                 return function (string $attribute, $value, \Closure $fail) use ($get) {
                                     if (!$value) return;
-                                    
+
                                     $amount = (float) ($get('amount') ?? 0);
                                     $payment = \App\Filament\Forms\Components\NumberInput::parseToFloat($value);
-                                    
+
                                     if ($payment > $amount + 0.01) {
-                                        $fail(__('Nilai pembayaran tidak boleh melebihi jumlah hutang (:amount).', [
+                                        $fail(__('Payment amount cannot exceed the payable amount (:amount).', [
                                             'amount' => \App\Filament\Forms\Components\NumberInput::formatRoundedIntegerDisplay($amount)
                                         ]));
                                     }
@@ -487,10 +487,10 @@ class PayablePaymentForm
             Section::make()
                 ->schema([
                     Textarea::make("transaction_notes")
-                        ->label(__("Catatan Transaksi"))
+                        ->label(__("Transaction Notes"))
                         ->rows(5)
                         ->maxLength(1000)
-                        ->placeholder(__("Tulis catatan transaksi di sini (maksimal 1000 karakter)"))
+                        ->placeholder(__("Write transaction notes here (max 1000 characters)"))
                         ->columnSpan(0),
                     Section::make()
                         ->schema([
@@ -499,7 +499,7 @@ class PayablePaymentForm
                                 ->columnSpan(1),
                             ...RoundedIntegerMoneyInput::schema(
                                 name: 'other_costs',
-                                label: __('Biaya Lainnya'),
+                                label: __('Other Costs'),
                                 inlineLabel: true,
                                 defaultDecimal: '0.00',
                                 columnSpan: 2,
@@ -513,7 +513,7 @@ class PayablePaymentForm
                                 ->columnSpan(1),
                             Placeholder::make("total_payment_display")
                                 ->inlineLabel()
-                                ->label(__("Jumlah Total"))
+                                ->label(__("Total Amount"))
                                 ->live()
                                 ->content(function ($get) {
                                     $items = $get('items') ?? [];
@@ -577,16 +577,16 @@ class PayablePaymentForm
             Select::make("status")
                 ->label(__("Status"))
                 ->options([
-                    'pending' => __('Menunggu'),
-                    'completed' => __('Selesai'),
-                    'failed' => __('Gagal'),
-                    'cancelled' => __('Dibatalkan'),
+                    'pending' => __('Pending'),
+                    'completed' => __('Completed'),
+                    'failed' => __('Failed'),
+                    'cancelled' => __('Cancelled'),
                 ])
                 ->default('pending')
                 ->required()
                 ->hidden(),
             NumberInput::make("total_payment")
-                ->label(__("Jumlah Total Pembayaran"))
+                ->label(__("Total Payment Amount"))
                 ->required()
                 ->decimal(true)
                 ->disabled()

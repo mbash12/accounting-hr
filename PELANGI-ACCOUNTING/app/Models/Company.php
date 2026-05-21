@@ -45,7 +45,6 @@ class Company extends Model
         'fiscal_year_end',
         'tax_period',
         'is_active',
-        'settings',
         'billing_address_line_1',
         'billing_address_line_2',
         'billing_city',
@@ -76,7 +75,6 @@ class Company extends Model
             'fiscal_year_end' => 'date',
             'is_active' => 'boolean',
             'is_ppn' => 'boolean',
-            'settings' => 'array',
             'business_type_id' => 'integer',
             'created_by_user_id' => 'integer',
         ];

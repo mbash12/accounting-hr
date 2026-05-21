@@ -20,26 +20,26 @@ class WarehousesTable
         return $table
             ->columns([
                 TextColumn::make("name")
-                    ->label(__("Nama"))
+                    ->label(__("Name"))
                     ->searchable()
                     ->weight("bold"),
                 TextColumn::make("code")
-                    ->label(__("Kode"))
+                    ->label(__("Code"))
                     ->searchable()
                     ->copyable(),
 
-                IconColumn::make("is_active")->boolean()->label(__("Aktif")),
+                IconColumn::make("is_active")->boolean()->label(__("Active")),
                 TextColumn::make("createdByUser.name")
-                    ->label(__("Dibuat Oleh"))
+                    ->label(__("Created By"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

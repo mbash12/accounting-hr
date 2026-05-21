@@ -23,21 +23,21 @@ class ManageAccountMappings extends Page implements HasForms
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $title = 'Pemetaan Akun & Jurnal';
+    protected static ?string $title = 'Account Mapping & Journal';
 
     public static function getNavigationLabel(): string
     {
-        return __('Pemetaan Akun');
+        return __('Account Mapping');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Buku Besar');
+        return __('General Ledger');
     }
 
     public function getTitle(): string
     {
-        return __('Pemetaan Akun & Jurnal');
+        return __('Account Mapping & Journal');
     }
 
     protected string $view = 'filament.pages.manage-account-mappings';

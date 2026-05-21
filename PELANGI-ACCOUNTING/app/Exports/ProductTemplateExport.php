@@ -18,12 +18,10 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
                 12000000,
                 15000000,
                 'good',
-                1,
                 'yes',
                 'Pcs',
                 'ELK',
                 'PPN',
-                'SUP-001'
             ],
             [
                 'Mouse Wireless Logitech',
@@ -32,12 +30,10 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
                 150000,
                 200000,
                 'good',
-                5,
                 'yes',
                 'Pcs',
                 'ELK',
                 'PPN',
-                'SUP-002'
             ],
             [
                 'Software Akuntansi Premium',
@@ -46,12 +42,10 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
                 500000,
                 750000,
                 'service',
-                1,
                 'yes',
                 'Pcs',
                 'SW',
                 '',
-                'SUP-001'
             ],
         ];
     }
@@ -65,12 +59,10 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
             'cost_price',
             'selling_price',
             'product_type',
-            'min_order_qty',
             'is_active',
             'unit_code',
             'product_group_code',
             'tax_code',
-            'supplier_code'
         ];
     }
 

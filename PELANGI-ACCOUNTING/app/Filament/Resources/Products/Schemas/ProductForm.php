@@ -35,14 +35,14 @@ class ProductForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make(__("Informasi Produk"))
+            Section::make(__("Product Information"))
                 ->schema([
                     TextInput::make("name")
-                        ->label(__("Nama Produk"))
+                        ->label(__("Product Name"))
                         ->required()
                         ->maxLength(200)
                         ->columnSpanFull(),
-                    (new static)->getCodeField('code', __("Kode Produk"))
+                    (new static)->getCodeField('code', __("Product Code"))
                         ->unique(
                             \App\Models\Product::class,
                             'code',
@@ -61,11 +61,11 @@ class ProductForm
                             },
                         ),
                     Textarea::make("description")
-                        ->label(__("Deskripsi"))
+                        ->label(__("Description"))
                         ->columnSpanFull()
                         ->maxLength(65535),
                     FileUpload::make("image")
-                        ->label(__("Gambar Produk"))
+                        ->label(__("Product Image"))
                         ->image()
                         ->disk("public")
                         ->directory("products")
@@ -78,7 +78,7 @@ class ProductForm
                         ])
                         ->columnSpanFull(),
                     Select::make("product_group_id")
-                        ->label(__("Kelompok Produk"))
+                        ->label(__("Product Group"))
                         ->relationship(
                             "productGroup",
                             "name",
@@ -94,7 +94,7 @@ class ProductForm
                         ->preload()
                         ->required(),
                     Select::make("unit_id")
-                        ->label(__("Satuan"))
+                        ->label(__("Unit"))
                         ->relationship(
                             "unit",
                             "name",
@@ -110,15 +110,15 @@ class ProductForm
                         ->preload()
                         ->required(),
                     Select::make("product_type")
-                        ->label(__("Jenis Produk"))
+                        ->label(__("Product Type"))
                         ->options([
-                            'good' => __('Barang'),
-                            'service' => __('Jasa'),
+                            'good' => __('Goods'),
+                            'service' => __('Service'),
                         ])
                         ->default('good')
                         ->required(),
                     Select::make("tax_id")
-                        ->label(__("Pajak"))
+                        ->label(__("Tax"))
                         ->relationship(
                             "tax",
                             "name",
@@ -134,7 +134,7 @@ class ProductForm
                         ->searchable()
                         ->preload(),
                     Select::make("company_id")
-                        ->label(__("Perusahaan"))
+                        ->label(__("Company"))
                         ->relationship(
                             name: 'company',
                             titleAttribute: 'name',
@@ -167,48 +167,27 @@ class ProductForm
                         ->preload()
                         ->required(),
                     Toggle::make("is_active")
-                        ->label(__("Aktif"))
+                        ->label(__("Active"))
                         ->default(true),
                 ])
                 ->columns(2),
 
-            Section::make(__("Harga & Pemasok"))
+            Section::make(__("Pricing"))
                 ->schema([
                     NumberInput::make("cost_price")
-                        ->label(__("Harga Pokok"))
+                        ->label(__("Cost Price"))
                         ->required()
                         ->minValue(0)
                         ->prefix('Rp')
                         ->default(0)
                         ->decimal(false),
                     NumberInput::make("selling_price")
-                        ->label(__("Harga Jual"))
+                        ->label(__("Selling Price"))
                         ->required()
                         ->minValue(0)
                         ->prefix('Rp')
                         ->default(0)
                         ->decimal(false),
-                    Select::make("supplier_id")
-                        ->label(__("Pemasok"))
-                        ->relationship(
-                            "supplier",
-                            "name",
-                            modifyQueryUsing: function ($query) {
-                                $selectedCompanyId = session('selected_company_id');
-                                if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-                                    $query->where('company_id', $selectedCompanyId);
-                                }
-                                $query->where('is_supplier', true);
-                                return $query;
-                            }
-                        )
-                        ->searchable()
-                        ->preload(),
-                    NumberInput::make("min_order_qty")
-                        ->label(__("Jumlah Minimum Pesanan"))
-                        ->helperText(__("Biarkan kosong jika tidak ada jumlah minimum pesanan"))
-                        ->default(0)
-                        ->decimal(true),
                 ])
                 ->columns(2),
         ]);

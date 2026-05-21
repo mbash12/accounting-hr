@@ -24,7 +24,7 @@ class CompanyForm
                     TextInput::make("tax_id")->label(__("Tax ID")),
                     Toggle::make("is_ppn")
                         ->label(__("PPN (PKP)"))
-                        ->helperText(__("Aktifkan jika perusahaan ini terdaftar sebagai Pengusaha Kena Pajak (PKP). Non-aktif = Non-PPN."))
+                        ->helperText(__("Enable if this company is registered as a Taxable Entrepreneur (PKP). Disabled = Non-PPN."))
                         ->default(false)
                         ->onIcon("heroicon-m-check-badge")
                         ->offIcon("heroicon-m-x-circle")

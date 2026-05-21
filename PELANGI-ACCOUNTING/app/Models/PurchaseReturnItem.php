@@ -24,7 +24,6 @@ class PurchaseReturnItem extends Model
         'purchase_return_id',
         'goods_receipt_item_id',
         'product_id',
-        'item_name',
         'unit_id',
     ];
 

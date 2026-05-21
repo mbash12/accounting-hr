@@ -79,7 +79,6 @@ class PurchaseInvoiceItem extends Model
         'purchase_invoice_id',
         'purchase_order_item_id',
         'product_id',
-        'item_name',
         'unit_id',
         'tax_id',
         'cost_center_id',

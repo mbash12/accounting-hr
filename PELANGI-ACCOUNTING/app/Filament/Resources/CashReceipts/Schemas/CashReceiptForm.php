@@ -114,7 +114,7 @@ class CashReceiptForm
                             },
                         ),
                     Select::make("to_account_id")
-                        ->label(__("Ke Cash/Bank Account"))
+                        ->label(__("To Cash/Bank Account"))
                         ->relationship("toAccount", "name")
                         ->options(function () {
                             $selectedCompanyId = session('selected_company_id');
@@ -166,7 +166,7 @@ class CashReceiptForm
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->helperText(__('Pilih akun kas/bank dari Chart of Accounts.')),
+                        ->helperText(__('Select a cash/bank account from the Chart of Accounts.')),
                     Textarea::make("description")
                         ->rows(1)
                         ->maxLength(65535)
@@ -285,7 +285,7 @@ class CashReceiptForm
                         ->hiddenLabel()
                         ->columnSpan(1),
                     Placeholder::make("total_receipt_display")
-                        ->label(__("Total Penerimaan"))
+                        ->label(__("Total Receipt"))
                         ->inlineLabel()
                         ->live()
                         ->content(function ($get) {
@@ -331,7 +331,7 @@ class CashReceiptForm
                         ->hiddenLabel()
                         ->columnSpan(1),
                     Toggle::make("is_posted")
-                        ->label(__("Diposting"))
+                        ->label(__("Posted"))
                         ->default(false)
                         ->dehydrated(true)
                         ->afterStateHydrated(function (callable $set, $state, $record) {

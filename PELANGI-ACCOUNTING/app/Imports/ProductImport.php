@@ -62,24 +62,6 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
                 ->where('company_id', $companyId)
                 ->first();
 
-            // Find supplier from contact code if supplier_code is provided
-            $supplierId = null;
-            if (!empty($row['supplier_code'])) {
-                $supplier = \App\Models\Contact::where('contact_code', (string) $row['supplier_code'])
-                    ->where('company_id', $companyId)
-                    ->first();
-                if (!$supplier) {
-                    throw new \Exception("Supplier with code '{$row['supplier_code']}' not found in current company");
-                }
-                $supplierId = $supplier->id;
-            } elseif (!empty($row['supplier_id'])) {
-                $supplier = \App\Models\Contact::find((int) $row['supplier_id']);
-                if (!$supplier) {
-                    throw new \Exception("Supplier with ID '{$row['supplier_id']}' not found");
-                }
-                $supplierId = $supplier->id;
-            }
-
             $data = [
                 'name' => isset($row['name']) ? (string) $row['name'] : null,
                 'description' => isset($row['description']) ? (string) $row['description'] : null,
@@ -89,7 +71,6 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
                 'max_stock' => isset($row['max_stock']) ? (float) $row['max_stock'] : 0,
                 'weight' => isset($row['weight']) ? (float) $row['weight'] : 0,
                 'product_type' => isset($row['product_type']) && in_array($row['product_type'], ['good', 'service']) ? (string) $row['product_type'] : 'good',
-                'min_order_qty' => isset($row['min_order_qty']) ? (float) $row['min_order_qty'] : 0,
                 'is_active' => isset($row['is_active']) &&
                     (strtolower((string) $row['is_active']) === 'yes' ||
                         strtolower((string) $row['is_active']) === 'true' ||
@@ -97,7 +78,6 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
                 'unit_id' => $unitId,
                 'product_group_id' => $productGroupId,
                 'tax_id' => $taxId,
-                'supplier_id' => $supplierId,
                 'created_by_user_id' => Auth::id(),
             ];
 
@@ -135,12 +115,10 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
             'max_stock' => isset($data['max_stock']) ? (string) $data['max_stock'] : null,
             'weight' => isset($data['weight']) ? (string) $data['weight'] : null,
             'product_type' => isset($data['product_type']) ? (string) $data['product_type'] : null,
-            'min_order_qty' => isset($data['min_order_qty']) ? (string) $data['min_order_qty'] : null,
             'is_active' => $isActive,
             'unit_code' => isset($data['unit_code']) ? (string) $data['unit_code'] : null,
             'product_group_code' => isset($data['product_group_code']) ? (string) $data['product_group_code'] : null,
             'tax_code' => isset($data['tax_code']) ? (string) $data['tax_code'] : null,
-            'supplier_code' => isset($data['supplier_code']) ? (string) $data['supplier_code'] : null,
             'created_by_user_id' => Auth::check() ? Auth::id() : null,
         ];
     }
@@ -160,12 +138,10 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
             'max_stock' => 'nullable|numeric|min:0',
             'weight' => 'nullable|numeric|min:0',
             'product_type' => 'nullable|in:good,service',
-            'min_order_qty' => 'nullable|numeric|min:0',
             'is_active' => 'nullable|boolean',
             'unit_code' => 'required|string|max:20',
             'product_group_code' => 'nullable|string|max:255',
             'tax_code' => 'nullable|string|max:50',
-            'supplier_code' => 'nullable|string|max:50',
             'created_by_user_id' => 'nullable|integer',
         ];
     }
@@ -189,13 +165,10 @@ class ProductImport implements ToCollection, WithHeadingRow, WithValidation
             'max_stock.numeric' => 'Stok maksimum harus berupa angka.',
             'weight.min' => 'Berat tidak boleh kurang dari 0.',
             'weight.numeric' => 'Berat harus berupa angka.',
-            'min_order_qty.min' => 'Jumlah pesanan minimal tidak boleh kurang dari 0.',
-            'min_order_qty.numeric' => 'Jumlah pesanan minimal harus berupa angka.',
             'product_type.max' => 'Tipe Produk tidak boleh lebih dari 50 karakter.',
             'unit_code.max' => 'Kode Satuan tidak boleh lebih dari 20 karakter.',
             'product_group_code.max' => 'Kode Grup Produk tidak boleh lebih dari 255 karakter.',
             'tax_code.max' => 'Kode Pajak tidak boleh lebih dari 50 karakter.',
-            'supplier_code.max' => 'Kode Supplier tidak boleh lebih dari 50 karakter.',
         ];
     }
 }

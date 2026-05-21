@@ -9,7 +9,6 @@ use App\Http\Controllers\Api\EmployeeApiPermitController;
 use App\Http\Controllers\Api\EmployeeApiOvertimeController;
 use App\Http\Controllers\Api\EmployeeApiUploadController;
 use App\Http\Controllers\Api\PurchaseOrderController;
-use App\Http\Controllers\Api\SalesOrderController;
 use App\Http\Middleware\EmployeeApiAuth;
 
 use App\Http\Controllers\Api\FaqController;
@@ -29,12 +28,6 @@ Route::prefix('master')->middleware([Api::class])->group(function () {
 Route::prefix('purchase')->middleware([Api::class])->group(function () {
     Route::post('/check', [PurchaseOrderController::class, 'detailPurchaseOrder']);
     Route::post('/store', [PurchaseOrderController::class, 'storePurchaseOrder']);
-});
-
-Route::prefix('sales-orders')->middleware([Api::class])->group(function () {
-    Route::get('/list', [SalesOrderController::class, 'list']);
-    Route::get('/detail', [SalesOrderController::class, 'detail']);
-    Route::post('/sync', [SalesOrderController::class, 'sync']);
 });
 
 

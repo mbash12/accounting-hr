@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
-use App\Models\Department;
 use App\Models\ProductGroup;
 use App\Models\Tax;
 use App\Models\Unit;
@@ -36,14 +35,6 @@ class PurchaseOrderController extends Controller
         // $rules['discount_account_id'] = 'required';
         $rules['supplier_code'] = 'required';
         $rules['company_id'] = 'required';
-        $rules['sales_order_id'] = 'required|integer';
-        // $rules['created_by_user_id'] = 'required';
-        // $rules['updated_by_user_id'] = 'required';
-        // $rules['order_type'] = 'required';
-        // $rules['is_closed'] = 'required';
-        // $rules['valid_until'] = 'required';
-        // $rules['related_order_id'] = 'required';
-        // $rules['advance_payment_id'] = 'required';
         $rules['total_amount'] = 'required';
         // $rules['discount_percentage'] = 'required';
         
@@ -86,9 +77,7 @@ class PurchaseOrderController extends Controller
             DB::beginTransaction();
             //code here
 
-            $department = Department::where('code', $request->department_code)->where('company_id', $request->company_id)->first();
             $supplier = Contact::where('contact_code', $request->supplier_code)->where('company_id', $request->company_id)->first();
-
 
             $po->date = $request->date;
             $po->reference_no = $request->reference_no;
@@ -100,21 +89,15 @@ class PurchaseOrderController extends Controller
             $po->total = $request->total;
             $po->status = $request->status ?: 'draft';
             $po->supplier_id = optional($supplier)->id;
-            $po->job_id = $request->job_id;
-            $po->department_id = optional($department)->id;
             $po->other_charges_account_id = $request->other_charges_account_id;
             $po->discount_account_id = $request->discount_account_id;
-            $po->company_id = $request->company_id ?: 1; 
+            $po->company_id = $request->company_id ?: 1;
             $po->created_by_user_id = $request->created_by_user_id ?? 0;
             $po->updated_by_user_id = $request->updated_by_user_id;
-            $po->order_type = $request->order_type ?? "standar";
             $po->is_closed = $request->is_closed ?? false;
             $po->valid_until = $request->valid_until;
-            $po->related_order_id = $request->related_order_id;
-            $po->advance_payment_id = $request->advance_payment_id;
             $po->total_amount = $request->total_amount ?: $request->total;
             $po->discount_percentage = $request->discount_percentage ?? 0;
-            $po->sales_order_id = $request->sales_order_id;
             $po->save();
 
             if ($mode == 'replace') {
@@ -165,8 +148,6 @@ class PurchaseOrderController extends Controller
                     $product->tax_id = optional($tax)->id;
                     $product->cost_price = $item['cost_price'] ?? ($item['unit_price'] ?? 0);
                     $product->selling_price = $item['selling_price'] ?? ($item['unit_price'] ?? 0);
-                    $product->supplier_id = optional($supplier)->id;
-                    $product->min_order_qty = $item['min_order_qty'] ?? 0;
                     $product->is_active = $item['is_active'] ?? true;
                     $product->created_by_user_id = 1;
                     $product->save();

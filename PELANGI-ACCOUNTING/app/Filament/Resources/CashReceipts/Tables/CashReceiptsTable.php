@@ -141,7 +141,7 @@ class CashReceiptsTable
                     ViewJournalVoucherAction::make(),
                     EditAction::make(),
                     \Filament\Actions\Action::make('printVoucher')
-                        ->label(__('Cetak Voucher'))
+                        ->label(__('Print Voucher'))
                         ->icon('heroicon-o-printer')
                         ->url(fn (\App\Models\CashReceipt $record) => route('cash-receipt.print-voucher', $record->id))
                         ->openUrlInNewTab(),

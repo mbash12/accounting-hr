@@ -115,7 +115,7 @@ class CashTransferForm
                                     return function (string $attribute, $value, \Closure $fail) use ($get) {
                                         $toAccountId = $get('to_account_id');
                                         if ($value && $toAccountId && $value == $toAccountId) {
-                                            $fail('Rekening asal dan tujuan tidak boleh sama.');
+                                            $fail('Source and destination accounts cannot be the same.');
                                         }
                                     };
                                 },
@@ -172,7 +172,7 @@ class CashTransferForm
                                     return function (string $attribute, $value, \Closure $fail) use ($get) {
                                         $fromAccountId = $get('from_account_id');
                                         if ($value && $fromAccountId && $value == $fromAccountId) {
-                                            $fail('Rekening asal dan tujuan tidak boleh sama.');
+                                            $fail('Source and destination accounts cannot be the same.');
                                         }
                                     };
                                 },
@@ -198,8 +198,8 @@ class CashTransferForm
                             columnSpan: 2,
                         ),
                         Toggle::make("is_posted")
-                            ->label(__("Diposting"))
-                            ->helperText(__("Tandai entri ini sebagai diposting ke buku besar"))
+                            ->label(__("Posted"))
+                            ->helperText(__("Mark this entry as posted to the general ledger"))
                             ->default(false)
                             ->dehydrated(true)
                             ->afterStateHydrated(function (callable $set, $state, $record) {

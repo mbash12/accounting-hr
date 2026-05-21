@@ -208,7 +208,6 @@ class GoodsReceiptForm
                                             foreach ($purchaseOrder->items as $poItem) {
                                                 $items[] = [
                                                     'product_id' => $poItem->product_id,
-                                                    'item_name' => $poItem->item_name ?? $poItem->product?->name,
                                                     'quantity' => $poItem->quantity,
                                                     'quantity_display' => NumberInput::formatRoundedIntegerDisplay($poItem->quantity),
                                                     'description' => $poItem->description,
@@ -301,8 +300,6 @@ class GoodsReceiptForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
                                     }
@@ -380,10 +377,6 @@ class GoodsReceiptForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
                             label: 'Jumlah',

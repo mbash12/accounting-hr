@@ -224,9 +224,6 @@ class SalesInvoiceForm
                                     // Only show sales orders with 'posted' status
                                     $query->where('status', 'posted');
 
-                                    // Exclude sales orders with order_type 'aktual'
-                                    $query->where('order_type', '!=', 'aktual');
-
                                     // Only exclude sales orders that already have locked sales invoices when creating a new record
                                     // Sales order menu creates locked invoices automatically, so this prevents manual creation
                                     // if any invoice was created from sales order menu
@@ -252,15 +249,12 @@ class SalesInvoiceForm
                                     if ($salesOrder) {
                                         $set('customer_id', $salesOrder->customer_id);
                                         $set('job_id', $salesOrder->job_id);
-                                        $set('jb_job_number_display', $salesOrder->jb_job_number);
-                                        $set('client_po_number_display', $salesOrder->client_po_number);
 
                                         // Auto-fill items from sales order
                                         $items = [];
                                         foreach ($salesOrder->items as $item) {
                                             $items[] = [
                                                 'product_id' => $item->product_id,
-                                                'item_name' => $item->item_name ?? $item->product?->name,
                                                 'quantity' => $item->quantity,
                                                 'quantity_display' => NumberInput::formatRoundedIntegerDisplay($item->quantity),
                                                 'unit_price' => $item->unit_price,
@@ -301,33 +295,13 @@ class SalesInvoiceForm
                                         $set('outstanding_amount', $c['outstanding']);
                                     }
                                 } else if (!$state) {
-                                    // Clear items and job_id if no sales order selected
+                                    // Clear items if no sales order selected
                                     $set('items', []);
                                     $set('job_id', null);
-                                    $set('jb_job_number_display', null);
-                                    $set('client_po_number_display', null);
                                     $set('other_charges', 0);
                                     $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay(0));
                                     $set('discount_percentage', 0);
                                     $set('total_amount', 0);
-                                }
-                            }),
-                        TextInput::make('jb_job_number_display')
-                            ->label('Nomor JB Job')
-                            ->readOnly()
-                            ->dehydrated(false)
-                            ->afterStateHydrated(function ($component, $get, $record) {
-                                if ($record && $record->sales_order_id) {
-                                    $component->state($record->salesOrder?->jb_job_number);
-                                }
-                            }),
-                        TextInput::make('client_po_number_display')
-                            ->label('Nomor Po Pelanggan')
-                            ->readOnly()
-                            ->dehydrated(false)
-                            ->afterStateHydrated(function ($component, $get, $record) {
-                                if ($record && $record->sales_order_id) {
-                                    $component->state($record->salesOrder?->client_po_number);
                                 }
                             }),
                         (new static)->getCodeField('invoice_number', 'Invoice No.')
@@ -495,8 +469,6 @@ class SalesInvoiceForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->selling_price) {
                                         $set('unit_price', $product->selling_price);
                                         $set('unit_price_display', NumberInput::formatRoundedIntegerDisplay($product->selling_price));
@@ -601,10 +573,6 @@ class SalesInvoiceForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
                             label: 'Jumlah',

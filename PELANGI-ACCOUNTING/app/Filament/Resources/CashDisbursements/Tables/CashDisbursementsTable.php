@@ -105,7 +105,7 @@ class CashDisbursementsTable
                     ViewJournalVoucherAction::make(),
                     EditAction::make(),
                     \Filament\Actions\Action::make('printVoucher')
-                        ->label(__('Cetak Voucher'))
+                        ->label(__('Print Voucher'))
                         ->icon('heroicon-o-printer')
                         ->url(fn (\App\Models\CashDisbursement $record) => route('cash-disbursement.print-voucher', $record->id))
                         ->openUrlInNewTab(),

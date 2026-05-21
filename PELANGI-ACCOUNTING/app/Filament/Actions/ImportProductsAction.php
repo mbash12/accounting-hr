@@ -18,7 +18,7 @@ class ImportProductsAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('File Data Produk')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data produk termasuk kolom: name, code, description, cost_price, selling_price, product_type, min_order_qty, unit_code, product_group_code, tax_code, supplier_code, dll. Pastikan kode grup produk, pajak, dan supplier yang digunakan sudah ada di sistem (diimpor terlebih dahulu melalui menu Grup Produk, Pajak, dan Kontak).')
+                    ->helperText('Upload an Excel file (.xlsx) with product data including columns: name, code, description, cost_price, selling_price, product_type, unit_code, product_group_code, tax_code, etc. Make sure the product group and tax codes already exist in the system.')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()

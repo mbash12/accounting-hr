@@ -25,25 +25,25 @@ class PayablePaymentsTable
         return $table
             ->columns([
                 TextColumn::make("payment_number")
-                    ->label(__("Nomor Pembayaran"))
+                    ->label(__("Payment No."))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("payment_date")
-                    ->label(__("Tanggal Pembayaran"))
+                    ->label(__("Payment Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("supplier.name")
-                    ->label(__("Pemasok"))
+                    ->label(__("Supplier"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("total_payment")
-                    ->label(__("Jumlah Total Pembayaran"))
+                    ->label(__("Total Payment"))
                     ->numeric()
                     ->money("IDR")
                     ->sortable(),
                 TextColumn::make("payment_method")
-                    ->label(__("Metode Pembayaran"))
+                    ->label(__("Payment Method"))
                     ->badge()
                     ->searchable()
                     ->sortable()
@@ -54,22 +54,22 @@ class PayablePaymentsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("reference_no")
-                    ->label(__("Nomor Referensi"))
+                    ->label(__("Reference No."))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -77,8 +77,8 @@ class PayablePaymentsTable
             ->filters([
                 Filter::make('payment_date_range')
                     ->form([
-                        DatePicker::make('from')->label(__('Dari')),
-                        DatePicker::make('until')->label(__('Sampai')),
+                        DatePicker::make('from')->label(__('From')),
+                        DatePicker::make('until')->label(__('Until')),
                     ])
                     ->query(function ($query, array $data) {
                         return $query
@@ -90,10 +90,10 @@ class PayablePaymentsTable
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
-                                'pending' => __('Menunggu'),
-                                'completed' => __('Selesai'),
-                                'failed' => __('Gagal'),
-                                'cancelled' => __('Dibatalkan'),
+                                'pending' => __('Pending'),
+                                'completed' => __('Completed'),
+                                'failed' => __('Failed'),
+                                'cancelled' => __('Cancelled'),
                             ])
                             ->multiple(),
                     ])
@@ -105,15 +105,15 @@ class PayablePaymentsTable
                 Filter::make('payment_method')
                     ->form([
                         Select::make('payment_method')
-                            ->label(__('Metode Pembayaran'))
+                            ->label(__('Payment Method'))
                             ->options([
-                                'cash' => __('Tunai'),
-                                'bank_transfer' => __('Transfer Bank'),
-                                'check' => __('Cek'),
-                                'credit_card' => __('Kartu Kredit'),
-                                'debit_card' => __('Kartu Debit'),
-                                'online_payment' => __('Pembayaran Online'),
-                                'other' => __('Lainnya'),
+                                'cash' => __('Cash'),
+                                'bank_transfer' => __('Bank Transfer'),
+                                'check' => __('Check'),
+                                'credit_card' => __('Credit Card'),
+                                'debit_card' => __('Debit Card'),
+                                'online_payment' => __('Online Payment'),
+                                'other' => __('Other'),
                             ])
                             ->multiple(),
                     ])

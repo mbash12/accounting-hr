@@ -54,7 +54,6 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
                 $ordersData[$orderNumber] = [
                     'order_data' => [
                         'order_number' => $orderNumber,
-                        'order_type' => $this->mapOrderType(isset($row['tipe_pesanan']) ? (string) $row['tipe_pesanan'] : 'standar'),
                         'date' => isset($row['tanggal']) ? $this->parseDate($row['tanggal']) : now()->format('Y-m-d'),
                         'reference_no' => isset($row['referensi']) ? (string) $row['referensi'] : null,
                         'description' => isset($row['deskripsi']) ? (string) $row['deskripsi'] : null,
@@ -195,7 +194,6 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
         return [
             'nomor_pesanan' => isset($data['nomor_pesanan']) ? (string) $data['nomor_pesanan'] : null,
             'tanggal' => isset($data['tanggal']) ? (string) $data['tanggal'] : null,
-            'tipe_pesanan' => isset($data['tipe_pesanan']) ? (string) $data['tipe_pesanan'] : null,
             'referensi' => isset($data['referensi']) ? (string) $data['referensi'] : null,
             'deskripsi' => isset($data['deskripsi']) ? (string) $data['deskripsi'] : null,
             'diskon_persen' => isset($data['diskon_persen']) ? (string) $data['diskon_persen'] : null,
@@ -229,7 +227,6 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
         return [
             'nomor_pesanan' => 'required|string|max:50',
             'tanggal' => 'required',
-            'tipe_pesanan' => 'nullable|string|in:standar,deposit,aktual|max:50',
             'referensi' => 'nullable|string|max:100',
             'deskripsi' => 'nullable|string|max:1000',
             'diskon_persen' => 'nullable|numeric|min:0|max:100',
@@ -253,35 +250,6 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
             'kode_satuan' => 'nullable|string|max:20',
             'kode_pajak' => 'nullable|string|max:50',
         ];
-    }
-
-    /**
-     * Map order type from form values to database values
-     */
-    private function mapOrderType($orderType)
-    {
-        $mapping = [
-            'standar' => 'standar', // Current DB value
-            'standard' => 'standar', // Map standard to standar for compatibility
-            'deposit' => 'deposit', // Current DB value
-            'aktual' => 'aktual', // Current DB value
-            'cash' => 'cash', // In case we need to map old values
-            'credit' => 'credit',
-            'consignment' => 'consignment',
-            'service' => 'service',
-        ];
-
-        // If the mapped value exists, return it; otherwise, default to 'standar'
-        $mapped = $mapping[strtolower($orderType)] ?? null;
-
-        // Check if the mapped value is valid according to current DB constraints
-        $validValues = ['standar', 'deposit', 'aktual'];
-        if ($mapped && in_array($mapped, $validValues)) {
-            return $mapped;
-        }
-
-        // If not valid or not mapped, default to 'standar' (the most common value)
-        return 'standar';
     }
 
     /**
@@ -318,7 +286,6 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
             'nomor_pesanan.required' => 'Nomor Pesanan wajib diisi.',
             'nomor_pesanan.max' => 'Nomor Pesanan tidak boleh lebih dari 50 karakter.',
             'tanggal.required' => 'Tanggal wajib diisi.',
-            'tipe_pesanan.max' => 'Tipe Pesanan tidak boleh lebih dari 50 karakter.',
             'referensi.max' => 'Referensi tidak boleh lebih dari 100 karakter.',
             'deskripsi.max' => 'Deskripsi tidak boleh lebih dari 1000 karakter.',
             'diskon_persen.min' => 'Diskon Persen tidak boleh kurang dari 0.',

@@ -8,7 +8,6 @@ use App\Models\Contact;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\Tax;
-use App\Models\Department;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Concerns\ToCollection;
@@ -52,29 +51,9 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
                     throw new \Exception("Either Kode Pemasok or Nama Pemasok is required for order {$orderNumber}");
                 }
 
-                $departmentId = null;
-                if (!empty($row['kode_departemen'])) {
-                    $department = Department::where('code', (string) $row['kode_departemen'])
-                        ->where('company_id', $companyId)
-                        ->first();
-                    if (!$department) {
-                        throw new \Exception("Department with code '{$row['kode_departemen']}' not found in current company for order {$orderNumber}");
-                    }
-                    $departmentId = $department->id;
-                } elseif (!empty($row['nama_departemen'])) {
-                    $department = Department::where('name', (string) $row['nama_departemen'])
-                        ->where('company_id', $companyId)
-                        ->first();
-                    if (!$department) {
-                        throw new \Exception("Department with name '{$row['nama_departemen']}' not found in current company for order {$orderNumber}");
-                    }
-                    $departmentId = $department->id;
-                }
-
                 $ordersData[$orderNumber] = [
                     'order_data' => [
                         'purchase_order_no' => $orderNumber,
-                        'order_type' => 'standar',
                         'date' => isset($row['tanggal']) ? $this->parseDate($row['tanggal']) : now()->format('Y-m-d'),
                         'reference_no' => isset($row['nomor_referensi']) ? (string) $row['nomor_referensi'] : null,
                         'description' => isset($row['deskripsi']) ? (string) $row['deskripsi'] : null,
@@ -87,7 +66,6 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
                         'total_amount' => isset($row['total']) ? (float) $row['total'] : 0,
                         'status' => isset($row['status']) ? (string) $row['status'] : 'draft',
                         'supplier_id' => $supplierId,
-                        'department_id' => $departmentId,
                         'company_id' => $companyId,
                         'created_by_user_id' => Auth::id(),
                     ],
@@ -228,8 +206,6 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
             'status' => isset($data['status']) ? (string) $data['status'] : null,
             'kode_pemasok' => isset($data['kode_pemasok']) ? (string) $data['kode_pemasok'] : null,
             'nama_pemasok' => isset($data['nama_pemasok']) ? (string) $data['nama_pemasok'] : null,
-            'kode_departemen' => isset($data['kode_departemen']) ? (string) $data['kode_departemen'] : null,
-            'nama_departemen' => isset($data['nama_departemen']) ? (string) $data['nama_departemen'] : null,
             'kode_produk' => isset($data['kode_produk']) ? (string) $data['kode_produk'] : null,
             'nama_produk' => isset($data['nama_produk']) ? (string) $data['nama_produk'] : null,
             'deskripsi_item' => isset($data['deskripsi_item']) ? (string) $data['deskripsi_item'] : null,
@@ -263,8 +239,6 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
             'status' => 'nullable|in:draft,posted',
             'kode_pemasok' => 'nullable|string|max:50',
             'nama_pemasok' => 'nullable|string|max:255',
-            'kode_departemen' => 'nullable|string|max:50',
-            'nama_departemen' => 'nullable|string|max:255',
             'kode_produk' => 'required_without:nama_produk|string|max:50',
             'nama_produk' => 'required_without:kode_produk|string|max:255',
             'deskripsi_item' => 'nullable|string|max:1000',
@@ -330,8 +304,6 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
             'total.numeric' => 'Total harus berupa angka.',
             'kode_pemasok.max' => 'Kode Pemasok tidak boleh lebih dari 50 karakter.',
             'nama_pemasok.max' => 'Nama Pemasok tidak boleh lebih dari 255 karakter.',
-            'kode_departemen.max' => 'Kode Departemen tidak boleh lebih dari 50 karakter.',
-            'nama_departemen.max' => 'Nama Departemen tidak boleh lebih dari 255 karakter.',
             'kode_produk.max' => 'Kode Produk tidak boleh lebih dari 50 karakter.',
             'nama_produk.max' => 'Nama Produk tidak boleh lebih dari 255 karakter.',
             'jumlah.required' => 'Jumlah wajib diisi.',

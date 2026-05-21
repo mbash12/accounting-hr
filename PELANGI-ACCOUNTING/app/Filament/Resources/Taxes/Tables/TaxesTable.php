@@ -19,10 +19,10 @@ class TaxesTable
     {
         return $table
             ->columns([
-                TextColumn::make("name")->label(__("Nama Pajak"))->searchable(),
-                TextColumn::make("code")->label(__("Kode Pajak"))->searchable(),
+                TextColumn::make("name")->label(__("Tax Name"))->searchable(),
+                TextColumn::make("code")->label(__("Tax Code"))->searchable(),
                 TextColumn::make("tax_percentage")
-                    ->label(__("Persentase Pajak"))
+                    ->label(__("Tax Percentage"))
                     ->numeric()
                     ->sortable()
                     ->suffix("%"),
@@ -30,40 +30,40 @@ class TaxesTable
                 //     ->label(__("Jenis Pajak"))
                 //     ->searchable(),
 
-                IconColumn::make("is_active")->boolean()->label(__("Aktif")),
+                IconColumn::make("is_active")->boolean()->label(__("Active")),
                 TextColumn::make("effective_date")
-                    ->label(__("Tanggal Berlaku"))
+                    ->label(__("Effective Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("expiry_date")
-                    ->label(__("Tanggal Kadaluarsa"))
+                    ->label(__("Expiry Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make("is_purchase_tax")
                     ->boolean()
-                    ->label(__("Pajak Pembelian"))
+                    ->label(__("Purchase Tax"))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make("is_sales_tax")
                     ->boolean()
-                    ->label(__("Pajak Penjualan"))
+                    ->label(__("Sales Tax"))
                     ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make("compound_tax")
                     ->boolean()
-                    ->label(__("Pajak Majemuk"))
+                    ->label(__("Compound Tax"))
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("createdByUser.name")
-                    ->label(__("Dibuat Oleh"))
+                    ->label(__("Created By"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

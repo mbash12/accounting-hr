@@ -41,7 +41,6 @@ class PurchaseOrderItem extends Model
         'invoiced_quantity',
         'purchase_order_id',
         'product_id',
-        'item_name',
         'unit_id',
         'tax_id',
     ];

@@ -351,7 +351,7 @@ class ManageOpeningBalances extends Page implements HasForms
 
     public static function getNavigationLabel(): string
     {
-        return __('Saldo Awal');
+        return __('Opening Balance');
     }
 
     public static function getNavigationIcon(): ?string
@@ -361,7 +361,7 @@ class ManageOpeningBalances extends Page implements HasForms
 
     public function getTitle(): string
     {
-        return __('Saldo Awal');
+        return __('Opening Balance');
     }
 
     public function getSubheading(): ?string

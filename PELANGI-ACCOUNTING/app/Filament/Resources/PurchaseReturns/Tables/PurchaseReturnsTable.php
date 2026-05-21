@@ -24,16 +24,16 @@ class PurchaseReturnsTable
         return $table
             ->columns([
                 TextColumn::make("return_number")
-                    ->label("Nomor Retur")
+                    ->label("Return No.")
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("date")
-                    ->label("Tanggal")
+                    ->label("Date")
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("supplier.name")
-                    ->label("Pemasok")
+                    ->label("Supplier")
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("status")
@@ -56,32 +56,32 @@ class PurchaseReturnsTable
                         },
                     ),
                 TextColumn::make("goodsReceipt.receipt_number")
-                    ->label("Nomor Penerimaan")
+                    ->label("Receipt No.")
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("goodsReceipt.purchaseOrder.purchase_order_no")
-                    ->label(__("No. Pesanan Pembelian"))
+                    ->label(__("Purchase Order No."))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("job.title")
-                    ->label("Proyek")
+                    ->label("Project")
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label("Dibuat Pada")
+                    ->label("Created At")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label("Diperbarui Pada")
+                    ->label("Updated At")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label("Dihapus Pada")
+                    ->label("Deleted At")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -99,9 +99,9 @@ class PurchaseReturnsTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -117,17 +117,17 @@ class PurchaseReturnsTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('supplier')
                     ->form([
                         \Filament\Forms\Components\Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_supplier', true);
@@ -169,12 +169,12 @@ class PurchaseReturnsTable
                             return null;
                         }
                         $supplier = \App\Models\Contact::find($data['supplier_id']);
-                        return 'Pemasok: ' . ($supplier?->name ?? $data['supplier_id']);
+                        return 'Supplier: ' . ($supplier?->name ?? $data['supplier_id']);
                     }),
                 Filter::make('goods_receipt')
                     ->form([
                         \Filament\Forms\Components\Select::make('goods_receipt_id')
-                            ->label('Nomor Penerimaan')
+                            ->label('Receipt No.')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\GoodsReceipt::query();
@@ -238,7 +238,7 @@ class PurchaseReturnsTable
                 ExportPurchaseReturnWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([

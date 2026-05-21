@@ -14,16 +14,16 @@ class FixedAssetCategoryForm
     {
         return $schema
             ->components([
-                Section::make(__('Informasi Kategori'))
+                Section::make(__('Category Information'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
                             ->maxLength(200)
-                            ->label(__('Nama Kategori'))
+                            ->label(__('Category Name'))
                             ->columnSpanFull(),
                         app(\App\Models\FixedAssetCategory::class)->getCodeField()
-                            ->label(__('Kode Kategori'))
-                            ->helperText(__('Kode unik untuk kategori aset tetap'))
+                            ->label(__('Category Code'))
+                            ->helperText(__('Unique code for the fixed asset category'))
                             ->columnSpanFull()
                             ->unique(
                                 \App\Models\FixedAssetCategory::class,
@@ -40,20 +40,20 @@ class FixedAssetCategoryForm
                             ),
                         Select::make('depreciation_method')
                             ->options([
-                                'straight_line' => __('Garis Lurus'),
-                                'declining_balance' => __('Saldo Menurun'),
-                                'double_declining' => __('Saldo Menurun Ganda'),
-                                'sum_of_years' => __('Jumlah Angka Tahun'),
-                                'units_of_production' => __('Satuan Hasil Produksi'),
+                                'straight_line' => __('Straight Line'),
+                                'declining_balance' => __('Declining Balance'),
+                                'double_declining' => __('Double Declining'),
+                                'sum_of_years' => __('Sum of Years'),
+                                'units_of_production' => __('Units of Production'),
                             ])
                             ->required()
-                            ->label(__('Metode Penyusutan')),
+                            ->label(__('Depreciation Method')),
                         TextInput::make('useful_life')
                             ->required()
                             ->numeric()
                             ->minValue(1)
-                            ->label(__('Masa Manfaat'))
-                            ->suffix(__('tahun')),
+                            ->label(__('Useful Life'))
+                            ->suffix(__('years')),
                         Select::make('company_id')
                             ->relationship(
                                 name: 'company',
@@ -147,10 +147,10 @@ class FixedAssetCategoryForm
                                 ]);
                             })
                             ->live()
-                            ->label(__('Akun Aset'))
+                            ->label(__('Asset Account'))
                             ->required()
                             ->columnSpanFull()
-                            ->helperText(__('Akun untuk mencatat nilai aset')),
+                            ->helperText(__('Account to record asset value')),
                         Select::make('accumulated_depreciation_account_id')
                             ->options(function (callable $get) {
                                 $liveCompany = $get('company_id');
@@ -187,10 +187,10 @@ class FixedAssetCategoryForm
                                 ]);
                             })
                             ->live()
-                            ->label(__('Akun Akumulasi Penyusutan'))
+                            ->label(__('Accumulated Depreciation Account'))
                             ->required()
                             ->columnSpanFull()
-                            ->helperText(__('Akun untuk melacak akumulasi penyusutan')),
+                            ->helperText(__('Account to track accumulated depreciation')),
                         Select::make('depreciation_account_id')
                             ->options(function (callable $get) {
                                 $liveCompany = $get('company_id');
@@ -227,10 +227,10 @@ class FixedAssetCategoryForm
                                 ]);
                             })
                             ->live()
-                            ->label(__('Akun Beban Penyusutan'))
+                            ->label(__('Depreciation Expense Account'))
                             ->required()
                             ->columnSpanFull()
-                            ->helperText(__('Akun untuk beban penyusutan')),
+                            ->helperText(__('Account for depreciation expense')),
                         Select::make('sales_account_id')
                             ->options(function (callable $get) {
                                 $liveCompany = $get('company_id');
@@ -267,10 +267,10 @@ class FixedAssetCategoryForm
                                 ]);
                             })
                             ->live()
-                            ->label(__('Akun Penjualan'))
+                            ->label(__('Sales Account'))
                             ->required()
                             ->columnSpanFull()
-                            ->helperText(__('Akun untuk keuntungan/kerugian pelepasan aset')),
+                            ->helperText(__('Account for gain/loss on asset disposal')),
                     ]),
             ]);
     }

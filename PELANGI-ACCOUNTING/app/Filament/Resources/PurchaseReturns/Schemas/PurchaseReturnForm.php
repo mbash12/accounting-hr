@@ -212,7 +212,6 @@ class PurchaseReturnForm
                                         foreach ($goodsReceipt->items as $receiptItem) {
                                             $items[] = [
                                                 'product_id' => $receiptItem->product_id,
-                                                'item_name' => $receiptItem->item_name ?? $receiptItem->product?->name,
                                                 'quantity' => $receiptItem->quantity,
                                                 'quantity_display' => number_format($receiptItem->quantity, 0),
                                                 'unit_id' => $receiptItem->unit_id,
@@ -307,8 +306,6 @@ class PurchaseReturnForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
                                     }
@@ -383,10 +380,6 @@ class PurchaseReturnForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
                             label: 'Jumlah',

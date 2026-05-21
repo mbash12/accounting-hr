@@ -140,7 +140,7 @@ class AdvanceDisbursementForm
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->helperText(__('Pilih akun kas/bank dari Chart of Accounts.')),
+                            ->helperText(__('Select a cash/bank account from the Chart of Accounts.')),
                         Textarea::make('description')
                             ->rows(1)
                             ->maxLength(65535)

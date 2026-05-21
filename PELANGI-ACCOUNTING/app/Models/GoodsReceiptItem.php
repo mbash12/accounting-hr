@@ -76,7 +76,6 @@ class GoodsReceiptItem extends Model
         'goods_receipt_id',
         'purchase_order_item_id',
         'product_id',
-        'item_name',
         'unit_id',
         'warehouse_id',
     ];

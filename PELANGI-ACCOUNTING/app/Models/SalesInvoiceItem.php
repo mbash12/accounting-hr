@@ -84,7 +84,6 @@ class SalesInvoiceItem extends Model
         'sales_invoice_id',
         'sales_order_item_id',
         'product_id',
-        'item_name',
         'unit_id',
         'tax_id',
         'cost_center_id',

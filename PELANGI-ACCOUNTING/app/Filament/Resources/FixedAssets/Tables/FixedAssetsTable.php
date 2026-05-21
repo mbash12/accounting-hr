@@ -26,9 +26,9 @@ class FixedAssetsTable
                 TextColumn::make("code")
                     ->searchable()
                     ->copyable()
-                    ->label(__("Kode Aset")),
+                    ->label(__("Asset Code")),
                 TextColumn::make("category.name")
-                    ->label(__("Kelompok"))
+                    ->label(__("Category"))
                     ->searchable(),
                 TextColumn::make("book_value")
                     ->money("IDR")

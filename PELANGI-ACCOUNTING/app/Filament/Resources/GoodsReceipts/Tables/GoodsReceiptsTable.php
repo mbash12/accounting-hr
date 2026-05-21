@@ -33,14 +33,14 @@ class GoodsReceiptsTable
                     ->searchable()
                     ->copyable()
                     ->weight("bold")
-                    ->label(__("No. Penerimaan")),
+                    ->label(__("Receipt No.")),
                 TextColumn::make("date")
                     ->date()
                     ->sortable()
-                    ->label(__("Tanggal")),
+                    ->label(__("Date")),
                 TextColumn::make("supplier.name")
                     ->searchable()
-                    ->label(__("Pemasok")),
+                    ->label(__("Supplier")),
                 TextColumn::make("status")
                     ->label(__("Status"))
                     ->searchable()
@@ -61,41 +61,41 @@ class GoodsReceiptsTable
                         },
                     ),
                 TextColumn::make("purchaseOrder.purchase_order_no")
-                    ->label(__("No. Pesanan Pembelian"))
+                    ->label(__("Purchase Order No."))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make("reference_no")
-                    ->label(__("Referensi"))
+                    ->label(__("Reference"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("items_count")
-                    ->label(__("Jumlah Item"))
+                    ->label(__("Item Count"))
                     ->getStateUsing(function ($record) {
                         return $record->items->count();
                     })
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("department.name")
-                    ->label(__("Departemen"))
+                    ->label(__("Department"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("createdByUser.name")
-                    ->label(__("Dibuat Oleh"))
+                    ->label(__("Created By"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -113,9 +113,9 @@ class GoodsReceiptsTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -131,17 +131,17 @@ class GoodsReceiptsTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('supplier')
                     ->form([
                         \Filament\Forms\Components\Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_supplier', true);
@@ -183,12 +183,12 @@ class GoodsReceiptsTable
                             return null;
                         }
                         $supplier = \App\Models\Contact::find($data['supplier_id']);
-                        return 'Pemasok: ' . ($supplier?->name ?? $data['supplier_id']);
+                        return 'Supplier: ' . ($supplier?->name ?? $data['supplier_id']);
                     }),
                 Filter::make('purchase_order')
                     ->form([
                         \Filament\Forms\Components\Select::make('purchase_order_id')
-                            ->label('No. Pesanan Pembelian')
+                            ->label('Purchase Order No.')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\PurchaseOrder::query();
@@ -238,7 +238,7 @@ class GoodsReceiptsTable
             ->recordActions([
                 ActionGroup::make([
                     Action::make('createReturn')
-                        ->label('Buat Retur')
+                        ->label('Create Return')
                         ->icon('heroicon-o-arrow-uturn-left')
                         ->color('warning')
                         ->visible(function (GoodsReceipt $record): bool {
@@ -247,9 +247,9 @@ class GoodsReceiptsTable
                             return (float) ($meta['remaining'] ?? 0) > 0;
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Buat Retur Pembelian')
-                        ->modalDescription('Apakah Anda yakin ingin membuat retur pembelian? Dokumen akan dibuat dengan status terkunci.')
-                        ->modalSubmitActionLabel('Ya, Buat')
+                        ->modalHeading('Create Purchase Return')
+                        ->modalDescription('Are you sure you want to create a purchase return? The document will be created in locked status.')
+                        ->modalSubmitActionLabel('Yes, Create')
                         ->action(function (GoodsReceipt $record) {
                             $receipt = GoodsReceipt::query()
                                 ->with(['items.product'])
@@ -317,7 +317,7 @@ class GoodsReceiptsTable
                 ExportGoodsReceiptWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([
