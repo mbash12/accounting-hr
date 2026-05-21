@@ -15,7 +15,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ManageOpeningBalances;
 use App\Filament\Pages\ManageAccountMappings;
-use App\Filament\Pages\SyncMonitoring;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -226,7 +225,6 @@ class MainPanelProvider extends PanelProvider
                 Dashboard::class,
                 ManageOpeningBalances::class,
                 ManageAccountMappings::class,
-                SyncMonitoring::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([

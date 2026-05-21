@@ -10,7 +10,6 @@ use App\Http\Controllers\Api\EmployeeApiOvertimeController;
 use App\Http\Controllers\Api\EmployeeApiUploadController;
 use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Controllers\Api\SalesOrderController;
-use App\Http\Controllers\Api\InvoiceSyncController;
 use App\Http\Middleware\EmployeeApiAuth;
 
 use App\Http\Controllers\Api\FaqController;
@@ -38,15 +37,6 @@ Route::prefix('sales-orders')->middleware([Api::class])->group(function () {
     Route::post('/sync', [SalesOrderController::class, 'sync']);
 });
 
-// Invoice Sync Monitoring Routes (external API with token)
-Route::prefix('invoice-sync')->middleware([Api::class])->group(function () {
-    Route::get('/', [InvoiceSyncController::class, 'index']);
-    Route::get('/stats', [InvoiceSyncController::class, 'stats']);
-    Route::post('/bulk-retry', [InvoiceSyncController::class, 'bulkRetry']);
-    Route::get('/{syncJobId}/status', [InvoiceSyncController::class, 'status']);
-    Route::post('/{syncJobId}/retry', [InvoiceSyncController::class, 'retrySync']);
-    Route::post('/{syncJobId}/queue-retry', [InvoiceSyncController::class, 'queueRetry']);
-});
 
 Route::prefix('employeeapi/auth')->group(function () {
     Route::post('/login', [EmployeeApiAuthController::class, 'login']);
