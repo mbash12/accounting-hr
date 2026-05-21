@@ -71,12 +71,9 @@ class SalesOrder extends Model
      */
     protected $fillable = [
         'order_number',
-        'order_type',
         'date',
         'is_closed',
         'reference_no',
-        'client_po_number',
-        'jb_job_number',
         'description',
         'discount_percentage',
         'other_charges',
@@ -87,11 +84,7 @@ class SalesOrder extends Model
         'status',
         'delivery_meta',
         'invoice_meta',
-        'job_id',
-        'job_number',
-        'related_order_id',
         'customer_id',
-        'advance_payment_id',
         'other_charges_account_id',
         'discount_account_id',
         'company_id',
@@ -109,7 +102,6 @@ class SalesOrder extends Model
         return [
             'id' => 'integer',
             'date' => 'date',
-            'order_type' => 'string',
             'is_closed' => 'boolean',
             'discount_percentage' => 'decimal:2',
             'other_charges' => 'decimal:2',
@@ -120,12 +112,7 @@ class SalesOrder extends Model
             'status' => 'string',
             'delivery_meta' => 'array',
             'invoice_meta' => 'array',
-            'job_id' => 'integer',
-            'job_number' => 'string',
-            'jb_job_number' => 'string',
-            'related_order_id' => 'integer',
             'customer_id' => 'integer',
-            'advance_payment_id' => 'integer',
             'other_charges_account_id' => 'integer',
             'discount_account_id' => 'integer',
             'company_id' => 'integer',
@@ -299,24 +286,9 @@ class SalesOrder extends Model
         $this->total_amount = $subtotal - $discount + $otherCharges + $taxAmount;
     }
 
-    public function job(): BelongsTo
-    {
-        return $this->belongsTo(Project::class);
-    }
-
-    public function relatedOrder(): BelongsTo
-    {
-        return $this->belongsTo(SalesOrder::class, 'related_order_id');
-    }
-
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
-    }
-
-    public function advancePayment(): BelongsTo
-    {
-        return $this->belongsTo(AdvancePayment::class);
     }
 
     public function otherChargesAccount(): BelongsTo
@@ -344,109 +316,4 @@ class SalesOrder extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function purchaseOrders(): HasMany
-    {
-        return $this->hasMany(PurchaseOrder::class);
-    }
-
-    /**
-     * Get all orders linked via related_order_id (reverse relationship)
-     */
-    public function referencingOrders(): HasMany
-    {
-        return $this->hasMany(SalesOrder::class, 'related_order_id');
-    }
-
-    /**
-     * Get all orders sharing the same job_number
-     */
-    public function ordersByJobNumber(): HasMany
-    {
-        return $this->hasMany(SalesOrder::class, 'job_number', 'job_number')
-            ->where('id', '!=', $this->id);
-    }
-
-    /**
-     * Get all related orders (by job_number or related_order_id)
-     * This includes deposit, aktual, and other orders in the same group
-     */
-    public function allRelatedOrders(): \Illuminate\Database\Eloquent\Collection
-    {
-        $query = SalesOrder::where('id', '!=', $this->id);
-
-        if ($this->job_number) {
-            // Get all orders with same job_number
-            $query->where(function ($q) {
-                $q->where('job_number', $this->job_number)
-                  ->orWhere('related_order_id', $this->id)
-                  ->orWhere(function ($q2) {
-                      if ($this->related_order_id) {
-                          $q2->where('id', $this->related_order_id)
-                              ->orWhere('related_order_id', $this->related_order_id);
-                      }
-                  });
-            });
-        } else {
-            // Fall back to related_order_id only
-            $query->where(function ($q) {
-                $q->where('related_order_id', $this->id)
-                  ->orWhere(function ($q2) {
-                      if ($this->related_order_id) {
-                          $q2->where('id', $this->related_order_id)
-                              ->orWhere('related_order_id', $this->related_order_id);
-                      }
-                  });
-            });
-        }
-
-        return $query->get();
-    }
-
-    /**
-     * Get all deposit orders related to this order
-     */
-    public function relatedDepositOrders(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->allRelatedOrders()->where('order_type', 'deposit')->values();
-    }
-
-    /**
-     * Get all aktual orders related to this order
-     */
-    public function relatedAktualOrders(): \Illuminate\Database\Eloquent\Collection
-    {
-        return $this->allRelatedOrders()->where('order_type', 'aktual')->values();
-    }
-
-    /**
-     * Check if this order has related orders (deposit, aktual, etc.)
-     */
-    public function hasRelatedOrders(): bool
-    {
-        return $this->allRelatedOrders()->count() > 0;
-    }
-
-    /**
-     * Get the order group summary (for multi deposit/aktual)
-     */
-    public function getOrderGroupSummary(): array
-    {
-        $relatedOrders = $this->allRelatedOrders();
-        $allOrders = $relatedOrders->push($this);
-
-        $depositOrders = $allOrders->where('order_type', 'deposit');
-        $aktualOrders = $allOrders->where('order_type', 'aktual');
-        $standarOrders = $allOrders->where('order_type', 'standar');
-
-        return [
-            'total_orders' => $allOrders->count(),
-            'deposit_count' => $depositOrders->count(),
-            'deposit_total' => $depositOrders->sum('total_amount'),
-            'aktual_count' => $aktualOrders->count(),
-            'aktual_total' => $aktualOrders->sum('total_amount'),
-            'standar_count' => $standarOrders->count(),
-            'standar_total' => $standarOrders->sum('total_amount'),
-            'grand_total' => $allOrders->sum('total_amount'),
-        ];
-    }
 }

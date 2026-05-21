@@ -50,7 +50,6 @@ class EditSalesOrder extends EditRecord
         $discountAmount = $subtotal * ($discountPercentage / 100);
         $total = $subtotal - $discountAmount + $otherCharges + $taxTotal;
 
-        // Set calculated totals
         $data['subtotal'] = $subtotal;
         $data['discount'] = $discountAmount;
         $data['tax_amount'] = $taxTotal;
@@ -62,12 +61,6 @@ class EditSalesOrder extends EditRecord
 
     protected function getFormActions(): array
     {
-        if (SalesOrderResource::isLocked()) {
-            return [
-                $this->getCancelFormAction(),
-            ];
-        }
-        
         return [
             $this->getSaveFormAction(),
             $this->getCancelFormAction(),
@@ -76,21 +69,11 @@ class EditSalesOrder extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        if (SalesOrderResource::isLocked()) {
-            return [];
-        }
-
         return [
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
-    }
-
-    public function form(Schema $schema): Schema
-    {
-        return parent::form($schema)
-            ->disabled(SalesOrderResource::isLocked());
     }
 
     protected function afterSave(): void

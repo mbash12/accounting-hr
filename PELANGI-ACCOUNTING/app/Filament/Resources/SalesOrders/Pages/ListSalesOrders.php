@@ -12,10 +12,6 @@ class ListSalesOrders extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        if (SalesOrderResource::isLocked()) {
-            return [];
-        }
-
         return [
             CreateAction::make(),
         ];
