@@ -195,8 +195,8 @@ class JournalEntryForm
                         },
                     ])
                     ->table([
-                        TableColumn::make('Akun')->width('25%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Account')->width('25%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('35%')->alignment(Alignment::Start),
                         TableColumn::make('Debit')->width('20%')->alignment(Alignment::End),
                         TableColumn::make('Kredit')->width('20%')->alignment(Alignment::End),
                     ])

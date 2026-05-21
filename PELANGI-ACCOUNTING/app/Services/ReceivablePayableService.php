@@ -32,7 +32,7 @@ class ReceivablePayableService
 
             $receivableAccount = $this->findReceivableAccount($payment->company_id);
             if (!$receivableAccount) {
-                throw new InvalidArgumentException('Accounts Receivable account not found. Please create an account with code starting with 11% or name containing "Piutang Usaha"');
+                throw new InvalidArgumentException('Accounts Receivable account not found. Please create an account with code starting with 11% or name containing "Accounts Receivable"');
             }
 
             $totalPayment = (float) $payment->total_payment;
@@ -221,7 +221,7 @@ class ReceivablePayableService
 
             $payableAccount = $this->findPayableAccount($payment->company_id);
             if (!$payableAccount) {
-                throw new InvalidArgumentException('Accounts Payable account not found. Please create an account with code starting with 21% or name containing "Utang Usaha"');
+                throw new InvalidArgumentException('Accounts Payable account not found. Please create an account with code starting with 21% or name containing "Accounts Payable"');
             }
 
             $totalPayment = (float) $payment->total_payment;
@@ -402,7 +402,7 @@ class ReceivablePayableService
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '11%')
-                    ->orWhere('name', 'like', '%Piutang Usaha%');
+                    ->orWhere('name', 'like', '%Accounts Receivable%');
             });
 
         if ($selectedCompanyId && $selectedCompanyId !== 'all') {
@@ -426,7 +426,7 @@ class ReceivablePayableService
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '21%')
-                    ->orWhere('name', 'like', '%Utang Usaha%');
+                    ->orWhere('name', 'like', '%Accounts Payable%');
             });
 
         if ($selectedCompanyId && $selectedCompanyId !== 'all') {
@@ -694,7 +694,6 @@ class ReceivablePayableService
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '4%')
-                    ->orWhere('name', 'like', '%Pendapatan%')
                     ->orWhere('name', 'like', '%Revenue%');
             });
 
@@ -717,7 +716,6 @@ class ReceivablePayableService
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '5%')
-                    ->orWhere('name', 'like', '%Beban%')
                     ->orWhere('name', 'like', '%Expense%');
             });
 

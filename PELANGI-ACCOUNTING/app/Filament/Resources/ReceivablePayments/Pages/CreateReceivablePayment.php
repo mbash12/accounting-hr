@@ -72,7 +72,6 @@ class CreateReceivablePayment extends CreateRecord
                     ->where('is_active', true)
                     ->where(function ($q) {
                         $q->where('code', 'like', '2102%')
-                            ->orWhere('name', 'like', '%Uang Muka Penjualan%')
                             ->orWhere('name', 'like', '%Advance Sales%');
                     })
                     ->where(function ($q) use ($data) {

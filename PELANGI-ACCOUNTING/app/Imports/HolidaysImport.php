@@ -64,9 +64,9 @@ class HolidaysImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Nama hari libur wajib diisi.',
-            'date.required' => 'Tanggal wajib diisi.',
-            'date.date'     => 'Format tanggal tidak valid.',
+            'name.required' => 'Holiday name is required.',
+            'date.required' => 'Date is required.',
+            'date.date'     => 'Date format is not valid.',
         ];
     }
 }

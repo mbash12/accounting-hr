@@ -78,11 +78,11 @@ class PermitsImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'employee_id.required' => 'ID karyawan wajib diisi.',
-            'type.required'        => 'Tipe izin wajib diisi.',
-            'start_date.required'  => 'Tanggal mulai wajib diisi.',
-            'end_date.after_or_equal' => 'Tanggal selesai harus sama atau setelah tanggal mulai.',
-            'status.in'            => 'Status harus salah satu dari: pending, approved, rejected.',
+            'employee_id.required' => 'Employee ID is required.',
+            'type.required'        => 'Permit type is required.',
+            'start_date.required'  => 'Start date is required.',
+            'end_date.after_or_equal' => 'End date must be the same as or after the start date.',
+            'status.in'            => 'Status must be one of: pending, approved, rejected.',
         ];
     }
 }

@@ -74,7 +74,7 @@
         <div class="report-company-name">{{ $company->name }}</div>
         <div class="report-title">Income Statement</div>
         <div class="report-date">
-            Periode {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} s/d {{
+            Period {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} to {{
             \Carbon\Carbon::parse($end_date)->format('d M Y') }}
         </div>
     </div>
@@ -91,7 +91,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Pendapatan Operasional</td>
+                    Operating Revenue</td>
             </tr>
             @php
             $operatingRevenues = $operatingRevenues ?? collect();
@@ -102,7 +102,7 @@
             @include('filament.pages.reports.partials.account-row-pdf', ['account' => $node, 'level' => 0])
             @endforeach
             <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Pendapatan Operasional</td>
+                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Operating Revenue</td>
                 <td class="amount" style="font-weight: bold; color: #1f2937;">{{ number_format($totalOperatingRevenue ??
                     0, 2, ',', '.') }}</td>
             </tr>
@@ -142,7 +142,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Beban Operasional</td>
+                    Operating Expenses</td>
             </tr>
             @php
             $operatingExpenses = $operatingExpenses ?? collect();
@@ -153,7 +153,7 @@
             @include('filament.pages.reports.partials.account-row-pdf', ['account' => $node, 'level' => 0])
             @endforeach
             <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Beban Operasional</td>
+                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Operating Expenses</td>
                 <td class="amount" style="font-weight: bold; color: #1f2937;">{{ number_format($totalOperatingExpense ??
                     0, 2, ',', '.') }}</td>
             </tr>
@@ -162,7 +162,7 @@
             <tr style="background-color: #f3f4f6;">
                 <td
                     style="padding-left: 10px; font-weight: bold; color: #111827; font-size: 12px; padding-top: 10px; padding-bottom: 10px;">
-                    Laba Operasional (Operating Profit)</td>
+                    Operating Profit</td>
                 <td class="amount"
                     style="font-weight: bold; color: #111827; font-size: 12px; border-top: 2px solid #111827; padding-top: 10px; padding-bottom: 10px;">
                     {{ number_format($operatingProfit ?? 0, 2, ',', '.') }}</td>
@@ -178,7 +178,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Pendapatan &amp; Beban Lain-lain</td>
+                    Other Revenue &amp; Expenses</td>
             </tr>
             @endif
 
@@ -191,7 +191,7 @@
             @include('filament.pages.reports.partials.account-row-pdf', ['account' => $node, 'level' => 0])
             @endforeach
             <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Pendapatan Lain-lain</td>
+                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Other Revenue</td>
                 <td class="amount" style="font-weight: bold; color: #1f2937;">{{ number_format($totalOtherRevenue ?? 0,
                     2, ',', '.') }}</td>
             </tr>
@@ -206,7 +206,7 @@
             @include('filament.pages.reports.partials.account-row-pdf', ['account' => $node, 'level' => 0])
             @endforeach
             <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Beban Lain-lain</td>
+                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Other Expenses</td>
                 <td class="amount" style="font-weight: bold; color: #1f2937;">{{ number_format($totalOtherExpense ?? 0,
                     2, ',', '.') }}</td>
             </tr>
@@ -216,7 +216,7 @@
             <tr style="background-color: #f3f4f6;">
                 <td
                     style="padding-left: 10px; font-weight: bold; color: #111827; font-size: 13px; padding-top: 12px; padding-bottom: 12px; border-top: 2px solid #1f2937;">
-                    Laba / Rugi Bersih (Net Income)</td>
+                    Net Income</td>
                 <td class="amount"
                     style="font-weight: bold; color: #111827; font-size: 13px; padding-top: 12px; padding-bottom: 12px; border-top: 2px solid #1f2937;">
                     {{ number_format($netIncome ?? 0, 2, ',', '.') }}</td>

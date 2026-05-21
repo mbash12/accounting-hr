@@ -48,7 +48,7 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
                     }
                     $customerId = $customer->id;
                 } else {
-                    throw new \Exception("Either Kode Customer or Nama Customer is required for order {$orderNumber}");
+                    throw new \Exception("Either Customer Code or Customer Name is required for order {$orderNumber}");
                 }
                 
                 $ordersData[$orderNumber] = [
@@ -91,7 +91,7 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for order {$orderNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for order {$orderNumber}");
             }
 
             $unitId = null;

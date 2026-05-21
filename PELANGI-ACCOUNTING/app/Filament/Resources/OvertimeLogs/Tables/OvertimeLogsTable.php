@@ -27,7 +27,7 @@ class OvertimeLogsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('date')
-                    ->label(__('Tanggal'))
+                    ->label(__('Date'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('hours')

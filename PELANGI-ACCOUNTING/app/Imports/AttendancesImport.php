@@ -83,10 +83,10 @@ class AttendancesImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'employee_id.required' => 'ID karyawan wajib diisi.',
-            'date.required'        => 'Tanggal wajib diisi.',
-            'date.date'            => 'Format tanggal tidak valid.',
-            'status.in'            => 'Status harus salah satu dari: present, late, absent, permit, leave.',
+            'employee_id.required' => 'Employee ID is required.',
+            'date.required'        => 'Date is required.',
+            'date.date'            => 'Date format is not valid.',
+            'status.in'            => 'Status must be one of: present, late, absent, permit, leave.',
         ];
     }
 }

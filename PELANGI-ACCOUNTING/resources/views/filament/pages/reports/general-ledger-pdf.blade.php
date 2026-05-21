@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ config('app.locale') }}">
 <head>
     <meta charset="UTF-8">
     <title>General Ledger Report</title>
@@ -60,8 +60,7 @@
         <h1>{{ $company->name }}</h1>
         <h2>General Ledger Report</h2>
         <p>
-            Periode: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} 
-            s/d {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+            Period: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
         </p>
     </div>
 
@@ -121,7 +120,7 @@
             @empty
             <tr>
                 <td colspan="8" class="text-center" style="padding: 20px;">
-                    Tidak ada transaksi untuk periode ini.
+                    No transactions for this period.
                 </td>
             </tr>
             @endforelse

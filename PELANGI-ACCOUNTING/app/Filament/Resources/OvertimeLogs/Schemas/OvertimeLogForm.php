@@ -39,7 +39,7 @@ class OvertimeLogForm
                             ->preload()
                             ->disabled($disabled),
                         DatePicker::make('date')
-                            ->label(__('Tanggal'))
+                            ->label(__('Date'))
                             ->required()
                             ->disabled($disabled),
                         TextInput::make('hours')

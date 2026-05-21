@@ -109,10 +109,10 @@ class EmployeesImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'name.required'    => 'Nama karyawan wajib diisi.',
-            'email.email'      => 'Format email tidak valid.',
-            'status.in'        => 'Status harus salah satu dari: permanent, contract, internship, probation.',
-            'basic_salary.numeric' => 'Gaji pokok harus berupa angka.',
+            'name.required'    => 'Employee name is required.',
+            'email.email'      => 'Email format is not valid.',
+            'status.in'        => 'Status must be one of: permanent, contract, internship, probation.',
+            'basic_salary.numeric' => 'Basic salary must be a number.',
         ];
     }
 }

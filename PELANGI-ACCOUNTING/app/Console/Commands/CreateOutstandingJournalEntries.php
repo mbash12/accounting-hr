@@ -374,7 +374,7 @@ class CreateOutstandingJournalEntries extends Command
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '11%')
-                    ->orWhere('name', 'like', '%Piutang Usaha%');
+                    ->orWhere('name', 'like', '%Accounts Receivable%');
             });
 
         if ($companyId) {
@@ -396,7 +396,7 @@ class CreateOutstandingJournalEntries extends Command
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '21%')
-                    ->orWhere('name', 'like', '%Utang Usaha%');
+                    ->orWhere('name', 'like', '%Accounts Payable%');
             });
 
         if ($companyId) {
@@ -418,7 +418,6 @@ class CreateOutstandingJournalEntries extends Command
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '4%')
-                    ->orWhere('name', 'like', '%Pendapatan%')
                     ->orWhere('name', 'like', '%Revenue%');
             });
 
@@ -441,7 +440,6 @@ class CreateOutstandingJournalEntries extends Command
             ->where('is_active', true)
             ->where(function ($q) {
                 $q->where('code', 'like', '5%')
-                    ->orWhere('name', 'like', '%Beban%')
                     ->orWhere('name', 'like', '%Expense%');
             });
 

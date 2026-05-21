@@ -92,7 +92,7 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for order {$orderNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for order {$orderNumber}");
             }
 
             $unitId = null;

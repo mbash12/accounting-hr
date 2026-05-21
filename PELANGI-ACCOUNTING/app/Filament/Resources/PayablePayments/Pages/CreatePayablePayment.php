@@ -72,9 +72,8 @@ class CreatePayablePayment extends CreateRecord
                     ->where('is_active', true)
                     ->where(function ($q) {
                         $q->where('code', 'like', '2101%')
-                            ->orWhere('name', 'like', '%Uang Muka Pembelian%')
                             ->orWhere('name', 'like', '%Advance Purchase%')
-                            ->orWhere('name', 'like', '%Hutang Usaha%');
+                            ->orWhere('name', 'like', '%Accounts Payable%');
                     })
                     ->where(function ($q) use ($data) {
                         $q->where('company_id', $data['company_id'])

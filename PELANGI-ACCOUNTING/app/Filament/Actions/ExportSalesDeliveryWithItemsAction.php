@@ -18,13 +18,13 @@ class ExportSalesDeliveryWithItemsAction extends Action
                 try {
                     return Excel::download(
                         new SalesDeliveryWithItemsExport(),
-                        'pengiriman-dan-item-penjualan-' . date('Y-m-d') . '.xlsx'
+                        'sales-delivery-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting pengiriman dan item penjualan: ' . $e->getMessage())
+                        ->body('An error occurred while exporting sales delivery with items: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -49,7 +49,7 @@ class SalesInvoiceWithItemsImport implements ToCollection, WithHeadingRow, WithV
                 if (!$customer) {
                     // Create customer if not found
                     if (empty($row['nama_customer']) && empty($row['kode_customer'])) {
-                         throw new \Exception("Either Kode Customer or Nama Customer is required for invoice {$invoiceNumber}");
+                         throw new \Exception("Either Customer Code or Customer Name is required for invoice {$invoiceNumber}");
                     }
 
                     $customerData = [

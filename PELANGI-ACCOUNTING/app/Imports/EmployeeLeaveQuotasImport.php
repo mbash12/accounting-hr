@@ -74,11 +74,11 @@ class EmployeeLeaveQuotasImport implements ToCollection, WithHeadingRow, WithVal
     public function customValidationMessages()
     {
         return [
-            'employee_id.required' => 'ID karyawan wajib diisi.',
-            'year.required'        => 'Tahun wajib diisi.',
-            'year.integer'         => 'Tahun harus berupa angka.',
-            'total_quota.integer'  => 'Total kuota harus berupa angka bulat.',
-            'used_quota.integer'   => 'Kuota terpakai harus berupa angka bulat.',
+            'employee_id.required' => 'Employee ID is required.',
+            'year.required'        => 'Year is required.',
+            'year.integer'         => 'Year must be a number.',
+            'total_quota.integer'  => 'Total quota must be an integer.',
+            'used_quota.integer'   => 'Used quota must be an integer.',
         ];
     }
 }

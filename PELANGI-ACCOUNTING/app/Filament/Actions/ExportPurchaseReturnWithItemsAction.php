@@ -18,13 +18,13 @@ class ExportPurchaseReturnWithItemsAction extends Action
                 try {
                     return Excel::download(
                         new PurchaseReturnWithItemsExport(),
-                        'retur-pembelian-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'purchase-return-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting retur pembelian dan item: ' . $e->getMessage())
+                        ->body('An error occurred while exporting purchase return with items: ' . $e->getMessage())
                         ->send();
                 }
             });

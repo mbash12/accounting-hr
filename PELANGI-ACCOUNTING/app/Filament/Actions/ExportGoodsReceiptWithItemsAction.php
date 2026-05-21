@@ -18,13 +18,13 @@ class ExportGoodsReceiptWithItemsAction extends Action
                 try {
                     return Excel::download(
                         new GoodsReceiptWithItemsExport(),
-                        'penerimaan-barang-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'goods-receipt-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting penerimaan barang dan item: ' . $e->getMessage())
+                        ->body('An error occurred while exporting goods receipt with items: ' . $e->getMessage())
                         ->send();
                 }
             });

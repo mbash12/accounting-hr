@@ -144,7 +144,7 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                                     ->where('is_active', true)
                                     ->where(function ($q) {
                                         $q->where('code', 'like', '21%')
-                                            ->orWhere('name', 'like', '%Utang Usaha%');
+                                            ->orWhere('name', 'like', '%Accounts Payable%');
                                     })->orderBy('code')->value('id');
 
                                 $journalEntry = $record->journalEntry;
@@ -163,8 +163,8 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                                         ->where('is_active', true)
                                         ->where(function ($q) {
                                             $q->where('code', 'like', '5%')
-                                                ->orWhere('name', 'like', '%Penghapusan%')
-                                                ->orWhere('name', 'like', '%Bad Debt%');
+                                                ->orWhere('name', 'like', '%Bad Debt%')
+                                                ->orWhere('name', 'like', '%Write Off%');
                                         })->orderBy('code')->value('id');
                                 }
 

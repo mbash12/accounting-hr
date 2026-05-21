@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ config('app.locale') }}">
 <head>
     <meta charset="UTF-8">
     <title>Journal Voucher - {{ $journalEntry->entry_number }}</title>
@@ -207,8 +207,8 @@
 
         <div class="header">
             <div class="company-info">
-                <strong>{{ $journalEntry->company->name ?? 'PT. PELANGI SENTRAL KREASI' }}</strong>
-                {!! nl2br(e($journalEntry->company->address ?? 'JL. KH. MOH. MANSYUR BLOK 15A/12'."\n".'JAKARTA PUSAT')) !!}
+                <strong>{{ $journalEntry->company->name ?? 'Company Name' }}</strong>
+                {!! nl2br(e($journalEntry->company->address ?? 'Company Address')) !!}
             </div>
             <div class="voucher-info">
                 <div class="voucher-title">Journal Voucher</div>

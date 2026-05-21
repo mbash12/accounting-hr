@@ -12,7 +12,7 @@ class ViewJournalVoucherAction
             ->label(__('View Journal Voucher'))
             ->icon('heroicon-o-document-text')
             ->color('info')
-            ->modalHeading(__('Voucher Jurnal'))
+            ->modalHeading(__('Journal Voucher'))
             ->modalWidth('6xl')
             ->modalContent(function ($record) {
                 $journalEntry = $record instanceof \App\Models\JournalEntry ? $record : $record->journalEntry;
@@ -37,7 +37,7 @@ class ViewJournalVoucherAction
                 ]);
             })
             ->modalSubmitAction(false)
-            ->modalCancelActionLabel(__('Tutup'))
+            ->modalCancelActionLabel(__('Close'))
             ->disabled(fn($record) => !($record instanceof \App\Models\JournalEntry) && !$record->journalEntry);
     }
 }

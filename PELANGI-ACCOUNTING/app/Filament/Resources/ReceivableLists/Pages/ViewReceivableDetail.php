@@ -181,7 +181,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                                     ->where('is_active', true)
                                     ->where(function ($q) {
                                         $q->where('code', 'like', '11%')
-                                            ->orWhere('name', 'like', '%Piutang Usaha%');
+                                            ->orWhere('name', 'like', '%Accounts Receivable%');
                                     })->orderBy('code')->value('id');
 
                                 $journalEntry = $record->journalEntry;
@@ -200,8 +200,8 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                                         ->where('is_active', true)
                                         ->where(function ($q) {
                                             $q->where('code', 'like', '5%')
-                                                ->orWhere('name', 'like', '%Penghapusan%')
-                                                ->orWhere('name', 'like', '%Bad Debt%');
+                                                ->orWhere('name', 'like', '%Bad Debt%')
+                                                ->orWhere('name', 'like', '%Write Off%');
                                         })->orderBy('code')->value('id');
                                 }
 

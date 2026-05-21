@@ -52,7 +52,7 @@
             <!-- Filters -->
             <div style="display: flex; gap: 1rem; background: white; border-radius: 0.75rem; padding: 1rem; border: 1px solid #e5e7eb;">
                 <div style="flex: 1;">
-                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Cari Account</label>
+                    <label style="display: block; font-size: 0.875rem; font-weight: 500; color: #374151; margin-bottom: 0.25rem;">Search Account</label>
                     <input
                         type="text"
                         wire:model.live="searchQuery"
@@ -66,7 +66,7 @@
                         wire:model.live="filterAccountType"
                         style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.375rem; font-size: 0.875rem; background: white;"
                     >
-                        <option value="">Semua Tipe</option>
+                        <option value="">All Types</option>
                         @foreach($this->getAccountTypes() as $type)
                             <option value="{{ $type }}">{{ ucfirst($type) }}</option>
                         @endforeach
@@ -79,7 +79,7 @@
                 <div style="padding: 1rem 1.5rem; border-bottom: 1px solid #e5e7eb; background: linear-gradient(to right, #f9fafb, #f3f4f6);">
                     <h3 style="font-size: 1.125rem; font-weight: 600; color: #1f2937; margin: 0;">
                         {{ __('Opening Balances') }}
-                        <span style="font-size: 0.875rem; font-weight: 400; color: #6b7280;">({{ count($this->openingBalanceData) }} akun)</span>
+                        <span style="font-size: 0.875rem; font-weight: 400; color: #6b7280;">({{ count($this->openingBalanceData) }} accounts)</span>
                     </h3>
                 </div>
 
@@ -88,9 +88,9 @@
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead style="position: sticky; top: 0; z-index: 10;">
                                 <tr style="background: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 120px;">{{ __('Kode') }}</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 120px;">{{ __('Code') }}</th>
                                     <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">{{ __('Account Name') }}</th>
-                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 100px;">{{ __('Tipe') }}</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151; width: 100px;">{{ __('Type') }}</th>
                                     <th style="padding: 0.75rem 1rem; text-align: right; font-size: 0.875rem; font-weight: 600; color: #374151; width: 150px;">{{ __('Debit') }}</th>
                                     <th style="padding: 0.75rem 1rem; text-align: right; font-size: 0.875rem; font-weight: 600; color: #374151; width: 150px;">{{ __('Credit') }}</th>
                                 </tr>

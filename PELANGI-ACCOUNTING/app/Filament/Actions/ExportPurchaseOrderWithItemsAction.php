@@ -18,13 +18,13 @@ class ExportPurchaseOrderWithItemsAction extends Action
                 try {
                     return Excel::download(
                         new PurchaseOrderWithItemsExport(),
-                        'pesanan-pembelian-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'purchase-order-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting pesanan pembelian dan item: ' . $e->getMessage())
+                        ->body('An error occurred while exporting purchase order with items: ' . $e->getMessage())
                         ->send();
                 }
             });

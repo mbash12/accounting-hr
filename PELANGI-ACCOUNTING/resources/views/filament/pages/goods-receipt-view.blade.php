@@ -410,19 +410,19 @@
                 </div>
 
                 <div class="document-info">
-                    <h2 class="doc-title">PENERIMAAN BARANG</h2>
+                    <h2 class="doc-title">GOODS RECEIPT</h2>
                     <table class="doc-meta-table">
                         <tr>
-                            <td class="doc-meta-label">No. Penerimaan:</td>
+                            <td class="doc-meta-label">Receipt No.:</td>
                             <td class="doc-meta-value">{{ $record->receipt_number }}</td>
                         </tr>
                         <tr>
-                            <td class="doc-meta-label">Tanggal:</td>
+                            <td class="doc-meta-label">Date:</td>
                             <td class="doc-meta-value">{{ $record->date ? $record->date->format('d M Y') : '-' }}</td>
                         </tr>
                         @if($record->reference_no)
                         <tr>
-                            <td class="doc-meta-label">Referensi:</td>
+                            <td class="doc-meta-label">Reference:</td>
                             <td class="doc-meta-value">{{ $record->reference_no }}</td>
                         </tr>
                         @endif
@@ -448,21 +448,21 @@
                     @if($record->supplier->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->supplier->tax_id }}
                     </p>@endif
                     @else
-                    <p class="text-muted">Tidak ada supplier dipilih</p>
+                    <p class="text-muted">No supplier selected</p>
                     @endif
                 </div>
 
                 <div class="address-box">
-                    <div class="address-title">Detail Penerimaan</div>
+                    <div class="address-title">Receipt Details</div>
                     @if($record->purchase_order)
                     <p><span class="text-muted">Purchase Ref.:</span> <strong>{{
                             $record->purchase_order->purchase_order_no }}</strong></p>
                     @endif
                     @if($record->received_by)
-                    <p><span class="text-muted">Diterima Oleh:</span> {{ $record->received_by }}</p>
+                    <p><span class="text-muted">Received By:</span> {{ $record->received_by }}</p>
                     @endif
                     @if($record->receipt_type)
-                    <p><span class="text-muted">Tipe Penerimaan:</span> {{ ucfirst($record->receipt_type) }}</p>
+                    <p><span class="text-muted">Receipt Type:</span> {{ ucfirst($record->receipt_type) }}</p>
                     @endif
                 </div>
             </div>
@@ -474,7 +474,7 @@
                         <tr>
                             <th class="col-idx">#</th>
                             <th class="col-desc">Description</th>
-                            <th class="col-qty" style="text-align: right;">Jumlah</th>
+                            <th class="col-qty" style="text-align: right;">Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -495,8 +495,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center" style="padding: 20px;">Tidak ada barang dalam penerimaan
-                                ini</td>
+                            <td colspan="3" class="text-center" style="padding: 20px;">No items in this receipt</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -507,11 +506,11 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Notes Penerimaan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Receipt Notes</h4>
                     <p class="text-sm text-muted">
-                        Mohon periksa semua barang saat diterima. Ketidaksesuaian harus dilaporkan dalam 24 jam.
+                        Please inspect all items upon receipt. Discrepancies must be reported within 24 hours.
                         <br>
-                        Dengan menandatangani di bawah ini, Anda menyatakan telah menerima barang dalam kondisi baik.
+                        By signing below, you acknowledge that you have received the goods in good condition.
                     </p>
                     @if($record->description)
                     <div style="margin-top: 10px; font-style: italic;" class="text-sm">
@@ -521,9 +520,9 @@
                 </div>
 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Diterima Oleh</div>
+                    <div style="margin-bottom: 40px;">Received By</div>
                     <div class="signature-line"></div>
-                    <div class="text-sm text-bold">Tanggal: __________________</div>
+                    <div class="text-sm text-bold">Date: __________________</div>
                 </div>
             </div>
 

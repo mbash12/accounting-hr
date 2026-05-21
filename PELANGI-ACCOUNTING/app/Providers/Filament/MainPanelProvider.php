@@ -100,49 +100,6 @@ class MainPanelProvider extends PanelProvider
                     ';
                 },
             )
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                function (): string {
-                    $userName = auth()->user() ? e(auth()->user()->name) : '';
-                    $isLoginPage = request()->routeIs('filament.main.auth.login');
-                    return '
-                        <link rel="preconnect" href="https://fonts.googleapis.com">
-                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-                        <link rel="stylesheet" href="' . asset('css/filament/admin/theme.css') . '">
-                        <script>
-                            // Force light mode immediately
-                            document.documentElement.classList.remove("dark");
-                            document.documentElement.classList.add("light");
-                            document.documentElement.setAttribute("data-theme", "light");
-
-                            // Clear any theme preferences
-                            localStorage.removeItem("theme");
-                            localStorage.removeItem("filament-theme");
-                            localStorage.setItem("theme", "light");
-
-                            document.addEventListener("DOMContentLoaded", function () {
-                                const userMenu = document.querySelector(".fi-user-menu .fi-link");
-                                if (userMenu && "' . $userName . '") {
-                                    userMenu.setAttribute("data-user-name", "' . $userName . '");
-                                }
-
-                                // Continuously enforce light mode
-                                setInterval(() => {
-                                    document.documentElement.classList.remove("dark");
-                                    document.documentElement.classList.add("light");
-                                }, 100);
-                            });
-
-                            // Also enforce light mode after DOM is loaded
-                            window.addEventListener("load", function () {
-                                document.documentElement.classList.remove("dark");
-                                document.documentElement.classList.add("light");
-                            });
-                        </script>
-                    ';
-                },
-            )
             // ->renderHook(
             //     PanelsRenderHook::BODY_START,
             //     function (): string {

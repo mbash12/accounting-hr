@@ -17,15 +17,15 @@ class ImportSalaryComponentsAction extends Action
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Komponen Gaji')
-                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: code, name, type, is_fixed, is_taxable, is_bpjs_base, is_active')
+                    ->label('Salary Component Data File')
+                    ->helperText('Upload Excel file (.xlsx) with columns: code, name, type, is_fixed, is_taxable, is_bpjs_base, is_active')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024)
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Komponen Gaji')
-            ->modalDescription('Upload Excel file with data komponen gaji. Unduh template untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Salary Components')
+            ->modalDescription('Upload Excel file with salary component data. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -35,7 +35,7 @@ class ImportSalaryComponentsAction extends Action
                         try {
                             return Excel::download(
                                 new \App\Exports\SalaryComponentsTemplateExport(),
-                                'template-impor-komponen-gaji.xlsx'
+                                'salary-components-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
@@ -53,13 +53,13 @@ class ImportSalaryComponentsAction extends Action
                     Notification::make()
                         ->success()
                         ->title('Import Successful')
-                        ->body('Data komponen gaji berhasil diimpor.')
+                        ->body('Salary component data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing komponen gaji: ' . $e->getMessage())
+                        ->body('An error occurred while importing salary components: ' . $e->getMessage())
                         ->send();
                 }
             });

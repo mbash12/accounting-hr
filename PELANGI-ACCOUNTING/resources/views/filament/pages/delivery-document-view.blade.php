@@ -410,14 +410,14 @@
                 </div>
 
                 <div class="document-info">
-                    <h2 class="doc-title">SURAT JALAN</h2>
+                    <h2 class="doc-title">DELIVERY NOTE</h2>
                     <table class="doc-meta-table">
                         <tr>
-                            <td class="doc-meta-label">No. Surat Jalan:</td>
+                            <td class="doc-meta-label">Delivery No.:</td>
                             <td class="doc-meta-value">{{ $record->delivery_number }}</td>
                         </tr>
                         <tr>
-                            <td class="doc-meta-label">Tanggal:</td>
+                            <td class="doc-meta-label">Date:</td>
                             <td class="doc-meta-value">{{ $record->date ? $record->date->format('d M Y') : '-' }}</td>
                         </tr>
                         @if($record->salesOrder)
@@ -433,7 +433,7 @@
             <!-- ADDRESSES -->
             <div class="address-section">
                 <div class="address-box">
-                    <div class="address-title">Kirim Ke</div>
+                    <div class="address-title">Ship To</div>
                     @if($record->customer)
                     <p class="recipient-name">{{ $record->customer->name }}</p>
                     <p>
@@ -453,20 +453,20 @@
                     @if($record->customer->phone)<p class="text-sm text-muted">Tel: {{ $record->customer->phone }}</p>
                     @endif
                     @else
-                    <p class="text-muted">Tidak ada pelanggan dipilih</p>
+                    <p class="text-muted">No customer selected</p>
                     @endif
                 </div>
 
                 <div class="address-box">
-                    <div class="address-title">Detail Pengiriman</div>
+                    <div class="address-title">Delivery Details</div>
                     @if($record->expedition)
-                    <p><span class="text-muted">Ekspedisi:</span> <strong>{{ $record->expedition->name }}</strong></p>
+                    <p><span class="text-muted">Expedition:</span> <strong>{{ $record->expedition->name }}</strong></p>
                     @endif
                     @if($record->tracking_number)
-                    <p><span class="text-muted">No. Resi:</span> {{ $record->tracking_number }}</p>
+                    <p><span class="text-muted">Tracking No.:</span> {{ $record->tracking_number }}</p>
                     @endif
                     @if($record->dispatch_time)
-                    <p><span class="text-muted">Tgl Berangkat:</span> {{ $record->dispatch_time->format('d M Y H:i') }}
+                    <p><span class="text-muted">Dispatch Date:</span> {{ $record->dispatch_time->format('d M Y H:i') }}
                     </p>
                     @endif
                 </div>
@@ -479,7 +479,7 @@
                         <tr>
                             <th class="col-idx">#</th>
                             <th class="col-desc">Description</th>
-                            <th class="col-qty" style="text-align: right;">Jumlah</th>
+                            <th class="col-qty" style="text-align: right;">Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -500,8 +500,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center" style="padding: 20px;">Tidak ada barang dalam pengiriman
-                                ini</td>
+                            <td colspan="3" class="text-center" style="padding: 20px;">No items in this delivery</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -511,23 +510,23 @@
             <!-- Footer -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Notes Pengiriman & Penerimaan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Delivery & Receiving Notes</h4>
                     <p class="text-sm text-muted">
-                        Mohon periksa semua barang saat diterima. Ketidaksesuaian harus dilaporkan dalam 24 jam.
+                        Please inspect all items upon receipt. Discrepancies must be reported within 24 hours.
                         <br>
-                        Dengan menandatangani di bawah ini, Anda menyatakan telah menerima barang dalam kondisi baik.
+                        By signing below, you acknowledge that you have received the goods in good condition.
                     </p>
                     @if($record->description)
                     <div style="margin-top: 10px; font-style: italic;" class="text-sm">
-                        Notes Supir: {{ $record->description }}
+                        Driver Notes: {{ $record->description }}
                     </div>
                     @endif
                 </div>
 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Diterima Oleh</div>
+                    <div style="margin-bottom: 40px;">Received By</div>
                     <div class="signature-line"></div>
-                    <div class="text-sm text-bold">Tanggal: __________________</div>
+                    <div class="text-sm text-bold">Date: __________________</div>
                 </div>
             </div>
 

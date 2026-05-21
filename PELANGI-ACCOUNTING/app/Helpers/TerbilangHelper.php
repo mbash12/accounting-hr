@@ -36,9 +36,71 @@ class TerbilangHelper
         return $temp;
     }
 
+    private static function english($number)
+    {
+        $number = abs(round($number));
+        $ones = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine',
+                 'Ten', 'Eleven', 'Twelve', 'Thirteen', 'Fourteen', 'Fifteen', 'Sixteen',
+                 'Seventeen', 'Eighteen', 'Nineteen'];
+        $tens = ['', '', 'Twenty', 'Thirty', 'Forty', 'Fifty', 'Sixty', 'Seventy', 'Eighty', 'Ninety'];
+
+        $temp = "";
+
+        if ($number == 0) {
+            $temp = " Zero";
+        } else if ($number < 20) {
+            $temp = " " . $ones[$number];
+        } else if ($number < 100) {
+            $temp = " " . $tens[(int)($number / 10)];
+            if ($number % 10 > 0) {
+                $temp .= " " . $ones[$number % 10];
+            }
+        } else if ($number < 1000) {
+            $temp = " " . $ones[(int)($number / 100)] . " Hundred";
+            if ($number % 100 > 0) {
+                $temp .= " and" . self::english($number % 100);
+            }
+        } else if ($number < 1000000) {
+            $temp = self::english((int)($number / 1000)) . " Thousand";
+            if ($number % 1000 > 0) {
+                if ($number % 1000 < 100) {
+                    $temp .= " and" . self::english($number % 1000);
+                } else {
+                    $temp .= self::english($number % 1000);
+                }
+            }
+        } else if ($number < 1000000000) {
+            $temp = self::english((int)($number / 1000000)) . " Million";
+            if ($number % 1000000 > 0) {
+                $temp .= self::english($number % 1000000);
+            }
+        } else if ($number < 1000000000000) {
+            $temp = self::english((int)($number / 1000000000)) . " Billion";
+            if ($number % 1000000000 > 0) {
+                $temp .= self::english($number % 1000000000);
+            }
+        } else if ($number < 1000000000000000) {
+            $temp = self::english((int)($number / 1000000000000)) . " Trillion";
+            if ($number % 1000000000000 > 0) {
+                $temp .= self::english($number % 1000000000000);
+            }
+        }
+
+        return $temp;
+    }
+
     public static function convert($number)
     {
+        if (app()->getLocale() === 'en') {
+            return self::convertEnglish($number);
+        }
         $result = self::terbilang($number);
+        return trim(preg_replace('/\s+/', ' ', $result));
+    }
+
+    public static function convertEnglish($number)
+    {
+        $result = self::english($number);
         return trim(preg_replace('/\s+/', ' ', $result));
     }
 }

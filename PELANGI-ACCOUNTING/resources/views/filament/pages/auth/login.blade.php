@@ -114,7 +114,7 @@
                         <!-- Error display for form validation -->
                         @error('data.login')
                             <div class="text-red-500 text-sm mt-2 mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                                <span class="font-medium">Kesalahan Email:</span> {{ $message }}
+                                <span class="font-medium">Email Error:</span> {{ $message }}
                             </div>
                         @enderror
 
@@ -127,7 +127,7 @@
                         <!-- General authentication error -->
                         @error('data.email')
                             <div class="text-red-500 text-sm mt-2 mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                                <span class="font-medium">Kesalahan Autentikasi:</span> {{ $message }}
+                                <span class="font-medium">Authentication Error:</span> {{ $message }}
                             </div>
                         @enderror
 

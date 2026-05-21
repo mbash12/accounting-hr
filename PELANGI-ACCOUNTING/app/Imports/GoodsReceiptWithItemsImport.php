@@ -98,7 +98,7 @@ class GoodsReceiptWithItemsImport implements ToCollection, WithHeadingRow, WithV
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for receipt {$receiptNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for receipt {$receiptNumber}");
             }
 
             $unitId = null;

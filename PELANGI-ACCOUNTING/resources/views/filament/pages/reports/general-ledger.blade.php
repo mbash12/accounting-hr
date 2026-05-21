@@ -215,8 +215,7 @@
             <h2 class="report-company-name">{{ $company->name }}</h2>
             <h1 class="report-title">General Ledger</h1>
             <p class="report-date">
-                Dari {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }}
-                s/d {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
+                From {{ \Carbon\Carbon::parse($startDate)->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($endDate)->format('d/m/Y') }}
             </p>
         </div>
 
@@ -272,7 +271,7 @@
                 @empty
                 <tr>
                     <td colspan="8" style="text-align:center; padding:2rem; color:#9ca3af;">
-                        Tidak ada transaksi untuk periode ini.
+                        No transactions for this period.
                     </td>
                 </tr>
                 @endforelse
@@ -280,7 +279,7 @@
         </table>
         @empty
         <div style="text-align:center; padding:2rem; color:#9ca3af;">
-            Tidak ada data akun yang terpilih.
+            No account data selected.
         </div>
         @endforelse
     </div>

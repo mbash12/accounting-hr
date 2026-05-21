@@ -50,7 +50,7 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
                     }
                     $customerId = $customer->id;
                 } else {
-                    throw new \Exception("Either Kode Customer or Nama Customer is required for delivery {$deliveryNumber}");
+                    throw new \Exception("Either Customer Code or Customer Name is required for delivery {$deliveryNumber}");
                 }
 
                 $salesOrderId = null;
@@ -112,7 +112,7 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for delivery {$deliveryNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for delivery {$deliveryNumber}");
             }
 
             $unitId = null;

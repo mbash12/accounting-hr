@@ -49,7 +49,7 @@ class SalesReturnWithItemsImport implements ToCollection, WithHeadingRow, WithVa
                     }
                     $customerId = $customer->id;
                 } else {
-                    throw new \Exception("Either Kode Customer or Nama Customer is required for return {$returnNumber}");
+                    throw new \Exception("Either Customer Code or Customer Name is required for return {$returnNumber}");
                 }
 
                 $deliveryDocumentId = null;
@@ -98,7 +98,7 @@ class SalesReturnWithItemsImport implements ToCollection, WithHeadingRow, WithVa
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for return {$returnNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for return {$returnNumber}");
             }
 
             $unitId = null;

@@ -111,8 +111,7 @@
         <div class="report-company-name">{{ $company->name }}</div>
         <div class="report-title">Trial Balance</div>
         <div class="report-date">
-            Dari {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }}
-            s/d {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
+            From {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }} to {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
         </div>
     </div>
 
@@ -159,7 +158,7 @@
             @empty
             <tr>
                 <td colspan="8" style="text-align:center; padding:10px; color:#9ca3af;">
-                    Tidak ada data untuk periode ini.
+                    No data for this period.
                 </td>
             </tr>
             @endforelse

@@ -18,13 +18,13 @@ class ExportPurchaseInvoiceWithItemsAction extends Action
                 try {
                     return Excel::download(
                         new PurchaseInvoiceWithItemsExport(),
-                        'faktur-pembelian-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'purchase-invoice-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting faktur pembelian dan item: ' . $e->getMessage())
+                        ->body('An error occurred while exporting purchase invoice with items: ' . $e->getMessage())
                         ->send();
                 }
             });

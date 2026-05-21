@@ -17,15 +17,15 @@ class ImportEmployeeLeaveQuotasAction extends Action
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Kuota Cuti')
-                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: employee_id, year, total_quota, used_quota')
+                    ->label('Leave Quota Data File')
+                    ->helperText('Upload Excel file (.xlsx) with columns: employee_id, year, total_quota, used_quota')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024)
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Kuota Cuti')
-            ->modalDescription('Upload Excel file with data kuota cuti karyawan. You can download the template below to see the expected format.')
+            ->modalHeading('Import Leave Quotas')
+            ->modalDescription('Upload Excel file with employee leave quota data. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -35,13 +35,13 @@ class ImportEmployeeLeaveQuotasAction extends Action
                         try {
                             return Excel::download(
                                 new \App\Exports\EmployeeLeaveQuotasTemplateExport(),
-                                'template-impor-kuota-cuti.xlsx'
+                                'leave-quota-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template kuota cuti: ' . $e->getMessage())
+                                ->body('An error occurred while downloading leave quota template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,13 +53,13 @@ class ImportEmployeeLeaveQuotasAction extends Action
                     Notification::make()
                         ->success()
                         ->title('Import Successful')
-                        ->body('Data kuota cuti berhasil diimpor.')
+                        ->body('Leave quota data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing kuota cuti: ' . $e->getMessage())
+                        ->body('An error occurred while importing leave quotas: ' . $e->getMessage())
                         ->send();
                 }
             });

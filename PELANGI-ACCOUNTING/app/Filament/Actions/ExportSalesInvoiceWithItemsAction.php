@@ -18,13 +18,13 @@ class ExportSalesInvoiceWithItemsAction extends Action
                 try {
                     return Excel::download(
                         new SalesInvoiceWithItemsExport(),
-                        'faktur-dan-item-penjualan-' . date('Y-m-d') . '.xlsx'
+                        'sales-invoice-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting faktur dan item penjualan: ' . $e->getMessage())
+                        ->body('An error occurred while exporting sales invoice with items: ' . $e->getMessage())
                         ->send();
                 }
             });

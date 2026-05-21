@@ -290,7 +290,7 @@ class GoodsReceiptsTable
                                         'unit_id' => $item['unit_id'],
                                         'quantity' => $item['quantity'],
                                         'description' => $item['description'],
-                                        'return_reason' => 'Retur otomatis dari penerimaan barang',
+                                        'return_reason' => 'Automatic return from goods receipt',
                                     ]);
                                 }
 

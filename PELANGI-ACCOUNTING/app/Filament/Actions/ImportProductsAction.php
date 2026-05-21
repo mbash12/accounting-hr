@@ -24,8 +24,8 @@ class ImportProductsAction extends Action
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Produk')
-            ->modalDescription('Upload Excel file with produk. Pastikan untuk mengimpor Grup Produk terlebih dahulu sebelum mengimpor produk agar kategori dapat terhubung dengan benar. You can download the template below to see the expected format.')
+            ->modalHeading('Import Products')
+            ->modalDescription('Upload Excel file with products. Make sure to import Product Groups first before importing products so categories can be linked correctly. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -41,7 +41,7 @@ class ImportProductsAction extends Action
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template produk: ' . $e->getMessage())
+                                ->body('An error occurred while downloading product template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -60,7 +60,7 @@ class ImportProductsAction extends Action
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing produk: ' . $e->getMessage())
+                        ->body('An error occurred while importing products: ' . $e->getMessage())
                         ->send();
                 }
             });

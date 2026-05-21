@@ -50,7 +50,7 @@ class PurchaseOrderController extends Controller
             $errors = $validator->errors()->toArray();
             return response()->json([
                 'code' => 400,
-                'message' => 'Input tidak valid',
+                'message' => 'Invalid input',
                 'data' => $errors,
             ], 400);
         }
@@ -233,7 +233,7 @@ class PurchaseOrderController extends Controller
         // Create default PPN tax (11%)
         try {
             $tax = new Tax();
-            $tax->name = 'Pajak Pertambahan Nilai';
+            $tax->name = 'Value Added Tax';
             $tax->code = 'PPN';
             $tax->tax_percentage = 11.00;
             $tax->company_id = $companyId;
