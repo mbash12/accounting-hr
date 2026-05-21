@@ -93,9 +93,9 @@
         <div class="report-page">
             <div class="report-header">
                 <h2 class="text-xl font-bold uppercase">{{ $reportData['company']?->name }}</h2>
-                <h1 class="text-2xl font-bold text-blue-900">{{ __('LAPORAN RINGKASAN PAYROLL') }}</h1>
+                <h1 class="text-2xl font-bold text-blue-900">{{ __('PAYROLL SUMMARY REPORT') }}</h1>
                 <p class="text-gray-600 font-semibold">
-                    {{ __('Periode') }}: {{ $reportData['period']?->name }} 
+                    {{ __('Period') }}: {{ $reportData['period']?->name }}
                     @if($reportData['department']) | {{ __('Department') }}: {{ $reportData['department']->name }} @endif
                 </p>
             </div>
@@ -105,14 +105,14 @@
                     <tr>
                         <th>{{ __('Employee') }}</th>
                         <th>{{ __('Department') }}</th>
-                        <th class="num">{{ __('Gaji Pokok') }}</th>
-                        <th class="num">{{ __('Tunjangan') }}</th>
-                        <th class="num">{{ __('Potongan') }}</th>
-                        <th class="num">{{ __('Gaji Bruto') }}</th>
+                        <th class="num">{{ __('Basic Salary') }}</th>
+                        <th class="num">{{ __('Allowances') }}</th>
+                        <th class="num">{{ __('Deductions') }}</th>
+                        <th class="num">{{ __('Gross Salary') }}</th>
                         <th class="num">{{ __('PPh21') }}</th>
-                        <th class="num">{{ __('BPJS (Kar)') }}</th>
-                        <th class="num">{{ __('BPJS (Per)') }}</th>
-                        <th class="num">{{ __('Gaji Bersih') }}</th>
+                        <th class="num">{{ __('BPJS (Employee)') }}</th>
+                        <th class="num">{{ __('BPJS (Company)') }}</th>
+                        <th class="num">{{ __('Net Salary') }}</th>
                     </tr>
                 </thead>
                 <tbody>

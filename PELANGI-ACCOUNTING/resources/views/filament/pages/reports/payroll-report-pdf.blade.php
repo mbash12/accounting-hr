@@ -18,9 +18,9 @@
 <body>
     <div class="header">
         <div class="company-name">{{ $company?->name }}</div>
-        <div class="report-title">LAPORAN RINGKASAN PAYROLL</div>
+        <div class="report-title">PAYROLL SUMMARY REPORT</div>
         <div class="report-meta">
-            Periode: {{ $period?->name }} 
+            Period: {{ $period?->name }}
             @if($department) | Department: {{ $department->name }} @endif
         </div>
     </div>
@@ -30,14 +30,14 @@
             <tr>
                 <th>Employee</th>
                 <th>Department</th>
-                <th class="num">Gaji Pokok</th>
-                <th class="num">Tunjangan</th>
-                <th class="num">Potongan</th>
-                <th class="num">Gaji Bruto</th>
+                <th class="num">Basic Salary</th>
+                <th class="num">Allowances</th>
+                <th class="num">Deductions</th>
+                <th class="num">Gross Salary</th>
                 <th class="num">PPh21</th>
-                <th class="num">BPJS (Kar)</th>
-                <th class="num">BPJS (Per)</th>
-                <th class="num">Gaji Bersih</th>
+                <th class="num">BPJS (Employee)</th>
+                <th class="num">BPJS (Company)</th>
+                <th class="num">Net Salary</th>
             </tr>
         </thead>
         <tbody>

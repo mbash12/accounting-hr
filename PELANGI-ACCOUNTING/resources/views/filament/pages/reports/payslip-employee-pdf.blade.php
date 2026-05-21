@@ -327,17 +327,17 @@
             @if($company?->billing_address_line_1)
                 <div class="slip-period" style="margin-top:2px;">{{ $company->billing_address_line_1 }}{{ $company->billing_city ? ', '.$company->billing_city : '' }}</div>
             @endif
-            <div class="slip-title">SLIP GAJI KARYAWAN</div>
+            <div class="slip-title">EMPLOYEE PAYSLIP</div>
             <div class="slip-period">
-                Periode: {{ $monthNames[$period->month] }} {{ $period->year }}
+                Period: {{ $monthNames[$period->month] }} {{ $period->year }}
                 @if($period->start_date && $period->end_date)
                     &nbsp;({{ $period->start_date->format('d/m/Y') }} – {{ $period->end_date->format('d/m/Y') }})
                 @endif
             </div>
         </div>
         <div class="slip-number">
-            No. Slip: <strong>{{ $payslip->number }}</strong><br>
-            Tgl Cetak: {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+            Slip No.: <strong>{{ $payslip->number }}</strong><br>
+            Print Date: {{ \Carbon\Carbon::now()->format('d/m/Y') }}
         </div>
     </div>
 
@@ -345,12 +345,12 @@
     <div class="employee-section">
         <div class="employee-col">
             <div class="info-row">
-                <div class="info-label">Nama Employee</div>
+                <div class="info-label">Employee Name</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->name }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">ID Employee</div>
+                <div class="info-label">Employee ID</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->employee_id ?? '-' }}</div>
             </div>
@@ -360,7 +360,7 @@
                 <div class="info-value">{{ $employee->department?->name ?? '-' }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Jabatan</div>
+                <div class="info-label">Position</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->position ?? '-' }}</div>
             </div>
@@ -382,7 +382,7 @@
                 <div class="info-value">{{ $employee->ptkp_status ?? '-' }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Bank / Rekening</div>
+                <div class="info-label">Bank / Account</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">
                     {{ $employee->bank_name ?? '' }}
@@ -394,12 +394,12 @@
 
     {{-- Salary Items --}}
     <div class="salary-section">
-        {{-- Left: Pendapatan --}}
+        {{-- Left: Earnings --}}
         <div class="salary-col-left">
-            <div class="salary-group-title earn">Pendapatan</div>
+            <div class="salary-group-title earn">Earnings</div>
             <table class="salary-items">
                 <tr>
-                    <td>Gaji Pokok</td>
+                    <td>Basic Salary</td>
                     <td class="amount">{{ fmtRp($payslip->basic_salary) }}</td>
                 </tr>
                 @foreach($allowances as $item)
@@ -415,9 +415,9 @@
             </table>
         </div>
 
-        {{-- Right: Potongan --}}
+        {{-- Right: Deductions --}}
         <div class="salary-col-right">
-            <div class="salary-group-title deduct">Potongan</div>
+            <div class="salary-group-title deduct">Deductions</div>
             <table class="salary-items">
                 @foreach($deductions as $item)
                 <tr>
@@ -438,7 +438,7 @@
                 </tr>
                 @endif
                 <tr class="subtotal deduct">
-                    <td>Total Potongan</td>
+                    <td>Total Deductions</td>
                     <td class="amount">{{ fmtRp($payslip->total_deduction + $payslip->pph21 + $bpjsEmp) }}</td>
                 </tr>
             </table>
@@ -449,31 +449,31 @@
     <div class="summary-box">
         <table>
             <tr>
-                <td class="label">Gaji Pokok</td>
+                <td class="label">Basic Salary</td>
                 <td class="value">{{ fmtRp($payslip->basic_salary) }}</td>
                 <td class="label" style="padding-left:20px;">BPJS Kesehatan (Employee)</td>
                 <td class="value">{{ fmtRp($payslip->bpjs_kesehatan_employee) }}</td>
             </tr>
             <tr>
-                <td class="label">Total Tunjangan</td>
+                <td class="label">Total Allowances</td>
                 <td class="value">{{ fmtRp($payslip->total_allowance) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS Ketenagakerjaan (Employee)</td>
+                <td class="label" style="padding-left:20px;">BPJS Employment (Employee)</td>
                 <td class="value">{{ fmtRp($payslip->bpjs_ketenagakerjaan_employee) }}</td>
             </tr>
             <tr>
-                <td class="label">Gaji Bruto</td>
+                <td class="label">Gross Salary</td>
                 <td class="value">{{ fmtRp($payslip->gross_salary) }}</td>
                 <td class="label" style="padding-left:20px;">PPh 21</td>
                 <td class="value">{{ fmtRp($payslip->pph21) }}</td>
             </tr>
             <tr>
-                <td class="label">Total Potongan Lain</td>
+                <td class="label">Total Other Deductions</td>
                 <td class="value">{{ fmtRp($payslip->total_deduction) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS (Ditanggung Perusahaan)</td>
+                <td class="label" style="padding-left:20px;">BPJS (Company Borne)</td>
                 <td class="value" style="color:#6b7280;">{{ fmtRp($bpjsPer) }}</td>
             </tr>
             <tr class="net-row">
-                <td colspan="2">GAJI BERSIH (TAKE HOME PAY)</td>
+                <td colspan="2">NET SALARY (TAKE HOME PAY)</td>
                 <td colspan="2" style="text-align:right;">{{ fmtRp($payslip->net_salary) }}</td>
             </tr>
         </table>
