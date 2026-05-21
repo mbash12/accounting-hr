@@ -84,20 +84,20 @@ class FixedAssetForm
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->label('Kategori Aset'),
+                            ->label('Asset Category'),
                         DatePicker::make('acquisition_date')
                             ->required()
-                            ->label('Tanggal Perolehan'),
+                            ->label('Acquisition Date'),
                         NumberInput::make('acquisition_value')
                             ->prefix('Rp')
                             ->required()
                             ->decimal(false)
-                            ->label('Nilai Perolehan'),
+                            ->label('Acquisition Value'),
                         NumberInput::make('book_value')
                             ->prefix('Rp')
                             ->required()
                             ->decimal(false)
-                            ->label('Nilai Buku'),
+                            ->label('Book Value'),
                         Select::make('company_id')
                             ->relationship(
                                 name: 'company',
