@@ -14,26 +14,26 @@ class TaxTemplateExport implements FromCollection, WithHeadings, WithTitle
         // Return sample data as template with real account codes from the CSV
         return collect([
             [
-                'PPN 11%',
+                'VAT 11%',
                 'PPN-11',
                 11,
                 'vat',
-                'ya',
-                'ya',
-                'ya',
-                '51000100', // Pembelian Barang PPN (expense account from CSV)
-                '40000100', // Penjualan (revenue account from CSV)
+                'Yes',
+                'Yes',
+                'Yes',
+                '51000100', // Purchase VAT (expense account from CSV)
+                '40000100', // Sales (revenue account from CSV)
             ],
             [
-                'PPh 23',
+                'Income Tax 23',
                 'PPh-23',
                 2,
                 'withholding_tax',
-                'tidak',
-                'ya',
-                'ya',
+                'No',
+                'Yes',
+                'Yes',
                 '',
-                '40000100',   // Penjualan (revenue account from CSV)
+                '40000100',   // Sales (revenue account from CSV)
             ],
         ]);
     }
@@ -41,20 +41,20 @@ class TaxTemplateExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'nama_pajak',
-            'kode_pajak',
-            'persentase_pajak',
-            'jenis_pajak',
-            'pajak_pembelian',
-            'pajak_penjualan',
-            'status_aktif',
-            'akun_pembelian',
-            'akun_penjualan'
+            'tax_name',
+            'tax_code',
+            'tax_percentage',
+            'tax_type',
+            'purchase_tax',
+            'sales_tax',
+            'active_status',
+            'purchase_account',
+            'sales_account',
         ];
     }
 
     public function title(): string
     {
-        return 'Template Data Pajak';
+        return 'Tax Import Template';
     }
 }

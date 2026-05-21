@@ -13,35 +13,35 @@ class ImportProductGroupsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Grup Produk')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data grup produk termasuk kolom: nama_grup_produk, kode_grup_produk, tipe_pengiriman, status_aktif. Kode grup produk akan digunakan saat mengimpor produk.')
+                    ->label('Product Group Data File')
+                    ->helperText('Upload Excel file (.xlsx) with product group data including columns: nama_grup_produk, kode_grup_produk, tipe_pengiriman, status_aktif. Product group code will be used when importing products.')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Grup Produk')
-            ->modalDescription('Unggah file Excel dengan informasi grup produk. Kode grup produk yang diimpor akan digunakan saat mengimpor produk untuk menghubungkan produk ke kategori yang sesuai. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Product Groups')
+            ->modalDescription('Upload Excel file with product group information. The imported product group code will be used when importing products to link products to the appropriate category. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\ProductGroupsTemplateExport(),
-                                'template-impor-grup-produk.xlsx'
+                                'product-group-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template grup produk: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the product group template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportProductGroupsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data grup produk berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Product group data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data grup produk: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing product group data: ' . $e->getMessage())
                         ->send();
                 }
             });

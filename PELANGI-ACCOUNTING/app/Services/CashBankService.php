@@ -108,7 +108,7 @@ class CashBankService
                     'account_id' => $item['account_id'] ?? null,
                     'debit' => 0,
                     'credit' => $item['amount'] ?? $item['total'] ?? 0,
-                    'notes' => $item['description'] ?? 'Uang Muka Diterima',
+                    'notes' => $item['description'] ?? 'Advance Received',
                     'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
                 ])->all(),
                 ]);
@@ -143,7 +143,7 @@ class CashBankService
             
             $glAccount = Account::findOrFail($glAccountId);
             if (!$glAccount->is_cash_bank) {
-                throw new InvalidArgumentException('Account yang dipilih harus memiliki flag is_cash_bank = true');
+                throw new InvalidArgumentException('Selected account must have is_cash_bank flag set to true');
             }
             
             // $bankAccount = BankAccount::where('account_id', $glAccountId)->first();
@@ -202,7 +202,7 @@ class CashBankService
                 'updated_by_user_id' => Auth::id(),
             ]);
 
-            // Hanya buat journal entry jika status posted
+            // Only create journal entry if status is posted
             if ($isPosted) {
                 $this->createJournalEntryWithItems([
                     'date' => $data['date'],
@@ -222,14 +222,14 @@ class CashBankService
                     'account_id' => $item['account_id'] ?? null,
                     'debit' => $item['amount'] ?? $item['total'] ?? 0,
                     'credit' => 0,
-                    'notes' => $item['description'] ?? 'Biaya/Aset',
+                    'notes' => $item['description'] ?? 'Expense/Asset',
                     'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
                 ])->all(),
                 [
                     'account_id' => $glAccountId,
                     'debit' => 0,
                     'credit' => $totalAmount,
-                    'notes' => 'Kas/Bank',
+                    'notes' => 'Cash/Bank',
                     'cost_center_id' => $data['cost_center_id'] ?? null,
                 ],
                 ]);
@@ -266,7 +266,7 @@ class CashBankService
             
             $glAccount = Account::findOrFail($glAccountId);
             if (!$glAccount->is_cash_bank) {
-                throw new InvalidArgumentException('Account yang dipilih harus memiliki flag is_cash_bank = true');
+                throw new InvalidArgumentException('Selected account must have is_cash_bank flag set to true');
             }
 
             // $bankAccount = BankAccount::where('account_id', $glAccountId)->first();
@@ -328,7 +328,7 @@ class CashBankService
                 'updated_by_user_id' => Auth::id(),
             ]);
 
-            // Hanya buat journal entry jika status posted
+            // Only create journal entry if status is posted
             if ($isPosted) {
                 $this->createJournalEntryWithItems([
                     'date' => $data['date'],
@@ -348,14 +348,14 @@ class CashBankService
                     'account_id' => $glAccountId,
                     'debit' => $totalAmount,
                     'credit' => 0,
-                    'notes' => 'Kas/Bank',
+                    'notes' => 'Cash/Bank',
                     'cost_center_id' => $data['cost_center_id'] ?? null,
                 ],
                 ...collect($items)->map(fn($item) => [
                     'account_id' => $item['account_id'] ?? null,
                     'debit' => 0,
                     'credit' => $item['amount'] ?? $item['total'] ?? 0,
-                    'notes' => $item['description'] ?? 'Akun Lawan',
+                    'notes' => $item['description'] ?? 'Contra Account',
                     'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
                 ])->all(),
                 ]);
@@ -394,17 +394,17 @@ class CashBankService
             $toAccount = Account::findOrFail($toAccountId);
             
             if (!$fromAccount->is_cash_bank) {
-                throw new InvalidArgumentException('Account yang dipilih harus memiliki flag is_cash_bank = true');
+                throw new InvalidArgumentException('Selected account must have is_cash_bank flag set to true');
             }
             
             if (!$toAccount->is_cash_bank) {
-                throw new InvalidArgumentException('Account yang dipilih harus memiliki flag is_cash_bank = true');
+                throw new InvalidArgumentException('Selected account must have is_cash_bank flag set to true');
             }
             
             $isPosted = $this->isPosted($data['status'] ?? null);
 
             if ($fromAccount->id === $toAccount->id) {
-                throw new InvalidArgumentException('Rekening asal dan tujuan tidak boleh sama.');
+                throw new InvalidArgumentException('Source and destination accounts cannot be the same.');
             }
 
             $transferNumber = $data['transfer_number'] ?? null;
@@ -471,14 +471,14 @@ class CashBankService
                         'account_id' => $toAccount->id,
                         'debit' => $data['amount'],
                         'credit' => 0,
-                        'notes' => 'Rekening Tujuan',
+                        'notes' => 'Destination Account',
                         'cost_center_id' => $data['cost_center_id'] ?? null,
                     ],
                     [
                         'account_id' => $fromAccount->id,
                         'debit' => 0,
                         'credit' => $data['amount'],
-                        'notes' => 'Rekening Asal',
+                        'notes' => 'Source Account',
                         'cost_center_id' => $data['cost_center_id'] ?? null,
                     ],
                 ]);
@@ -573,7 +573,7 @@ class CashBankService
             throw new InvalidArgumentException('Bank account not found for this account.');
         }
 
-        throw new InvalidArgumentException('bank_account_id atau account_id harus diisi.');
+        throw new InvalidArgumentException('Either bank_account_id or account_id is required.');
     }
 
     private function getBankAccount(?int $bankAccountId): BankAccount
@@ -590,21 +590,21 @@ class CashBankService
         
         if (!$bankAccount->account_id) {
             
-            throw new InvalidArgumentException('Bank account belum dipetakan ke akun buku besar.');
+            throw new InvalidArgumentException('Bank account is not mapped to a ledger account.');
         }
     }
 
     private function assertPositiveAmount($amount): void
     {
         if (!$amount || $amount <= 0) {
-            throw new InvalidArgumentException('Nominal harus lebih besar dari 0.');
+            throw new InvalidArgumentException('Amount must be greater than 0.');
         }
     }
 
     private function assertHasItems(array $items): void
     {
         if (empty($items)) {
-            throw new InvalidArgumentException('Minimal satu item transaksi diperlukan.');
+            throw new InvalidArgumentException('At least one transaction item is required.');
         }
     }
 
@@ -702,14 +702,14 @@ class CashBankService
                 'account_id' => $toAccountId,
                 'debit' => $totalAmount,
                 'credit' => 0,
-                'notes' => 'Kas/Bank',
+                'notes' => 'Cash/Bank',
                 'cost_center_id' => $costCenterId,
             ],
             ...$items->map(fn($item) => [
                 'account_id' => $item->account_id,
                 'debit' => 0,
                 'credit' => $item->amount ?? 0,
-                'notes' => $item->description ?? 'Akun Lawan',
+                'notes' => $item->description ?? 'Contra Account',
                 'cost_center_id' => $costCenterId,
             ])->all(),
         ];
@@ -749,14 +749,14 @@ class CashBankService
                 'account_id' => $item->account_id,
                 'debit' => $item->amount ?? 0,
                 'credit' => 0,
-                'notes' => $item->description ?? 'Biaya/Aset',
+                'notes' => $item->description ?? 'Expense/Asset',
                 'cost_center_id' => $costCenterId,
             ])->all(),
             [
                 'account_id' => $fromAccountId,
                 'debit' => 0,
                 'credit' => $totalAmount,
-                'notes' => 'Kas/Bank',
+                'notes' => 'Cash/Bank',
                 'cost_center_id' => $costCenterId,
             ],
         ];
@@ -792,14 +792,14 @@ class CashBankService
                 'account_id' => $toAccountId,
                 'debit' => $amount,
                 'credit' => 0,
-                'notes' => 'Rekening Tujuan',
+                'notes' => 'Destination Account',
                 'cost_center_id' => $costCenterId,
             ],
             [
                 'account_id' => $fromAccountId,
                 'debit' => 0,
                 'credit' => $amount,
-                'notes' => 'Rekening Asal',
+                'notes' => 'Source Account',
                 'cost_center_id' => $costCenterId,
             ],
         ];
@@ -825,7 +825,7 @@ class CashBankService
         return DB::transaction(function () use ($data) {
             $items = $data['advanceReceiptItems'] ?? [];
             if (empty($items)) {
-                throw new InvalidArgumentException('Minimal satu item diperlukan.');
+                throw new InvalidArgumentException('At least one item is required.');
             }
 
             $totalAmount = 0;
@@ -838,12 +838,12 @@ class CashBankService
             }
 
             if ($totalAmount <= 0) {
-                throw new InvalidArgumentException('Total amount harus lebih dari 0.');
+                throw new InvalidArgumentException('Total amount must be greater than 0.');
             }
 
             $toAccount = Account::find($data['to_account_id']);
             if (!$toAccount || !$toAccount->is_cash_bank) {
-                throw new InvalidArgumentException('Account yang dipilih harus memiliki flag is_cash_bank = true');
+                throw new InvalidArgumentException('Selected account must have is_cash_bank flag set to true');
             }
 
             $isPosted = $this->isPosted($data['status'] ?? null);
@@ -865,7 +865,7 @@ class CashBankService
             }
             
             if (!$companyId) {
-                throw new InvalidArgumentException('Company ID harus tersedia. Pastikan company dipilih di session atau form.');
+                throw new InvalidArgumentException('Company ID is required. Ensure a company is selected in session or form.');
             }
 
             $advanceReceipt = AdvanceReceipt::create([
@@ -920,7 +920,7 @@ class CashBankService
                     }
                     
                     if (!$classification->default_account_id) {
-                        throw new InvalidArgumentException("Transaction Classification '{$classification->name}' pada item #" . ($index + 1) . " tidak memiliki default account. Silakan set default account di Transaction Classification.");
+                        throw new InvalidArgumentException("Transaction Classification '{$classification->name}' for item #" . ($index + 1) . " does not have a default account. Please set a default account in Transaction Classification.");
                     }
 
                     $journalItems[] = [
@@ -936,7 +936,7 @@ class CashBankService
                 $costCenterId = $data['cost_center_id'] ?? \App\Models\CostCenter::first()?->id;
 
                 if (!$departmentId || !$costCenterId) {
-                    throw new InvalidArgumentException('Department dan Cost Center harus tersedia untuk membuat journal entry.');
+                    throw new InvalidArgumentException('Department and Cost Center are required to create a journal entry.');
                 }
 
                 $this->createJournalEntryWithItems([
@@ -964,7 +964,7 @@ class CashBankService
         return DB::transaction(function () use ($data) {
             $items = $data['items'] ?? [];
             if (empty($items)) {
-                throw new InvalidArgumentException('Minimal satu item diperlukan.');
+                throw new InvalidArgumentException('At least one item is required.');
             }
 
             $totalAmount = 0;
@@ -977,12 +977,12 @@ class CashBankService
             }
 
             if ($totalAmount <= 0) {
-                throw new InvalidArgumentException('Total amount harus lebih dari 0.');
+                throw new InvalidArgumentException('Total amount must be greater than 0.');
             }
 
             $fromAccount = Account::find($data['from_account_id']);
             if (!$fromAccount || !$fromAccount->is_cash_bank) {
-                throw new InvalidArgumentException('Account yang dipilih harus memiliki flag is_cash_bank = true');
+                throw new InvalidArgumentException('Selected account must have is_cash_bank flag set to true');
             }
 
             $isPosted = $this->isPosted($data['status'] ?? null);
@@ -1004,7 +1004,7 @@ class CashBankService
             }
             
             if (!$companyId) {
-                throw new InvalidArgumentException('Company ID harus tersedia. Pastikan company dipilih di session atau form.');
+                throw new InvalidArgumentException('Company ID is required. Ensure a company is selected in session or form.');
             }
 
             $referenceNo = $data['reference_no'] ?? null;
@@ -1060,7 +1060,7 @@ class CashBankService
                     }
                     
                     if (!$classification->default_account_id) {
-                        throw new InvalidArgumentException("Transaction Classification '{$classification->name}' pada item #" . ($index + 1) . " tidak memiliki default account. Silakan set default account di Transaction Classification.");
+                        throw new InvalidArgumentException("Transaction Classification '{$classification->name}' for item #" . ($index + 1) . " does not have a default account. Please set a default account in Transaction Classification.");
                     }
 
                     $journalItems[] = [
@@ -1084,7 +1084,7 @@ class CashBankService
                 $costCenterId = $data['cost_center_id'] ?? \App\Models\CostCenter::first()?->id;
 
                 if (!$departmentId || !$costCenterId) {
-                    throw new InvalidArgumentException('Department dan Cost Center harus tersedia untuk membuat journal entry.');
+                    throw new InvalidArgumentException('Department and Cost Center are required to create a journal entry.');
                 }
 
                 $this->createJournalEntryWithItems([

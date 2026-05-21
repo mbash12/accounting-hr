@@ -23,8 +23,8 @@ class ExportAccountsAction extends Action
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Export Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data akun: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting akun: ' . $e->getMessage())
                         ->send();
                 }
             });

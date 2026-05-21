@@ -248,7 +248,6 @@ class SalesInvoiceForm
                                     $salesOrder = \App\Models\SalesOrder::with(['items.product', 'customer'])->find($state);
                                     if ($salesOrder) {
                                         $set('customer_id', $salesOrder->customer_id);
-                                        $set('job_id', $salesOrder->job_id);
 
                                         // Auto-fill items from sales order
                                         $items = [];
@@ -297,7 +296,6 @@ class SalesInvoiceForm
                                 } else if (!$state) {
                                     // Clear items if no sales order selected
                                     $set('items', []);
-                                    $set('job_id', null);
                                     $set('other_charges', 0);
                                     $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay(0));
                                     $set('discount_percentage', 0);

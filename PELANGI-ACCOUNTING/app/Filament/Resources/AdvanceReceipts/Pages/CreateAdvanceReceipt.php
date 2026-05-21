@@ -17,27 +17,27 @@ class CreateAdvanceReceipt extends CreateRecord
         $items = $data['advanceReceiptItems'] ?? [];
         if (empty($items)) {
             throw ValidationException::withMessages([
-                'advanceReceiptItems' => __('Minimal satu item diperlukan.'),
+                'advanceReceiptItems' => __('At least one item is required.'),
             ]);
         }
 
         foreach ($items as $index => $item) {
             if (empty($item['transaction_classification_id'])) {
                 throw ValidationException::withMessages([
-                    "advanceReceiptItems.{$index}.transaction_classification_id" => __('Transaction Classification harus dipilih untuk setiap item.'),
+                    "advanceReceiptItems.{$index}.transaction_classification_id" => __('Transaction Classification must be selected for each item.'),
                 ]);
             }
         }
 
         if (empty($data['to_account_id'])) {
             throw ValidationException::withMessages([
-                'to_account_id' => __('Cash/Bank Account harus dipilih.'),
+                'to_account_id' => __('Cash/Bank Account must be selected.'),
             ]);
         }
 
         if (empty($data['recipient_id'])) {
             throw ValidationException::withMessages([
-                'recipient_id' => __('Recipient harus dipilih.'),
+                'recipient_id' => __('Recipient must be selected.'),
             ]);
         }
 
@@ -75,7 +75,7 @@ class CreateAdvanceReceipt extends CreateRecord
             
             Notification::make()
                 ->title(__('Success'))
-                ->body(__('Advance Receipt berhasil dibuat.'))
+                ->body(__('Advance Receipt created successfully.'))
                 ->success()
                 ->send();
 
@@ -100,12 +100,12 @@ class CreateAdvanceReceipt extends CreateRecord
 
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Terjadi kesalahan: ' . $e->getMessage()))
+                ->body(__('An error occurred: ' . $e->getMessage()))
                 ->danger()
                 ->send();
 
             throw ValidationException::withMessages([
-                'form' => __('Terjadi kesalahan: ' . $e->getMessage()),
+                'form' => __('An error occurred: ' . $e->getMessage()),
             ]);
         }
     }

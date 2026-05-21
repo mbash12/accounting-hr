@@ -13,35 +13,35 @@ class ImportUnitMeasurementsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Satuan')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data satuan termasuk kolom: unit_code, unit_name, unit_description, active_status')
+                    ->label('Unit Measurement Data File')
+                    ->helperText('Upload Excel file (.xlsx) with unit data including columns: unit_code, unit_name, unit_description, active_status')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Satuan')
-            ->modalDescription('Unggah file Excel dengan informasi satuan. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Unit Measurement Data')
+            ->modalDescription('Upload Excel file with unit measurement information. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\UnitMeasurementsTemplateExport(),
-                                'template-impor-satuan.xlsx'
+                                'unit-measurement-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template satuan: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the unit measurement template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportUnitMeasurementsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data satuan berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Unit measurement data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data satuan: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing unit measurement data: ' . $e->getMessage())
                         ->send();
                 }
             });

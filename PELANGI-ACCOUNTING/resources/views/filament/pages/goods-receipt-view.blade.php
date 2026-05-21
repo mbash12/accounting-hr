@@ -388,7 +388,7 @@
                     <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                     <!-- Fallback if no logo: Just Company Name styling -->
-                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}
+                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}
                     </h1>
                     @endif
 
@@ -403,8 +403,8 @@
                             nl2br(e($record->company->billing_state)) !!} {!!
                             nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
@@ -433,7 +433,7 @@
             <!-- ADDRESSES -->
             <div class="address-section">
                 <div class="address-box">
-                    <div class="address-title">Detail Supplier</div>
+                    <div class="address-title">Supplier Details</div>
                     @if($record->supplier)
                     <p class="recipient-name">{{ $record->supplier->name }}</p>
                     <p>
@@ -445,7 +445,7 @@
                         @if($record->supplier->billing_state), {!! nl2br(e($record->supplier->billing_state)) !!}@endif
                         {!! nl2br(e($record->supplier->billing_postal_code)) !!}
                     </p>
-                    @if($record->supplier->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->supplier->tax_id }}
+                    @if($record->supplier->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->supplier->tax_id }}
                     </p>@endif
                     @else
                     <p class="text-muted">Tidak ada supplier dipilih</p>
@@ -455,7 +455,7 @@
                 <div class="address-box">
                     <div class="address-title">Detail Penerimaan</div>
                     @if($record->purchase_order)
-                    <p><span class="text-muted">Ref. Pembelian:</span> <strong>{{
+                    <p><span class="text-muted">Purchase Ref.:</span> <strong>{{
                             $record->purchase_order->purchase_order_no }}</strong></p>
                     @endif
                     @if($record->received_by)
@@ -473,7 +473,7 @@
                     <thead>
                         <tr>
                             <th class="col-idx">#</th>
-                            <th class="col-desc">Deskripsi Barang</th>
+                            <th class="col-desc">Description</th>
                             <th class="col-qty" style="text-align: right;">Jumlah</th>
                         </tr>
                     </thead>
@@ -482,10 +482,9 @@
                         <tr>
                             <td class="col-idx">{{ $index + 1 }}</td>
                             <td class="col-desc">
-                                <strong>{{ $item->item_name ?? $item->product->name ?? $item->description ?? 'Barang'
+                                <strong>{{ $item->product->name ?? $item->description ?? ''
                                     }}</strong>
-                                @if($item->description && $item->description !== ($item->item_name ??
-                                $item->product->name ?? ''))
+                                @if($item->description && $item->description !== ($item->product->name ?? ''))
                                 <div class="text-sm text-muted">{{ $item->description }}</div>
                                 @endif
                             </td>

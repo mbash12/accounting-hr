@@ -19,10 +19,10 @@ class CreateSalesInvoice extends CreateRecord
         try {
             parent::create(...$args);
         } catch (ValidationException $e) {
-            $message = collect($e->errors())->flatten()->first() ?? __('Validasi gagal.');
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
 
             Notification::make()
-                ->title(__('Gagal menyimpan'))
+                ->title(__('Save Failed'))
                 ->body($message)
                 ->danger()
                 ->send();
@@ -58,10 +58,10 @@ class CreateSalesInvoice extends CreateRecord
             
             return $record;
         } catch (ValidationException $e) {
-            $message = collect($e->errors())->flatten()->first() ?? __('Validasi gagal.');
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
 
             Notification::make()
-                ->title(__('Gagal menyimpan'))
+                ->title(__('Save Failed'))
                 ->body($message)
                 ->danger()
                 ->send();

@@ -13,7 +13,7 @@ class ImportEmployeeLeaveQuotasAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
@@ -24,11 +24,11 @@ class ImportEmployeeLeaveQuotasAction extends Action
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Kuota Cuti')
-            ->modalDescription('Unggah file Excel dengan data kuota cuti karyawan. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Kuota Cuti')
+            ->modalDescription('Upload Excel file with data kuota cuti karyawan. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
@@ -40,8 +40,8 @@ class ImportEmployeeLeaveQuotasAction extends Action
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template kuota cuti: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading template kuota cuti: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -52,14 +52,14 @@ class ImportEmployeeLeaveQuotasAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
+                        ->title('Import Successful')
                         ->body('Data kuota cuti berhasil diimpor.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data kuota cuti: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing kuota cuti: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -21,14 +21,14 @@ class CreateCashReceipt extends CreateRecord
         $items = $data['items'] ?? [];
         if (empty($items)) {
             throw ValidationException::withMessages([
-                'items' => __('Minimal satu item diperlukan.'),
+                'items' => __('At least one item is required.'),
             ]);
         }
 
         foreach ($items as $index => $item) {
             if (empty($item['account_id'])) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.account_id" => __('Account harus dipilih untuk setiap item.'),
+                    "items.{$index}.account_id" => __('Account must be selected for each item.'),
                 ]);
             }
         }
@@ -64,7 +64,7 @@ class CreateCashReceipt extends CreateRecord
             
             if (empty($data['to_account_id'])) {
                 throw ValidationException::withMessages([
-                    'to_account_id' => __('Account harus dipilih.'),
+                    'to_account_id' => __('Account must be selected.'),
                 ]);
             }
 
@@ -73,7 +73,7 @@ class CreateCashReceipt extends CreateRecord
             $defaultDepartment = \App\Models\Department::first();
             if (!$defaultDepartment) {
                 throw ValidationException::withMessages([
-                    'department_id' => __('Department tidak ditemukan. Silakan buat department terlebih dahulu.'),
+                    'department_id' => __('Department not found. Please create a department first.'),
                 ]);
             }
 
@@ -85,12 +85,12 @@ class CreateCashReceipt extends CreateRecord
                     if (!$userId) {
                         Notification::make()
                             ->title(__('Error'))
-                            ->body(__('User tidak terautentikasi.'))
+                            ->body(__('User is not authenticated.'))
                             ->danger()
                             ->send();
                         
                         throw ValidationException::withMessages([
-                            'to_account_id' => __('User tidak terautentikasi.'),
+                            'to_account_id' => __('User is not authenticated.'),
                         ]);
                     }
                     
@@ -103,7 +103,7 @@ class CreateCashReceipt extends CreateRecord
                     ]);
                 } catch (\Exception $e) {
                     throw ValidationException::withMessages([
-                        'cost_center_id' => __('Gagal membuat cost center default: ' . $e->getMessage()),
+                        'cost_center_id' => __('Failed to create default cost center: ' . $e->getMessage()),
                     ]);
                 }
             }
@@ -166,12 +166,12 @@ class CreateCashReceipt extends CreateRecord
             
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Terjadi kesalahan: ' . $e->getMessage()))
+                ->body(__('An error occurred: ' . $e->getMessage()))
                 ->danger()
                 ->send();
             
             throw ValidationException::withMessages([
-                'to_account_id' => __('Terjadi kesalahan. Silakan cek log untuk detail.'),
+                'to_account_id' => __('An error occurred. Please check the log for details.'),
             ]);
         }
     }

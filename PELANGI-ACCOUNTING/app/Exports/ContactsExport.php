@@ -29,14 +29,14 @@ class ContactsExport implements FromCollection, WithHeadings, WithTitle
                     'email' => $contact->email,
                     'phone' => $contact->phone,
                     'contact_person' => $contact->contact_person,
-                    'is_customer' => $contact->is_customer ? 'ya' : 'tidak',
-                    'is_supplier' => $contact->is_supplier ? 'ya' : 'tidak',
-                    'is_employee' => $contact->is_employee ? 'ya' : 'tidak',
-                    'is_sales' => $contact->is_sales ? 'ya' : 'tidak',
-                    'is_pkp' => $contact->is_pkp ? 'ya' : 'tidak',
+                    'is_customer' => $contact->is_customer ? 'Yes' : 'No',
+                    'is_supplier' => $contact->is_supplier ? 'Yes' : 'No',
+                    'is_employee' => $contact->is_employee ? 'Yes' : 'No',
+                    'is_sales' => $contact->is_sales ? 'Yes' : 'No',
+                    'is_pkp' => $contact->is_pkp ? 'Yes' : 'No',
                     'billing_address' => $contact->billing_address_line_1,
                     'shipping_address' => $contact->delivery_address_line_1,
-                    'is_active' => $contact->is_active ? 'ya' : 'tidak',
+                    'is_active' => $contact->is_active ? 'Yes' : 'No',
                 ];
             });
     }
@@ -44,24 +44,24 @@ class ContactsExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Kode Kontak',
-            'Nama Kontak',
+            'Contact Code',
+            'Contact Name',
             'Email',
-            'Telepon',
-            'Nama Kontak',
-            'Pelanggan',
-            'Pemasok',
-            'Karyawan',
-            'Penjualan',
+            'Phone',
+            'Contact Person',
+            'Customer',
+            'Supplier',
+            'Employee',
+            'Sales',
             'PKP',
-            'Alamat Tagihan',
-            'Alamat Pengiriman',
-            'Status Aktif',
+            'Billing Address',
+            'Shipping Address',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Kontak';
+        return 'Contact Data';
     }
 }

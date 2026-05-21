@@ -12,9 +12,9 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
     {
         return [
             [
-                'Laptop Dell Inspiron',
+                'Dell Inspiron Laptop',
                 'LP-001',
-                'Laptop Dell Inspiron 15 inch dengan prosesor Intel Core i5, RAM 8GB, SSD 256GB',
+                'Dell Inspiron 15 inch laptop with Intel Core i5 processor, 8GB RAM, 256GB SSD',
                 12000000,
                 15000000,
                 'good',
@@ -24,9 +24,9 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
                 'PPN',
             ],
             [
-                'Mouse Wireless Logitech',
+                'Logitech Wireless Mouse',
                 'MO-001',
-                'Mouse wireless Logitech dengan sensor optik presisi tinggi',
+                'Logitech wireless mouse with high precision optical sensor',
                 150000,
                 200000,
                 'good',
@@ -36,9 +36,9 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
                 'PPN',
             ],
             [
-                'Software Akuntansi Premium',
+                'Premium Accounting Software',
                 'SA-001',
-                'Software akuntansi untuk usaha kecil dan menengah',
+                'Accounting software for small and medium businesses',
                 500000,
                 750000,
                 'service',
@@ -68,6 +68,6 @@ class ProductTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Produk';
+        return 'Product Import Template';
     }
 }

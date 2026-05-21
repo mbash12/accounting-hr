@@ -69,10 +69,10 @@ class WarehousesImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'kode_gudang.required' => 'Kode Gudang wajib diisi.',
-            'kode_gudang.max' => 'Kode Gudang tidak boleh lebih dari 20 karakter.',
-            'nama_gudang.required' => 'Nama Gudang wajib diisi.',
-            'nama_gudang.max' => 'Nama Gudang tidak boleh lebih dari 255 karakter.',
+            'kode_gudang.required' => 'Warehouse Code is required.',
+            'kode_gudang.max' => 'Warehouse Code cannot exceed 20 characters.',
+            'nama_gudang.required' => 'Warehouse Name is required.',
+            'nama_gudang.max' => 'Warehouse Name cannot exceed 255 characters.',
         ];
     }
 }

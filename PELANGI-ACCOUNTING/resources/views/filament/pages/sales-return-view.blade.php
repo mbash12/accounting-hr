@@ -312,7 +312,7 @@
                         <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                         <!-- Fallback if no logo: Just Company Name styling -->
-                        <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}</h1>
+                        <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}</h1>
                     @endif
 
                     <div class="company-details">
@@ -322,8 +322,8 @@
                             @if($record->company->billing_address_line_2)<br>{!! nl2br(e($record->company->billing_address_line_2)) !!}@endif
                             @if($record->company->billing_city)<br>{!! nl2br(e($record->company->billing_city)) !!}, {!! nl2br(e($record->company->billing_state)) !!} {!! nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
@@ -352,7 +352,7 @@
             <!-- ADDRESSES -->
             <div class="address-section">
                 <div class="address-box">
-                    <div class="address-title">Detail Pelanggan</div>
+                    <div class="address-title">Customer Details</div>
                     @if($record->customer)
                         <p class="recipient-name">{{ $record->customer->name }}</p>
                         <p>
@@ -363,7 +363,7 @@
                             @if($record->customer->billing_state), {!! nl2br(e($record->customer->billing_state)) !!}@endif
                             {!! nl2br(e($record->customer->billing_postal_code)) !!}
                         </p>
-                        @if($record->customer->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->customer->tax_id }}</p>@endif
+                        @if($record->customer->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->customer->tax_id }}</p>@endif
                     @else
                         <p class="text-muted">Tidak ada pelanggan dipilih</p>
                     @endif
@@ -386,7 +386,7 @@
                     <thead>
                         <tr>
                             <th class="col-idx">#</th>
-                            <th class="col-desc">Deskripsi Barang</th>
+                            <th class="col-desc">Description</th>
                             <th class="col-qty" style="text-align: right;">Jumlah</th>
                             <th class="col-reason">Alasan Retur</th>
                         </tr>
@@ -396,8 +396,8 @@
                         <tr>
                             <td class="col-idx">{{ $index + 1 }}</td>
                             <td class="col-desc">
-                                <strong>{{ $item->item_name ?? $item->product->name ?? $item->description ?? 'Barang' }}</strong>
-                                @if($item->description && $item->description !== ($item->item_name ?? $item->product->name ?? ''))
+                                <strong>{{ $item->product->name ?? $item->description ?? '' }}</strong>
+                                @if($item->description && $item->description !== ($item->product->name ?? ''))
                                     <div class="text-sm text-muted">{{ $item->description }}</div>
                                 @endif
                             </td>

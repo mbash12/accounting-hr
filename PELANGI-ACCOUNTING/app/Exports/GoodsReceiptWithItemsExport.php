@@ -28,37 +28,37 @@ class GoodsReceiptWithItemsExport implements FromCollection, WithHeadings, WithT
             if ($receipt->items->count() > 0) {
                 foreach ($receipt->items as $item) {
                     $results->push([
-                        'No. Penerimaan Barang' => $receipt->receipt_number,
-                        'Tanggal' => $receipt->date ? $receipt->date->format('Y-m-d') : null,
-                        'Nomor Referensi' => $receipt->reference_no,
-                        'Deskripsi' => $receipt->description,
+                        'Receipt No.' => $receipt->receipt_number,
+                        'Date' => $receipt->date ? $receipt->date->format('Y-m-d') : null,
+                        'Reference No.' => $receipt->reference_no,
+                        'Description' => $receipt->description,
                         'Status' => $receipt->status,
-                        'Kode Pemasok' => $receipt->supplier ? $receipt->supplier->contact_code : null,
-                        'Nama Pemasok' => $receipt->supplier ? $receipt->supplier->name : null,
-                        'Nomor Pesanan Pembelian' => $receipt->purchaseOrder ? $receipt->purchaseOrder->purchase_order_no : null,
-                        'Kode Produk' => $item->product ? $item->product->code : null,
-                        'Nama Produk' => $item->product ? $item->product->name : null,
-                        'Deskripsi Item' => $item->description,
-                        'Jumlah' => $item->quantity,
-                        'Kode Satuan' => $item->unit ? $item->unit->code : null,
+                        'Supplier Code' => $receipt->supplier ? $receipt->supplier->contact_code : null,
+                        'Supplier Name' => $receipt->supplier ? $receipt->supplier->name : null,
+                        'Purchase Order No.' => $receipt->purchaseOrder ? $receipt->purchaseOrder->purchase_order_no : null,
+                        'Product Code' => $item->product ? $item->product->code : null,
+                        'Product Name' => $item->product ? $item->product->name : null,
+                        'Item Description' => $item->description,
+                        'Quantity' => $item->quantity,
+                        'Unit Code' => $item->unit ? $item->unit->code : null,
                     ]);
                 }
             } else {
                 // If receipt has no items, still add the receipt row with empty item fields
                 $results->push([
-                    'No. Penerimaan Barang' => $receipt->receipt_number,
-                    'Tanggal' => $receipt->date ? $receipt->date->format('Y-m-d') : null,
-                    'Nomor Referensi' => $receipt->reference_no,
-                    'Deskripsi' => $receipt->description,
+                    'Receipt No.' => $receipt->receipt_number,
+                    'Date' => $receipt->date ? $receipt->date->format('Y-m-d') : null,
+                    'Reference No.' => $receipt->reference_no,
+                    'Description' => $receipt->description,
                     'Status' => $receipt->status,
-                    'Kode Pemasok' => $receipt->supplier ? $receipt->supplier->contact_code : null,
-                    'Nama Pemasok' => $receipt->supplier ? $receipt->supplier->name : null,
-                    'Nomor Pesanan Pembelian' => $receipt->purchaseOrder ? $receipt->purchaseOrder->purchase_order_no : null,
-                    'Kode Produk' => null,
-                    'Nama Produk' => null,
-                    'Deskripsi Item' => null,
-                    'Jumlah' => null,
-                    'Kode Satuan' => null,
+                    'Supplier Code' => $receipt->supplier ? $receipt->supplier->contact_code : null,
+                    'Supplier Name' => $receipt->supplier ? $receipt->supplier->name : null,
+                    'Purchase Order No.' => $receipt->purchaseOrder ? $receipt->purchaseOrder->purchase_order_no : null,
+                    'Product Code' => null,
+                    'Product Name' => null,
+                    'Item Description' => null,
+                    'Quantity' => null,
+                    'Unit Code' => null,
                 ]);
             }
         }
@@ -69,24 +69,24 @@ class GoodsReceiptWithItemsExport implements FromCollection, WithHeadings, WithT
     public function headings(): array
     {
         return [
-            'No. Penerimaan Barang',
-            'Tanggal',
-            'Nomor Referensi',
-            'Deskripsi',
+            'Receipt No.',
+            'Date',
+            'Reference No.',
+            'Description',
             'Status',
-            'Kode Pemasok',
-            'Nama Pemasok',
-            'Nomor Pesanan Pembelian',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Kode Satuan',
+            'Supplier Code',
+            'Supplier Name',
+            'Purchase Order No.',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Unit Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Penerimaan Barang dan Item';
+        return 'Goods Receipts and Items';
     }
 }

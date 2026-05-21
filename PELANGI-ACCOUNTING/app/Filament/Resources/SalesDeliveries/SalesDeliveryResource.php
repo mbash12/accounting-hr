@@ -23,17 +23,17 @@ class SalesDeliveryResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Penjualan';
+        return __('Sales');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Pengiriman Penjualan';
+        return __('Sales Deliveries');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Pengiriman Penjualan';
+        return __('Sales Deliveries');
     }
 
     public static function getNavigationSort(): int
@@ -43,7 +43,7 @@ class SalesDeliveryResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'Pengiriman Penjualan';
+        return __('Sales Deliveries');
     }
 
     public static function form(Schema $schema): Schema

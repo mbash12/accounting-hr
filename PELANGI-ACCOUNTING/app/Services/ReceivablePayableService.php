@@ -62,7 +62,7 @@ class ReceivablePayableService
                     'account_id' => $cashBankAccountId,
                     'debit' => $totalPayment,
                     'credit' => 0,
-                    'notes' => __('Kas/Bank - Pembayaran dari :customer', ['customer' => $payment->customer->name ?? '']),
+                    'notes' => __('Cash/Bank - Payment from :customer', ['customer' => $payment->customer->name ?? '']),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -71,7 +71,7 @@ class ReceivablePayableService
                     'account_id' => $receivableAccount->id,
                     'debit' => 0,
                     'credit' => $receivableCreditAmount,
-                    'notes' => __('Piutang Usaha - Pembayaran :number', ['number' => $payment->payment_number]),
+                    'notes' => __('Receivable - Payment :number', ['number' => $payment->payment_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -81,7 +81,7 @@ class ReceivablePayableService
                         'account_id' => $payment->other_costs_account_id,
                         'debit' => 0,
                         'credit' => $otherCosts,
-                        'notes' => __('Biaya Lainnya - Pembayaran :number', ['number' => $payment->payment_number]),
+                        'notes' => __('Other Costs - Payment :number', ['number' => $payment->payment_number]),
                         'cost_center_id' => $costCenterId,
                     ]);
                 }
@@ -94,7 +94,7 @@ class ReceivablePayableService
                             'account_id' => $discountAccount->id,
                             'debit' => $totalDiscount,
                             'credit' => 0,
-                            'notes' => __('Potongan/Diskon - Pembayaran :number', ['number' => $payment->payment_number]),
+                            'notes' => __('Discount - Payment :number', ['number' => $payment->payment_number]),
                             'cost_center_id' => $costCenterId,
                         ]);
                     }
@@ -108,7 +108,7 @@ class ReceivablePayableService
                             'account_id' => $writeOffAccount->id,
                             'debit' => $totalWriteOff,
                             'credit' => 0,
-                            'notes' => __('Penghapusan (Write Off) - Pembayaran :number', ['number' => $payment->payment_number]),
+                            'notes' => __('Write Off - Payment :number', ['number' => $payment->payment_number]),
                             'cost_center_id' => $costCenterId,
                         ]);
                     }
@@ -147,7 +147,7 @@ class ReceivablePayableService
                 'account_id' => $cashBankAccountId,
                 'debit' => $totalPayment,
                 'credit' => 0,
-                'notes' => __('Kas/Bank - Pembayaran dari :customer', ['customer' => $payment->customer->name ?? '']),
+                'notes' => __('Cash/Bank - Payment from :customer', ['customer' => $payment->customer->name ?? '']),
                 'cost_center_id' => $costCenterId,
             ]);
 
@@ -156,7 +156,7 @@ class ReceivablePayableService
                 'account_id' => $receivableAccount->id,
                 'debit' => 0,
                 'credit' => $receivableCreditAmount,
-                'notes' => __('Piutang Usaha - Pembayaran :number', ['number' => $payment->payment_number]),
+                'notes' => __('Receivable - Payment :number', ['number' => $payment->payment_number]),
                 'cost_center_id' => $costCenterId,
             ]);
 
@@ -166,7 +166,7 @@ class ReceivablePayableService
                     'account_id' => $payment->other_costs_account_id,
                     'debit' => 0,
                     'credit' => $otherCosts,
-                    'notes' => __('Biaya Lainnya - Pembayaran :number', ['number' => $payment->payment_number]),
+                    'notes' => __('Other Costs - Payment :number', ['number' => $payment->payment_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
             }
@@ -179,7 +179,7 @@ class ReceivablePayableService
                         'account_id' => $discountAccount->id,
                         'debit' => $totalDiscount,
                         'credit' => 0,
-                        'notes' => __('Potongan/Diskon - Pembayaran :number', ['number' => $payment->payment_number]),
+                        'notes' => __('Discount - Payment :number', ['number' => $payment->payment_number]),
                         'cost_center_id' => $costCenterId,
                     ]);
                 }
@@ -193,7 +193,7 @@ class ReceivablePayableService
                         'account_id' => $writeOffAccount->id,
                         'debit' => $totalWriteOff,
                         'credit' => 0,
-                        'notes' => __('Penghapusan (Write Off) - Pembayaran :number', ['number' => $payment->payment_number]),
+                        'notes' => __('Write Off - Payment :number', ['number' => $payment->payment_number]),
                         'cost_center_id' => $costCenterId,
                     ]);
                 }
@@ -251,7 +251,7 @@ class ReceivablePayableService
                     'account_id' => $cashBankAccountId,
                     'debit' => 0,
                     'credit' => $totalPayment,
-                    'notes' => __('Kas/Bank - Pembayaran ke :supplier', ['supplier' => $payment->supplier->name ?? '']),
+                    'notes' => __('Cash/Bank - Payment to :supplier', ['supplier' => $payment->supplier->name ?? '']),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -260,7 +260,7 @@ class ReceivablePayableService
                     'account_id' => $payableAccount->id,
                     'debit' => $payableDebitAmount,
                     'credit' => 0,
-                    'notes' => __('Hutang Usaha - Pembayaran :number', ['number' => $payment->payment_number]),
+                    'notes' => __('Payable - Payment :number', ['number' => $payment->payment_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -270,7 +270,7 @@ class ReceivablePayableService
                         'account_id' => $payment->other_costs_account_id,
                         'debit' => $otherCosts,
                         'credit' => 0,
-                        'notes' => __('Biaya Lainnya - Pembayaran :number', ['number' => $payment->payment_number]),
+                        'notes' => __('Other Costs - Payment :number', ['number' => $payment->payment_number]),
                         'cost_center_id' => $costCenterId,
                     ]);
                 }
@@ -283,7 +283,7 @@ class ReceivablePayableService
                             'account_id' => $discountAccount->id,
                             'debit' => 0,
                             'credit' => $totalDiscount,
-                            'notes' => __('Potongan/Diskon - Pembayaran :number', ['number' => $payment->payment_number]),
+                            'notes' => __('Discount - Payment :number', ['number' => $payment->payment_number]),
                             'cost_center_id' => $costCenterId,
                         ]);
                     }
@@ -297,7 +297,7 @@ class ReceivablePayableService
                             'account_id' => $writeOffAccount->id,
                             'debit' => 0,
                             'credit' => $totalWriteOff,
-                            'notes' => __('Penghapusan (Write Off) - Pembayaran :number', ['number' => $payment->payment_number]),
+                            'notes' => __('Write Off - Payment :number', ['number' => $payment->payment_number]),
                             'cost_center_id' => $costCenterId,
                         ]);
                     }
@@ -335,7 +335,7 @@ class ReceivablePayableService
                 'account_id' => $cashBankAccountId,
                 'debit' => 0,
                 'credit' => $totalPayment,
-                'notes' => __('Kas/Bank - Pembayaran ke :supplier', ['supplier' => $payment->supplier->name ?? '']),
+                'notes' => __('Cash/Bank - Payment to :supplier', ['supplier' => $payment->supplier->name ?? '']),
                 'cost_center_id' => $costCenterId,
             ]);
 
@@ -344,7 +344,7 @@ class ReceivablePayableService
                 'account_id' => $payableAccount->id,
                 'debit' => $payableDebitAmount,
                 'credit' => 0,
-                'notes' => __('Hutang Usaha - Pembayaran :number', ['number' => $payment->payment_number]),
+                'notes' => __('Payable - Payment :number', ['number' => $payment->payment_number]),
                 'cost_center_id' => $costCenterId,
             ]);
 
@@ -354,7 +354,7 @@ class ReceivablePayableService
                     'account_id' => $payment->other_costs_account_id,
                     'debit' => $otherCosts,
                     'credit' => 0,
-                    'notes' => __('Biaya Lainnya - Pembayaran :number', ['number' => $payment->payment_number]),
+                    'notes' => __('Other Costs - Payment :number', ['number' => $payment->payment_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
             }
@@ -367,7 +367,7 @@ class ReceivablePayableService
                         'account_id' => $discountAccount->id,
                         'debit' => 0,
                         'credit' => $totalDiscount,
-                        'notes' => __('Potongan/Diskon - Pembayaran :number', ['number' => $payment->payment_number]),
+                        'notes' => __('Discount - Payment :number', ['number' => $payment->payment_number]),
                         'cost_center_id' => $costCenterId,
                     ]);
                 }
@@ -381,7 +381,7 @@ class ReceivablePayableService
                         'account_id' => $writeOffAccount->id,
                         'debit' => 0,
                         'credit' => $totalWriteOff,
-                        'notes' => __('Penghapusan (Write Off) - Pembayaran :number', ['number' => $payment->payment_number]),
+                        'notes' => __('Write Off - Payment :number', ['number' => $payment->payment_number]),
                         'cost_center_id' => $costCenterId,
                     ]);
                 }
@@ -517,7 +517,7 @@ class ReceivablePayableService
                     'account_id' => $receivableAccount->id,
                     'debit' => $outstandingAmount,
                     'credit' => 0,
-                    'notes' => __('Piutang Usaha - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Receivable - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -526,7 +526,7 @@ class ReceivablePayableService
                     'account_id' => $revenueAccount->id,
                     'debit' => 0,
                     'credit' => $outstandingAmount,
-                    'notes' => __('Pendapatan - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Revenue - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
             } else {
@@ -539,7 +539,7 @@ class ReceivablePayableService
                     'entry_number' => $entryNumber,
                     'date' => $invoice->date,
                     'reference_no' => $invoice->invoice_number,
-                    'description' => __('Piutang Usaha - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'description' => __('Receivable - Invoice :number', ['number' => $invoice->invoice_number]),
                     'amount' => $outstandingAmount,
                     'total_amount' => $outstandingAmount,
                     'status' => 'posted',
@@ -561,7 +561,7 @@ class ReceivablePayableService
                     'account_id' => $receivableAccount->id,
                     'debit' => $outstandingAmount,
                     'credit' => 0,
-                    'notes' => __('Piutang Usaha - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Receivable - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -570,7 +570,7 @@ class ReceivablePayableService
                     'account_id' => $revenueAccount->id,
                     'debit' => 0,
                     'credit' => $outstandingAmount,
-                    'notes' => __('Pendapatan - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Revenue - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
             }
@@ -625,7 +625,7 @@ class ReceivablePayableService
                     'account_id' => $expenseAccount->id,
                     'debit' => $outstandingAmount,
                     'credit' => 0,
-                    'notes' => __('Beban - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Expense - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -634,7 +634,7 @@ class ReceivablePayableService
                     'account_id' => $payableAccount->id,
                     'debit' => 0,
                     'credit' => $outstandingAmount,
-                    'notes' => __('Utang Usaha - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Payable - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
             } else {
@@ -647,7 +647,7 @@ class ReceivablePayableService
                     'entry_number' => $entryNumber,
                     'date' => $invoice->date,
                     'reference_no' => $invoice->invoice_number,
-                    'description' => __('Utang Usaha - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'description' => __('Payable - Invoice :number', ['number' => $invoice->invoice_number]),
                     'amount' => $outstandingAmount,
                     'total_amount' => $outstandingAmount,
                     'status' => 'posted',
@@ -669,7 +669,7 @@ class ReceivablePayableService
                     'account_id' => $expenseAccount->id,
                     'debit' => $outstandingAmount,
                     'credit' => 0,
-                    'notes' => __('Beban - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Expense - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
 
@@ -678,7 +678,7 @@ class ReceivablePayableService
                     'account_id' => $payableAccount->id,
                     'debit' => 0,
                     'credit' => $outstandingAmount,
-                    'notes' => __('Utang Usaha - Faktur :number', ['number' => $invoice->invoice_number]),
+                    'notes' => __('Payable - Invoice :number', ['number' => $invoice->invoice_number]),
                     'cost_center_id' => $costCenterId,
                 ]);
             }

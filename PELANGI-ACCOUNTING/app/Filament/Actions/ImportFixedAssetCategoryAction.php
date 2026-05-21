@@ -13,35 +13,35 @@ class ImportFixedAssetCategoryAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Kategori Aset Tetap')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data kategori aset tetap termasuk kolom: name, code, depreciation_method, useful_life, is_active, sales_account_code, asset_account_code, accumulated_depreciation_account_code, depreciation_account_code')
+                    ->label('Fixed Asset Category Data File')
+                    ->helperText('Upload Excel file (.xlsx) with fixed asset category data including columns: name, code, depreciation_method, useful_life, is_active, sales_account_code, asset_account_code, accumulated_depreciation_account_code, depreciation_account_code')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Kategori Aset Tetap')
-            ->modalDescription('Unggah file Excel dengan informasi kategori aset tetap. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Kategori Aset Tetap')
+            ->modalDescription('Upload Excel file with kategori aset tetap. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\FixedAssetCategoryTemplateExport(),
-                                'template-impor-kategori-aset-tetap.xlsx'
+                                'fixed-asset-category-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template kategori aset tetap: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading template kategori aset tetap: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportFixedAssetCategoryAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data kategori aset tetap berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Fixed asset category data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data kategori aset tetap: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing kategori aset tetap: ' . $e->getMessage())
                         ->send();
                 }
             });

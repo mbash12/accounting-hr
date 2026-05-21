@@ -210,9 +210,9 @@ class MainPanelProvider extends PanelProvider
                     ->icon(asset('icons/cash.svg')),
                 NavigationGroup::make(__('Ledger'))
                     ->icon(asset('icons/ledger.svg')),
-                NavigationGroup::make(__('Buku Besar'))
+                NavigationGroup::make(__('General Ledger'))
                     ->icon(asset('icons/ledger.svg')),
-                NavigationGroup::make(__('Laporan Keuangan'))
+                NavigationGroup::make(__('Financial Reports'))
                     ->icon(asset('icons/report.svg')),
                 NavigationGroup::make(__('Laporan HR & Payroll'))
                     ->icon(asset('icons/report.svg')),

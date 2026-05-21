@@ -72,12 +72,12 @@ class UnitMeasurementsImport implements ToCollection, WithHeadingRow, WithValida
     public function customValidationMessages()
     {
         return [
-            'unit_code.required' => 'Kode Satuan wajib diisi.',
-            'unit_code.max' => 'Kode Satuan tidak boleh lebih dari 20 karakter.',
-            'unit_code.unique' => 'Kode Satuan sudah digunakan.',
-            'unit_name.required' => 'Nama Satuan wajib diisi.',
-            'unit_name.max' => 'Nama Satuan tidak boleh lebih dari 255 karakter.',
-            'unit_description.max' => 'Deskripsi Satuan tidak boleh lebih dari 500 karakter.',
+            'unit_code.required' => 'Unit Code is required.',
+            'unit_code.max' => 'Unit Code cannot exceed 20 characters.',
+            'unit_code.unique' => 'Unit Code is already in use.',
+            'unit_name.required' => 'Unit Name is required.',
+            'unit_name.max' => 'Unit Name cannot exceed 255 characters.',
+            'unit_description.max' => 'Unit Description cannot exceed 500 characters.',
         ];
     }
 }

@@ -28,39 +28,39 @@ class PurchaseReturnWithItemsExport implements FromCollection, WithHeadings, Wit
             if ($return->items->count() > 0) {
                 foreach ($return->items as $item) {
                     $results->push([
-                        'Nomor Retur' => $return->return_number,
-                        'Tanggal' => $return->date ? $return->date->format('Y-m-d') : null,
-                        'Nomor Referensi' => $return->reference_no,
-                        'Deskripsi' => $return->description,
+                        'Return No.' => $return->return_number,
+                        'Date' => $return->date ? $return->date->format('Y-m-d') : null,
+                        'Reference No.' => $return->reference_no,
+                        'Description' => $return->description,
                         'Status' => $return->status,
-                        'Kode Pemasok' => $return->supplier ? $return->supplier->contact_code : null,
-                        'Nama Pemasok' => $return->supplier ? $return->supplier->name : null,
-                        'Nomor Penerimaan Barang' => $return->goodsReceipt ? $return->goodsReceipt->receipt_number : null,
-                        'Kode Produk' => $item->product ? $item->product->code : null,
-                        'Nama Produk' => $item->product ? $item->product->name : null,
-                        'Deskripsi Item' => $item->description,
-                        'Jumlah' => $item->quantity,
-                        'Alasan Retur' => $item->return_reason,
-                        'Kode Satuan' => $item->unit ? $item->unit->code : null,
+                        'Supplier Code' => $return->supplier ? $return->supplier->contact_code : null,
+                        'Supplier Name' => $return->supplier ? $return->supplier->name : null,
+                        'Goods Receipt No.' => $return->goodsReceipt ? $return->goodsReceipt->receipt_number : null,
+                        'Product Code' => $item->product ? $item->product->code : null,
+                        'Product Name' => $item->product ? $item->product->name : null,
+                        'Item Description' => $item->description,
+                        'Quantity' => $item->quantity,
+                        'Return Reason' => $item->return_reason,
+                        'Unit Code' => $item->unit ? $item->unit->code : null,
                     ]);
                 }
             } else {
                 // If return has no items, still add the return row with empty item fields
                 $results->push([
-                    'Nomor Retur' => $return->return_number,
-                    'Tanggal' => $return->date ? $return->date->format('Y-m-d') : null,
-                    'Nomor Referensi' => $return->reference_no,
-                    'Deskripsi' => $return->description,
+                    'Return No.' => $return->return_number,
+                    'Date' => $return->date ? $return->date->format('Y-m-d') : null,
+                    'Reference No.' => $return->reference_no,
+                    'Description' => $return->description,
                     'Status' => $return->status,
-                    'Kode Pemasok' => $return->supplier ? $return->supplier->contact_code : null,
-                    'Nama Pemasok' => $return->supplier ? $return->supplier->name : null,
-                    'Nomor Penerimaan Barang' => $return->goodsReceipt ? $return->goodsReceipt->receipt_number : null,
-                    'Kode Produk' => null,
-                    'Nama Produk' => null,
-                    'Deskripsi Item' => null,
-                    'Jumlah' => null,
-                    'Alasan Retur' => null,
-                    'Kode Satuan' => null,
+                    'Supplier Code' => $return->supplier ? $return->supplier->contact_code : null,
+                    'Supplier Name' => $return->supplier ? $return->supplier->name : null,
+                    'Goods Receipt No.' => $return->goodsReceipt ? $return->goodsReceipt->receipt_number : null,
+                    'Product Code' => null,
+                    'Product Name' => null,
+                    'Item Description' => null,
+                    'Quantity' => null,
+                    'Return Reason' => null,
+                    'Unit Code' => null,
                 ]);
             }
         }
@@ -71,25 +71,25 @@ class PurchaseReturnWithItemsExport implements FromCollection, WithHeadings, Wit
     public function headings(): array
     {
         return [
-            'Nomor Retur',
-            'Tanggal',
-            'Nomor Referensi',
-            'Deskripsi',
+            'Return No.',
+            'Date',
+            'Reference No.',
+            'Description',
             'Status',
-            'Kode Pemasok',
-            'Nama Pemasok',
-            'Nomor Penerimaan Barang',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Alasan Retur',
-            'Kode Satuan',
+            'Supplier Code',
+            'Supplier Name',
+            'Goods Receipt No.',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Return Reason',
+            'Unit Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Retur Pembelian dan Item';
+        return 'Purchase Returns and Items';
     }
 }

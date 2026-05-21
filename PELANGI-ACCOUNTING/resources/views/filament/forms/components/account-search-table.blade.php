@@ -150,7 +150,7 @@
                             <div class="flex flex-col items-center justify-center space-y-2">
                                 <x-heroicon-o-magnifying-glass class="h-8 w-8 text-gray-200" />
                                 <span x-show="accounts.length === 0">Tidak ada akun tersedia</span>
-                                <span x-show="accounts.length > 0 && searchTerm">Tidak ada hasil ditemukan</span>
+                                <span x-show="accounts.length > 0 && searchTerm">No results found</span>
                             </div>
                         </td>
                     </tr>

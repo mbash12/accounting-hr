@@ -13,7 +13,7 @@ class ImportOvertimeRulesAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
@@ -24,11 +24,11 @@ class ImportOvertimeRulesAction extends Action
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Aturan Lembur')
-            ->modalDescription('Unggah file Excel dengan informasi aturan lembur. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Aturan Lembur')
+            ->modalDescription('Upload Excel file with aturan lembur. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
@@ -40,8 +40,8 @@ class ImportOvertimeRulesAction extends Action
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template aturan lembur: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading template aturan lembur: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -52,14 +52,14 @@ class ImportOvertimeRulesAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
+                        ->title('Import Successful')
                         ->body('Data aturan lembur berhasil diimpor.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data aturan lembur: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing aturan lembur: ' . $e->getMessage())
                         ->send();
                 }
             });

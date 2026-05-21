@@ -72,12 +72,12 @@ class ProductGroupsImport implements ToCollection, WithHeadingRow, WithValidatio
     public function customValidationMessages()
     {
         return [
-            'nama_grup_produk.required' => 'Nama Grup Produk wajib diisi.',
-            'nama_grup_produk.max' => 'Nama Grup Produk tidak boleh lebih dari 255 karakter.',
-            'kode_grup_produk.required' => 'Kode Grup Produk wajib diisi.',
-            'kode_grup_produk.max' => 'Kode Grup Produk tidak boleh lebih dari 255 karakter.',
-            'tipe_pengiriman.required' => 'Tipe Pengiriman wajib diisi.',
-            'tipe_pengiriman.in' => 'Tipe Pengiriman harus "physical" atau "digital".',
+            'nama_grup_produk.required' => 'Product Group Name is required.',
+            'nama_grup_produk.max' => 'Product Group Name cannot exceed 255 characters.',
+            'kode_grup_produk.required' => 'Product Group Code is required.',
+            'kode_grup_produk.max' => 'Product Group Code cannot exceed 255 characters.',
+            'tipe_pengiriman.required' => 'Shipping Type is required.',
+            'tipe_pengiriman.in' => 'Shipping Type must be "physical" or "digital".',
         ];
     }
 }

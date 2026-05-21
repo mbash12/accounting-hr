@@ -101,8 +101,8 @@
                 <img src="{{ asset('logo.png') }}" alt="Logo" class="h-24 mx-auto mb-6">
 
                 <div class="bg-white p-8 !rounded-3xl shadow-lg w-[450px]">
-                    <h2 class="text-2xl font-light mb-6">Lupa Kata Sandi</h2>
-                    <p class="text-gray-600 text-sm mb-6">Masukkan alamat email Anda dan kami akan mengirimkan tautan untuk mengatur ulang kata sandi Anda.</p>
+                    <h2 class="text-2xl font-light mb-6">Forgot Password</h2>
+                    <p class="text-gray-600 text-sm mb-6">Enter your email address and we will send you a link to reset your password.</p>
 
                     <!-- Form with loading state -->
                     <form wire:submit="request"
@@ -127,13 +127,13 @@
 
                             <a href="{{ filament()->getLoginUrl() }}"
                                class="fi-auth-link text-blue-600 hover:text-blue-800 text-sm transition-colors text-center">
-                                Kembali ke Masuk
+                                Back to Sign In
                             </a>
                         </div>
                     </form>
 
                     <div class="text-center text-gray-500 mt-6 text-sm">
-                       @ {{ date('Y') }} | Pelangi Sentral Kreasi
+                       @ {{ date('Y') }}
                     </div>
                 </div>
             </div>

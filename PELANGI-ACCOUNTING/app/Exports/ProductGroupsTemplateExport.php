@@ -12,25 +12,25 @@ class ProductGroupsTemplateExport implements FromArray, WithHeadings, WithTitle
     {
         return [
             [
-                'Elektronik',
+                'Electronics',
                 'ELK',
                 'physical',
                 'yes'
             ],
             [
-                'Perangkat Lunak',
+                'Software',
                 'SW',
                 'digital',
                 'yes'
             ],
             [
-                'Buku',
+                'Books',
                 'BKS',
                 'physical',
                 'yes'
             ],
             [
-                'Kursus Daring',
+                'Online Courses',
                 'KUR',
                 'digital',
                 'yes'
@@ -41,15 +41,15 @@ class ProductGroupsTemplateExport implements FromArray, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'nama_grup_produk',
-            'kode_grup_produk',
-            'tipe_pengiriman',
-            'status_aktif'
+            'product_group_name',
+            'product_group_code',
+            'shipping_type',
+            'active_status'
         ];
     }
 
     public function title(): string
     {
-        return 'Template Impor Grup Produk';
+        return 'Product Group Import Template';
     }
 }

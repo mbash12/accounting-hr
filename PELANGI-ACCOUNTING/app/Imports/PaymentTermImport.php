@@ -130,13 +130,13 @@ class PaymentTermImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'kode_termin.max' => 'Kode Termin tidak boleh lebih dari 50 karakter.',
-            'nama_termin.required' => 'Nama Termin wajib diisi.',
-            'nama_termin.max' => 'Nama Termin tidak boleh lebih dari 100 karakter.',
-            'jumlah_hari.integer' => 'Jumlah Hari harus berupa angka.',
-            'jumlah_hari.min' => 'Jumlah Hari minimal 0.',
-            'jumlah_hari.max' => 'Jumlah Hari maksimal 3650 (10 tahun).',
-            'deskripsi.max' => 'Deskripsi tidak boleh lebih dari 65535 karakter.',
+            'kode_termin.max' => 'Payment Term Code cannot exceed 50 characters.',
+            'nama_termin.required' => 'Payment Term Name is required.',
+            'nama_termin.max' => 'Payment Term Name cannot exceed 100 characters.',
+            'jumlah_hari.integer' => 'Due Days must be a whole number.',
+            'jumlah_hari.min' => 'Due Days must be at least 0.',
+            'jumlah_hari.max' => 'Due Days cannot exceed 3650 (10 years).',
+            'deskripsi.max' => 'Description cannot exceed 65535 characters.',
         ];
     }
 
@@ -146,11 +146,11 @@ class PaymentTermImport implements ToCollection, WithHeadingRow, WithValidation
     public function validationAttributes()
     {
         return [
-            'kode_termin' => 'Kode Termin',
-            'nama_termin' => 'Nama Termin',
-            'jumlah_hari' => 'Jumlah Hari',
-            'status_aktif' => 'Status Aktif',
-            'deskripsi' => 'Deskripsi',
+            'kode_termin' => 'Payment Term Code',
+            'nama_termin' => 'Payment Term Name',
+            'jumlah_hari' => 'Due Days',
+            'status_aktif' => 'Active Status',
+            'deskripsi' => 'Description',
         ];
     }
 }

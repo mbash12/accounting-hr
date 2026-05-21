@@ -16,14 +16,14 @@ class SalesDeliveryWithItemsTemplateExport implements FromArray, WithHeadings, W
                 '2024-01-01',
                 'goods',
                 'REF-001',
-                'Pengiriman pertama untuk pelanggan A',
+                'First delivery for customer A',
                 'draft',
                 'CUST-001',
-                'PT. Pelanggan A',
+                'PT. Customer A',
                 'SO-001',
                 'PROD-001',
-                'Laptop Gaming',
-                'Laptop gaming dengan spesifikasi tinggi',
+                'Gaming Laptop',
+                'Gaming laptop with high specifications',
                 2,
                 'PCS'
             ],
@@ -32,14 +32,14 @@ class SalesDeliveryWithItemsTemplateExport implements FromArray, WithHeadings, W
                 '2024-01-02',
                 'document',
                 'REF-002',
-                'Pengiriman dokumen untuk pelanggan B',
+                'Document delivery for customer B',
                 'posted',
                 'CUST-002',
-                'CV. Pelanggan B',
+                'CV. Customer B',
                 'SO-002',
                 'PROD-002',
-                'Surat Kontrak',
-                'Dokumen kontrak kerja sama',
+                'Contract Letter',
+                'Partnership contract document',
                 1,
                 'SET'
             ],
@@ -48,14 +48,14 @@ class SalesDeliveryWithItemsTemplateExport implements FromArray, WithHeadings, W
                 '2024-01-03',
                 'goods',
                 'REF-003',
-                'Pengiriman barang untuk pelanggan C',
+                'Goods delivery for customer C',
                 'posted',
                 'CUST-003',
-                'PT. Pelanggan C',
+                'PT. Customer C',
                 'SO-003',
                 'PROD-003',
-                'Keyboard Mechanical',
-                'Keyboard mekanik dengan RGB',
+                'Mechanical Keyboard',
+                'Mechanical keyboard with RGB',
                 5,
                 'PCS'
             ],
@@ -65,25 +65,25 @@ class SalesDeliveryWithItemsTemplateExport implements FromArray, WithHeadings, W
     public function headings(): array
     {
         return [
-            'Nomor Pengiriman',
-            'Tanggal',
-            'Jenis Pengiriman',
-            'Nomor Referensi',
-            'Deskripsi',
+            'Delivery No.',
+            'Date',
+            'Delivery Type',
+            'Reference No.',
+            'Description',
             'Status',
-            'Kode Customer',
-            'Nama Customer',
-            'Nomor Pesanan Penjualan',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Kode Satuan',
+            'Customer Code',
+            'Customer Name',
+            'Sales Order No.',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Unit Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Template Impor Pengiriman Penjualan dan Item';
+        return 'Sales Delivery Import Template';
     }
 }

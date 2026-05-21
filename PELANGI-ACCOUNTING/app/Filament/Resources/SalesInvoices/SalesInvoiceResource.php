@@ -22,7 +22,7 @@ class SalesInvoiceResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Penjualan';
+        return __('Sales');
     }
 
     public static function getNavigationLabel(): string

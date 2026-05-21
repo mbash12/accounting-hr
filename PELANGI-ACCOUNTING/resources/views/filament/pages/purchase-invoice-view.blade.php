@@ -306,8 +306,8 @@
                             @if($record->company->billing_address_line_2)<br>{!! nl2br(e($record->company->billing_address_line_2)) !!}@endif
                             @if($record->company->billing_city)<br>{!! nl2br(e($record->company->billing_city)) !!}, {!! nl2br(e($record->company->billing_state)) !!} {!! nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
@@ -347,7 +347,7 @@
                         @if($record->supplier->billing_state), {!! nl2br(e($record->supplier->billing_state)) !!}@endif
                         {!! nl2br(e($record->supplier->billing_postal_code ?? '')) !!}
                     </p>
-                    @if($record->supplier->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->supplier->tax_id }}</p>@endif
+                    @if($record->supplier->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->supplier->tax_id }}</p>@endif
                     @else
                     <p class="text-muted">No supplier selected</p>
                     @endif

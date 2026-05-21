@@ -68,10 +68,10 @@ class DepartmentsImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'department_code.required' => 'Kode Departemen wajib diisi.',
-            'department_code.max' => 'Kode Departemen tidak boleh lebih dari 20 karakter.',
-            'department_name.required' => 'Nama Departemen wajib diisi.',
-            'department_name.max' => 'Nama Departemen tidak boleh lebih dari 255 karakter.',
+            'department_code.required' => 'Department Code is required.',
+            'department_code.max' => 'Department Code cannot exceed 20 characters.',
+            'department_name.required' => 'Department Name is required.',
+            'department_name.max' => 'Department Name cannot exceed 255 characters.',
         ];
     }
 }

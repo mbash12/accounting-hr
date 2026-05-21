@@ -13,7 +13,7 @@ class ImportSalaryComponentsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
@@ -24,11 +24,11 @@ class ImportSalaryComponentsAction extends Action
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Komponen Gaji')
-            ->modalDescription('Unggah file Excel dengan data komponen gaji. Unduh template untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Komponen Gaji')
+            ->modalDescription('Upload Excel file with data komponen gaji. Unduh template untuk melihat format yang diharapkan.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
@@ -40,8 +40,8 @@ class ImportSalaryComponentsAction extends Action
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -52,14 +52,14 @@ class ImportSalaryComponentsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
+                        ->title('Import Successful')
                         ->body('Data komponen gaji berhasil diimpor.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data komponen gaji: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing komponen gaji: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -12,7 +12,7 @@ class ExportContactsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
@@ -23,8 +23,8 @@ class ExportContactsAction extends Action
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data kontak: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting kontak: ' . $e->getMessage())
                         ->send();
                 }
             });

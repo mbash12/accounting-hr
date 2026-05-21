@@ -15,11 +15,11 @@ class FaqCategoryForm
     {
         return $schema
             ->components([
-                Section::make(__('Kategori FAQ'))
+                Section::make(__('FAQ Categories'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
-                            ->label(__('Nama Kategori')),
+                            ->label(__('Category Name')),
                         TextInput::make('sort_order')
                             ->numeric()
                             ->default(0)
@@ -27,18 +27,18 @@ class FaqCategoryForm
                         Select::make('company_id')
                             ->relationship('company', 'name')
                             ->disabled()
-                            ->label(__('Perusahaan')),
+                            ->label(__('Company')),
                     ])
                     ->columns(3)
                     ->columnSpanFull(),
-                Section::make(__('Daftar Pertanyaan'))
+                Section::make(__('Questions'))
                     ->schema([
                         Repeater::make('faqs')
                             ->relationship('faqs')
                             ->schema([
                                 TextInput::make('question')
                                     ->required()
-                                    ->label(__('Pertanyaan')),
+                                    ->label(__('Question')),
                                 RichEditor::make('answer')
                                     ->required()
                                     ->label(__('Jawaban')),

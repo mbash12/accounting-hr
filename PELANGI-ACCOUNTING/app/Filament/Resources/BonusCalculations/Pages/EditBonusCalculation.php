@@ -33,7 +33,7 @@ class EditBonusCalculation extends EditRecord
                             ->send();
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Gagal menghitung bonus'))
+                            ->title(__('Failed to calculate bonus'))
                             ->body($e->getMessage())
                             ->danger()
                             ->persistent()
@@ -58,7 +58,7 @@ class EditBonusCalculation extends EditRecord
                             ->send();
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Gagal posting ke jurnal'))
+                            ->title(__('Failed to post to journal'))
                             ->body($e->getMessage())
                             ->danger()
                             ->persistent()

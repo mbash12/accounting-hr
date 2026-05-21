@@ -46,7 +46,7 @@
             @endif
             {{-- @if($journalEntry->department)
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Departemen') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Department') }}</div>
                 <div style="font-size: 14px; color: #111827;">{{ $journalEntry->department->name }}</div>
             </div>
             @endif --}}

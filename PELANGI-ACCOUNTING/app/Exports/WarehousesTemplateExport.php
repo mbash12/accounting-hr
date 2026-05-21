@@ -13,22 +13,22 @@ class WarehousesTemplateExport implements FromArray, WithHeadings, WithTitle
         return [
             [
                 'WH001',
-                'Gudang Utama',
+                'Main Warehouse',
                 'yes'
             ],
             [
                 'WH002',
-                'Gudang Bahan Baku',
+                'Raw Materials Warehouse',
                 'yes'
             ],
             [
                 'WH003',
-                'Gudang Barang Jadi',
+                'Finished Goods Warehouse',
                 'yes'
             ],
             [
                 'WH004',
-                'Gudang Sementara',
+                'Temporary Warehouse',
                 'no'
             ],
         ];
@@ -37,14 +37,14 @@ class WarehousesTemplateExport implements FromArray, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'kode_gudang',
-            'nama_gudang',
-            'status_aktif'
+            'warehouse_code',
+            'warehouse_name',
+            'active_status'
         ];
     }
 
     public function title(): string
     {
-        return 'Template Impor Gudang';
+        return 'Warehouse Import Template';
     }
 }

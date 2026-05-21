@@ -61,7 +61,7 @@ class EditCashDisbursement extends EditRecord
         $items = $data['items'] ?? [];
         if (empty($items)) {
             throw ValidationException::withMessages([
-                'items' => __('Minimal satu item diperlukan.'),
+                'items' => __('At least one item is required.'),
             ]);
         }
 

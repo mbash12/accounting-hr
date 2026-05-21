@@ -398,7 +398,7 @@
                     <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                     <!-- Fallback if no logo: Just Company Name styling -->
-                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}
+                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}
                     </h1>
                     @endif
 
@@ -413,8 +413,8 @@
                             nl2br(e($record->company->billing_state)) !!} {!!
                             nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
@@ -455,14 +455,13 @@
                         @if($record->customer->billing_state), {!! nl2br(e($record->customer->billing_state)) !!}@endif
                         {!! nl2br(e($record->customer->billing_postal_code)) !!}
                     </p>
-                    @if($record->customer->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->customer->tax_id }}
+                    @if($record->customer->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->customer->tax_id }}
                     </p>@endif
                     @else
                     <p class="text-muted">No customer selected</p>
                     @endif
                 </div>
 
-                <div class="address-box"></div>
             </div>
 
             <!-- ITEMS -->

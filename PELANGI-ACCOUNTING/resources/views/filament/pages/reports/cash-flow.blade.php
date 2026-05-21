@@ -181,7 +181,7 @@
             </svg>
         </div>
         <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
-        <p>{{ $reportData['error'] ?? 'Silakan pilih perusahaan tertentu.' }}</p>
+        <p>{{ $reportData['error'] ?? 'Please select a specific company.' }}</p>
     </div>
     @else
     <div class="report-page">

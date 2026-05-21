@@ -48,7 +48,7 @@ class GoodsReceiptWithItemsImport implements ToCollection, WithHeadingRow, WithV
                     }
                     $supplierId = $supplier->id;
                 } else {
-                    throw new \Exception("Either Kode Pemasok or Nama Pemasok is required for receipt {$receiptNumber}");
+                    throw new \Exception("Either Supplier Code or Supplier Name is required for receipt {$receiptNumber}");
                 }
 
                 $purchaseOrderId = null;
@@ -234,20 +234,20 @@ class GoodsReceiptWithItemsImport implements ToCollection, WithHeadingRow, WithV
     public function customValidationMessages()
     {
         return [
-            'no_penerimaan_barang.required' => 'No. Penerimaan Barang wajib diisi.',
-            'no_penerimaan_barang.max' => 'No. Penerimaan Barang tidak boleh lebih dari 50 karakter.',
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'nomor_referensi.max' => 'Nomor Referensi tidak boleh lebih dari 100 karakter.',
-            'deskripsi.max' => 'Deskripsi tidak boleh lebih dari 1000 karakter.',
-            'kode_pemasok.max' => 'Kode Pemasok tidak boleh lebih dari 50 karakter.',
-            'nama_pemasok.max' => 'Nama Pemasok tidak boleh lebih dari 255 karakter.',
-            'nomor_pesanan_pembelian.max' => 'Nomor Pesanan Pembelian tidak boleh lebih dari 100 karakter.',
-            'kode_produk.max' => 'Kode Produk tidak boleh lebih dari 50 karakter.',
-            'nama_produk.max' => 'Nama Produk tidak boleh lebih dari 255 karakter.',
-            'jumlah.required' => 'Jumlah wajib diisi.',
-            'jumlah.min' => 'Jumlah tidak boleh kurang dari 0.',
-            'jumlah.numeric' => 'Jumlah harus berupa angka.',
-            'kode_satuan.max' => 'Kode Satuan tidak boleh lebih dari 20 karakter.',
+            'no_penerimaan_barang.required' => 'Goods Receipt Number is required.',
+            'no_penerimaan_barang.max' => 'Goods Receipt Number cannot exceed 50 characters.',
+            'tanggal.required' => 'Date is required.',
+            'nomor_referensi.max' => 'Reference Number cannot exceed 100 characters.',
+            'deskripsi.max' => 'Description cannot exceed 1000 characters.',
+            'kode_pemasok.max' => 'Supplier Code cannot exceed 50 characters.',
+            'nama_pemasok.max' => 'Supplier Name cannot exceed 255 characters.',
+            'nomor_pesanan_pembelian.max' => 'Purchase Order Number cannot exceed 100 characters.',
+            'kode_produk.max' => 'Product Code cannot exceed 50 characters.',
+            'nama_produk.max' => 'Product Name cannot exceed 255 characters.',
+            'jumlah.required' => 'Quantity is required.',
+            'jumlah.min' => 'Quantity cannot be less than 0.',
+            'jumlah.numeric' => 'Quantity must be a number.',
+            'kode_satuan.max' => 'Unit Code cannot exceed 20 characters.',
         ];
     }
 }

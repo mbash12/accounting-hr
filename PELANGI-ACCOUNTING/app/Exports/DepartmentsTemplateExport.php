@@ -13,22 +13,22 @@ class DepartmentsTemplateExport implements FromArray, WithHeadings, WithTitle
         return [
             [
                 'HR',
-                'Sumber Daya Manusia',
+                'Human Resources',
                 'yes'
             ],
             [
                 'IT',
-                'Teknologi Informasi',
+                'Information Technology',
                 'yes'
             ],
             [
                 'FIN',
-                'Keuangan',
+                'Finance',
                 'yes'
             ],
             [
                 'OPS',
-                'Operasional',
+                'Operations',
                 'yes'
             ],
         ];
@@ -45,6 +45,6 @@ class DepartmentsTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Departemen';
+        return 'Department Import Template';
     }
 }

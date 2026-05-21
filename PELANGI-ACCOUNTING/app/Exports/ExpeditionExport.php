@@ -24,7 +24,7 @@ class ExpeditionExport implements FromCollection, WithHeadings, WithTitle
                 return [
                     'code' => $expedition->code,
                     'name' => $expedition->name,
-                    'is_active' => $expedition->is_active ? 'ya' : 'tidak',
+                    'is_active' => $expedition->is_active ? 'Yes' : 'No',
                 ];
             });
     }
@@ -32,14 +32,14 @@ class ExpeditionExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Kode Ekspedisi',
-            'Nama Ekspedisi',
-            'Status Aktif'
+            'Expedition Code',
+            'Expedition Name',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Ekspedisi';
+        return 'Expedition Data';
     }
 }

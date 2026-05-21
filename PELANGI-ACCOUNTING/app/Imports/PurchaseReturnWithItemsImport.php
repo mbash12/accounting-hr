@@ -48,7 +48,7 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
                     }
                     $supplierId = $supplier->id;
                 } else {
-                    throw new \Exception("Either Kode Pemasok or Nama Pemasok is required for return {$returnNumber}");
+                    throw new \Exception("Either Supplier Code or Supplier Name is required for return {$returnNumber}");
                 }
 
                 $goodsReceiptId = null;
@@ -237,22 +237,22 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
     public function customValidationMessages()
     {
         return [
-            'nomor_retur.required' => 'Nomor Retur wajib diisi.',
-            'nomor_retur.max' => 'Nomor Retur tidak boleh lebih dari 50 karakter.',
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'nomor_referensi.max' => 'Nomor Referensi tidak boleh lebih dari 100 karakter.',
-            'deskripsi.max' => 'Deskripsi tidak boleh lebih dari 1000 karakter.',
-            'kode_pemasok.max' => 'Kode Pemasok tidak boleh lebih dari 50 karakter.',
-            'nama_pemasok.max' => 'Nama Pemasok tidak boleh lebih dari 255 karakter.',
-            'nomor_penerimaan_barang.max' => 'Nomor Penerimaan Barang tidak boleh lebih dari 100 karakter.',
-            'kode_produk.max' => 'Kode Produk tidak boleh lebih dari 50 karakter.',
-            'nama_produk.max' => 'Nama Produk tidak boleh lebih dari 255 karakter.',
-            'jumlah.required' => 'Jumlah wajib diisi.',
-            'jumlah.min' => 'Jumlah tidak boleh kurang dari 0.',
-            'jumlah.numeric' => 'Jumlah harus berupa angka.',
-            'alasan_retur.required' => 'Alasan Retur wajib diisi.',
-            'alasan_retur.max' => 'Alasan Retur tidak boleh lebih dari 255 karakter.',
-            'kode_satuan.max' => 'Kode Satuan tidak boleh lebih dari 20 karakter.',
+            'nomor_retur.required' => 'Return Number is required.',
+            'nomor_retur.max' => 'Return Number cannot exceed 50 characters.',
+            'tanggal.required' => 'Date is required.',
+            'nomor_referensi.max' => 'Reference Number cannot exceed 100 characters.',
+            'deskripsi.max' => 'Description cannot exceed 1000 characters.',
+            'kode_pemasok.max' => 'Supplier Code cannot exceed 50 characters.',
+            'nama_pemasok.max' => 'Supplier Name cannot exceed 255 characters.',
+            'nomor_penerimaan_barang.max' => 'Goods Receipt Number cannot exceed 100 characters.',
+            'kode_produk.max' => 'Product Code cannot exceed 50 characters.',
+            'nama_produk.max' => 'Product Name cannot exceed 255 characters.',
+            'jumlah.required' => 'Quantity is required.',
+            'jumlah.min' => 'Quantity cannot be less than 0.',
+            'jumlah.numeric' => 'Quantity must be a number.',
+            'alasan_retur.required' => 'Return Reason is required.',
+            'alasan_retur.max' => 'Return Reason cannot exceed 255 characters.',
+            'kode_satuan.max' => 'Unit Code cannot exceed 20 characters.',
         ];
     }
 }

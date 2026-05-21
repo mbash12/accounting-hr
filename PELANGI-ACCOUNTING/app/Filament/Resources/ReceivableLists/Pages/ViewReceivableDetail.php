@@ -31,7 +31,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
 
     public function getTitle(): string
     {
-        return __('Detail Account Receivable');
+        return __('Receivable Detail');
     }
 
     // public function getReceivableSummary(): array
@@ -107,7 +107,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('aging_less_30')
-                    ->label(__('< 30 HARI'))
+                    ->label(__('< 30 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -123,7 +123,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                         return 0;
                     }),
                 TextColumn::make('aging_30_60')
-                    ->label(__('30 - 60 HARI'))
+                    ->label(__('30 - 60 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -135,7 +135,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                         return 0;
                     }),
                 TextColumn::make('aging_60_90')
-                    ->label(__('60 - 90 HARI'))
+                    ->label(__('60 - 90 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -147,7 +147,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                         return 0;
                     }),
                 TextColumn::make('aging_over_90')
-                    ->label(__('> 90 HARI'))
+                    ->label(__('> 90 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -167,8 +167,8 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading(__('Hapus Piutang Usaha'))
-                        ->modalDescription(__('Apakah Anda yakin ingin menghapus sisa piutang usaha ini? Tindakan ini akan membuat jurnal otomatis dan melunasi sisa tagihan.'))
+                        ->modalHeading(__('Delete Receivable'))
+                        ->modalDescription(__('Are you sure you want to delete the remaining receivable? This action will create an automatic journal entry and settle the remaining balance.'))
                         ->action(function ($record) {
                             try {
                                 $amount = $record->outstanding_amount;
@@ -206,7 +206,7 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                                 }
 
                                 if (!$receivableAccountId || !$writeOffAccountId) {
-                                    throw new \Exception(__('Gagal mendeteksi akun Piutang atau akun Write Off secara otomatis.'));
+                                    throw new \Exception(__('Failed to automatically detect Receivable or Write Off account.'));
                                 }
 
                                 $companyId = $record->company_id ?? session('selected_company_id');
@@ -264,20 +264,20 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
                                 $record->save();
 
                                 \Filament\Notifications\Notification::make()
-                                    ->title(__('Write Off Berhasil'))
+                                    ->title(__('Write Off Successful'))
                                     ->success()
                                     ->send();
 
                             } catch (\Exception $e) {
                                 \Filament\Notifications\Notification::make()
-                                    ->title(__('Write Off Gagal'))
+                                    ->title(__('Write Off Failed'))
                                     ->body($e->getMessage())
                                     ->danger()
                                     ->send();
                             }
                         }),
                     \Filament\Actions\Action::make('detail')
-                        ->label(__('Detail'))
+                        ->label(__('Details'))
                         ->icon('heroicon-o-magnifying-glass')
                         ->url(fn ($record) => \App\Filament\Resources\SalesInvoices\SalesInvoiceResource::getUrl('view', ['record' => $record])),
                 ]),

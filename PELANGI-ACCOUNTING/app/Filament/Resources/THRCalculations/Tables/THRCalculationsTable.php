@@ -68,7 +68,7 @@ class THRCalculationsTable
                                     ->send();
                             } catch (\Exception $e) {
                                 Notification::make()
-                                    ->title(__('Gagal menghitung THR'))
+                                    ->title(__('Failed to calculate THR'))
                                     ->body($e->getMessage())
                                     ->danger()
                                     ->persistent()
@@ -90,7 +90,7 @@ class THRCalculationsTable
                                     ->send();
                             } catch (\Exception $e) {
                                 Notification::make()
-                                    ->title(__('Gagal posting ke jurnal'))
+                                    ->title(__('Failed to post to journal'))
                                     ->body($e->getMessage())
                                     ->danger()
                                     ->persistent()

@@ -25,12 +25,12 @@ class BanksExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'Kode Bank',
-            'Nama Bank',
-            'Negara',
-            'Kode Clearing',
-            'Kode SKN',
-            'Status Aktif',
+            'Bank Code',
+            'Bank Name',
+            'Country',
+            'Clearing Code',
+            'SKN Code',
+            'Active Status',
         ];
     }
 
@@ -42,7 +42,7 @@ class BanksExport implements FromCollection, WithHeadings, WithMapping
             $bank->country,
             $bank->clearing_code,
             $bank->skn_code,
-            $bank->is_active ? 'Ya' : 'Tidak',
+            $bank->is_active ? 'Yes' : 'No',
         ];
     }
 }

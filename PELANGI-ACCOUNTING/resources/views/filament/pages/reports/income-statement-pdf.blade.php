@@ -112,7 +112,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Harga Pokok Penjualan</td>
+                    Cost of Goods Sold</td>
             </tr>
             @php
             $cogsNodes = ($costOfGoodsSold->count() === 1 && $costOfGoodsSold->first()->is_header) ?
@@ -122,7 +122,7 @@
             @include('filament.pages.reports.partials.account-row-pdf', ['account' => $node, 'level' => 0])
             @endforeach
             <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Harga Pokok Penjualan</td>
+                <td style="font-weight: bold; color: #1f2937; padding-left: 10px;">Total Cost of Goods Sold</td>
                 <td class="amount" style="font-weight: bold; color: #1f2937;">{{ number_format($totalCogs ?? 0, 2, ',',
                     '.') }}</td>
             </tr>
@@ -132,7 +132,7 @@
             <tr style="background-color: #f3f4f6;">
                 <td
                     style="padding-left: 10px; font-weight: bold; color: #111827; font-size: 12px; padding-top: 10px; padding-bottom: 10px;">
-                    Laba Kotor (Gross Profit)</td>
+                    Gross Profit</td>
                 <td class="amount"
                     style="font-weight: bold; color: #111827; font-size: 12px; border-top: 2px solid #111827; padding-top: 10px; padding-bottom: 10px;">
                     {{ number_format($grossProfit ?? 0, 2, ',', '.') }}</td>

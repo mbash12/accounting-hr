@@ -383,7 +383,7 @@
                     <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                     <!-- Fallback if no logo: Just Company Name styling -->
-                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}
+                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}
                     </h1>
                     @endif
 
@@ -403,8 +403,8 @@
                             nl2br(e($record->company->delivery_postal_code ?? $record->company->billing_postal_code))
                             !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
@@ -422,7 +422,7 @@
                         </tr>
                         @if($record->salesOrder)
                         <tr>
-                            <td class="doc-meta-label">Ref. Pesanan:</td>
+                            <td class="doc-meta-label">Order Ref.:</td>
                             <td class="doc-meta-value">{{ $record->salesOrder->order_number }}</td>
                         </tr>
                         @endif
@@ -478,7 +478,7 @@
                     <thead>
                         <tr>
                             <th class="col-idx">#</th>
-                            <th class="col-desc">Deskripsi Barang</th>
+                            <th class="col-desc">Description</th>
                             <th class="col-qty" style="text-align: right;">Jumlah</th>
                         </tr>
                     </thead>
@@ -487,10 +487,9 @@
                         <tr>
                             <td class="col-idx">{{ $index + 1 }}</td>
                             <td class="col-desc">
-                                <strong>{{ $item->item_name ?? $item->product->name ?? $item->description ?? 'Barang'
+                                <strong>{{ $item->product->name ?? $item->description ?? ''
                                     }}</strong>
-                                @if($item->description && $item->description !== ($item->item_name ??
-                                $item->product->name ?? ''))
+                                @if($item->description && $item->description !== ($item->product->name ?? ''))
                                 <div class="text-sm text-muted">{{ $item->description }}</div>
                                 @endif
                             </td>

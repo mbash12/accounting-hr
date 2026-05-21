@@ -175,7 +175,7 @@
             </svg>
         </div>
         <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
-        <p>Silakan pilih perusahaan tertentu dari pemilih perusahaan untuk melihat Laporan Saldo Akun.</p>
+        <p>Please select a specific company from the company selector to view the Account Balance Report.</p>
     </div>
     @else
     @php

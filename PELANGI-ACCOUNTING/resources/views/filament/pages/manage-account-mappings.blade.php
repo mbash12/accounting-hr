@@ -69,9 +69,9 @@
                                                 class="fi-input block w-full border-gray-300 rounded-lg shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                                 style="font-size: 0.875rem; padding: 0.5rem 0.75rem; @if($this->hasFieldChanged($this->selectedDocumentType, $mappingType)) border-color: #f59e0b; @endif"
                                             >
-                                                <option value="">-- Pilih Akun --</option>
+                                                <option value="">-- Select Account --</option>
                                                 @if($currentValue && !$accountExists)
-                                                    <option value="{{ $currentValue }}" selected style="color: #ef4444;">⚠ ID Akun {{ $currentValue }} (tidak ditemukan)</option>
+                                                    <option value="{{ $currentValue }}" selected style="color: #ef4444;">⚠ Account ID {{ $currentValue }} (not found)</option>
                                                 @endif
                                                 @foreach($accounts as $id => $name)
                                                     <option value="{{ (string) $id }}" @if($currentValue == $id) selected @endif>{{ $name }}</option>
@@ -92,7 +92,7 @@
                             </svg>
                         </div>
                         <h3 style="font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.25rem;">Pilih Perusahaan</h3>
-                        <p style="font-size: 0.8125rem; color: #6b7280;">Silakan pilih perusahaan dari dropdown untuk mengatur pemetaan akun.</p>
+                        <p style="font-size: 0.8125rem; color: #6b7280;">Please select a company from the dropdown to configure account mappings.</p>
                     </div>
                 @endif
             @else

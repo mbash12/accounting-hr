@@ -12,7 +12,7 @@ class ExportEmployeeLeaveQuotasAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
@@ -23,8 +23,8 @@ class ExportEmployeeLeaveQuotasAction extends Action
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data kuota cuti: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting kuota cuti: ' . $e->getMessage())
                         ->send();
                 }
             });

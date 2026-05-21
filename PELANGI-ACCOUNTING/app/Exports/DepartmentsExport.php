@@ -22,7 +22,7 @@ class DepartmentsExport implements FromCollection, WithHeadings, WithTitle
                 return [
                     'department_code' => $department->code,
                     'department_name' => $department->name,
-                    'active_status' => $department->is_active ? 'ya' : 'tidak',
+                    'active_status' => $department->is_active ? 'Yes' : 'No',
                 ];
             });
     }
@@ -30,14 +30,14 @@ class DepartmentsExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Kode Departemen',
-            'Nama Departemen',
-            'Status Aktif'
+            'Department Code',
+            'Department Name',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Departemen';
+        return 'Department Data';
     }
 }

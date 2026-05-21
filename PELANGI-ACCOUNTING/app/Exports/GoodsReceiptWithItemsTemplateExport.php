@@ -15,14 +15,14 @@ class GoodsReceiptWithItemsTemplateExport implements FromArray, WithHeadings, Wi
                 'GR-001',
                 '2024-01-01',
                 'REF-001',
-                'Penerimaan pertama dari pemasok A',
+                'First receipt from supplier A',
                 'draft',
                 'SUP-001',
-                'PT. Pemasok A',
+                'PT. Supplier A',
                 'PO-001',
                 'PROD-001',
-                'Laptop Gaming',
-                'Laptop gaming dengan spesifikasi tinggi',
+                'Gaming Laptop',
+                'Gaming laptop with high specifications',
                 2,
                 'PCS'
             ],
@@ -30,14 +30,14 @@ class GoodsReceiptWithItemsTemplateExport implements FromArray, WithHeadings, Wi
                 'GR-002',
                 '2024-01-02',
                 'REF-002',
-                'Penerimaan dari pemasok B',
+                'Receipt from supplier B',
                 'posted',
                 'SUP-002',
-                'CV. Pemasok B',
+                'CV. Supplier B',
                 'PO-002',
                 'PROD-002',
-                'Mouse Wireless',
-                'Mouse wireless dengan teknologi bluetooth',
+                'Wireless Mouse',
+                'Wireless mouse with bluetooth technology',
                 5,
                 'PCS'
             ],
@@ -45,14 +45,14 @@ class GoodsReceiptWithItemsTemplateExport implements FromArray, WithHeadings, Wi
                 'GR-003',
                 '2024-01-03',
                 'REF-003',
-                'Penerimaan dari pemasok C',
+                'Receipt from supplier C',
                 'draft',
                 'SUP-003',
-                'PT. Pemasok C',
+                'PT. Supplier C',
                 'PO-003',
                 'PROD-003',
-                'Keyboard Mechanical',
-                'Keyboard mekanik dengan RGB',
+                'Mechanical Keyboard',
+                'Mechanical keyboard with RGB',
                 10,
                 'PCS'
             ],
@@ -62,24 +62,24 @@ class GoodsReceiptWithItemsTemplateExport implements FromArray, WithHeadings, Wi
     public function headings(): array
     {
         return [
-            'No. Penerimaan Barang',
-            'Tanggal',
-            'Nomor Referensi',
-            'Deskripsi',
+            'Receipt No.',
+            'Date',
+            'Reference No.',
+            'Description',
             'Status',
-            'Kode Pemasok',
-            'Nama Pemasok',
-            'Nomor Pesanan Pembelian',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Kode Satuan',
+            'Supplier Code',
+            'Supplier Name',
+            'Purchase Order No.',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Unit Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Template Impor Penerimaan Barang dan Item';
+        return 'Goods Receipt Import Template';
     }
 }

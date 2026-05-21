@@ -54,7 +54,7 @@ class EditPayablePayment extends EditRecord
             
             if ($originalUpdatedAt && $currentUpdatedAt && $currentUpdatedAt->gt($originalUpdatedAt)) {
                 throw ValidationException::withMessages([
-                    'items' => __('Data telah diubah oleh pengguna lain atau proses lain. Silakan refresh halaman dan coba lagi.'),
+                    'items' => __('Data has been modified by another user or process. Please refresh the page and try again.'),
                 ]);
             }
         }
@@ -62,7 +62,7 @@ class EditPayablePayment extends EditRecord
         $items = $data['items'] ?? [];
         if (empty($items)) {
             throw ValidationException::withMessages([
-                'items' => __('Minimal satu item diperlukan.'),
+                'items' => __('At least one item is required.'),
             ]);
         }
 
@@ -70,13 +70,13 @@ class EditPayablePayment extends EditRecord
         foreach ($items as $index => $item) {
             if (empty($item['purchase_invoice_id'])) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.purchase_invoice_id" => __('Nomor faktur harus dipilih untuk setiap item.'),
+                    "items.{$index}.purchase_invoice_id" => __('Invoice number must be selected for each item.'),
                 ]);
             }
             
             if (in_array($item['purchase_invoice_id'], $invoiceIds)) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.purchase_invoice_id" => __('Nomor faktur tidak boleh sama. Faktur ini sudah digunakan pada item lain.'),
+                    "items.{$index}.purchase_invoice_id" => __('Invoice number cannot be duplicated. This invoice is already used in another item.'),
                 ]);
             }
             

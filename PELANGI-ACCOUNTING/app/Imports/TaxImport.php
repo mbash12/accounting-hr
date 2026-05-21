@@ -222,15 +222,15 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'nama_pajak.required' => 'Nama Pajak wajib diisi.',
-            'nama_pajak.max' => 'Nama Pajak tidak boleh lebih dari 200 karakter.',
-            'kode_pajak.required' => 'Kode Pajak wajib diisi.',
-            'kode_pajak.max' => 'Kode Pajak tidak boleh lebih dari 50 karakter.',
-            'persentase_pajak.required' => 'Persentase Pajak wajib diisi.',
-            'jenis_pajak.required' => 'Jenis Pajak wajib diisi.',
-            'jenis_pajak.in' => 'Jenis Pajak harus salah satu dari: vat, sales_tax, service_tax, withholding_tax, excise_tax.',
-            'akun_pembelian.max' => 'Kode Akun Pembelian tidak boleh lebih dari 50 karakter.',
-            'akun_penjualan.max' => 'Kode Akun Penjualan tidak boleh lebih dari 50 karakter.',
+            'nama_pajak.required' => 'Tax Name is required.',
+            'nama_pajak.max' => 'Tax Name cannot exceed 200 characters.',
+            'kode_pajak.required' => 'Tax Code is required.',
+            'kode_pajak.max' => 'Tax Code cannot exceed 50 characters.',
+            'persentase_pajak.required' => 'Tax Percentage is required.',
+            'jenis_pajak.required' => 'Tax Type is required.',
+            'jenis_pajak.in' => 'Tax Type must be one of: vat, sales_tax, service_tax, withholding_tax, excise_tax.',
+            'akun_pembelian.max' => 'Purchase Account Code cannot exceed 50 characters.',
+            'akun_penjualan.max' => 'Sales Account Code cannot exceed 50 characters.',
         ];
     }
 
@@ -240,15 +240,15 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
     public function validationAttributes()
     {
         return [
-            'nama_pajak' => 'Nama Pajak',
-            'kode_pajak' => 'Kode Pajak',
-            'persentase_pajak' => 'Persentase Pajak',
-            'jenis_pajak' => 'Jenis Pajak',
-            'pajak_pembelian' => 'Pajak Pembelian',
-            'pajak_penjualan' => 'Pajak Penjualan',
-            'status_aktif' => 'Status Aktif',
-            'akun_pembelian' => 'Akun Pembelian',
-            'akun_penjualan' => 'Akun Penjualan',
+            'nama_pajak' => 'Tax Name',
+            'kode_pajak' => 'Tax Code',
+            'persentase_pajak' => 'Tax Percentage',
+            'jenis_pajak' => 'Tax Type',
+            'pajak_pembelian' => 'Purchase Tax',
+            'pajak_penjualan' => 'Sales Tax',
+            'status_aktif' => 'Active Status',
+            'akun_pembelian' => 'Purchase Account',
+            'akun_penjualan' => 'Sales Account',
         ];
     }
 }

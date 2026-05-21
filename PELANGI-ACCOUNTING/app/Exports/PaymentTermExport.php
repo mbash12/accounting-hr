@@ -28,13 +28,13 @@ class PaymentTermExport implements FromCollection, WithHeadings, WithTitle
         return $query->get()
             ->map(function ($paymentTerm) {
                 return [
-                    'Kode Termin' => $paymentTerm->code,
-                    'Nama Termin' => $paymentTerm->name,
-                    'Jumlah Hari' => $paymentTerm->due_days,
-                    'Status Aktif' => $paymentTerm->is_active ? 'ya' : 'tidak',
-                    'Deskripsi' => $paymentTerm->description,
-                    'Dibuat Pada' => $paymentTerm->created_at ? $paymentTerm->created_at->format('Y-m-d H:i:s') : null,
-                    'Diubah Pada' => $paymentTerm->updated_at ? $paymentTerm->updated_at->format('Y-m-d H:i:s') : null,
+                    'Term Code' => $paymentTerm->code,
+                    'Term Name' => $paymentTerm->name,
+                    'Due Days' => $paymentTerm->due_days,
+                    'Active Status' => $paymentTerm->is_active ? 'Yes' : 'No',
+                    'Description' => $paymentTerm->description,
+                    'Created At' => $paymentTerm->created_at ? $paymentTerm->created_at->format('Y-m-d H:i:s') : null,
+                    'Updated At' => $paymentTerm->updated_at ? $paymentTerm->updated_at->format('Y-m-d H:i:s') : null,
                 ];
             });
     }
@@ -42,18 +42,18 @@ class PaymentTermExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Kode Termin',
-            'Nama Termin',
-            'Jumlah Hari',
-            'Status Aktif',
-            'Deskripsi',
-            'Dibuat Pada',
-            'Diubah Pada',
+            'Term Code',
+            'Term Name',
+            'Due Days',
+            'Active Status',
+            'Description',
+            'Created At',
+            'Updated At',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Termin Pembayaran';
+        return 'Payment Term Data';
     }
 }

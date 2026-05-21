@@ -13,7 +13,7 @@ class ImportPermitsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
@@ -24,11 +24,11 @@ class ImportPermitsAction extends Action
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Izin & Cuti')
-            ->modalDescription('Unggah file Excel dengan data izin dan cuti karyawan. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Izin & Cuti')
+            ->modalDescription('Upload Excel file with data izin dan cuti karyawan. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
@@ -40,8 +40,8 @@ class ImportPermitsAction extends Action
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template izin & cuti: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading template izin & cuti: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -52,14 +52,14 @@ class ImportPermitsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
+                        ->title('Import Successful')
                         ->body('Data izin & cuti berhasil diimpor.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data izin & cuti: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing izin & cuti: ' . $e->getMessage())
                         ->send();
                 }
             });

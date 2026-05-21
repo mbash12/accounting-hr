@@ -185,11 +185,11 @@ class JournalEntryForm
                                 }
                                 
                                 if ($debit <= 0 && $credit <= 0) {
-                                    $fail(__('Item :index harus memiliki nilai debit atau kredit.', ['index' => $loopIndex]));
+                                    $fail(__('Item :index must have a debit or credit value.', ['index' => $loopIndex]));
                                 }
                                 
                                 if ($debit > 0 && $credit > 0) {
-                                    $fail(__('Item :index tidak boleh memiliki nilai debit dan kredit sekaligus.', ['index' => $loopIndex]));
+                                    $fail(__('Item :index cannot have both debit and credit values.', ['index' => $loopIndex]));
                                 }
                             }
                         },
