@@ -208,13 +208,11 @@ class MainPanelProvider extends PanelProvider
                     ->icon(asset('icons/users.svg')),
                 NavigationGroup::make(__('Cash & Bank'))
                     ->icon(asset('icons/cash.svg')),
-                NavigationGroup::make(__('Ledger'))
-                    ->icon(asset('icons/ledger.svg')),
                 NavigationGroup::make(__('General Ledger'))
                     ->icon(asset('icons/ledger.svg')),
                 NavigationGroup::make(__('Financial Reports'))
                     ->icon(asset('icons/report.svg')),
-                NavigationGroup::make(__('Laporan HR & Payroll'))
+                NavigationGroup::make(__('HR & Payroll Reports'))
                     ->icon(asset('icons/report.svg')),
             ])
 

@@ -28,7 +28,7 @@ class ManageOpeningBalances extends Page implements HasForms
         return false;
     }
 
-    protected static string|UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|UnitEnum|null $navigationGroup = 'General Ledger';
 
     protected static ?int $navigationSort = 2;
 

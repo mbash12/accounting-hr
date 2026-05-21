@@ -32,7 +32,7 @@ class ManageAccounts extends Page
     
     protected static ?string $navigationLabel = 'Chart of Accounts';
     
-    protected static string|UnitEnum|null $navigationGroup = 'Ledger';
+    protected static string|UnitEnum|null $navigationGroup = 'General Ledger';
     
     protected static ?int $navigationSort = 1;
     

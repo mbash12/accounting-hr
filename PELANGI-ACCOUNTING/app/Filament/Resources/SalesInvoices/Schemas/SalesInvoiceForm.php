@@ -432,9 +432,8 @@ class SalesInvoiceForm
                     ->required()
                     ->addable(fn (callable $get) => !(bool) $get('is_locked'))
                     ->table([
-                        TableColumn::make('Product')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Item Name')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Quantity')->width('8%')->alignment(Alignment::End),
+                        TableColumn::make('Product')->width('20%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('10%')->alignment(Alignment::End),
                         TableColumn::make('Unit Price')->width('14%')->alignment(Alignment::End),
                         TableColumn::make('Tax')->width('11%')->alignment(Alignment::Start),
                         TableColumn::make('Unit')->width('11%')->alignment(Alignment::Start),

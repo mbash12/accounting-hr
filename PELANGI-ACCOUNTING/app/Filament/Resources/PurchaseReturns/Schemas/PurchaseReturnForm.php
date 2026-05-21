@@ -273,9 +273,8 @@ class PurchaseReturnForm
                     ->addActionLabel('Add New Item')
                     ->required()
                     ->table([
-                        TableColumn::make('Product')->width('30%')->alignment(Alignment::Start),
-                        TableColumn::make('Item Name')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Quantity')->width('10%')->alignment(Alignment::End),
+                        TableColumn::make('Product')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('15%')->alignment(Alignment::End),
                         TableColumn::make('Unit')->width('10%')->alignment(Alignment::Start),
                         TableColumn::make('Return Reason')->width('25%')->alignment(Alignment::Start),
                         TableColumn::make('Description')->width('10%')->alignment(Alignment::Start),

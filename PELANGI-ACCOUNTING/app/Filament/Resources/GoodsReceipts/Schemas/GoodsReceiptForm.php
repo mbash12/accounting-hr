@@ -266,9 +266,8 @@ class GoodsReceiptForm
                     ->required()
                     ->addable(fn (callable $get) => !(bool) $get('is_locked'))
                     ->table([
-                        TableColumn::make('Product')->width('30%')->alignment(Alignment::Start),
-                        TableColumn::make('Item Name')->width('20%')->alignment(Alignment::Start),
-                        TableColumn::make('Quantity')->width('15%')->alignment(Alignment::End),
+                        TableColumn::make('Product')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('20%')->alignment(Alignment::End),
                         TableColumn::make('Unit')->width('15%')->alignment(Alignment::Start),
                         TableColumn::make('Description')->width('20%')->alignment(Alignment::Start),
                     ])
