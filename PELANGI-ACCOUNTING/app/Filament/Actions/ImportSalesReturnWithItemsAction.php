@@ -13,35 +13,35 @@ class ImportSalesReturnWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Retur Penjualan dan Item')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data retur penjualan dan itemnya. Setiap baris mewakili satu item dalam retur. Pastikan kode customer, produk, satuan yang digunakan sudah ada di sistem (diimpor terlebih dahulu melalui menu Kontak, Produk, dan Satuan).')
+                    ->label('Sales Return and Items File')
+                    ->helperText('Upload an Excel file (.xlsx) with sales return and item data. Each row represents one item in a return. Make sure customer, product, and unit codes already exist in the system (import them first via Contacts, Products, and Units menus).')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Retur Penjualan dan Item')
-            ->modalDescription('Unggah file Excel dengan informasi retur penjualan dan itemnya. Setiap baris dalam file mewakili satu item dalam retur. Retur dengan nomor yang sama akan digabungkan. Pastikan untuk mengimpor Customer, Produk, dan Satuan terlebih dahulu sebelum mengimpor retur penjualan agar data dapat terhubung dengan benar. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Sales Return and Items Data')
+            ->modalDescription('Upload an Excel file with sales return and item information. Each row represents one item in a return. Returns with the same number will be merged. Make sure to import Customers, Products, and Units first before importing sales returns so data can be linked correctly. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\SalesReturnWithItemsTemplateExport(),
-                                'template-impor-retur-dan-item.xlsx'
+                                'sales-return-items-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template retur dan item: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the sales return and items template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportSalesReturnWithItemsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data retur penjualan dan item berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Sales return and items data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data retur dan item: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing sales return and items data: ' . $e->getMessage())
                         ->send();
                 }
             });

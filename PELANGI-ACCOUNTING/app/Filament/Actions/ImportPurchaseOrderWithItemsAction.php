@@ -13,35 +13,35 @@ class ImportPurchaseOrderWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Pesanan Pembelian dan Item')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data pesanan pembelian dan itemnya. Setiap baris mewakili satu item dalam pesanan. Pastikan kode pemasok, produk, satuan, departemen, dan pajak yang digunakan sudah ada di sistem (diimpor terlebih dahulu melalui menu Kontak, Produk, Satuan, Departemen, dan Pajak).')
+                    ->label('Purchase Order and Items File')
+                    ->helperText('Upload an Excel file (.xlsx) with purchase order and item data. Each row represents one item in an order. Make sure supplier, product, unit, and tax codes already exist in the system (import them first via Contacts, Products, Units, and Tax menus).')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Pesanan Pembelian dan Item')
-            ->modalDescription('Unggah file Excel dengan informasi pesanan pembelian dan itemnya. Setiap baris dalam file mewakili satu item dalam pesanan. Pesanan dengan nomor yang sama akan digabungkan. Pastikan untuk mengimpor Pemasok, Produk, Satuan, Departemen, dan Pajak terlebih dahulu sebelum mengimpor pesanan pembelian agar data dapat terhubung dengan benar. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Purchase Order and Items Data')
+            ->modalDescription('Upload an Excel file with purchase order and item information. Each row represents one item in an order. Orders with the same number will be merged. Make sure to import Suppliers, Products, Units, and Taxes first before importing purchase orders so data can be linked correctly. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\PurchaseOrderWithItemsTemplateExport(),
-                                'template-impor-pesanan-pembelian-dan-item.xlsx'
+                                'purchase-order-items-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template pesanan pembelian dan item: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the purchase order and items template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportPurchaseOrderWithItemsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data pesanan pembelian dan item berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Purchase order and items data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data pesanan pembelian dan item: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing purchase order and items data: ' . $e->getMessage())
                         ->send();
                 }
             });
