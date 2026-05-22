@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'wisma' => [
+        'url' => env('WISMA_API_URL', 'https://api-dev.wismaatlet.id/api'),
+        'token' => env('WISMA_API_TOKEN', 'prima-accounting-secret-token'),
+    ],
+
 ];

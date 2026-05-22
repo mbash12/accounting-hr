@@ -284,4 +284,25 @@ class MasterDataController extends Controller
             return response()->json(['code' => 500, 'message' => 'Internal Server Error: ' . $e->getMessage()], 500);
         }
     }
+
+    public function companies(Request $request)
+    {
+        $query = \App\Models\Company::query();
+
+        if ($request->has('is_active')) {
+            $query->where('is_active', filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN));
+        } else {
+            $query->where('is_active', true);
+        }
+
+        $query = $this->applySearch($query, $request->search, ['name', 'description']);
+
+        $data = $query->orderBy('name')->get();
+
+        return response()->json([
+            'code'    => 200,
+            'message' => 'get companies success',
+            'data'    => $data,
+        ]);
+    }
 }

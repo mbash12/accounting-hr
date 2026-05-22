@@ -60,6 +60,34 @@ class PurchaseOrder extends Model
                 return false;
             }
         });
+
+        static::created(function ($model) {
+            if ($model->status === 'approved') {
+                try {
+                    $wismaService = app(\App\Services\WismaService::class);
+                    $wismaService->syncApprovedPurchaseOrder($model);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to sync approved PO to Wisma on created event: " . $e->getMessage(), [
+                        'exception' => $e,
+                        'purchase_order_id' => $model->id,
+                    ]);
+                }
+            }
+        });
+
+        static::updated(function ($model) {
+            if ($model->isDirty('status') && $model->status === 'approved') {
+                try {
+                    $wismaService = app(\App\Services\WismaService::class);
+                    $wismaService->syncApprovedPurchaseOrder($model);
+                } catch (\Throwable $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to sync approved PO to Wisma on updated event: " . $e->getMessage(), [
+                        'exception' => $e,
+                        'purchase_order_id' => $model->id,
+                    ]);
+                }
+            }
+        });
     }
 
     /**
