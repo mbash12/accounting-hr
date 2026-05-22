@@ -214,9 +214,10 @@ class PurchaseInvoiceForm
                                         $set('supplier_id', $goodsReceipt->supplier_id);
                                         $set('purchase_order_id', $goodsReceipt->purchase_order_id);
 
-                                        // Copy totals from PO if available
+                                        // Copy reference and totals from PO if available
                                         $po = $goodsReceipt->purchaseOrder;
                                         if ($po) {
+                                            $set('reference_no', $po->purchase_order_no);
                                             if ($po->discount_percentage) {
                                                 $set('discount_percentage', $po->discount_percentage);
                                             }
