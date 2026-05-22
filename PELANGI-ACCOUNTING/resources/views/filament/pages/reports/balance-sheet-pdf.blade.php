@@ -73,7 +73,7 @@
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
         <div class="report-title">Balance Sheet (Standard)</div>
-        <div class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
+        <div class="report-date">As of {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
     </div>
 
     <table>
@@ -88,7 +88,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Aktiva</td>
+                    Assets</td>
             </tr>
             @php
             $assetNodes = ($assets->count() === 1 && $assets->first()->is_header) ? $assets->first()->children :
@@ -107,14 +107,14 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Kewajiban and Equity</td>
+                    Liabilities and Equity</td>
             </tr>
 
             <!-- Liabilities -->
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-left: 10px; background-color: white; text-transform: uppercase;">
-                    Kewajiban</td>
+                    Liabilities</td>
             </tr>
             @php
             $liabNodes = ($liabilities->count() === 1 && $liabilities->first()->is_header) ?
@@ -134,7 +134,7 @@
             <tr>
                 <td colspan="2"
                     style="font-weight: bold; color: #1e3a8a; padding-left: 10px; padding-top: 15px; background-color: white; text-transform: uppercase;">
-                    Ekuitas</td>
+                    Equity</td>
             </tr>
             @php
             $equityNodes = ($equity->count() === 1 && $equity->first()->is_header) ? $equity->first()->children :

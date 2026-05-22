@@ -185,7 +185,7 @@
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name }}</h2>
             <h1 class="report-title">Balance Sheet (Standard)</h1>
-            <p class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
+            <p class="report-date">As of {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
         </div>
 
         <table class="tb-table">
@@ -200,7 +200,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Aktiva</td>
+                        Assets</td>
                 </tr>
                 @php
                 $assetNodes = ($assets->count() === 1 && $assets->first()->is_header) ? $assets->first()->children :
@@ -219,14 +219,14 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Kewajiban and Equity</td>
+                        Liabilities and Equity</td>
                 </tr>
 
                 <!-- Liabilities -->
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-left: 1.6rem; background-color: white; text-transform: uppercase;">
-                        Kewajiban</td>
+                        Liabilities</td>
                 </tr>
                 @php
                 $liabNodes = ($liabilities->count() === 1 && $liabilities->first()->is_header) ?
@@ -246,7 +246,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-left: 1.6rem; padding-top: 1rem; background-color: white; text-transform: uppercase;">
-                        Ekuitas</td>
+                        Equity</td>
                 </tr>
                 @php
                 $equityNodes = ($equity->count() === 1 && $equity->first()->is_header) ? $equity->first()->children :

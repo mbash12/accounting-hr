@@ -26,27 +26,27 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
         $deliveriesData = [];
 
         foreach ($rows as $row) {
-            $deliveryNumber = (string) $row['nomor_pengiriman'];
+            $deliveryNumber = (string) $row['delivery_no'];
 
             if (!isset($deliveriesData[$deliveryNumber])) {
                 // Create the delivery data
                 $customerId = null;
-                if (!empty($row['kode_customer'])) {
-                    $customer = Contact::where('contact_code', (string) $row['kode_customer'])
+                if (!empty($row['customer_code'])) {
+                    $customer = Contact::where('contact_code', (string) $row['customer_code'])
                         ->where('company_id', $companyId)
                         ->where('is_customer', true)
                         ->first();
                     if (!$customer) {
-                        throw new \Exception("Customer with code '{$row['kode_customer']}' not found or is not marked as customer in current company");
+                        throw new \Exception("Customer with code '{$row['customer_code']}' not found or is not marked as customer in current company");
                     }
                     $customerId = $customer->id;
-                } elseif (!empty($row['nama_customer'])) {
-                    $customer = Contact::where('name', (string) $row['nama_customer'])
+                } elseif (!empty($row['customer_name'])) {
+                    $customer = Contact::where('name', (string) $row['customer_name'])
                         ->where('company_id', $companyId)
                         ->where('is_customer', true)
                         ->first();
                     if (!$customer) {
-                        throw new \Exception("Customer with name '{$row['nama_customer']}' not found or is not marked as customer in current company");
+                        throw new \Exception("Customer with name '{$row['customer_name']}' not found or is not marked as customer in current company");
                     }
                     $customerId = $customer->id;
                 } else {
@@ -54,23 +54,23 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
                 }
 
                 $salesOrderId = null;
-                if (!empty($row['nomor_pesanan_penjualan'])) {
-                    $salesOrder = SalesOrder::where('order_number', (string) $row['nomor_pesanan_penjualan'])
+                if (!empty($row['sales_order_no'])) {
+                    $salesOrder = SalesOrder::where('order_number', (string) $row['sales_order_no'])
                         ->where('company_id', $companyId)
                         ->first();
                     if (!$salesOrder) {
-                        throw new \Exception("Sales Order with number '{$row['nomor_pesanan_penjualan']}' not found in current company for delivery {$deliveryNumber}");
+                        throw new \Exception("Sales Order with number '{$row['sales_order_no']}' not found in current company for delivery {$deliveryNumber}");
                     }
                     $salesOrderId = $salesOrder->id;
                 }
 
                 $projectId = null;
-                if (!empty($row['kode_proyek'])) {
-                    $project = Project::where('project_code', (string) $row['kode_proyek'])
+                if (!empty($row['project_code'])) {
+                    $project = Project::where('project_code', (string) $row['project_code'])
                         ->where('company_id', $companyId)
                         ->first();
                     if (!$project) {
-                        throw new \Exception("Project with code '{$row['kode_proyek']}' not found in current company for delivery {$deliveryNumber}");
+                        throw new \Exception("Project with code '{$row['project_code']}' not found in current company for delivery {$deliveryNumber}");
                     }
                     $projectId = $project->id;
                 }
@@ -78,10 +78,10 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
                 $deliveriesData[$deliveryNumber] = [
                     'delivery_data' => [
                         'delivery_number' => $deliveryNumber,
-                        'date' => isset($row['tanggal']) ? $this->parseDate($row['tanggal']) : now()->format('Y-m-d'),
-                        'delivery_type' => isset($row['jenis']) ? (string) $row['jenis'] : 'goods',
-                        'reference_no' => isset($row['nomor_referensi']) ? (string) $row['nomor_referensi'] : null,
-                        'description' => isset($row['deskripsi']) ? (string) $row['deskripsi'] : null,
+                        'date' => isset($row['date']) ? $this->parseDate($row['date']) : now()->format('Y-m-d'),
+                        'delivery_type' => isset($row['delivery_type']) ? (string) $row['delivery_type'] : 'goods',
+                        'reference_no' => isset($row['reference_no']) ? (string) $row['reference_no'] : null,
+                        'description' => isset($row['description']) ? (string) $row['description'] : null,
                         'status' => isset($row['status']) ? (string) $row['status'] : 'draft',
                         'customer_id' => $customerId,
                         'sales_order_id' => $salesOrderId,
@@ -95,20 +95,20 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
 
             // Process the item for this delivery
             $productId = null;
-            if (!empty($row['kode_produk'])) {
-                $product = Product::where('code', (string) $row['kode_produk'])
+            if (!empty($row['product_code'])) {
+                $product = Product::where('code', (string) $row['product_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$product) {
-                    throw new \Exception("Product with code '{$row['kode_produk']}' not found in current company for delivery {$deliveryNumber}");
+                    throw new \Exception("Product with code '{$row['product_code']}' not found in current company for delivery {$deliveryNumber}");
                 }
                 $productId = $product->id;
-            } elseif (!empty($row['nama_produk'])) {
-                $product = Product::where('name', (string) $row['nama_produk'])
+            } elseif (!empty($row['product_name'])) {
+                $product = Product::where('name', (string) $row['product_name'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$product) {
-                    throw new \Exception("Product with name '{$row['nama_produk']}' not found in current company for delivery {$deliveryNumber}");
+                    throw new \Exception("Product with name '{$row['product_name']}' not found in current company for delivery {$deliveryNumber}");
                 }
                 $productId = $product->id;
             } else {
@@ -116,21 +116,21 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
             }
 
             $unitId = null;
-            if (!empty($row['kode_satuan'])) {
-                $unit = Unit::where('code', (string) $row['kode_satuan'])
+            if (!empty($row['unit_code'])) {
+                $unit = Unit::where('code', (string) $row['unit_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$unit) {
-                    throw new \Exception("Unit with code '{$row['kode_satuan']}' not found in current company for delivery {$deliveryNumber}");
+                    throw new \Exception("Unit with code '{$row['unit_code']}' not found in current company for delivery {$deliveryNumber}");
                 }
                 $unitId = $unit->id;
             }
 
             $deliveriesData[$deliveryNumber]['items'][] = [
-                'description' => isset($row['deskripsi_item']) ? (string) $row['deskripsi_item'] : null,
-                'quantity' => isset($row['jumlah']) ? (float) $row['jumlah'] : 0,
-                'unit_price' => isset($row['harga_satuan']) ? (float) $row['harga_satuan'] : 0,
-                'total' => isset($row['total_item']) ? (float) $row['total_item'] : 0,
+                'description' => isset($row['item_description']) ? (string) $row['item_description'] : null,
+                'quantity' => isset($row['quantity']) ? (float) $row['quantity'] : 0,
+                'unit_price' => isset($row['unit_price']) ? (float) $row['unit_price'] : 0,
+                'total' => isset($row['item_total']) ? (float) $row['item_total'] : 0,
                 'product_id' => $productId,
                 'unit_id' => $unitId,
                 'created_by_user_id' => Auth::id(),
@@ -184,23 +184,23 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
     public function prepareForValidation($data, $index)
     {
         return [
-            'nomor_pengiriman' => isset($data['nomor_pengiriman']) ? (string) $data['nomor_pengiriman'] : null,
-            'tanggal' => isset($data['tanggal']) ? (string) $data['tanggal'] : null,
-            'jenis' => isset($data['jenis']) ? (string) $data['jenis'] : null,
-            'nomor_referensi' => isset($data['nomor_referensi']) ? (string) $data['nomor_referensi'] : null,
-            'deskripsi' => isset($data['deskripsi']) ? (string) $data['deskripsi'] : null,
+            'delivery_no' => isset($data['delivery_no']) ? (string) $data['delivery_no'] : null,
+            'date' => isset($data['date']) ? (string) $data['date'] : null,
+            'delivery_type' => isset($data['delivery_type']) ? (string) $data['delivery_type'] : null,
+            'reference_no' => isset($data['reference_no']) ? (string) $data['reference_no'] : null,
+            'description' => isset($data['description']) ? (string) $data['description'] : null,
             'status' => isset($data['status']) ? (string) $data['status'] : null,
-            'kode_customer' => isset($data['kode_customer']) ? (string) $data['kode_customer'] : null,
-            'nama_customer' => isset($data['nama_customer']) ? (string) $data['nama_customer'] : null,
-            'nomor_pesanan_penjualan' => isset($data['nomor_pesanan_penjualan']) ? (string) $data['nomor_pesanan_penjualan'] : null,
-            'kode_proyek' => isset($data['kode_proyek']) ? (string) $data['kode_proyek'] : null,
-            'kode_produk' => isset($data['kode_produk']) ? (string) $data['kode_produk'] : null,
-            'nama_produk' => isset($data['nama_produk']) ? (string) $data['nama_produk'] : null,
-            'deskripsi_item' => isset($data['deskripsi_item']) ? (string) $data['deskripsi_item'] : null,
-            'jumlah' => isset($data['jumlah']) ? (string) $data['jumlah'] : null,
-            'harga_satuan' => isset($data['harga_satuan']) ? (string) $data['harga_satuan'] : null,
-            'total_item' => isset($data['total_item']) ? (string) $data['total_item'] : null,
-            'kode_satuan' => isset($data['kode_satuan']) ? (string) $data['kode_satuan'] : null,
+            'customer_code' => isset($data['customer_code']) ? (string) $data['customer_code'] : null,
+            'customer_name' => isset($data['customer_name']) ? (string) $data['customer_name'] : null,
+            'sales_order_no' => isset($data['sales_order_no']) ? (string) $data['sales_order_no'] : null,
+            'project_code' => isset($data['project_code']) ? (string) $data['project_code'] : null,
+            'product_code' => isset($data['product_code']) ? (string) $data['product_code'] : null,
+            'product_name' => isset($data['product_name']) ? (string) $data['product_name'] : null,
+            'item_description' => isset($data['item_description']) ? (string) $data['item_description'] : null,
+            'quantity' => isset($data['quantity']) ? (string) $data['quantity'] : null,
+            'unit_price' => isset($data['unit_price']) ? (string) $data['unit_price'] : null,
+            'item_total' => isset($data['item_total']) ? (string) $data['item_total'] : null,
+            'unit_code' => isset($data['unit_code']) ? (string) $data['unit_code'] : null,
         ];
     }
 
@@ -210,23 +210,23 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
         $companyId = ($selectedCompanyId && $selectedCompanyId !== 'all') ? $selectedCompanyId : null;
 
         return [
-            'nomor_pengiriman' => 'required|string|max:50',
-            'tanggal' => 'required',
-            'jenis' => 'nullable|in:goods,document|max:20',
-            'nomor_referensi' => 'nullable|string|max:100',
-            'deskripsi' => 'nullable|string|max:1000',
+            'delivery_no' => 'required|string|max:50',
+            'date' => 'required',
+            'delivery_type' => 'nullable|in:goods,document|max:20',
+            'reference_no' => 'nullable|string|max:100',
+            'description' => 'nullable|string|max:1000',
             'status' => 'nullable|in:draft,posted',
-            'kode_customer' => 'nullable|string|max:50',
-            'nama_customer' => 'nullable|string|max:255',
-            'nomor_pesanan_penjualan' => 'nullable|string|max:100',
-            'kode_proyek' => 'nullable|string|max:50',
-            'kode_produk' => 'required_without:nama_produk|string|max:50',
-            'nama_produk' => 'required_without:kode_produk|string|max:255',
-            'deskripsi_item' => 'nullable|string|max:1000',
-            'jumlah' => 'required|numeric|min:0',
-            'harga_satuan' => 'nullable|numeric|min:0',
-            'total_item' => 'nullable|numeric|min:0',
-            'kode_satuan' => 'nullable|string|max:20',
+            'customer_code' => 'nullable|string|max:50',
+            'customer_name' => 'nullable|string|max:255',
+            'sales_order_no' => 'nullable|string|max:100',
+            'project_code' => 'nullable|string|max:50',
+            'product_code' => 'required_without:product_name|string|max:50',
+            'product_name' => 'required_without:product_code|string|max:255',
+            'item_description' => 'nullable|string|max:1000',
+            'quantity' => 'required|numeric|min:0',
+            'unit_price' => 'nullable|numeric|min:0',
+            'item_total' => 'nullable|numeric|min:0',
+            'unit_code' => 'nullable|string|max:20',
         ];
     }
 
@@ -261,26 +261,26 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
     public function customValidationMessages()
     {
         return [
-            'nomor_pengiriman.required' => 'Delivery Number is required.',
-            'nomor_pengiriman.max' => 'Delivery Number cannot exceed 50 characters.',
-            'tanggal.required' => 'Date is required.',
-            'jenis.in' => 'Type must be goods or document.',
-            'nomor_referensi.max' => 'Reference Number cannot exceed 100 characters.',
-            'deskripsi.max' => 'Description cannot exceed 1000 characters.',
-            'kode_customer.max' => 'Customer Code cannot exceed 50 characters.',
-            'nama_customer.max' => 'Customer Name cannot exceed 255 characters.',
-            'nomor_pesanan_penjualan.max' => 'Sales Order Number cannot exceed 100 characters.',
-            'kode_proyek.max' => 'Project Code cannot exceed 50 characters.',
-            'kode_produk.max' => 'Product Code cannot exceed 50 characters.',
-            'nama_produk.max' => 'Product Name cannot exceed 255 characters.',
-            'jumlah.required' => 'Quantity is required.',
-            'jumlah.min' => 'Quantity cannot be less than 0.',
-            'jumlah.numeric' => 'Quantity must be a number.',
-            'harga_satuan.min' => 'Unit Price cannot be less than 0.',
-            'harga_satuan.numeric' => 'Unit Price must be a number.',
-            'total_item.min' => 'Item Total cannot be less than 0.',
-            'total_item.numeric' => 'Item Total must be a number.',
-            'kode_satuan.max' => 'Unit Code cannot exceed 20 characters.',
+            'delivery_no.required' => 'Delivery Number is required.',
+            'delivery_no.max' => 'Delivery Number cannot exceed 50 characters.',
+            'date.required' => 'Date is required.',
+            'delivery_type.in' => 'Type must be goods or document.',
+            'reference_no.max' => 'Reference Number cannot exceed 100 characters.',
+            'description.max' => 'Description cannot exceed 1000 characters.',
+            'customer_code.max' => 'Customer Code cannot exceed 50 characters.',
+            'customer_name.max' => 'Customer Name cannot exceed 255 characters.',
+            'sales_order_no.max' => 'Sales Order Number cannot exceed 100 characters.',
+            'project_code.max' => 'Project Code cannot exceed 50 characters.',
+            'product_code.max' => 'Product Code cannot exceed 50 characters.',
+            'product_name.max' => 'Product Name cannot exceed 255 characters.',
+            'quantity.required' => 'Quantity is required.',
+            'quantity.min' => 'Quantity cannot be less than 0.',
+            'quantity.numeric' => 'Quantity must be a number.',
+            'unit_price.min' => 'Unit Price cannot be less than 0.',
+            'unit_price.numeric' => 'Unit Price must be a number.',
+            'item_total.min' => 'Item Total cannot be less than 0.',
+            'item_total.numeric' => 'Item Total must be a number.',
+            'unit_code.max' => 'Unit Code cannot exceed 20 characters.',
         ];
     }
 }

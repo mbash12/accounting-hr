@@ -84,14 +84,14 @@
     <table>
         <thead>
             <tr>
-                <th class="text-left">Tanggal</th>
-                <th class="text-left">No. Sumber</th>
-                <th class="text-left">No. Cek</th>
-                <th class="text-left">Keterangan</th>
-                <th class="text-right">Pemasukan (Dr)</th>
-                <th class="text-right">Pengeluaran (Cr)</th>
+                <th class="text-left">Date</th>
+                <th class="text-left">Source No.</th>
+                <th class="text-left">Check No.</th>
+                <th class="text-left">Description</th>
+                <th class="text-right">Receipt (Dr)</th>
+                <th class="text-right">Payment (Cr)</th>
                 <th class="text-right">Balance</th>
-                <th class="text-center">Terekonsiliasi</th>
+                <th class="text-center">Reconciled</th>
             </tr>
         </thead>
         <tbody>

@@ -47,7 +47,7 @@ class ManageAccounts extends Page
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Ledger');
+        return __('General Ledger');
     }
 
     public function getTitle(): string

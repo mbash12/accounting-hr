@@ -73,7 +73,7 @@
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
         <div class="report-title">Account Balance Report</div>
-        <div class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
+        <div class="report-date">As of {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
     </div>
 
     <table>

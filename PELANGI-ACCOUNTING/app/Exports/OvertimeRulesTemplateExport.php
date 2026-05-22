@@ -11,8 +11,8 @@ class OvertimeRulesTemplateExport implements FromArray, WithHeadings, WithTitle
     public function array(): array
     {
         return [
-            ['Aturan Lembur Standar', '', 'yes', 173, 1.5, 2, 2, 'yes'],
-            ['Aturan Lembur IT', 'IT', 'no', 173, 1.5, 2, 2.5, 'yes'],
+            ['Standard Overtime Rule', '', 'yes', 173, 1.5, 2, 2, 'yes'],
+            ['IT Overtime Rule', 'IT', 'no', 173, 1.5, 2, 2.5, 'yes'],
         ];
     }
 
@@ -32,6 +32,6 @@ class OvertimeRulesTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Aturan Lembur';
+        return 'Overtime Rules Import Template';
     }
 }

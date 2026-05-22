@@ -123,7 +123,7 @@ class SalesInvoiceWithItemsTemplateExport implements FromArray, WithHeadings, Wi
             'Unit Price',
             'Item Total',
             'Item Discount',
-            'Item Discount %',
+            'Item Discount Pct.',
             'Item Tax',
             'Unit Code',
             'Tax Code',

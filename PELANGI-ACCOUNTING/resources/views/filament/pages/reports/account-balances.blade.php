@@ -187,7 +187,7 @@
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name ?? '' }}</h2>
             <h1 class="report-title">Account Balance Report</h1>
-            <p class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
+            <p class="report-date">As of {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
         </div>
 
         <div class="accounts-search no-print" style="margin-bottom: 1rem;">

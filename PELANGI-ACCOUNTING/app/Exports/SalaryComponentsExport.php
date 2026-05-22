@@ -35,18 +35,18 @@ class SalaryComponentsExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Kode',
-            'Nama',
-            'Tipe (allowance/deduction)',
-            'Tetap (yes/no)',
-            'Kena Pajak (yes/no)',
-            'Dasar BPJS (yes/no)',
-            'Aktif (yes/no)',
+            'Code',
+            'Name',
+            'Type (allowance/deduction)',
+            'Fixed (yes/no)',
+            'Taxable (yes/no)',
+            'BPJS Base (yes/no)',
+            'Active (yes/no)',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Komponen Gaji';
+        return 'Salary Components Data';
     }
 }

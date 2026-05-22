@@ -11,9 +11,9 @@ class PermitsTemplateExport implements FromArray, WithHeadings, WithTitle
     public function array(): array
     {
         return [
-            ['EMP-001', 'sick', '2025-04-05', '2025-04-06', 'Demam', 'approved'],
-            ['EMP-002', 'annual', '2025-04-10', '2025-04-12', 'Liburan keluarga', 'pending'],
-            ['EMP-003', 'others', '2025-04-03', '2025-04-03', 'Keperluan pribadi', 'approved'],
+            ['EMP-001', 'sick', '2025-04-05', '2025-04-06', 'Fever', 'approved'],
+            ['EMP-002', 'annual', '2025-04-10', '2025-04-12', 'Family vacation', 'pending'],
+            ['EMP-003', 'others', '2025-04-03', '2025-04-03', 'Personal matter', 'approved'],
         ];
     }
 
@@ -31,6 +31,6 @@ class PermitsTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Izin & Cuti';
+        return 'Permits & Leave Import Template';
     }
 }

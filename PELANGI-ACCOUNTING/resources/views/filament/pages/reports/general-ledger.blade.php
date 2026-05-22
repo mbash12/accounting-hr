@@ -234,14 +234,14 @@
         <table class="tb-table" style="margin-bottom: 1rem;">
             <thead>
                 <tr>
-                    <th>Tanggal</th>
-                    <th>No. Sumber</th>
-                    <th>No. Cek</th>
-                    <th>Keterangan</th>
-                    <th>Pemasukan (Dr)</th>
-                    <th>Pengeluaran (Cr)</th>
+                    <th>Date</th>
+                    <th>Source No.</th>
+                    <th>Check No.</th>
+                    <th>Description</th>
+                    <th>Receipt (Dr)</th>
+                    <th>Payment (Cr)</th>
                     <th>Balance</th>
-                    <th>Terekonsiliasi</th>
+                    <th>Reconciled</th>
                 </tr>
             </thead>
             <tbody>
