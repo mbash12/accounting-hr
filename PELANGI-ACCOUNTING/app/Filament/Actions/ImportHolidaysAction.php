@@ -17,15 +17,15 @@ class ImportHolidaysAction extends Action
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Hari Libur')
-                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: name, date, is_cuti_bersama')
+                    ->label('Holiday Data File')
+                    ->helperText('Upload Excel file (.xlsx) with columns: name, date, is_cuti_bersama')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024)
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Hari Libur')
-            ->modalDescription('Upload Excel file with hari libur. You can download the template below to see the expected format.')
+            ->modalHeading('Import Holidays')
+            ->modalDescription('Upload Excel file with holiday data. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -35,13 +35,13 @@ class ImportHolidaysAction extends Action
                         try {
                             return Excel::download(
                                 new \App\Exports\HolidaysTemplateExport(),
-                                'template-impor-hari-libur.xlsx'
+                                'holiday-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template hari libur: ' . $e->getMessage())
+                                ->body('An error occurred while downloading holiday template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,13 +53,13 @@ class ImportHolidaysAction extends Action
                     Notification::make()
                         ->success()
                         ->title('Import Successful')
-                        ->body('Data hari libur berhasil diimpor.')
+                        ->body('Holiday data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing hari libur: ' . $e->getMessage())
+                        ->body('An error occurred while importing holidays: ' . $e->getMessage())
                         ->send();
                 }
             });

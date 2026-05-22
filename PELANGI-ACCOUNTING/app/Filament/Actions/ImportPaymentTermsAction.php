@@ -18,14 +18,14 @@ class ImportPaymentTermsAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('Payment Term Data File')
-                    ->helperText('Upload Excel file (.xlsx) with payment term data including columns: kode_termin, nama_termin, jumlah_hari, status_aktif, deskripsi. If kode_termin is empty, it will be auto-generated.')
+                    ->helperText('Upload Excel file (.xlsx) with payment term data including columns: term_code, term_name, due_days, active_status, description. If term_code is empty, it will be auto-generated.')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Termin Pembayaran')
-            ->modalDescription('Upload Excel file with termin pembayaran. You can download the template below to see the expected format.')
+            ->modalHeading('Import Payment Terms')
+            ->modalDescription('Upload Excel file with payment terms. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -41,7 +41,7 @@ class ImportPaymentTermsAction extends Action
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template termin pembayaran: ' . $e->getMessage())
+                                ->body('An error occurred while downloading payment term template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -60,7 +60,7 @@ class ImportPaymentTermsAction extends Action
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing termin pembayaran: ' . $e->getMessage())
+                        ->body('An error occurred while importing payment terms: ' . $e->getMessage())
                         ->send();
                 }
             });

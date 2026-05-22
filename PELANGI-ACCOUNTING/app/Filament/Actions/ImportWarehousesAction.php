@@ -18,14 +18,14 @@ class ImportWarehousesAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('Warehouse Data File')
-                    ->helperText('Upload Excel file (.xlsx) with warehouse data including columns: kode_gudang, nama_gudang, status_aktif')
+                    ->helperText('Upload Excel file (.xlsx) with warehouse data including columns: warehouse_code, warehouse_name, active_status')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Gudang')
-            ->modalDescription('Upload Excel file with gudang. You can download the template below to see the expected format.')
+            ->modalHeading('Import Warehouses')
+            ->modalDescription('Upload Excel file with warehouse data. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -41,7 +41,7 @@ class ImportWarehousesAction extends Action
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template gudang: ' . $e->getMessage())
+                                ->body('An error occurred while downloading warehouse template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -60,7 +60,7 @@ class ImportWarehousesAction extends Action
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing gudang: ' . $e->getMessage())
+                        ->body('An error occurred while importing warehouses: ' . $e->getMessage())
                         ->send();
                 }
             });

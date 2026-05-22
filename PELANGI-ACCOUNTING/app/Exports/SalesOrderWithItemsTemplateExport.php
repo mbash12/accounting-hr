@@ -14,7 +14,6 @@ class SalesOrderWithItemsTemplateExport implements FromArray, WithHeadings, With
             [
                 'SO-001',
                 '2024-01-01',
-                'standard',
                 'REF-001',
                 'First order from customer A',
                 10,
@@ -41,7 +40,6 @@ class SalesOrderWithItemsTemplateExport implements FromArray, WithHeadings, With
             [
                 'SO-002',
                 '2024-01-02',
-                'deposit',
                 'REF-002',
                 'Deposit order from customer B',
                 5,
@@ -68,7 +66,6 @@ class SalesOrderWithItemsTemplateExport implements FromArray, WithHeadings, With
             [
                 'SO-003',
                 '2024-01-03',
-                'actual',
                 'REF-003',
                 'Actual order from customer C',
                 0,
@@ -100,7 +97,6 @@ class SalesOrderWithItemsTemplateExport implements FromArray, WithHeadings, With
         return [
             'Order No.',
             'Date',
-            'Order Type',
             'Reference',
             'Order Description',
             'Discount Pct.',

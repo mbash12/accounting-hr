@@ -18,14 +18,14 @@ class ImportTaxesAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('Tax Data File')
-                    ->helperText('Upload Excel file (.xlsx) with tax data including columns: nama_pajak, kode_pajak, persentase_pajak, jenis_pajak, pajak_pembelian, pajak_penjualan, status_aktif, akun_pembelian, akun_penjualan. Use valid account codes from the system.')
+                    ->helperText('Upload Excel file (.xlsx) with tax data including columns: tax_name, tax_code, tax_percentage, tax_type, purchase_tax, sales_tax, active_status, purchase_account, sales_account. Use valid account codes from the system.')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Pajak')
-            ->modalDescription('Upload Excel file with pajak. You can download the template below to see the expected format.')
+            ->modalHeading('Import Taxes')
+            ->modalDescription('Upload Excel file with tax data. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -41,7 +41,7 @@ class ImportTaxesAction extends Action
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template pajak: ' . $e->getMessage())
+                                ->body('An error occurred while downloading tax template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -60,7 +60,7 @@ class ImportTaxesAction extends Action
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing pajak: ' . $e->getMessage())
+                        ->body('An error occurred while importing taxes: ' . $e->getMessage())
                         ->send();
                 }
             });

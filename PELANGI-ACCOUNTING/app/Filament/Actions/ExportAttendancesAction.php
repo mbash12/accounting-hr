@@ -18,13 +18,13 @@ class ExportAttendancesAction extends Action
                 try {
                     return Excel::download(
                         new AttendancesExport(),
-                        'absensi-' . date('Y-m-d') . '.xlsx'
+                        'attendance-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting absensi: ' . $e->getMessage())
+                        ->body('An error occurred while exporting attendance: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -18,13 +18,13 @@ class ExportProductGroupsAction extends Action
                 try {
                     return Excel::download(
                         new ProductGroupsExport(),
-                        'grup-produk-' . date('Y-m-d') . '.xlsx'
+                        'product-groups-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting grup produk: ' . $e->getMessage())
+                        ->body('An error occurred while exporting product groups: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -31,6 +31,7 @@ class SalesInvoiceWithItemsExport implements FromCollection, WithHeadings, WithT
                     $results->push([
                         'Invoice No.' => $invoice->invoice_number,
                         'Date' => $invoice->date ? $invoice->date->format('Y-m-d') : null,
+                        'Due Date' => $invoice->due_date ? $invoice->due_date->format('Y-m-d') : null,
                         'Reference No.' => $invoice->reference_no,
                         'Description' => $invoice->description,
                         'Other Charges' => $invoice->other_charges,
@@ -99,6 +100,7 @@ class SalesInvoiceWithItemsExport implements FromCollection, WithHeadings, WithT
         return [
             'Invoice No.',
             'Date',
+            'Due Date',
             'Reference No.',
             'Description',
             'Other Charges',

@@ -17,24 +17,24 @@ class WarehousesImport implements ToCollection, WithHeadingRow, WithValidation
             // Convert all values to strings to avoid type errors
             $companyId = session('selected_company_id') && session('selected_company_id') !== 'all' ? session('selected_company_id') : null;
 
-            $warehouse = Warehouse::where('code', (string) $row['kode_gudang'])
+            $warehouse = Warehouse::where('code', (string) $row['warehouse_code'])
                 ->where('company_id', $companyId)
                 ->first();
 
             $data = [
-                'name' => (string) $row['nama_gudang'],
-                'is_active' => isset($row['status_aktif']) &&
-                    (strtolower((string) $row['status_aktif']) === 'ya' ||
-                        strtolower((string) $row['status_aktif']) === 'yes' ||
-                        strtolower((string) $row['status_aktif']) === 'true' ||
-                        (string) $row['status_aktif'] === '1'),
+                'name' => (string) $row['warehouse_name'],
+                'is_active' => isset($row['active_status']) &&
+                    (strtolower((string) $row['active_status']) === 'ya' ||
+                        strtolower((string) $row['active_status']) === 'yes' ||
+                        strtolower((string) $row['active_status']) === 'true' ||
+                        (string) $row['active_status'] === '1'),
                 'created_by_user_id' => Auth::id(),
             ];
 
             if ($warehouse) {
                 $warehouse->update($data);
             } else {
-                $data['code'] = (string) $row['kode_gudang'];
+                $data['code'] = (string) $row['warehouse_code'];
                 $data['company_id'] = $companyId;
                 Warehouse::create($data);
             }
@@ -48,9 +48,9 @@ class WarehousesImport implements ToCollection, WithHeadingRow, WithValidation
     {
         // Convert all fields to strings to satisfy validation rules
         return [
-            'kode_gudang' => isset($data['kode_gudang']) ? (string) $data['kode_gudang'] : null,
-            'nama_gudang' => isset($data['nama_gudang']) ? (string) $data['nama_gudang'] : null,
-            'status_aktif' => isset($data['status_aktif']) ? (string) $data['status_aktif'] : null,
+            'warehouse_code' => isset($data['warehouse_code']) ? (string) $data['warehouse_code'] : null,
+            'warehouse_name' => isset($data['warehouse_name']) ? (string) $data['warehouse_name'] : null,
+            'active_status' => isset($data['active_status']) ? (string) $data['active_status'] : null,
         ];
     }
 
@@ -60,19 +60,19 @@ class WarehousesImport implements ToCollection, WithHeadingRow, WithValidation
         $companyId = ($selectedCompanyId && $selectedCompanyId !== 'all') ? $selectedCompanyId : null;
 
         return [
-            'kode_gudang' => 'required|string|max:20',
-            'nama_gudang' => 'required|string|max:255',
-            'status_aktif' => 'nullable|string',
+            'warehouse_code' => 'required|string|max:20',
+            'warehouse_name' => 'required|string|max:255',
+            'active_status' => 'nullable|string',
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            'kode_gudang.required' => 'Warehouse Code is required.',
-            'kode_gudang.max' => 'Warehouse Code cannot exceed 20 characters.',
-            'nama_gudang.required' => 'Warehouse Name is required.',
-            'nama_gudang.max' => 'Warehouse Name cannot exceed 255 characters.',
+            'warehouse_code.required' => 'Warehouse Code is required.',
+            'warehouse_code.max' => 'Warehouse Code cannot exceed 20 characters.',
+            'warehouse_name.required' => 'Warehouse Name is required.',
+            'warehouse_name.max' => 'Warehouse Name cannot exceed 255 characters.',
         ];
     }
 }

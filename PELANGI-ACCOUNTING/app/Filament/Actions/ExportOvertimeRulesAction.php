@@ -18,13 +18,13 @@ class ExportOvertimeRulesAction extends Action
                 try {
                     return Excel::download(
                         new OvertimeRulesExport(),
-                        'aturan-lembur-' . date('Y-m-d') . '.xlsx'
+                        'overtime-rules-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting aturan lembur: ' . $e->getMessage())
+                        ->body('An error occurred while exporting overtime rules: ' . $e->getMessage())
                         ->send();
                 }
             });

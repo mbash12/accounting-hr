@@ -17,15 +17,15 @@ class ImportEmployeesAction extends Action
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Karyawan')
-                    ->helperText('Unggah file Excel (.xlsx) dengan kolom: employee_id, name, email, nik, npwp, department_code, position, hire_date, status, ptkp_status, bank_name, bank_account_number, bank_account_holder, bpjs_kesehatan_number, bpjs_ketenagakerjaan_number, basic_salary, active_status')
+                    ->label('Employee Data File')
+                    ->helperText('Upload Excel file (.xlsx) with columns: employee_id, name, email, nik, npwp, department_code, position, hire_date, status, ptkp_status, bank_name, bank_account_number, bank_account_holder, bpjs_kesehatan_number, bpjs_ketenagakerjaan_number, basic_salary, active_status')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(2048)
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Karyawan')
-            ->modalDescription('Upload Excel file with karyawan. You can download the template below to see the expected format.')
+            ->modalHeading('Import Employees')
+            ->modalDescription('Upload Excel file with employee data. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -35,13 +35,13 @@ class ImportEmployeesAction extends Action
                         try {
                             return Excel::download(
                                 new \App\Exports\EmployeesTemplateExport(),
-                                'template-impor-karyawan.xlsx'
+                                'employee-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
                                 ->title('Template Download Failed')
-                                ->body('An error occurred while downloading template karyawan: ' . $e->getMessage())
+                                ->body('An error occurred while downloading employee template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,13 +53,13 @@ class ImportEmployeesAction extends Action
                     Notification::make()
                         ->success()
                         ->title('Import Successful')
-                        ->body('Data karyawan berhasil diimpor.')
+                        ->body('Employee data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Import Failed')
-                        ->body('An error occurred while importing karyawan: ' . $e->getMessage())
+                        ->body('An error occurred while importing employees: ' . $e->getMessage())
                         ->send();
                 }
             });

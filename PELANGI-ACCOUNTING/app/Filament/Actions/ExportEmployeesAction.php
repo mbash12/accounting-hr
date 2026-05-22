@@ -18,13 +18,13 @@ class ExportEmployeesAction extends Action
                 try {
                     return Excel::download(
                         new EmployeesExport(),
-                        'karyawan-' . date('Y-m-d') . '.xlsx'
+                        'employees-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting karyawan: ' . $e->getMessage())
+                        ->body('An error occurred while exporting employees: ' . $e->getMessage())
                         ->send();
                 }
             });

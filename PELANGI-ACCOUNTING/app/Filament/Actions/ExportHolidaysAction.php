@@ -18,13 +18,13 @@ class ExportHolidaysAction extends Action
                 try {
                     return Excel::download(
                         new HolidaysExport(),
-                        'hari-libur-' . date('Y-m-d') . '.xlsx'
+                        'holidays-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting hari libur: ' . $e->getMessage())
+                        ->body('An error occurred while exporting holidays: ' . $e->getMessage())
                         ->send();
                 }
             });

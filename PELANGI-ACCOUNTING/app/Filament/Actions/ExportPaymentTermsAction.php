@@ -18,13 +18,13 @@ class ExportPaymentTermsAction extends Action
                 try {
                     return Excel::download(
                         new PaymentTermExport(),
-                        'termin-pembayaran-' . date('Y-m-d') . '.xlsx'
+                        'payment-terms-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting termin pembayaran: ' . $e->getMessage())
+                        ->body('An error occurred while exporting payment terms: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -18,7 +18,7 @@ class ImportProductGroupsAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('Product Group Data File')
-                    ->helperText('Upload Excel file (.xlsx) with product group data including columns: nama_grup_produk, kode_grup_produk, tipe_pengiriman, status_aktif. Product group code will be used when importing products.')
+                    ->helperText('Upload Excel file (.xlsx) with product group data including columns: product_group_name, product_group_code, shipping_type, active_status. Product group code will be used when importing products.')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()

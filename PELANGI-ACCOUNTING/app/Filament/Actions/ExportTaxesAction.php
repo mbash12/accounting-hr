@@ -18,13 +18,13 @@ class ExportTaxesAction extends Action
                 try {
                     return Excel::download(
                         new TaxExport(),
-                        'pajak-' . date('Y-m-d') . '.xlsx'
+                        'taxes-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting pajak: ' . $e->getMessage())
+                        ->body('An error occurred while exporting taxes: ' . $e->getMessage())
                         ->send();
                 }
             });

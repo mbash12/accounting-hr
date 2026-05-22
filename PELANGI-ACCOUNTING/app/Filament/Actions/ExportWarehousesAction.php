@@ -18,13 +18,13 @@ class ExportWarehousesAction extends Action
                 try {
                     return Excel::download(
                         new WarehousesExport(),
-                        'gudang-' . date('Y-m-d') . '.xlsx'
+                        'warehouses-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
-                        ->body('An error occurred while exporting gudang: ' . $e->getMessage())
+                        ->body('An error occurred while exporting warehouses: ' . $e->getMessage())
                         ->send();
                 }
             });
