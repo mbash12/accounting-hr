@@ -5,7 +5,7 @@
 
     <div class="mt-4">
         <p class="text-sm text-gray-500 italic">
-            {{ __('Pilih karyawan di atas, lalu gunakan tombol di header untuk mensimulasikan Absen Masuk, Absen Keluar, atau pengajuan Izin/Cuti.') }}
+            {{ __('Select an employee above, then use the buttons in the header to simulate Check In, Check Out, or Permit/Leave submission.') }}
         </p>
     </div>
 </x-filament-panels::page>

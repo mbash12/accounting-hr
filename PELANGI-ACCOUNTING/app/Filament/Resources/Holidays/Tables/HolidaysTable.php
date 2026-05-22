@@ -24,15 +24,15 @@ class HolidaysTable
             ->defaultSort('date', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('date')
-                    ->label(__('Tanggal'))
+                    ->label(__('Date'))
                     ->date()
                     ->sortable(),
                 IconColumn::make('is_cuti_bersama')
-                    ->label(__('Cuti Bersama'))
+                    ->label(__('Collective Leave'))
                     ->boolean(),
             ])
             ->filters([

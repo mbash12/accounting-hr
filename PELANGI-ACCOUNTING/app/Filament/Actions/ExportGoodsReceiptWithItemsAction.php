@@ -12,19 +12,19 @@ class ExportGoodsReceiptWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
                     return Excel::download(
                         new GoodsReceiptWithItemsExport(),
-                        'penerimaan-barang-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'goods-receipt-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data penerimaan barang dan item: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting goods receipt with items: ' . $e->getMessage())
                         ->send();
                 }
             });

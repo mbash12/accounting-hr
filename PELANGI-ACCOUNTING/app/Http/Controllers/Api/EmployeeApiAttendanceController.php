@@ -317,7 +317,7 @@ class EmployeeApiAttendanceController extends Controller
 
         if (!is_numeric($latitude) || !is_numeric($longitude)) {
             throw ValidationException::withMessages([
-                $latField => 'Koordinat absensi wajib diisi.',
+                $latField => 'Attendance coordinates are required.',
             ]);
         }
 
@@ -345,7 +345,7 @@ class EmployeeApiAttendanceController extends Controller
             $nearestRadius = $bestMatch['spot']->radius_meters ?? 0;
             throw ValidationException::withMessages([
                 $latField => sprintf(
-                    'Lokasi absensi di luar semua spot yang diizinkan. Spot terdekat: %s (radius %.0f m, jarak %.0f m).',
+                    'Attendance location is outside all allowed spots. Nearest spot: %s (radius %.0f m, distance %.0f m).',
                     $nearestSpotName,
                     (float) $nearestRadius,
                     (float) $nearestDistance

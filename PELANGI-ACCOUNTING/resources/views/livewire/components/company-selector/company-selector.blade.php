@@ -270,7 +270,7 @@
                         </path>
                     </svg>
                 </div>
-                <div class="company-item-text">Semua Perusahaan</div>
+                <div class="company-item-text">All Companies</div>
                 <div class="company-item-check">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

@@ -25,12 +25,12 @@ class PayablePaymentResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Pembayaran Hutang Usaha');
+        return __('Payable Payments');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Pembayaran Hutang Usaha');
+        return __('Payable Payments');
     }
 
     public static function getNavigationSort(): int
@@ -40,7 +40,7 @@ class PayablePaymentResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('Pembayaran Hutang Usaha');
+        return __('Payable Payments');
     }
 
     public static function form(Schema $schema): Schema

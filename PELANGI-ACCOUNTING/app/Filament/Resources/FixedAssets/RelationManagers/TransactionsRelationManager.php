@@ -21,40 +21,40 @@ class TransactionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'transactions';
 
-    protected static ?string $title = 'Transaksi';
+    protected static ?string $title = 'Transactions';
 
     public function form(Schema $schema): Schema
     {
         return $schema->components([
             Select::make('transaction_type')
                 ->options([
-                    'acquisition' => 'Perolehan',
-                    'depreciation' => 'Penyusutan',
-                    'revaluation' => 'Revaluasi',
-                    'disposal' => 'Pelepasan',
-                    'impairment' => 'Penurunan Nilai',
+                    'acquisition' => 'Acquisition',
+                    'depreciation' => 'Depreciation',
+                    'revaluation' => 'Revaluation',
+                    'disposal' => 'Disposal',
+                    'impairment' => 'Impairment',
                 ])
                 ->required()
-                ->label('Jenis Transaksi'),
+                ->label('Transaction Type'),
             DatePicker::make('date')
                 ->required()
                 ->default(now())
-                ->label('Tanggal'),
+                ->label('Date'),
             TextInput::make('reference_no')
                 ->maxLength(255)
-                ->label('No. Referensi'),
+                ->label('Reference No.'),
             ...RoundedIntegerMoneyInput::schema(
                 name: 'journal_value',
-                label: 'Nilai Jurnal',
+                label: 'Journal Value',
                 required: true,
             ),
             Textarea::make('description')
                 ->rows(2)
                 ->columnSpanFull()
-                ->label('Keterangan'),
+                ->label('Description'),
             Toggle::make('create_journal')
-                ->label('Buat Jurnal Otomatis')
-                ->helperText('Buat jurnal entry berdasarkan akun di kategori aset')
+                ->label('Auto Create Journal')
+                ->helperText('Create journal entry based on accounts in the asset category')
                 ->default(false)
                 ->columnSpanFull(),
         ]);
@@ -67,15 +67,15 @@ class TransactionsRelationManager extends RelationManager
                 TextColumn::make('date')
                     ->date('d/m/Y')
                     ->sortable()
-                    ->label('Tanggal'),
+                    ->label('Date'),
                 TextColumn::make('transaction_type')
                     ->badge()
                     ->formatStateUsing(fn ($state) => match ($state) {
-                        'acquisition' => 'Perolehan',
-                        'depreciation' => 'Penyusutan',
-                        'revaluation' => 'Revaluasi',
-                        'disposal' => 'Pelepasan',
-                        'impairment' => 'Penurunan Nilai',
+                        'acquisition' => 'Acquisition',
+                        'depreciation' => 'Depreciation',
+                        'revaluation' => 'Revaluation',
+                        'disposal' => 'Disposal',
+                        'impairment' => 'Impairment',
                         default => $state,
                     })
                     ->color(fn ($state) => match ($state) {
@@ -84,22 +84,22 @@ class TransactionsRelationManager extends RelationManager
                         'disposal' => 'danger',
                         default => 'gray',
                     })
-                    ->label('Jenis'),
+                    ->label('Type'),
                 TextColumn::make('journal_value')
                     ->numeric(decimalPlaces: 0, thousandsSeparator: '.')
                     ->prefix('Rp ')
-                    ->label('Nilai'),
+                    ->label('Value'),
                 IconColumn::make('create_journal')
                     ->boolean()
-                    ->label('Jurnal'),
+                    ->label('Journal'),
                 TextColumn::make('reference_no')
-                    ->label('Referensi'),
+                    ->label('Reference'),
             ])
             ->defaultSort('date', 'desc')
             ->headerActions([
                 CreateAction::make()
-                    ->label('Buat Transaksi')
-                    ->modalHeading('Buat Transaksi Harta Tetap')
+                    ->label('Create Transaction')
+                    ->modalHeading(__('Create Fixed Asset Transaction'))
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['company_id'] = $this->getOwnerRecord()->company_id;
                         $data['created_by_user_id'] = auth()->id();

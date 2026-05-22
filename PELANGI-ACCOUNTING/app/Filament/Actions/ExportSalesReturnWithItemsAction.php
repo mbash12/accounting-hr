@@ -12,19 +12,19 @@ class ExportSalesReturnWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
                     return Excel::download(
                         new SalesReturnWithItemsExport(),
-                        'retur-dan-item-penjualan-' . date('Y-m-d') . '.xlsx'
+                        'sales-return-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data retur dan item penjualan: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting sales return with items: ' . $e->getMessage())
                         ->send();
                 }
             });

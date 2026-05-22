@@ -20,9 +20,9 @@ class ProductGroupsExport implements FromCollection, WithHeadings, WithTitle
         return $query->get()
             ->map(function ($productGroup) {
                 return [
-                    'nama_grup_produk' => $productGroup->name,
-                    'tipe_pengiriman' => $productGroup->shipping_type,
-                    'status_aktif' => $productGroup->is_active ? 'ya' : 'tidak',
+                    'product_group_name' => $productGroup->name,
+                    'shipping_type' => $productGroup->shipping_type,
+                    'active_status' => $productGroup->is_active ? 'Yes' : 'No',
                 ];
             });
     }
@@ -30,14 +30,14 @@ class ProductGroupsExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Nama Grup Produk',
-            'Tipe Pengiriman',
-            'Status Aktif'
+            'Product Group Name',
+            'Shipping Type',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Grup Produk';
+        return 'Product Group Data';
     }
 }

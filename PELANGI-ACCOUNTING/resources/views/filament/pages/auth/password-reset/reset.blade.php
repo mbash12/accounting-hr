@@ -101,8 +101,8 @@
                 <img src="{{ asset('logo.png') }}" alt="Logo" class="h-24 mx-auto mb-6">
 
                 <div class="bg-white p-8 !rounded-3xl shadow-lg w-[450px]">
-                    <h2 class="text-2xl font-light mb-6">Atur Ulang Kata Sandi</h2>
-                    <p class="text-gray-600 text-sm mb-6">Masukkan kata sandi baru Anda di bawah ini.</p>
+                    <h2 class="text-2xl font-light mb-6">Reset Password</h2>
+                    <p class="text-gray-600 text-sm mb-6">Enter your new password below.</p>
 
                     <!-- Form with loading state -->
                     <form wire:submit="resetPassword"
@@ -115,19 +115,19 @@
                         <!-- Error display for form validation -->
                         @error('data.email')
                             <div class="text-red-500 text-sm mt-2 mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                                <span class="font-medium">Kesalahan Email:</span> {{ $message }}
+                                <span class="font-medium">Email Error:</span> {{ $message }}
                             </div>
                         @enderror
 
                         @error('data.password')
                             <div class="text-red-500 text-sm mt-2 mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                                <span class="font-medium">Kesalahan Kata Sandi:</span> {{ $message }}
+                                <span class="font-medium">Password Error:</span> {{ $message }}
                             </div>
                         @enderror
 
                         @error('data.password_confirmation')
                             <div class="text-red-500 text-sm mt-2 mb-4 p-3 bg-red-50 rounded-lg border border-red-200">
-                                <span class="font-medium">Kesalahan Konfirmasi:</span> {{ $message }}
+                                <span class="font-medium">Confirmation Error:</span> {{ $message }}
                             </div>
                         @enderror
 
@@ -139,13 +139,13 @@
 
                             <a href="{{ filament()->getLoginUrl() }}"
                                class="fi-auth-link text-blue-600 hover:text-blue-800 text-sm transition-colors text-center">
-                                Kembali ke Masuk
+                                Back to Sign In
                             </a>
                         </div>
                     </form>
 
                     <div class="text-center text-gray-500 mt-6 text-sm">
-                       @ {{ date('Y') }} | Pelangi Sentral Kreasi
+                       @ {{ date('Y') }}
                     </div>
                 </div>
             </div>

@@ -78,7 +78,7 @@ class MasterDataController extends Controller
         }
 
         $query = \App\Models\Product::where('company_id', $request->company_id)
-            ->with('unit', 'productGroup', 'supplier', 'tax');
+            ->with('unit', 'productGroup', 'tax');
 
         $query = $this->applySearch($query, $request->search, ['name', 'code', 'description']);
 
@@ -223,15 +223,6 @@ class MasterDataController extends Controller
                 $productGroupId = $pg ? $pg->id : null;
             }
 
-            $supplierId = null;
-            if ($request->supplier_code) {
-                $supplier = \App\Models\Contact::where('company_id', $request->company_id)
-                    ->whereRaw("LOWER(contact_code) = ?", [strtolower($request->supplier_code)])
-                    ->where('is_supplier', true)
-                    ->first();
-                $supplierId = $supplier ? $supplier->id : null;
-            }
-
             $product = \App\Models\Product::where('company_id', $request->company_id)
                 ->whereRaw("LOWER(code) = ?", [strtolower($request->code)])
                 ->withTrashed()
@@ -250,7 +241,6 @@ class MasterDataController extends Controller
             $product->description = $request->description ?? $product->description;
             $product->cost_price = $request->cost_price ?? $product->cost_price;
             $product->selling_price = $request->selling_price ?? $product->selling_price;
-            $product->min_order_qty = $request->min_order_qty ?? $product->min_order_qty;
             $product->created_by_user_id = 1;
             if (isset($request->is_active)) {
                 $product->is_active = $request->is_active;
@@ -259,7 +249,6 @@ class MasterDataController extends Controller
             if ($unitId) $product->unit_id = $unitId;
             if ($taxId) $product->tax_id = $taxId;
             if ($productGroupId) $product->product_group_id = $productGroupId;
-            if ($supplierId) $product->supplier_id = $supplierId;
 
             if ($request->hasFile('image')) {
                 if ($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image)) {

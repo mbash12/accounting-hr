@@ -84,7 +84,7 @@ class OvertimeRulesImport implements ToCollection, WithHeadingRow, WithValidatio
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Nama aturan lembur wajib diisi.',
+            'name.required' => 'Overtime rule name is required.',
         ];
     }
 }

@@ -24,20 +24,20 @@ class GeneralLedger extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.general-ledger';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan Keuangan';
+    protected static string|UnitEnum|null $navigationGroup = 'Financial Reports';
 
-    protected static ?string $navigationLabel = 'Buku Besar';
+    protected static ?string $navigationLabel = 'General Ledger';
 
-    protected static ?string $title = 'Buku Besar';
+    protected static ?string $title = 'General Ledger';
 
     public function getTitle(): string
     {
-        return 'Buku Besar';
+        return 'General Ledger';
     }
 
     public function getHeading(): string
     {
-        return 'Buku Besar';
+        return 'General Ledger';
     }
 
     public ?array $data = [];
@@ -59,7 +59,7 @@ class GeneralLedger extends Page implements HasForms
         return $form
             ->schema([
                 \Filament\Forms\Components\Toggle::make('select_all')
-                    ->label('Pilih Semua Akun')
+                    ->label('Select All Accounts')
                     ->reactive()
                     ->inline(false)
                     ->afterStateUpdated(function ($state, $set) {
@@ -69,7 +69,7 @@ class GeneralLedger extends Page implements HasForms
                     }),
 
                 Select::make('account_ids')
-                    ->label('Akun')
+                    ->label('Accounts')
                     ->multiple()
                     ->options(function () use ($companyId) {
                         if (!$companyId || $companyId === 'all') {
@@ -90,12 +90,12 @@ class GeneralLedger extends Page implements HasForms
                     ->disabled(fn ($get) => $get('select_all')),
 
                 DatePicker::make('start_date')
-                    ->label('Dari Tanggal')
+                    ->label('From Date')
                     ->required()
                     ->default(now()->startOfMonth()),
 
                 DatePicker::make('end_date')
-                    ->label('Sampai Tanggal')
+                    ->label('To Date')
                     ->required()
                     ->default(now())
                     ->suffixAction(function () {
@@ -127,7 +127,7 @@ class GeneralLedger extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Buku_Besar_' . now()->format('Ymd') . '.pdf');
+        }, 'General_Ledger_' . now()->format('Ymd') . '.pdf');
     }
 
     public function getReportData(): array
@@ -144,7 +144,7 @@ class GeneralLedger extends Page implements HasForms
                 'company' => null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'error' => 'Silakan pilih perusahaan tertentu dari pemilih global untuk melihat laporan.',
+                'error' => 'Please select a specific company from the global selector to view the report.',
             ];
         }
 
@@ -154,7 +154,7 @@ class GeneralLedger extends Page implements HasForms
                 'company' => null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'error' => 'Pilih setidaknya satu akun untuk melihat laporan Buku Besar.',
+                'error' => 'Please select at least one account to view the General Ledger report.',
             ];
         }
 
@@ -172,7 +172,7 @@ class GeneralLedger extends Page implements HasForms
                 'company' => null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'error' => 'Akun tidak ditemukan.',
+                'error' => 'Accounts not found.',
             ];
         }
 

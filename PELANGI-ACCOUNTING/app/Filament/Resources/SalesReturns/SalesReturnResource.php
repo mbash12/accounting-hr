@@ -27,17 +27,17 @@ class SalesReturnResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Penjualan';
+        return __('Sales');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Retur Penjualan';
+        return 'Sales Return';
     }
 
     public static function getModelLabel(): string
     {
-        return 'Retur Penjualan';
+        return 'Sales Return';
     }
 
     public static function getNavigationSort(): int
@@ -47,7 +47,7 @@ class SalesReturnResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'Retur Penjualan';
+        return 'Sales Return';
     }
 
     public static function form(Schema $schema): Schema

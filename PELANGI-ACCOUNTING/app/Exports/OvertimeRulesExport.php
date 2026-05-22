@@ -34,19 +34,19 @@ class OvertimeRulesExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Nama Aturan',
-            'Kode Departemen',
+            'Rule Name',
+            'Department Code',
             'Default',
-            'Pembagi Tarif Jam',
-            'Pengali Jam 1 (Kerja)',
-            'Pengali Jam Berikutnya (Kerja)',
-            'Pengali Hari Libur',
-            'Status Aktif',
+            'Hourly Rate Divisor',
+            'First Hour Multiplier (Workday)',
+            'Subsequent Hour Multiplier (Workday)',
+            'Holiday Multiplier',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Aturan Lembur';
+        return 'Overtime Rules Data';
     }
 }

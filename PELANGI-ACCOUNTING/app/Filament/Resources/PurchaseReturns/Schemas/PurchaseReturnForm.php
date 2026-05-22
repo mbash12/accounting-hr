@@ -96,7 +96,7 @@ class PurchaseReturnForm
                             })
                             ->columnSpanFull(),
                         Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'supplier',
@@ -122,9 +122,9 @@ class PurchaseReturnForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Contacts\Schemas\ContactForm)->getCodeField('contact_code', 'Kode Kontak')
+                                (new \App\Filament\Resources\Contacts\Schemas\ContactForm)->getCodeField('contact_code', 'Contact Code')
                                     ->unique(\App\Models\Contact::class, 'contact_code', ignoreRecord: true,
                                         modifyRuleUsing: function ($rule) {
                                             // Get the company_id from the session
@@ -143,7 +143,7 @@ class PurchaseReturnForm
                                     ->label('Email')
                                     ->email(),
                                 TextInput::make('phone')
-                                    ->label('Telepon')
+                                    ->label('Phone')
                                     ->tel(),
                                 Hidden::make('is_supplier')
                                     ->default(true),
@@ -162,7 +162,7 @@ class PurchaseReturnForm
                                 return $contact->id;
                             }),
                         SelectWithModal::make('goods_receipt_id')
-                            ->label('Penerimaan Barang')
+                            ->label('Goods Receipt')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'goodsReceipt',
@@ -199,7 +199,7 @@ class PurchaseReturnForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->receipt_number)
                             ->searchable()
                             ->preload()
-                            ->placeholder('Pilih Penerimaan Barang')
+                            ->placeholder('Select Goods Receipt')
                             ->reactive()
                             ->live(onBlur: true)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
@@ -212,7 +212,6 @@ class PurchaseReturnForm
                                         foreach ($goodsReceipt->items as $receiptItem) {
                                             $items[] = [
                                                 'product_id' => $receiptItem->product_id,
-                                                'item_name' => $receiptItem->item_name ?? $receiptItem->product?->name,
                                                 'quantity' => $receiptItem->quantity,
                                                 'quantity_display' => number_format($receiptItem->quantity, 0),
                                                 'unit_id' => $receiptItem->unit_id,
@@ -233,7 +232,7 @@ class PurchaseReturnForm
                             ->columnSpan(1),
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Nomor Referensi')
+                            ->label('Reference No.')
                             ->columnSpan(1),
                         (new static)->getCodeField()
                             ->unique('purchase_returns', 'return_number', ignoreRecord: true,
@@ -252,7 +251,7 @@ class PurchaseReturnForm
                         Textarea::make('description')
                             ->rows(1)
                             ->maxLength(65535)
-                            ->label('Deskripsi'),
+                            ->label('Description'),
                         Select::make('status')
                             ->label('Status')
                             ->options([
@@ -271,22 +270,21 @@ class PurchaseReturnForm
                 Repeater::make('items')
                     ->relationship()
                     ->hiddenLabel()
-                    ->addActionLabel('Tambah Item Baru')
+                    ->addActionLabel('Add New Item')
                     ->required()
                     ->table([
-                        TableColumn::make('Produk')->width('30%')->alignment(Alignment::Start),
-                        TableColumn::make('Nama Barang')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Jumlah')->width('10%')->alignment(Alignment::End),
-                        TableColumn::make('Satuan')->width('10%')->alignment(Alignment::Start),
-                        TableColumn::make('Alasan Retur')->width('25%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('10%')->alignment(Alignment::Start),
+                        TableColumn::make('Product')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('15%')->alignment(Alignment::End),
+                        TableColumn::make('Unit')->width('10%')->alignment(Alignment::Start),
+                        TableColumn::make('Return Reason')->width('25%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('10%')->alignment(Alignment::Start),
                     ])
                     ->schema([
                         Hidden::make('goods_receipt_item_id'),
                         Select::make('product_id')
                             ->required()
                             ->searchable(['name', 'code'])
-                            ->label('Produk')
+                            ->label('Product')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'product',
@@ -307,8 +305,6 @@ class PurchaseReturnForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
                                     }
@@ -316,9 +312,9 @@ class PurchaseReturnForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Kode Produk')
+                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Product Code')
                                     ->unique(
                                         \App\Models\Product::class,
                                         'code',
@@ -332,7 +328,7 @@ class PurchaseReturnForm
                                         },
                                     ),
                                 Select::make('product_group_id')
-                                    ->label('Kelompok Produk')
+                                    ->label('Product Group')
                                     ->relationship(
                                         "productGroup",
                                         "name",
@@ -349,12 +345,12 @@ class PurchaseReturnForm
                                     ->required(),
                                 ...RoundedIntegerMoneyInput::schema(
                                     name: 'cost_price',
-                                    label: 'Harga Beli',
+                                    label: 'Cost Price',
                                     required: false,
                                     defaultDecimal: '0.00',
                                 ),
                                 Select::make('unit_id')
-                                    ->label('Satuan')
+                                    ->label('Unit')
                                     ->searchable()
                                     ->options(function () {
                                         $selectedCompanyId = session('selected_company_id');
@@ -367,7 +363,7 @@ class PurchaseReturnForm
                                         return $q->orderBy('name')->pluck('name', 'id')->toArray();
                                     }),
                                 Textarea::make('description')
-                                    ->label('Deskripsi')
+                                    ->label('Description')
                                     ->rows(2),
                                 Hidden::make('company_id')
                                     ->default(function () {
@@ -383,19 +379,15 @@ class PurchaseReturnForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
-                            label: 'Jumlah',
+                            label: 'Quantity',
                             required: true,
                             defaultDecimal: '1.00',
                         ),
                         Select::make('unit_id')
                             ->searchable()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'unit',
@@ -413,10 +405,10 @@ class PurchaseReturnForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
                         TextInput::make('return_reason')
                             ->required()
-                            ->label('Alasan Retur')
-                            ->placeholder('misalnya, Rusak, Salah barang, Tidak dibutuhkan'),
+                            ->label('Return Reason')
+                            ->placeholder('e.g. Damaged, Wrong item, Not needed'),
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->rows(1)
                             ->maxLength(255),

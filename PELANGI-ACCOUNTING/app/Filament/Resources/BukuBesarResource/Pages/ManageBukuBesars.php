@@ -108,7 +108,7 @@ $baseAmount = (float) $obRecord->amount;
             'mutasiBalance' => $mutasiBalance,
             'saldoAkhir' => $saldoAkhir,
             'totalDebit' => $totalDebit,
-            'totalKredit' => $totalKredit,
+            'totalCredit' => $totalKredit,
         ]);
     }
 }

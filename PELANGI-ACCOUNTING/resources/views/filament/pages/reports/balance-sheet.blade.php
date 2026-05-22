@@ -158,10 +158,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -176,7 +176,7 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>{{ $error }}</p>
     </div>
     @elseif($company)
@@ -184,8 +184,8 @@
         <!-- Header -->
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name }}</h2>
-            <h1 class="report-title">Neraca (Standar)</h1>
-            <p class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
+            <h1 class="report-title">Balance Sheet (Standard)</h1>
+            <p class="report-date">As of {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</p>
         </div>
 
         <table class="tb-table">
@@ -200,7 +200,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Aktiva</td>
+                        Assets</td>
                 </tr>
                 @php
                 $assetNodes = ($assets->count() === 1 && $assets->first()->is_header) ? $assets->first()->children :
@@ -210,7 +210,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Jumlah Aktiva</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Assets</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{
                         number_format($assets->sum('calculated_balance'), 2, ',', '.') }}</td>
                 </tr>
@@ -219,14 +219,14 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Kewajiban dan Ekuitas</td>
+                        Liabilities and Equity</td>
                 </tr>
 
                 <!-- Liabilities -->
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-left: 1.6rem; background-color: white; text-transform: uppercase;">
-                        Kewajiban</td>
+                        Liabilities</td>
                 </tr>
                 @php
                 $liabNodes = ($liabilities->count() === 1 && $liabilities->first()->is_header) ?
@@ -237,7 +237,7 @@
                 @endforeach
 
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Jumlah Kewajiban</td>
+                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Total Liabilities</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">{{
                         number_format($liabilities->sum('calculated_balance'), 2, ',', '.') }}</td>
                 </tr>
@@ -246,7 +246,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-left: 1.6rem; padding-top: 1rem; background-color: white; text-transform: uppercase;">
-                        Ekuitas</td>
+                        Equity</td>
                 </tr>
                 @php
                 $equityNodes = ($equity->count() === 1 && $equity->first()->is_header) ? $equity->first()->children :
@@ -257,7 +257,7 @@
                 @endforeach
 
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Jumlah Ekuitas</td>
+                    <td style="font-weight: bold; color: #1f2937; padding-left: 2rem;">Total Equity</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">{{
                         number_format($equity->sum('calculated_balance'), 2, ',', '.') }}</td>
                 </tr>
@@ -268,7 +268,7 @@
                 $totalEquity = $equity->sum('calculated_balance');
                 @endphp
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Jumlah Kewajiban dan Ekuitas</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Liabilities and Equity</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalLiabilities +
                         $totalEquity, 2, ',', '.') }}</td>
                 </tr>
@@ -285,8 +285,8 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
-        <p>Pilih perusahaan tertentu untuk melihat laporan.</p>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
+        <p>Select a specific company to view the report.</p>
     </div>
     @endif
 </x-filament-panels::page>

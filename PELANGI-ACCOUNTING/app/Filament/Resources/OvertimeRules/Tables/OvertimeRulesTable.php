@@ -23,29 +23,29 @@ class OvertimeRulesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('department.name')
-                    ->label(__('Departemen'))
-                    ->placeholder(__('Semua Departemen'))
+                    ->label(__('Department'))
+                    ->placeholder(__('All Departments'))
                     ->searchable()
                     ->sortable(),
                 IconColumn::make('is_default')
                     ->label(__('Default'))
                     ->boolean(),
                 IconColumn::make('is_active')
-                    ->label(__('Aktif'))
+                    ->label(__('Active'))
                     ->boolean(),
                 TextColumn::make('base_hourly_rate_divisor')
-                    ->label(__('Pembagi'))
+                    ->label(__('Divisor'))
                     ->sortable(),
                 TextColumn::make('workday_first_hour_multiplier')
-                    ->label(__('Pengali 1 (Kerja)')),
+                    ->label(__('Multiplier 1 (Workday)')),
                 TextColumn::make('workday_subsequent_hour_multiplier')
-                    ->label(__('Pengali 2 (Kerja)')),
+                    ->label(__('Multiplier 2 (Workday)')),
                 TextColumn::make('holiday_multiplier')
-                    ->label(__('Pengali Libur')),
+                    ->label(__('Holiday Multiplier')),
             ])
             ->filters([
                 TrashedFilter::make(),

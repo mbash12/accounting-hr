@@ -58,12 +58,12 @@ class ProductGroupForm
                             }),
                         Select::make('shipping_type')
                             ->options([
-                                'physical' => __('Produk Fisik'),
-                                'digital' => __('Produk Digital'),
+                                'physical' => __('Physical Product'),
+                                'digital' => __('Digital Product'),
                             ])
                             ->default('physical')
                             ->required()
-                            ->label(__('Jenis Produk')),
+                            ->label(__('Product Type')),
                         Toggle::make('is_active')
                             ->required()
                             ->default(true)

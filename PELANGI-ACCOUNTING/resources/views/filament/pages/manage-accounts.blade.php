@@ -41,9 +41,9 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                         </svg>
                     </div>
-                    <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">{{ __('Pilih Perusahaan') }}</h3>
+                    <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">{{ __('Select Company') }}</h3>
                     <p style="color: #6b7280; margin: 0 0 1.5rem 0; line-height: 1.5;">
-                        {{ __('Silakan pilih perusahaan tertentu dari pemilih perusahaan untuk melihat dan mengelola Bagan Akunnya.') }}
+                        {{ __('Please select a specific company from the company selector to view and manage the Chart of Accounts.') }}
                     </p>
                 </div>
             </div>

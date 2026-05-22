@@ -89,7 +89,7 @@ class JournalEntriesTable
                 ActionGroup::make([
                     EditAction::make(),
                     \Filament\Actions\Action::make('printVoucher')
-                        ->label(__('Cetak Voucher'))
+                        ->label(__('Print Voucher'))
                         ->icon('heroicon-o-printer')
                         ->url(fn (\App\Models\JournalEntry $record) => route('journal-voucher.print-voucher', $record->id))
                         ->openUrlInNewTab(),

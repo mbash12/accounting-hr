@@ -11,11 +11,11 @@ class SalaryComponentsTemplateExport implements FromArray, WithHeadings, WithTit
     public function array(): array
     {
         return [
-            ['TJB',  'Tunjangan Jabatan',             'allowance', 'yes', 'yes', 'yes', 'yes'],
-            ['TJM',  'Tunjangan Makan',                'allowance', 'no',  'no',  'no',  'yes'],
-            ['TJT',  'Tunjangan Transportasi',         'allowance', 'yes', 'no',  'no',  'yes'],
-            ['BPJSK','BPJS Kesehatan Potongan',        'deduction', 'yes', 'no',  'no',  'yes'],
-            ['BPJTK','BPJS Ketenagakerjaan Potongan',  'deduction', 'yes', 'no',  'no',  'yes'],
+            ['TJB',  'Position Allowance',            'allowance', 'yes', 'yes', 'yes', 'yes'],
+            ['TJM',  'Meal Allowance',                 'allowance', 'no',  'no',  'no',  'yes'],
+            ['TJT',  'Transport Allowance',            'allowance', 'yes', 'no',  'no',  'yes'],
+            ['BPJSK','BPJS Health Deduction',           'deduction', 'yes', 'no',  'no',  'yes'],
+            ['BPJTK','BPJS Employment Deduction',       'deduction', 'yes', 'no',  'no',  'yes'],
         ];
     }
 
@@ -34,6 +34,6 @@ class SalaryComponentsTemplateExport implements FromArray, WithHeadings, WithTit
 
     public function title(): string
     {
-        return 'Template Impor Komponen Gaji';
+        return 'Salary Components Import Template';
     }
 }

@@ -13,35 +13,35 @@ class ImportPurchaseInvoiceWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Faktur Pembelian dan Item')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data faktur pembelian dan itemnya. Setiap baris mewakili satu item dalam faktur. Pastikan kode pemasok, produk, satuan, dan pajak yang digunakan sudah ada di sistem (diimpor terlebih dahulu melalui menu Kontak, Produk, Satuan, dan Pajak).')
+                    ->label('Purchase Invoice and Items File')
+                    ->helperText('Upload an Excel file (.xlsx) with purchase invoice and item data. Each row represents one item in an invoice. Make sure supplier, product, unit, and tax codes already exist in the system (import them first via Contacts, Products, Units, and Tax menus).')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Faktur Pembelian dan Item')
-            ->modalDescription('Unggah file Excel dengan informasi faktur pembelian dan itemnya. Setiap baris dalam file mewakili satu item dalam faktur. Faktur dengan nomor yang sama akan digabungkan. Pastikan untuk mengimpor Pemasok, Produk, Satuan, dan Pajak terlebih dahulu sebelum mengimpor faktur pembelian agar data dapat terhubung dengan benar. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Purchase Invoice and Items Data')
+            ->modalDescription('Upload an Excel file with purchase invoice and item information. Each row represents one item in an invoice. Invoices with the same number will be merged. Make sure to import Suppliers, Products, Units, and Taxes first before importing purchase invoices so data can be linked correctly. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\PurchaseInvoiceWithItemsTemplateExport(),
-                                'template-impor-faktur-pembelian-dan-item.xlsx'
+                                'purchase-invoice-items-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template faktur pembelian dan item: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the purchase invoice and items template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportPurchaseInvoiceWithItemsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data faktur pembelian dan item berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Purchase invoice and items data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data faktur pembelian dan item: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing purchase invoice and items data: ' . $e->getMessage())
                         ->send();
                 }
             });

@@ -107,7 +107,7 @@ class CashDisbursementForm
                             },
                         ),
                     Select::make("from_account_id")
-                        ->label(__("Dari Cash / Bank"))
+                        ->label(__("From Cash / Bank"))
                         ->relationship("fromAccount", "name")
                         ->options(function () {
                             $selectedCompanyId = session('selected_company_id');
@@ -159,7 +159,7 @@ class CashDisbursementForm
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->helperText(__('Pilih akun kas/bank dari Chart of Accounts.')),
+                        ->helperText(__('Select a cash/bank account from the Chart of Accounts.')),
                     Textarea::make("description")
                         ->rows(1)
                         ->maxLength(65535)
@@ -271,7 +271,7 @@ class CashDisbursementForm
                         ->hiddenLabel()
                         ->columnSpan(1),
                     Placeholder::make("total_disbursement_display")
-                        ->label(__("Total Pencairan"))
+                        ->label(__("Total Disbursement"))
                         ->inlineLabel()
                         ->live()
                         ->content(function ($get) {
@@ -317,8 +317,8 @@ class CashDisbursementForm
                         ->hiddenLabel()
                         ->columnSpan(1),
                     Toggle::make("is_posted")
-                        ->label(__("Diposting"))
-                        ->helperText(__("Tandai entri ini sebagai diposting ke buku besar"))
+                        ->label(__("Posted"))
+                        ->helperText(__("Mark this entry as posted to the general ledger"))
                         ->default(false)
                         ->dehydrated(true)
                         ->afterStateHydrated(function (callable $set, $state, $record) {

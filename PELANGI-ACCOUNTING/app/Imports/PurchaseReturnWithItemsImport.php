@@ -24,41 +24,41 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
         $returnsData = [];
 
         foreach ($rows as $row) {
-            $returnNumber = (string) $row['nomor_retur'];
+            $returnNumber = (string) $row['return_no'];
 
             if (!isset($returnsData[$returnNumber])) {
                 // Create the return data
                 $supplierId = null;
-                if (!empty($row['kode_pemasok'])) {
-                    $supplier = Contact::where('contact_code', (string) $row['kode_pemasok'])
+                if (!empty($row['supplier_code'])) {
+                    $supplier = Contact::where('contact_code', (string) $row['supplier_code'])
                         ->where('company_id', $companyId)
                         ->where('is_supplier', true)
                         ->first();
                     if (!$supplier) {
-                        throw new \Exception("Supplier with code '{$row['kode_pemasok']}' not found in current company");
+                        throw new \Exception("Supplier with code '{$row['supplier_code']}' not found in current company");
                     }
                     $supplierId = $supplier->id;
-                } elseif (!empty($row['nama_pemasok'])) {
-                    $supplier = Contact::where('name', (string) $row['nama_pemasok'])
+                } elseif (!empty($row['supplier_name'])) {
+                    $supplier = Contact::where('name', (string) $row['supplier_name'])
                         ->where('company_id', $companyId)
                         ->where('is_supplier', true)
                         ->first();
                     if (!$supplier) {
-                        throw new \Exception("Supplier with name '{$row['nama_pemasok']}' not found in current company");
+                        throw new \Exception("Supplier with name '{$row['supplier_name']}' not found in current company");
                     }
                     $supplierId = $supplier->id;
                 } else {
-                    throw new \Exception("Either Kode Pemasok or Nama Pemasok is required for return {$returnNumber}");
+                    throw new \Exception("Either Supplier Code or Supplier Name is required for return {$returnNumber}");
                 }
 
                 $goodsReceiptId = null;
-                if (!empty($row['nomor_penerimaan_barang'])) {
-                    $goodsReceipt = GoodsReceipt::where('receipt_number', (string) $row['nomor_penerimaan_barang'])
+                if (!empty($row['goods_receipt_no'])) {
+                    $goodsReceipt = GoodsReceipt::where('receipt_number', (string) $row['goods_receipt_no'])
                         ->where('company_id', $companyId)
                         ->where('supplier_id', $supplierId)
                         ->first();
                     if (!$goodsReceipt) {
-                        throw new \Exception("Goods Receipt with number '{$row['nomor_penerimaan_barang']}' not found for supplier in current company for return {$returnNumber}");
+                        throw new \Exception("Goods Receipt with number '{$row['goods_receipt_no']}' not found for supplier in current company for return {$returnNumber}");
                     }
                     $goodsReceiptId = $goodsReceipt->id;
                 }
@@ -66,9 +66,9 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
                 $returnsData[$returnNumber] = [
                     'return_data' => [
                         'return_number' => $returnNumber,
-                        'date' => isset($row['tanggal']) ? $this->parseDate($row['tanggal']) : now()->format('Y-m-d'),
-                        'reference_no' => isset($row['nomor_referensi']) ? (string) $row['nomor_referensi'] : null,
-                        'description' => isset($row['deskripsi']) ? (string) $row['deskripsi'] : null,
+                        'date' => isset($row['date']) ? $this->parseDate($row['date']) : now()->format('Y-m-d'),
+                        'reference_no' => isset($row['reference_no']) ? (string) $row['reference_no'] : null,
+                        'description' => isset($row['description']) ? (string) $row['description'] : null,
                         'status' => isset($row['status']) ? (string) $row['status'] : 'draft',
                         'supplier_id' => $supplierId,
                         'goods_receipt_id' => $goodsReceiptId,
@@ -81,41 +81,41 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
 
             // Process the item for this return
             $productId = null;
-            if (!empty($row['kode_produk'])) {
-                $product = Product::where('code', (string) $row['kode_produk'])
+            if (!empty($row['product_code'])) {
+                $product = Product::where('code', (string) $row['product_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$product) {
-                    throw new \Exception("Product with code '{$row['kode_produk']}' not found in current company for return {$returnNumber}");
+                    throw new \Exception("Product with code '{$row['product_code']}' not found in current company for return {$returnNumber}");
                 }
                 $productId = $product->id;
-            } elseif (!empty($row['nama_produk'])) {
-                $product = Product::where('name', (string) $row['nama_produk'])
+            } elseif (!empty($row['product_name'])) {
+                $product = Product::where('name', (string) $row['product_name'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$product) {
-                    throw new \Exception("Product with name '{$row['nama_produk']}' not found in current company for return {$returnNumber}");
+                    throw new \Exception("Product with name '{$row['product_name']}' not found in current company for return {$returnNumber}");
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for return {$returnNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for return {$returnNumber}");
             }
 
             $unitId = null;
-            if (!empty($row['kode_satuan'])) {
-                $unit = Unit::where('code', (string) $row['kode_satuan'])
+            if (!empty($row['unit_code'])) {
+                $unit = Unit::where('code', (string) $row['unit_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$unit) {
-                    throw new \Exception("Unit with code '{$row['kode_satuan']}' not found in current company for return {$returnNumber}");
+                    throw new \Exception("Unit with code '{$row['unit_code']}' not found in current company for return {$returnNumber}");
                 }
                 $unitId = $unit->id;
             }
 
             $returnsData[$returnNumber]['items'][] = [
-                'description' => isset($row['deskripsi_item']) ? (string) $row['deskripsi_item'] : null,
-                'quantity' => isset($row['jumlah']) ? (float) $row['jumlah'] : 0,
-                'return_reason' => isset($row['alasan_retur']) ? (string) $row['alasan_retur'] : null,
+                'description' => isset($row['item_description']) ? (string) $row['item_description'] : null,
+                'quantity' => isset($row['quantity']) ? (float) $row['quantity'] : 0,
+                'return_reason' => isset($row['return_reason']) ? (string) $row['return_reason'] : null,
                 'product_id' => $productId,
                 'unit_id' => $unitId,
                 'created_by_user_id' => Auth::id(),
@@ -166,20 +166,20 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
     public function prepareForValidation($data, $index)
     {
         return [
-            'nomor_retur' => isset($data['nomor_retur']) ? (string) $data['nomor_retur'] : null,
-            'tanggal' => isset($data['tanggal']) ? (string) $data['tanggal'] : null,
-            'nomor_referensi' => isset($data['nomor_referensi']) ? (string) $data['nomor_referensi'] : null,
-            'deskripsi' => isset($data['deskripsi']) ? (string) $data['deskripsi'] : null,
+            'return_no' => isset($data['return_no']) ? (string) $data['return_no'] : null,
+            'date' => isset($data['date']) ? (string) $data['date'] : null,
+            'reference_no' => isset($data['reference_no']) ? (string) $data['reference_no'] : null,
+            'description' => isset($data['description']) ? (string) $data['description'] : null,
             'status' => isset($data['status']) ? (string) $data['status'] : null,
-            'kode_pemasok' => isset($data['kode_pemasok']) ? (string) $data['kode_pemasok'] : null,
-            'nama_pemasok' => isset($data['nama_pemasok']) ? (string) $data['nama_pemasok'] : null,
-            'nomor_penerimaan_barang' => isset($data['nomor_penerimaan_barang']) ? (string) $data['nomor_penerimaan_barang'] : null,
-            'kode_produk' => isset($data['kode_produk']) ? (string) $data['kode_produk'] : null,
-            'nama_produk' => isset($data['nama_produk']) ? (string) $data['nama_produk'] : null,
-            'deskripsi_item' => isset($data['deskripsi_item']) ? (string) $data['deskripsi_item'] : null,
-            'jumlah' => isset($data['jumlah']) ? (string) $data['jumlah'] : null,
-            'alasan_retur' => isset($data['alasan_retur']) ? (string) $data['alasan_retur'] : null,
-            'kode_satuan' => isset($data['kode_satuan']) ? (string) $data['kode_satuan'] : null,
+            'supplier_code' => isset($data['supplier_code']) ? (string) $data['supplier_code'] : null,
+            'supplier_name' => isset($data['supplier_name']) ? (string) $data['supplier_name'] : null,
+            'goods_receipt_no' => isset($data['goods_receipt_no']) ? (string) $data['goods_receipt_no'] : null,
+            'product_code' => isset($data['product_code']) ? (string) $data['product_code'] : null,
+            'product_name' => isset($data['product_name']) ? (string) $data['product_name'] : null,
+            'item_description' => isset($data['item_description']) ? (string) $data['item_description'] : null,
+            'quantity' => isset($data['quantity']) ? (string) $data['quantity'] : null,
+            'return_reason' => isset($data['return_reason']) ? (string) $data['return_reason'] : null,
+            'unit_code' => isset($data['unit_code']) ? (string) $data['unit_code'] : null,
         ];
     }
 
@@ -189,20 +189,20 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
         $companyId = ($selectedCompanyId && $selectedCompanyId !== 'all') ? $selectedCompanyId : null;
 
         return [
-            'nomor_retur' => 'required|string|max:50',
-            'tanggal' => 'required',
-            'nomor_referensi' => 'nullable|string|max:100',
-            'deskripsi' => 'nullable|string|max:1000',
+            'return_no' => 'required|string|max:50',
+            'date' => 'required',
+            'reference_no' => 'nullable|string|max:100',
+            'description' => 'nullable|string|max:1000',
             'status' => 'nullable|in:draft,posted',
-            'kode_pemasok' => 'nullable|string|max:50',
-            'nama_pemasok' => 'nullable|string|max:255',
-            'nomor_penerimaan_barang' => 'nullable|string|max:100',
-            'kode_produk' => 'required_without:nama_produk|string|max:50',
-            'nama_produk' => 'required_without:kode_produk|string|max:255',
-            'deskripsi_item' => 'nullable|string|max:1000',
-            'jumlah' => 'required|numeric|min:0',
-            'alasan_retur' => 'required|string|max:255',
-            'kode_satuan' => 'nullable|string|max:20',
+            'supplier_code' => 'nullable|string|max:50',
+            'supplier_name' => 'nullable|string|max:255',
+            'goods_receipt_no' => 'nullable|string|max:100',
+            'product_code' => 'required_without:product_name|string|max:50',
+            'product_name' => 'required_without:product_code|string|max:255',
+            'item_description' => 'nullable|string|max:1000',
+            'quantity' => 'required|numeric|min:0',
+            'return_reason' => 'required|string|max:255',
+            'unit_code' => 'nullable|string|max:20',
         ];
     }
 
@@ -237,22 +237,22 @@ class PurchaseReturnWithItemsImport implements ToCollection, WithHeadingRow, Wit
     public function customValidationMessages()
     {
         return [
-            'nomor_retur.required' => 'Nomor Retur wajib diisi.',
-            'nomor_retur.max' => 'Nomor Retur tidak boleh lebih dari 50 karakter.',
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'nomor_referensi.max' => 'Nomor Referensi tidak boleh lebih dari 100 karakter.',
-            'deskripsi.max' => 'Deskripsi tidak boleh lebih dari 1000 karakter.',
-            'kode_pemasok.max' => 'Kode Pemasok tidak boleh lebih dari 50 karakter.',
-            'nama_pemasok.max' => 'Nama Pemasok tidak boleh lebih dari 255 karakter.',
-            'nomor_penerimaan_barang.max' => 'Nomor Penerimaan Barang tidak boleh lebih dari 100 karakter.',
-            'kode_produk.max' => 'Kode Produk tidak boleh lebih dari 50 karakter.',
-            'nama_produk.max' => 'Nama Produk tidak boleh lebih dari 255 karakter.',
-            'jumlah.required' => 'Jumlah wajib diisi.',
-            'jumlah.min' => 'Jumlah tidak boleh kurang dari 0.',
-            'jumlah.numeric' => 'Jumlah harus berupa angka.',
-            'alasan_retur.required' => 'Alasan Retur wajib diisi.',
-            'alasan_retur.max' => 'Alasan Retur tidak boleh lebih dari 255 karakter.',
-            'kode_satuan.max' => 'Kode Satuan tidak boleh lebih dari 20 karakter.',
+            'return_no.required' => 'Return Number is required.',
+            'return_no.max' => 'Return Number cannot exceed 50 characters.',
+            'date.required' => 'Date is required.',
+            'reference_no.max' => 'Reference Number cannot exceed 100 characters.',
+            'description.max' => 'Description cannot exceed 1000 characters.',
+            'supplier_code.max' => 'Supplier Code cannot exceed 50 characters.',
+            'supplier_name.max' => 'Supplier Name cannot exceed 255 characters.',
+            'goods_receipt_no.max' => 'Goods Receipt Number cannot exceed 100 characters.',
+            'product_code.max' => 'Product Code cannot exceed 50 characters.',
+            'product_name.max' => 'Product Name cannot exceed 255 characters.',
+            'quantity.required' => 'Quantity is required.',
+            'quantity.min' => 'Quantity cannot be less than 0.',
+            'quantity.numeric' => 'Quantity must be a number.',
+            'return_reason.required' => 'Return Reason is required.',
+            'return_reason.max' => 'Return Reason cannot exceed 255 characters.',
+            'unit_code.max' => 'Unit Code cannot exceed 20 characters.',
         ];
     }
 }

@@ -36,21 +36,21 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'ID Karyawan',
-            'Tanggal',
-            'Jam Masuk',
-            'Jam Keluar',
-            'Keterlambatan (Menit)',
-            'Pulang Awal (Menit)',
+            'Employee ID',
+            'Date',
+            'Check In',
+            'Check Out',
+            'Late (Minutes)',
+            'Early Departure (Minutes)',
             'Status',
-            'Catatan',
-            'Catatan Masuk',
-            'Catatan Keluar',
+            'Notes',
+            'Check In Notes',
+            'Check Out Notes',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Absensi';
+        return 'Attendance Data';
     }
 }

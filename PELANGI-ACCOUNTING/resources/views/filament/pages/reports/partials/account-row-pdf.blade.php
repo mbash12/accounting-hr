@@ -19,7 +19,7 @@
 
 {{-- Header Total Line --}}
 <tr>
-    <td style="padding-left: {{ 5 + ($level * 15) }}px; font-weight: bold; color: #1f2937;">Jumlah {{ $account->name }}
+    <td style="padding-left: {{ 5 + ($level * 15) }}px; font-weight: bold; color: #1f2937;">Total {{ $account->name }}
     </td>
     <td class="amount" style="font-weight: bold; color: #1f2937; border-top: 1px solid #d1d5db;">{{
         number_format($account->calculated_balance, 2, ',', '.') }}</td>

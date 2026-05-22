@@ -25,7 +25,7 @@ class CreateCashTransfer extends CreateRecord
         $defaultDepartment = \App\Models\Department::first();
         if (!$defaultDepartment) {
             throw ValidationException::withMessages([
-                'department_id' => __('Department tidak ditemukan. Silakan buat department terlebih dahulu.'),
+                'department_id' => __('Department not found. Please create a department first.'),
             ]);
         }
 
@@ -44,7 +44,7 @@ class CreateCashTransfer extends CreateRecord
                 $userId = Auth::id();
                 if (!$userId) {
                     throw ValidationException::withMessages([
-                        'form' => __('User tidak terautentikasi.'),
+                        'form' => __('User is not authenticated.'),
                     ]);
                 }
                 
@@ -57,7 +57,7 @@ class CreateCashTransfer extends CreateRecord
                 ]);
             } catch (\Exception $e) {
                 throw ValidationException::withMessages([
-                    'cost_center_id' => __('Gagal membuat cost center default: ' . $e->getMessage()),
+                    'cost_center_id' => __('Failed to create default cost center: ' . $e->getMessage()),
                 ]);
             }
         }

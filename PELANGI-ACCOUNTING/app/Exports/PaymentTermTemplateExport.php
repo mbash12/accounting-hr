@@ -15,38 +15,38 @@ class PaymentTermTemplateExport implements FromCollection, WithHeadings, WithTit
         return collect([
             [
                 'CASH',
-                'Cash / Tunai',
+                'Cash',
                 0,
-                'ya',
-                'Pembayaran tunai saat transaksi',
+                'Yes',
+                'Cash payment at time of transaction',
             ],
             [
                 'NET15',
                 'Net 15',
                 15,
-                'ya',
-                'Pembayaran jatuh tempo 15 hari',
+                'Yes',
+                'Payment due in 15 days',
             ],
             [
                 'NET30',
                 'Net 30',
                 30,
-                'ya',
-                'Pembayaran jatuh tempo 30 hari',
+                'Yes',
+                'Payment due in 30 days',
             ],
             [
                 'NET45',
                 'Net 45',
                 45,
-                'ya',
-                'Pembayaran jatuh tempo 45 hari',
+                'Yes',
+                'Payment due in 45 days',
             ],
             [
                 'NET60',
                 'Net 60',
                 60,
-                'tidak',
-                'Pembayaran jatuh tempo 60 hari',
+                'No',
+                'Payment due in 60 days',
             ],
         ]);
     }
@@ -54,16 +54,16 @@ class PaymentTermTemplateExport implements FromCollection, WithHeadings, WithTit
     public function headings(): array
     {
         return [
-            'kode_termin',
-            'nama_termin',
-            'jumlah_hari',
-            'status_aktif',
-            'deskripsi',
+            'term_code',
+            'term_name',
+            'due_days',
+            'active_status',
+            'description',
         ];
     }
 
     public function title(): string
     {
-        return 'Template Data Termin Pembayaran';
+        return 'Payment Term Import Template';
     }
 }

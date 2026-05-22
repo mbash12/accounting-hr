@@ -25,20 +25,20 @@ class IncomeStatement extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.income-statement';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan Keuangan';
+    protected static string|UnitEnum|null $navigationGroup = 'Financial Reports';
 
-    protected static ?string $navigationLabel = 'Laba Rugi';
+    protected static ?string $navigationLabel = 'Income Statement';
 
     protected static ?string $title = 'Income Statement';
 
     public function getTitle(): string
     {
-        return 'Laporan Laba Rugi';
+        return 'Income Statement';
     }
 
     public function getHeading(): string
     {
-        return 'Laporan Laba Rugi';
+        return 'Income Statement';
     }
 
     public ?array $data = [];
@@ -56,12 +56,12 @@ class IncomeStatement extends Page implements HasForms
         return $form
             ->schema([
             DatePicker::make('start_date')
-            ->label('Dari Tanggal')
+            ->label('From Date')
             ->required()
             ->default(now()->startOfMonth()),
 
             DatePicker::make('end_date')
-            ->label('Sampai Tanggal')
+            ->label('To Date')
             ->required()
             ->default(now())
             ->suffixAction(function () {
@@ -98,7 +98,7 @@ class IncomeStatement extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Laporan_Laba_Rugi_' . now()->format('Ymd') . '.pdf');
+        }, 'Income_Statement_' . now()->format('Ymd') . '.pdf');
     }
 
     protected function getViewData(): array
@@ -120,7 +120,7 @@ class IncomeStatement extends Page implements HasForms
                 'company' => null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'error' => 'Silakan pilih perusahaan tertentu dari pemilih global untuk melihat laporan.'
+                'error' => 'Please select a specific company from the global selector to view the report.'
             ];
         }
 

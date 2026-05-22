@@ -19,14 +19,14 @@ class CreateCashDisbursement extends CreateRecord
         $items = $data['items'] ?? [];
         if (empty($items)) {
             throw ValidationException::withMessages([
-                'items' => __('Minimal satu item diperlukan.'),
+                'items' => __('At least one item is required.'),
             ]);
         }
 
         foreach ($items as $index => $item) {
             if (empty($item['account_id'])) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.account_id" => __('Account harus dipilih untuk setiap item.'),
+                    "items.{$index}.account_id" => __('Account must be selected for each item.'),
                 ]);
             }
         }
@@ -58,7 +58,7 @@ class CreateCashDisbursement extends CreateRecord
         try {
             if (empty($data['from_account_id'])) {
                 throw ValidationException::withMessages([
-                    'from_account_id' => __('Bank Account harus dipilih.'),
+                    'from_account_id' => __('Bank Account must be selected.'),
                 ]);
             }
 
@@ -67,7 +67,7 @@ class CreateCashDisbursement extends CreateRecord
             $defaultDepartment = \App\Models\Department::first();
             if (!$defaultDepartment) {
                 throw ValidationException::withMessages([
-                    'department_id' => __('Department tidak ditemukan. Silakan buat department terlebih dahulu.'),
+                    'department_id' => __('Department not found. Please create a department first.'),
                 ]);
             }
 
@@ -77,7 +77,7 @@ class CreateCashDisbursement extends CreateRecord
                     $userId = Auth::id();
                     if (!$userId) {
                         throw ValidationException::withMessages([
-                            'form' => __('User tidak terautentikasi.'),
+                            'form' => __('User is not authenticated.'),
                         ]);
                     }
                     
@@ -90,7 +90,7 @@ class CreateCashDisbursement extends CreateRecord
                     ]);
                 } catch (\Exception $e) {
                     throw ValidationException::withMessages([
-                        'cost_center_id' => __('Gagal membuat cost center default: ' . $e->getMessage()),
+                        'cost_center_id' => __('Failed to create default cost center: ' . $e->getMessage()),
                     ]);
                 }
             }
@@ -146,7 +146,7 @@ class CreateCashDisbursement extends CreateRecord
             ]);
             
             throw ValidationException::withMessages([
-                'form' => __('Terjadi kesalahan: ' . $e->getMessage()),
+                'form' => __('An error occurred: ' . $e->getMessage()),
             ]);
         }
     }

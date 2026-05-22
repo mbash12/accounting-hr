@@ -14,43 +14,43 @@ class UnitMeasurementsTemplateExport implements FromArray, WithHeadings, WithTit
             [
                 'KG',
                 'Kilogram',
-                'Unit berat standar internasional',
+                'Standard international weight unit',
                 'yes'
             ],
             [
                 'GR',
                 'Gram',
-                'Unit berat kecil',
+                'Small weight unit',
                 'yes'
             ],
             [
                 'M',
                 'Meter',
-                'Unit panjang',
+                'Length unit',
                 'yes'
             ],
             [
                 'CM',
                 'Centimeter',
-                'Unit panjang kecil',
+                'Small length unit',
                 'yes'
             ],
             [
                 'L',
                 'Liter',
-                'Unit volume',
+                'Volume unit',
                 'yes'
             ],
             [
                 'ML',
                 'Milliliter',
-                'Unit volume kecil',
+                'Small volume unit',
                 'yes'
             ],
             [
                 'Pcs',
                 'Pieces',
-                'Unit potong/pieces',
+                'Pieces unit',
                 'yes'
             ],
         ];
@@ -68,6 +68,6 @@ class UnitMeasurementsTemplateExport implements FromArray, WithHeadings, WithTit
 
     public function title(): string
     {
-        return 'Template Impor Satuan';
+        return 'Unit Measurement Import Template';
     }
 }

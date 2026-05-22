@@ -28,7 +28,7 @@ class ManageOpeningBalances extends Page implements HasForms
         return false;
     }
 
-    protected static string|UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|UnitEnum|null $navigationGroup = 'General Ledger';
 
     protected static ?int $navigationSort = 2;
 
@@ -253,7 +253,7 @@ class ManageOpeningBalances extends Page implements HasForms
             [
                 'entry_number' => $this->generateOpeningBalanceEntryNumber($companyId),
                 'date' => $date,
-                'description' => 'Saldo Awal / Opening Balance',
+                'description' => 'Opening Balance',
                 'amount' => $totalDebit,
                 'total_amount' => $totalDebit,
                 'status' => 'posted',
@@ -290,7 +290,7 @@ class ManageOpeningBalances extends Page implements HasForms
                     'account_id' => $equityAccount->id,
                     'debit' => $difference < 0 ? abs($difference) : 0,
                     'credit' => $difference > 0 ? $difference : 0,
-                    'notes' => 'Selisih Saldo Awal / Opening Balance Equity',
+                    'notes' => 'Opening Balance Equity',
                 ]);
             }
         }
@@ -318,7 +318,7 @@ class ManageOpeningBalances extends Page implements HasForms
                 $q->where('code', 'like', '%3900%')
                     ->orWhere('code', 'like', '%390%')
                     ->orWhere('name', 'like', '%Opening Balance%')
-                    ->orWhere('name', 'like', '%Saldo Awal%')
+                    ->orWhere('name', 'like', '%Opening Balance%')
                     ->orWhere('name', 'like', '%Retained Earnings%')
                     ->orWhere('name', 'like', '%Laba Ditahan%');
             })
@@ -351,7 +351,7 @@ class ManageOpeningBalances extends Page implements HasForms
 
     public static function getNavigationLabel(): string
     {
-        return __('Saldo Awal');
+        return __('Opening Balance');
     }
 
     public static function getNavigationIcon(): ?string
@@ -361,7 +361,7 @@ class ManageOpeningBalances extends Page implements HasForms
 
     public function getTitle(): string
     {
-        return __('Saldo Awal');
+        return __('Opening Balance');
     }
 
     public function getSubheading(): ?string
@@ -380,7 +380,7 @@ class ManageOpeningBalances extends Page implements HasForms
     {
         return [
             Action::make('saveOpeningBalances')
-                ->label(__('Simpan Saldo Awal'))
+                ->label(__('Save Opening Balance'))
                 ->icon('heroicon-o-check')
                 ->color('success')
                 ->visible(function () {
@@ -392,7 +392,7 @@ class ManageOpeningBalances extends Page implements HasForms
                 }),
 
             Action::make('importOpeningBalances')
-                ->label(__('Impor Saldo Awal'))
+                ->label(__('Import Opening Balance'))
                 ->icon('heroicon-o-document-arrow-up')
                 ->color('primary')
                 ->visible(function () {
@@ -404,19 +404,19 @@ class ManageOpeningBalances extends Page implements HasForms
                         ->label(__('File Excel'))
                         ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'])
                         ->required()
-                        ->helperText(__('Upload file Excel dengan kolom: account_code, account_name, debit_amount, credit_amount')),
+                        ->helperText(__('Upload Excel file with columns: account_code, account_name, debit_amount, credit_amount')),
                 ])
-                ->modalDescription(__('Unggah file Excel dengan informasi saldo awal. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.'))
+                ->modalDescription(__('Upload Excel file with opening balance information. You can download the template below to see the expected format.'))
                 ->modalFooterActions(fn ($action) => [
                     $action->getModalSubmitAction(),
                     \Filament\Actions\Action::make('download_template')
-                        ->label(__('Unduh Template'))
+                        ->label(__('Download Template'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('gray')
                         ->action(function () {
                             return Excel::download(
                                 new \App\Exports\OpeningBalancesTemplateExport(),
-                                'template-saldo-awal.xlsx'
+                                'opening-balance-import-template.xlsx'
                             );
                         }),
                     $action->getModalCancelAction(),

@@ -12,19 +12,19 @@ class ExportPaymentTermsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
                     return Excel::download(
                         new PaymentTermExport(),
-                        'termin-pembayaran-' . date('Y-m-d') . '.xlsx'
+                        'payment-terms-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data termin pembayaran: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting payment terms: ' . $e->getMessage())
                         ->send();
                 }
             });

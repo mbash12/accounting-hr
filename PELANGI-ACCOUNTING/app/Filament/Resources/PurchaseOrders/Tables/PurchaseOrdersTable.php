@@ -33,30 +33,14 @@ class PurchaseOrdersTable
                     ->searchable()
                     ->copyable()
                     ->weight("bold")
-                    ->label(__("No. Pesanan Pembelian")),
+                    ->label(__("Purchase Order No.")),
                 TextColumn::make("date")
                     ->date()
                     ->sortable()
-                    ->label(__("Tanggal Pesanan")),
+                    ->label(__("Order Date")),
                 TextColumn::make("supplier.name")
                     ->searchable()
-                    ->label(__("Pemasok")),
-                TextColumn::make("salesOrder.order_number")
-                    ->searchable()
-                    ->label(__("No. SO"))
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make("salesOrder.job_number")
-                    ->searchable()
-                    ->label(__("No. Job"))
-                    ->toggleable(isToggledHiddenByDefault: false),
-                TextColumn::make("salesOrder.client_po_number")
-                    ->searchable()
-                    ->label(__("No. PO Pelanggan"))
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("salesOrder.jb_job_number")
-                    ->searchable()
-                    ->label(__("No. Job JB"))
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label(__("Supplier")),
                 TextColumn::make("total_amount")
                     ->money("IDR")
                     ->sortable()
@@ -80,26 +64,22 @@ class PurchaseOrdersTable
                             default => "gray",
                         },
                     ),
-                TextColumn::make("department.name")
-                    ->label(__("Departemen"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("createdByUser.name")
-                    ->label(__("Dibuat Oleh"))
+                    ->label(__("Created By"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -117,9 +97,9 @@ class PurchaseOrdersTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -135,17 +115,17 @@ class PurchaseOrdersTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('supplier')
                     ->form([
                         \Filament\Forms\Components\Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_supplier', true);
@@ -187,7 +167,7 @@ class PurchaseOrdersTable
                             return null;
                         }
                         $supplier = \App\Models\Contact::find($data['supplier_id']);
-                        return 'Pemasok: ' . ($supplier?->name ?? $data['supplier_id']);
+                        return 'Supplier: ' . ($supplier?->name ?? $data['supplier_id']);
                     }),
             ])
             ->defaultSort('date', 'desc')
@@ -195,7 +175,7 @@ class PurchaseOrdersTable
             ->recordActions([
                 ActionGroup::make([
                     Action::make('createGoodsReceipt')
-                        ->label('Buat Penerimaan Barang')
+                        ->label('Create Goods Receipt')
                         ->icon('heroicon-o-inbox-arrow-down')
                         ->color('primary')
                         ->visible(function (PurchaseOrder $record): bool {
@@ -203,9 +183,9 @@ class PurchaseOrdersTable
                             return (float) ($meta['remaining'] ?? 0) > 0 && $record->status === 'posted';
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Buat Penerimaan Barang')
-                        ->modalDescription('Apakah Anda yakin ingin membuat penerimaan barang? Dokumen akan dibuat dengan status terkunci.')
-                        ->modalSubmitActionLabel('Ya, Buat')
+                        ->modalHeading('Create Goods Receipt')
+                        ->modalDescription('Are you sure you want to create a goods receipt? The document will be created in locked status.')
+                        ->modalSubmitActionLabel('Yes, Create')
                         ->action(function (PurchaseOrder $record) {
                             $purchaseOrder = PurchaseOrder::query()
                                 ->with(['items'])
@@ -232,8 +212,7 @@ class PurchaseOrdersTable
                                     'supplier_id' => $purchaseOrder->supplier_id,
                                     'purchase_order_id' => $purchaseOrder->id,
                                     'is_locked' => false,
-                                    'status' => 'draft', // Create as draft initially
-                                    'job_id' => $purchaseOrder->job_id,
+                                    'status' => 'draft',
                                     'company_id' => $purchaseOrder->company_id,
                                     'created_by_user_id' => auth()->id(),
                                 ]);
@@ -258,7 +237,7 @@ class PurchaseOrdersTable
                             });
                         }),
                     Action::make('createPurchaseInvoice')
-                        ->label('Buat Invoice Pembelian')
+                        ->label('Create Purchase Invoice')
                         ->icon('heroicon-o-document-text')
                         ->color('success')
                         ->visible(function (PurchaseOrder $record): bool {
@@ -266,9 +245,9 @@ class PurchaseOrdersTable
                             return (float) ($meta['remaining'] ?? 0) > 0 && $record->status === 'posted';
                         })
                         ->requiresConfirmation()
-                        ->modalHeading('Buat Invoice Pembelian')
-                        ->modalDescription('Apakah Anda yakin ingin membuat invoice pembelian? Invoice akan dibuat dengan status terkunci.')
-                        ->modalSubmitActionLabel('Ya, Buat')
+                        ->modalHeading('Create Purchase Invoice')
+                        ->modalDescription('Are you sure you want to create a purchase invoice? The invoice will be created in locked status.')
+                        ->modalSubmitActionLabel('Yes, Create')
                         ->action(function (PurchaseOrder $record) {
                             $purchaseOrder = PurchaseOrder::query()
                                 ->with(['items'])
@@ -311,8 +290,7 @@ class PurchaseOrdersTable
                                     'supplier_id' => $purchaseOrder->supplier_id,
                                     'purchase_order_id' => $purchaseOrder->id,
                                     'is_locked' => false,
-                                    'status' => 'draft', // Create as draft initially
-                                    'job_id' => $purchaseOrder->job_id,
+                                    'status' => 'draft',
                                     'company_id' => $purchaseOrder->company_id,
                                     'created_by_user_id' => auth()->id(),
                                     'subtotal' => $subtotal,
@@ -361,7 +339,7 @@ class PurchaseOrdersTable
                 ExportPurchaseOrderWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([

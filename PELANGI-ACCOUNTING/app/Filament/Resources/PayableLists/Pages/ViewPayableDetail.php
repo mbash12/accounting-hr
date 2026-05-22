@@ -31,7 +31,7 @@ class ViewPayableDetail extends ViewRecord implements HasTable
 
     public function getTitle(): string
     {
-        return __('Detail Hutang Usaha');
+        return __('Payable Detail');
     }
 
     public function table(Table $table): Table
@@ -56,21 +56,21 @@ class ViewPayableDetail extends ViewRecord implements HasTable
             )
             ->columns([
                 TextColumn::make('date')
-                    ->label(__('Tanggal'))
+                    ->label(__('Date'))
                     ->date('M d, Y')
                     ->sortable(),
                 TextColumn::make('due_date')
-                    ->label(__('Tanggal Jatuh Tempo'))
+                    ->label(__('Due Date'))
                     ->date('M d, Y')
                     ->sortable()
                     ->color(fn ($record) => $record->due_date < now() ? 'danger' : null)
                     ->hidden(),
                 TextColumn::make('invoice_number')
-                    ->label(__('Nomor Faktur'))
+                    ->label(__('Invoice No.'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('aging_less_30')
-                    ->label(__('< 30 HARI'))
+                    ->label(__('< 30 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -86,7 +86,7 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                         return 0;
                     }),
                 TextColumn::make('aging_30_60')
-                    ->label(__('30 - 60 HARI'))
+                    ->label(__('30 - 60 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -98,7 +98,7 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                         return 0;
                     }),
                 TextColumn::make('aging_60_90')
-                    ->label(__('60 - 90 HARI'))
+                    ->label(__('60 - 90 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -110,7 +110,7 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                         return 0;
                     }),
                 TextColumn::make('aging_over_90')
-                    ->label(__('> 90 HARI'))
+                    ->label(__('> 90 Days'))
                     ->formatStateUsing(function ($state) {
                         return 'IDR ' . number_format($state, 0, ',', '.');
                     })
@@ -130,8 +130,8 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading(__('Hapus Utang Usaha'))
-                        ->modalDescription(__('Apakah Anda yakin ingin menghapus sisa utang usaha ini? Tindakan ini akan membuat jurnal otomatis dan melunasi sisa tagihan.'))
+                        ->modalHeading(__('Delete Payable'))
+                        ->modalDescription(__('Are you sure you want to delete the remaining payable? This action will create an automatic journal entry and settle the remaining balance.'))
                         ->action(function ($record) {
                             try {
                                 $amount = $record->outstanding_amount;
@@ -144,7 +144,7 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                                     ->where('is_active', true)
                                     ->where(function ($q) {
                                         $q->where('code', 'like', '21%')
-                                            ->orWhere('name', 'like', '%Utang Usaha%');
+                                            ->orWhere('name', 'like', '%Accounts Payable%');
                                     })->orderBy('code')->value('id');
 
                                 $journalEntry = $record->journalEntry;
@@ -163,13 +163,13 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                                         ->where('is_active', true)
                                         ->where(function ($q) {
                                             $q->where('code', 'like', '5%')
-                                                ->orWhere('name', 'like', '%Penghapusan%')
-                                                ->orWhere('name', 'like', '%Bad Debt%');
+                                                ->orWhere('name', 'like', '%Bad Debt%')
+                                                ->orWhere('name', 'like', '%Write Off%');
                                         })->orderBy('code')->value('id');
                                 }
 
                                 if (!$payableAccountId || !$writeOffAccountId) {
-                                    throw new \Exception(__('Gagal mendeteksi akun Utang atau akun Write Off secara otomatis.'));
+                                    throw new \Exception(__('Failed to automatically detect Payable or Write Off account.'));
                                 }
 
                                 // Create journal entry for write off
@@ -226,20 +226,20 @@ class ViewPayableDetail extends ViewRecord implements HasTable
                                 $record->save();
 
                                 \Filament\Notifications\Notification::make()
-                                    ->title(__('Write Off Berhasil'))
+                                    ->title(__('Write Off Successful'))
                                     ->success()
                                     ->send();
 
                             } catch (\Exception $e) {
                                 \Filament\Notifications\Notification::make()
-                                    ->title(__('Write Off Gagal'))
+                                    ->title(__('Write Off Failed'))
                                     ->body($e->getMessage())
                                     ->danger()
                                     ->send();
                             }
                         }),
                     \Filament\Actions\Action::make('detail')
-                        ->label(__('Detail'))
+                        ->label(__('Details'))
                         ->icon('heroicon-o-magnifying-glass')
                         ->url(fn ($record) => \App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource::getUrl('view', ['record' => $record])),
                 ]),

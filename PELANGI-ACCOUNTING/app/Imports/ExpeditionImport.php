@@ -66,12 +66,12 @@ class ExpeditionImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Nama Ekspedisi wajib diisi.',
-            'name.max' => 'Nama Ekspedisi tidak boleh lebih dari 200 karakter.',
-            'code.required' => 'Kode Ekspedisi wajib diisi.',
-            'code.max' => 'Kode Ekspedisi tidak boleh lebih dari 50 karakter.',
-            'code.unique' => 'Kode Ekspedisi sudah digunakan.',
-            'company_name.max' => 'Nama Perusahaan tidak boleh lebih dari 200 karakter.',
+            'name.required' => 'Expedition Name is required.',
+            'name.max' => 'Expedition Name cannot exceed 200 characters.',
+            'code.required' => 'Expedition Code is required.',
+            'code.max' => 'Expedition Code cannot exceed 50 characters.',
+            'code.unique' => 'Expedition Code is already in use.',
+            'company_name.max' => 'Company Name cannot exceed 200 characters.',
         ];
     }
 

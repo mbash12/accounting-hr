@@ -34,14 +34,14 @@ class AttendanceSimulator extends Page implements HasForms
 
     public static function getNavigationLabel(): string
     {
-        return __('Simulator Absensi');
+        return __('Attendance Simulator');
     }
 
     protected static ?int $navigationSort = 9;
 
     public function getTitle(): string
     {
-        return __('Simulator Absensi & Izin');
+        return __('Attendance & Permit Simulator');
     }
 
     protected string $view = 'filament.pages.attendance-simulator';
@@ -58,7 +58,7 @@ class AttendanceSimulator extends Page implements HasForms
         return $schema
             ->components([
                 Select::make('employee_id')
-                    ->label(__('Pilih Karyawan untuk Simulasi'))
+                    ->label(__('Select Employee for Simulation'))
                     ->options(function () {
                         $companyId = session('selected_company_id');
                         $query = Employee::where('is_active', true);
@@ -81,7 +81,7 @@ class AttendanceSimulator extends Page implements HasForms
     {
         return [
             Action::make('checkIn')
-                ->label(__('Absen Masuk'))
+                ->label(__('Check In'))
                 ->color('success')
                 ->icon('heroicon-o-arrow-right-start-on-rectangle')
                 ->requiresConfirmation()
@@ -89,7 +89,7 @@ class AttendanceSimulator extends Page implements HasForms
                 ->action(fn () => $this->performCheckIn()),
             
             Action::make('checkOut')
-                ->label(__('Absen Keluar'))
+                ->label(__('Check Out'))
                 ->color('warning')
                 ->icon('heroicon-o-arrow-left-start-on-rectangle')
                 ->requiresConfirmation()
@@ -97,22 +97,22 @@ class AttendanceSimulator extends Page implements HasForms
                 ->action(fn () => $this->performCheckOut()),
 
             Action::make('requestPermit')
-                ->label(__('Ajukan Izin/Cuti'))
+                ->label(__('Submit Permit/Leave'))
                 ->color('info')
                 ->icon('heroicon-o-document-plus')
                 ->form([
                     Select::make('type')
-                        ->label(__('Tipe'))
+                        ->label(__('Type'))
                         ->options([
-                            'sick' => __('Sakit'),
-                            'annual_leave' => __('Cuti Tahunan'),
-                            'unpaid_leave' => __('Cuti Diluar Tanggungan'),
-                            'other_permit' => __('Izin Lainnya'),
+                            'sick' => __('Sick'),
+                            'annual_leave' => __('Annual Leave'),
+                            'unpaid_leave' => __('Unpaid Leave'),
+                            'other_permit' => __('Other Permit'),
                         ])->required(),
-                    DatePicker::make('start_date')->label(__('Tanggal Mulai'))->required(),
-                    DatePicker::make('end_date')->label(__('Tanggal Selesai'))->required(),
-                    Textarea::make('reason')->label(__('Alasan')),
-                    FileUpload::make('attachment_path')->label(__('Lampiran'))->directory('permits'),
+                    DatePicker::make('start_date')->label(__('Start Date'))->required(),
+                    DatePicker::make('end_date')->label(__('End Date'))->required(),
+                    Textarea::make('reason')->label(__('Reason')),
+                    FileUpload::make('attachment_path')->label(__('Attachment'))->directory('permits'),
                 ])
                 ->hidden(fn () => empty($this->data['employee_id']))
                 ->action(fn (array $data) => $this->performPermitRequest($data)),
@@ -130,7 +130,7 @@ class AttendanceSimulator extends Page implements HasForms
             ->first();
 
         if ($existing) {
-            Notification::make()->title(__('Sudah absen masuk hari ini'))->danger()->send();
+            Notification::make()->title(__('Already checked in today'))->danger()->send();
             return;
         }
 
@@ -158,8 +158,8 @@ class AttendanceSimulator extends Page implements HasForms
         ]);
 
         Notification::make()
-            ->title(__('Absen masuk berhasil'))
-            ->body($lateMinutes > 0 ? __('Terlambat :minutes menit', ['minutes' => $lateMinutes]) : null)
+            ->title(__('Check in successful'))
+            ->body($lateMinutes > 0 ? __('Late :minutes minutes', ['minutes' => $lateMinutes]) : null)
             ->success()
             ->send();
     }
@@ -175,12 +175,12 @@ class AttendanceSimulator extends Page implements HasForms
             ->first();
 
         if (!$attendance) {
-            Notification::make()->title(__('Data absen masuk tidak ditemukan untuk hari ini'))->danger()->send();
+            Notification::make()->title(__('Check in data not found for today'))->danger()->send();
             return;
         }
 
         if ($attendance->check_out) {
-            Notification::make()->title(__('Sudah absen keluar hari ini'))->danger()->send();
+            Notification::make()->title(__('Already checked out today'))->danger()->send();
             return;
         }
 
@@ -202,8 +202,8 @@ class AttendanceSimulator extends Page implements HasForms
         ]);
 
         Notification::make()
-            ->title(__('Absen keluar berhasil'))
-            ->body($earlyMinutes > 0 ? __('Pulang cepat :minutes menit', ['minutes' => $earlyMinutes]) : null)
+            ->title(__('Check out successful'))
+            ->body($earlyMinutes > 0 ? __('Left early by :minutes minutes', ['minutes' => $earlyMinutes]) : null)
             ->success()
             ->send();
     }
@@ -223,6 +223,6 @@ class AttendanceSimulator extends Page implements HasForms
             'company_id' => Employee::find($employeeId)->company_id,
         ]);
 
-        Notification::make()->title(__('Pengajuan izin berhasil dikirim'))->success()->send();
+        Notification::make()->title(__('Permit submission sent successfully'))->success()->send();
     }
 }

@@ -30,7 +30,7 @@ class PaymentTermForm
         return $schema->components([
             Section::make(__('Payment Term Information'))
                 ->schema([
-                    (new static)->getCodeField('code', __('Kode Termin'))
+                    (new static)->getCodeField('code', __('Payment Term Code'))
                         ->rule('required')
                         ->rule(function (?\App\Models\PaymentTerm $record) {
                             return function (string $attribute, $value, \Closure $fail) use ($record) {

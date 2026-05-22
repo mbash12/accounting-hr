@@ -18,7 +18,7 @@ class PurchaseInvoiceItem extends Model
         static::creating(function ($model) {
             if ($model->purchaseInvoice && $model->purchaseInvoice->is_locked) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'items' => 'Tidak dapat menambah item baru pada invoice yang terkunci.',
+                    'items' => 'Cannot add new item to a locked invoice.',
                 ]);
             }
         });
@@ -34,7 +34,7 @@ class PurchaseInvoiceItem extends Model
                 $newQty = (float) ($model->quantity ?? 0);
                 if ($newQty > $originalQty) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
-                        'items' => 'Kuantitas tidak boleh ditambah pada invoice yang terkunci.',
+                        'items' => 'Quantity cannot be increased on a locked invoice.',
                     ]);
                 }
             }
@@ -58,7 +58,7 @@ class PurchaseInvoiceItem extends Model
                     
                     if (($totalInvoiced + $model->quantity) > $orderItem->quantity) {
                         throw \Illuminate\Validation\ValidationException::withMessages([
-                            'quantity' => 'Total kuantitas invoice tidak boleh melebihi kuantitas pesanan.',
+                            'quantity' => 'Total invoice quantity cannot exceed order quantity.',
                         ]);
                     }
                 }
@@ -79,7 +79,6 @@ class PurchaseInvoiceItem extends Model
         'purchase_invoice_id',
         'purchase_order_item_id',
         'product_id',
-        'item_name',
         'unit_id',
         'tax_id',
         'cost_center_id',

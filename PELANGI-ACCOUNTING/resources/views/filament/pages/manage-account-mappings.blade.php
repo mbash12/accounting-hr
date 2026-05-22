@@ -3,7 +3,7 @@
         {{-- Sidebar: Document Types --}}
         <div style="width: 280px; flex-shrink: 0; background: white; border-radius: 0.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); border: 1px solid #e5e7eb; padding: 1rem 0;">
             <div style="padding: 0 1rem 0.75rem;">
-                <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151;">Jenis Dokumen</h3>
+                <h3 style="font-size: 0.875rem; font-weight: 600; color: #374151;">Document Type</h3>
             </div>
             <div style="display: flex; flex-direction: column; gap: 0.25rem; overflow-y: auto; max-height: calc(100vh - 200px); padding: 0 0.5rem;">
                 @foreach($this->getDocumentTypes() as $type => $label)
@@ -40,8 +40,8 @@
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">
-                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; width: 280px;">Jenis Pemetaan</th>
-                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Akun</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; width: 280px;">Mapping Type</th>
+                                    <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.75rem; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;">Account</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -69,9 +69,9 @@
                                                 class="fi-input block w-full border-gray-300 rounded-lg shadow-sm focus:border-primary-500 focus:ring-primary-500"
                                                 style="font-size: 0.875rem; padding: 0.5rem 0.75rem; @if($this->hasFieldChanged($this->selectedDocumentType, $mappingType)) border-color: #f59e0b; @endif"
                                             >
-                                                <option value="">-- Pilih Akun --</option>
+                                                <option value="">-- Select Account --</option>
                                                 @if($currentValue && !$accountExists)
-                                                    <option value="{{ $currentValue }}" selected style="color: #ef4444;">⚠ ID Akun {{ $currentValue }} (tidak ditemukan)</option>
+                                                    <option value="{{ $currentValue }}" selected style="color: #ef4444;">⚠ Account ID {{ $currentValue }} (not found)</option>
                                                 @endif
                                                 @foreach($accounts as $id => $name)
                                                     <option value="{{ (string) $id }}" @if($currentValue == $id) selected @endif>{{ $name }}</option>
@@ -91,8 +91,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                             </svg>
                         </div>
-                        <h3 style="font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.25rem;">Pilih Perusahaan</h3>
-                        <p style="font-size: 0.8125rem; color: #6b7280;">Silakan pilih perusahaan dari dropdown untuk mengatur pemetaan akun.</p>
+                        <h3 style="font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.25rem;">Select Company</h3>
+                        <p style="font-size: 0.8125rem; color: #6b7280;">Please select a company from the dropdown to configure account mappings.</p>
                     </div>
                 @endif
             @else
@@ -103,8 +103,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                     </div>
-                    <h3 style="font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.25rem;">Pilih Jenis Dokumen</h3>
-                    <p style="font-size: 0.8125rem; color: #6b7280;">Pilih jenis dokumen dari sidebar untuk mengatur pemetaan akunnya.</p>
+                    <h3 style="font-size: 0.875rem; font-weight: 500; color: #111827; margin-bottom: 0.25rem;">Select Document Type</h3>
+                    <p style="font-size: 0.8125rem; color: #6b7280;">Select a document type from the sidebar to configure account mappings.</p>
                 </div>
             @endif
         </div>

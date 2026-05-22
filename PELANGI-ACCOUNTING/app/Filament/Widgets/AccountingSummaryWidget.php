@@ -135,15 +135,15 @@ class AccountingSummaryWidget extends BaseWidget
 
         return [
             Stat::make('Yearly Revenue', 'Rp ' . number_format($revenue, 0, ',', '.'))
-                ->description(abs(round($revGrowth, 1)) . '% ' . ($revGrowth >= 0 ? 'naik' : 'turun') . ' YoY')
+                ->description(abs(round($revGrowth, 1)) . '% ' . ($revGrowth >= 0 ? 'up' : 'down') . ' YoY')
                 ->descriptionIcon($revGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($revGrowth >= 0 ? 'success' : 'danger'),
             Stat::make('Yearly Net Profit', 'Rp ' . number_format($netProfit, 0, ',', '.'))
-                ->description(abs(round($profGrowth, 1)) . '% ' . ($profGrowth >= 0 ? 'naik' : 'turun') . ' YoY')
+                ->description(abs(round($profGrowth, 1)) . '% ' . ($profGrowth >= 0 ? 'up' : 'down') . ' YoY')
                 ->descriptionIcon($profGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($profGrowth >= 0 ? 'success' : 'danger'),
             Stat::make('Bank Balance', 'Rp ' . number_format($totalCash, 0, ',', '.'))
-                ->description('Status per 31 Des ' . $year)
+                ->description('Status as of Dec 31, ' . $year)
                 ->color('primary'),
             Stat::make('Outstanding A/R', 'Rp ' . number_format($totalAR, 0, ',', '.'))
                 ->description('Total collectible at year end')

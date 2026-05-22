@@ -65,6 +65,6 @@ class ContactsTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Kontak';
+        return 'Contact Import Template';
     }
 }

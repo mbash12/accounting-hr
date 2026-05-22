@@ -14,26 +14,26 @@ class SalaryComponentForm
     {
         return $schema
             ->components([
-                Section::make(__('Detail Komponen Gaji'))
+                Section::make(__('Salary Component Details'))
                     ->schema([
                         TextInput::make('code')
-                            ->label(__('Kode'))
+                            ->label(__('Code'))
                             ->required()
                             ->maxLength(50)
                             ->unique(ignoreRecord: true),
                         TextInput::make('name')
-                            ->label(__('Nama'))
+                            ->label(__('Name'))
                             ->required()
                             ->maxLength(200),
                         Select::make('type')
-                            ->label(__('Tipe'))
+                            ->label(__('Type'))
                             ->options([
-                                'allowance' => __('Tunjangan'),
-                                'deduction' => __('Potongan'),
+                                'allowance' => __('Allowance'),
+                                'deduction' => __('Deduction'),
                             ])
                             ->required(),
                         Select::make('account_id')
-                            ->label(__('Akun GL'))
+                            ->label(__('GL Account'))
                             ->relationship(
                                 name: 'account', 
                                 titleAttribute: 'name',
@@ -51,16 +51,16 @@ class SalaryComponentForm
                             ->searchable()
                             ->preload(),
                         Toggle::make('is_fixed')
-                            ->label(__('Komponen Tetap'))
+                            ->label(__('Fixed Component'))
                             ->default(false),
                         Toggle::make('is_taxable')
-                            ->label(__('Kena Pajak (PPh21)'))
+                            ->label(__('Taxable (PPh21)'))
                             ->default(true),
                         Toggle::make('is_bpjs_base')
-                            ->label(__('Dasar Perhitungan BPJS'))
+                            ->label(__('BPJS Calculation Base'))
                             ->default(true),
                         Toggle::make('is_active')
-                            ->label(__('Aktif'))
+                            ->label(__('Active'))
                             ->default(true),
                     ])
                     ->columns(3)

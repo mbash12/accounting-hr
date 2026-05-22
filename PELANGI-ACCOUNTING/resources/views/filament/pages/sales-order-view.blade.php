@@ -398,7 +398,7 @@
                     <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                     <!-- Fallback if no logo: Just Company Name styling -->
-                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}
+                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}
                     </h1>
                     @endif
 
@@ -413,26 +413,26 @@
                             nl2br(e($record->company->billing_state)) !!} {!!
                             nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
 
                 <div class="document-info">
-                    <h2 class="doc-title">PESANAN PENJUALAN</h2>
+                    <h2 class="doc-title">SALES ORDER</h2>
                     <table class="doc-meta-table">
                         <tr>
-                            <td class="doc-meta-label">No. Pesanan:</td>
+                            <td class="doc-meta-label">Order No.:</td>
                             <td class="doc-meta-value">{{ $record->order_number }}</td>
                         </tr>
                         <tr>
-                            <td class="doc-meta-label">Tanggal:</td>
+                            <td class="doc-meta-label">Date:</td>
                             <td class="doc-meta-value">{{ $record->date ? $record->date->format('d M Y') : '-' }}</td>
                         </tr>
                         @if($record->reference_no)
                         <tr>
-                            <td class="doc-meta-label">Referensi:</td>
+                            <td class="doc-meta-label">Reference:</td>
                             <td class="doc-meta-value">{{ $record->reference_no }}</td>
                         </tr>
                         @endif
@@ -443,7 +443,7 @@
             <!-- ADDRESSES -->
             <div class="address-section">
                 <div class="address-box">
-                    <div class="address-title">Detail Pelanggan</div>
+                    <div class="address-title">Customer Details</div>
                     @if($record->customer)
                     <p class="recipient-name">{{ $record->customer->name }}</p>
                     <p>
@@ -455,19 +455,13 @@
                         @if($record->customer->billing_state), {!! nl2br(e($record->customer->billing_state)) !!}@endif
                         {!! nl2br(e($record->customer->billing_postal_code)) !!}
                     </p>
-                    @if($record->customer->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->customer->tax_id }}
+                    @if($record->customer->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->customer->tax_id }}
                     </p>@endif
                     @else
-                    <p class="text-muted">Tidak ada pelanggan dipilih</p>
+                    <p class="text-muted">No customer selected</p>
                     @endif
                 </div>
 
-                <div class="address-box">
-                    <div class="address-title">Detail Pesanan</div>
-                    @if($record->order_type)
-                    <p><span class="text-muted">Tipe Pesanan:</span> {{ ucfirst($record->order_type) }}</p>
-                    @endif
-                </div>
             </div>
 
             <!-- ITEMS -->
@@ -476,9 +470,9 @@
                     <thead>
                         <tr>
                             <th class="col-idx">#</th>
-                            <th class="col-desc">Deskripsi Barang</th>
-                            <th class="col-qty" style="text-align: right;">Jumlah</th>
-                            <th class="col-price" style="text-align: right;">Harga Satuan</th>
+                            <th class="col-desc">Description</th>
+                            <th class="col-qty" style="text-align: right;">QTY</th>
+                            <th class="col-price" style="text-align: right;">Unit Price</th>
                             <th class="col-total" style="text-align: right;">Total</th>
                         </tr>
                     </thead>
@@ -487,10 +481,8 @@
                         <tr>
                             <td class="col-idx">{{ $index + 1 }}</td>
                             <td class="col-desc">
-                                <strong>{{ $item->item_name ?? $item->product->name ?? $item->description ?? 'Barang'
-                                    }}</strong>
-                                @if($item->description && $item->description !== ($item->item_name ??
-                                $item->product->name ?? ''))
+                                <strong>{{ $item->product->name ?? $item->description ?? '' }}</strong>
+                                @if($item->description && $item->description !== ($item->product->name ?? ''))
                                 <div class="text-sm text-muted">{{ $item->description }}</div>
                                 @endif
                             </td>
@@ -503,8 +495,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="text-center" style="padding: 20px;">Tidak ada barang dalam pesanan
-                                ini</td>
+                            <td colspan="5" class="text-center" style="padding: 20px;">No items in this order</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -520,20 +511,20 @@
                     </tr>
                     @if($record->discount > 0)
                     <tr>
-                        <td class="summary-label">Diskon</td>
+                        <td class="summary-label">Discount</td>
                         <td class="summary-value" style="color: #c0392b;">-{{ number_format($record->discount, 0, ',',
                             '.') }}</td>
                     </tr>
                     @endif
                     @if($record->tax_amount > 0)
                     <tr>
-                        <td class="summary-label">Pajak (PPN)</td>
+                        <td class="summary-label">Tax (PPN)</td>
                         <td class="summary-value">{{ number_format($record->tax_amount, 0, ',', '.') }}</td>
                     </tr>
                     @endif
                     @if($record->other_charges > 0)
                     <tr>
-                        <td class="summary-label">Biaya Lainnya</td>
+                        <td class="summary-label">Other Charges</td>
                         <td class="summary-value">{{ number_format($record->other_charges, 0, ',', '.') }}</td>
                     </tr>
                     @endif
@@ -547,24 +538,23 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Syarat & Ketentuan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Terms & Conditions</h4>
                     <p class="text-sm text-muted">
-                        Ini adalah konfirmasi pesanan penjualan. Tanggal pengiriman bersifat tentatif dan tergantung
-                        ketersediaan.
+                        This is a sales order confirmation. Delivery dates are tentative and subject to availability.
                         <br>
-                        Mohon sebutkan nomor pesanan dalam semua korespondensi mengenai pesanan ini.
+                        Please reference the order number in all correspondence regarding this order.
                     </p>
                     @if($record->description)
                     <div style="margin-top: 10px; font-style: italic;" class="text-sm">
-                        Catatan: {{ $record->description }}
+                        Notes: {{ $record->description }}
                     </div>
                     @endif
                 </div>
 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Disetujui Oleh</div>
+                    <div style="margin-bottom: 40px;">Authorized By</div>
                     <div class="signature-line"></div>
-                    <div class="text-sm text-bold">{{ $record->company->name ?? 'Manajemen' }}</div>
+                    <div class="text-sm text-bold">{{ $record->company->name ?? '' }}</div>
                 </div>
             </div>
 

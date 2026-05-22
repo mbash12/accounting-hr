@@ -12,7 +12,7 @@ class OvertimeTrendChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Tren Lembur Bulanan';
+    protected ?string $heading = 'Monthly Overtime Trend';
     protected static ?int $sort = 33;
     protected int | string | array $columnSpan = 1;
 
@@ -60,7 +60,7 @@ class OvertimeTrendChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Jam Lembur',
+                    'label' => 'Overtime Hours',
                     'data' => $data,
                     'fill' => 'start',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',

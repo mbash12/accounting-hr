@@ -32,21 +32,21 @@ class BukuBesarResource extends Resource
 {
     protected static ?string $model = JournalEntryItem::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Buku Besar';
+    protected static UnitEnum|string|null $navigationGroup = 'General Ledger';
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Buku Besar');
+        return __('General Ledger');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('Buku Besar');
+        return __('General Ledger');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Buku Besar');
+        return __('General Ledger');
     }
 
     public static function table(Table $table): Table
@@ -54,23 +54,23 @@ class BukuBesarResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('journalEntry.entry_number')
-                    ->label(__('No Refrensi'))
+                    ->label(__('Reference No.'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('journalEntry.date')
-                    ->label(__('Tanggal'))
+                    ->label(__('Date'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('account.name')
-                    ->label(__('Akun'))
+                    ->label(__('Account'))
                     ->description(fn (JournalEntryItem $record): string => $record->account->code)
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('contact.name')
-                    ->label(__('Kontak'))
+                    ->label(__('Contact'))
                     ->placeholder('-'),
                 TextColumn::make('notes')
-                    ->label(__('Keterangan'))
+                    ->label(__('Description'))
                     ->wrap()
                     ->searchable(),
                 TextColumn::make('debit')
@@ -78,7 +78,7 @@ class BukuBesarResource extends Resource
                     ->money('IDR')
                     ->alignment(Alignment::End),
                 TextColumn::make('credit')
-                    ->label(__('Kredit'))
+                    ->label(__('Credit'))
                     ->money('IDR')
                     ->alignment(Alignment::End),
             ])
@@ -86,8 +86,8 @@ class BukuBesarResource extends Resource
                 Filter::make('account_id')
                     ->form([
                         Select::make('account_id')
-                            ->label(__('Akun'))
-                            ->placeholder(__('Pilih Akun'))
+                            ->label(__('Account'))
+                            ->placeholder(__('Select Account'))
                             ->options(function () {
                                 $companyId = session('selected_company_id');
                                 $accounts = Account::where('is_header', false)
@@ -97,7 +97,7 @@ class BukuBesarResource extends Resource
                                     ->get()
                                     ->mapWithKeys(fn($a) => [$a->id => "{$a->code} - {$a->name}"]);
                                 
-                                return ['all' => __('Semua')] + $accounts->toArray();
+                                return ['all' => __('All')] + $accounts->toArray();
                             })
                             ->searchable()
                             ->nullable(),
@@ -118,15 +118,15 @@ class BukuBesarResource extends Resource
                             return null;
                         }
                         if ($data['account_id'] === 'all') {
-                            return __('Akun') . ': ' . __('Semua');
+                            return __('Account') . ': ' . __('All');
                         }
                         $account = Account::find($data['account_id']);
-                        return __('Akun') . ': ' . ($account ? "{$account->code} - {$account->name}" : $data['account_id']);
+                        return __('Account') . ': ' . ($account ? "{$account->code} - {$account->name}" : $data['account_id']);
                     }),
                 Filter::make('date')
                     ->form([
-                        DatePicker::make('from')->label(__('Dari'))->default(now()->startOfMonth()),
-                        DatePicker::make('until')->label(__('Sampai'))->default(now()->endOfMonth()),
+                        DatePicker::make('from')->label(__('From'))->default(now()->startOfMonth()),
+                        DatePicker::make('until')->label(__('Until'))->default(now()->endOfMonth()),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -164,7 +164,7 @@ class BukuBesarResource extends Resource
                         ->icon('heroicon-o-pencil')
                         ->url(fn (JournalEntryItem $record): string => static::resolveSourceUrl($record, 'edit')),
                     Action::make('view')
-                        ->label(__('Detail'))
+                        ->label(__('Details'))
                         ->icon('heroicon-o-eye')
                         ->url(fn (JournalEntryItem $record): string => static::resolveSourceUrl($record, 'view')),
                     ViewJournalVoucherAction::make()

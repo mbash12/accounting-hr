@@ -183,10 +183,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -204,7 +204,7 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>{{ $reportData['error'] }}</p>
     </div>
     @elseif($reportData['company'])
@@ -228,10 +228,9 @@
         {{-- Header --}}
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name }}</h2>
-            <h1 class="report-title">Neraca Saldo</h1>
+            <h1 class="report-title">Trial Balance</h1>
             <p class="report-date">
-                Dari {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }}
-                s/d {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}
+                From {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} to {{ \Carbon\Carbon::parse($endDate)->format('d M Y') }}
             </p>
         </div>
 
@@ -240,18 +239,18 @@
             <thead>
                 <tr>
                     <th rowspan="2" style="text-align:left; width:80px;">Kode</th>
-                    <th rowspan="2" style="text-align:left; min-width:200px;">Nama Akun</th>
-                    <th colspan="2">Saldo Awal</th>
+                    <th rowspan="2" style="text-align:left; min-width:200px;">Account Name</th>
+                    <th colspan="2">Opening Balance</th>
                     <th colspan="2">Perubahan</th>
-                    <th colspan="2">Saldo Akhir</th>
+                    <th colspan="2">Closing Balance</th>
                 </tr>
                 <tr>
                     <th>Debit</th>
-                    <th>Kredit</th>
+                    <th>Credit</th>
                     <th>Debit</th>
-                    <th>Kredit</th>
+                    <th>Credit</th>
                     <th>Debit</th>
-                    <th>Kredit</th>
+                    <th>Credit</th>
                 </tr>
             </thead>
             <tbody>
@@ -269,7 +268,7 @@
                 @empty
                 <tr>
                     <td colspan="8" style="text-align:center; padding:2rem; color:#9ca3af;">
-                        Tidak ada data untuk periode ini.
+                        No data for this period.
                     </td>
                 </tr>
                 @endforelse
@@ -297,8 +296,8 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
-        <p>Pilih perusahaan tertentu untuk melihat laporan.</p>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
+        <p>Select a specific company to view the report.</p>
     </div>
     @endif
 </x-filament-panels::page>

@@ -114,7 +114,7 @@ class PurchaseInvoiceForm
                             ->nullable()
                             ->columnSpanFull(),
                         Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'supplier',
@@ -176,7 +176,7 @@ class PurchaseInvoiceForm
                                 return $contact->id;
                             }),
                         Select::make('purchase_order_id')
-                            ->label('Pesanan Pembelian')
+                            ->label('Purchase Order')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'purchaseOrder',
@@ -217,7 +217,7 @@ class PurchaseInvoiceForm
                             ->preload()
                             ->live()
                             ->nullable()
-                            ->placeholder('Pilih Pesanan Pembelian')
+                            ->placeholder('Select Purchase Order')
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 if ($state) {
                                     $purchaseOrder = \App\Models\PurchaseOrder::with('items')->find($state);
@@ -240,7 +240,6 @@ class PurchaseInvoiceForm
                                                 $itemTotal = ($poItem->quantity ?? 0) * ($poItem->unit_price ?? 0);
                                                 $items[] = [
                                                     'product_id' => $poItem->product_id,
-                                                    'item_name' => $poItem->item_name ?? $poItem->product?->name,
                                                     'quantity' => $poItem->quantity,
                                                     'quantity_display' => NumberInput::formatRoundedIntegerDisplay($poItem->quantity),
                                                     'unit_price' => $poItem->unit_price,
@@ -282,7 +281,7 @@ class PurchaseInvoiceForm
                                 }
                             }),
                         DatePicker::make('date')
-                            ->label('Tanggal')
+                            ->label('Date')
                             ->required()
                             ->default(now())
                             ->live()
@@ -297,7 +296,7 @@ class PurchaseInvoiceForm
                                 }
                             }),
                         Select::make('payment_term_id')
-                            ->label('Termin Pembayaran')
+                            ->label('Payment Term')
                             ->relationship(
                                 name: 'paymentTerm',
                                 titleAttribute: 'name',
@@ -311,7 +310,7 @@ class PurchaseInvoiceForm
                                     return $query->where('is_active', true)->orderBy('due_days');
                                 }
                             )
-                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} ({$record->due_days} hari)")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} ({$record->due_days} days)")
                             ->searchable()
                             ->preload()
                             ->live()
@@ -326,13 +325,13 @@ class PurchaseInvoiceForm
                                 }
                             }),
                         DatePicker::make('due_date')
-                            ->label('Jatuh Tempo')
+                            ->label('Due Date')
                             ->required()
                             ->default(now()),
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Nomor Referensi'),
-                        (new static)->getCodeField('invoice_number', 'Nomor Faktur')
+                            ->label('Reference No.'),
+                        (new static)->getCodeField('invoice_number', 'Invoice No.')
                             ->unique('purchase_invoices', 'invoice_number', ignoreRecord: true,
                                 modifyRuleUsing: fn ($rule) => $rule->where(function ($query) {
                                     $companyId = session('selected_company_id');
@@ -348,7 +347,7 @@ class PurchaseInvoiceForm
                         Textarea::make('description')
                             ->rows(1)
                             ->maxLength(65535)
-                            ->label('Deskripsi'),
+                            ->label('Description'),
                         Select::make('status')
                             ->label('Status')
                             ->options(function ($get, $record) {
@@ -406,13 +405,12 @@ class PurchaseInvoiceForm
                     ->required()
                     ->addable(fn (callable $get) => !(bool) $get('is_locked'))
                     ->table([
-                        TableColumn::make('Produk')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Nama Barang')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Jumlah')->width('8%')->alignment(Alignment::End),
-                        TableColumn::make('Harga Satuan')->width('14%')->alignment(Alignment::End),
-                        TableColumn::make('Pajak')->width('11%')->alignment(Alignment::Start),
-                        TableColumn::make('Satuan')->width('11%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('16%')->alignment(Alignment::Start),
+                        TableColumn::make('Product')->width('20%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('10%')->alignment(Alignment::End),
+                        TableColumn::make('Unit Price')->width('14%')->alignment(Alignment::End),
+                        TableColumn::make('Tax')->width('11%')->alignment(Alignment::Start),
+                        TableColumn::make('Unit')->width('11%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('16%')->alignment(Alignment::Start),
                         TableColumn::make('Total')->width('10%')->alignment(Alignment::End),
                     ])
                     ->schema([
@@ -421,7 +419,7 @@ class PurchaseInvoiceForm
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->label('Produk')
+                            ->label('Product')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'product',
@@ -442,8 +440,6 @@ class PurchaseInvoiceForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->cost_price) {
                                         $set('unit_price', $product->cost_price);
                                         $set('unit_price_display', NumberInput::formatRoundedIntegerDisplay($product->cost_price));
@@ -462,9 +458,9 @@ class PurchaseInvoiceForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Kode Produk')
+                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Product Code')
                                     ->unique(
                                         \App\Models\Product::class,
                                         'code',
@@ -478,7 +474,7 @@ class PurchaseInvoiceForm
                                         },
                                     ),
                                 Select::make('product_group_id')
-                                    ->label('Kelompok Produk')
+                                    ->label('Product Group')
                                     ->relationship(
                                         "productGroup",
                                         "name",
@@ -495,12 +491,12 @@ class PurchaseInvoiceForm
                                     ->required(),
                                 ...RoundedIntegerMoneyInput::schema(
                                     name: 'cost_price',
-                                    label: 'Harga Beli',
+                                    label: 'Cost Price',
                                     required: false,
                                     defaultDecimal: '0.00',
                                 ),
                                 Select::make('unit_id')
-                                    ->label('Satuan')
+                                    ->label('Unit')
                                     ->searchable()
                                     ->options(function () {
                                         $selectedCompanyId = session('selected_company_id');
@@ -513,7 +509,7 @@ class PurchaseInvoiceForm
                                         return $q->orderBy('name')->pluck('name', 'id')->toArray();
                                     }),
                                 Textarea::make('description')
-                                    ->label('Deskripsi')
+                                    ->label('Description')
                                     ->rows(2),
                                 Hidden::make('company_id')
                                     ->default(function () {
@@ -529,13 +525,9 @@ class PurchaseInvoiceForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
-                            label: 'Jumlah',
+                            label: 'Quantity',
                             required: true,
                             defaultDecimal: '1.00',
                             afterUpdated: function ($decimal, callable $set, callable $get) {
@@ -553,7 +545,7 @@ class PurchaseInvoiceForm
                         ),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'unit_price',
-                            label: 'Harga Satuan',
+                            label: 'Unit Price',
                             required: true,
                             afterUpdated: function ($decimal, callable $set, callable $get) {
                                 $quantity = NumberInput::parseToFloat($get('quantity') ?? 0);
@@ -571,7 +563,7 @@ class PurchaseInvoiceForm
                         Select::make('tax_id')
                             ->searchable()
                             ->preload()
-                            ->label('Pajak')
+                            ->label('Tax')
                             ->relationship(
                                 name: 'tax',
                                 titleAttribute: 'name',
@@ -598,7 +590,7 @@ class PurchaseInvoiceForm
                         Select::make('unit_id')
                             ->searchable()
                             ->preload()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->relationship(
                                 name: 'unit',
                                 titleAttribute: 'name',
@@ -615,7 +607,7 @@ class PurchaseInvoiceForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
 
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->rows(1),
                         Hidden::make('total')
                             ->default(0),
@@ -667,7 +659,7 @@ class PurchaseInvoiceForm
                             ->columnSpan(1),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'other_charges',
-                            label: 'Biaya Lainnya',
+                            label: 'Other Charges',
                             inlineLabel: true,
                             defaultDecimal: '0.00',
                             columnSpan: 1,
@@ -688,7 +680,7 @@ class PurchaseInvoiceForm
                             ->numeric()
                             ->suffix('%')
                             ->inlineLabel()
-                            ->label('Diskon')
+                            ->label('Discount')
                             ->live()
                             ->reactive()
                             ->afterStateHydrated(function ($component, $state, $record) {
@@ -714,7 +706,7 @@ class PurchaseInvoiceForm
                             ->columnSpan(1),
                         Placeholder::make('discount_amount_display')
                             ->inlineLabel()
-                            ->label('Jumlah Diskon')
+                            ->label('Discount Amount')
                             ->content(function (callable $get) {
                                 $c = self::calculateTotals($get);
                                 return 'Rp ' . number_format($c['discount'], 0, ',', '.');
@@ -728,7 +720,7 @@ class PurchaseInvoiceForm
                             ->columnSpan(1),
                         Placeholder::make('tax_amount')
                             ->inlineLabel()
-                            ->label('Jumlah Pajak')
+                            ->label('Tax Amount')
                             ->content(function (callable $get) {
                                 $c = self::calculateTotals($get);
                                 return 'Rp ' . number_format($c['tax'], 0, ',', '.');

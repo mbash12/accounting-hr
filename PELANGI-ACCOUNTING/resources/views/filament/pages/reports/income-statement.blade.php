@@ -158,10 +158,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -178,7 +178,7 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
         <p>{{ $reportData['error'] }}</p>
     </div>
     @elseif($reportData['company'])
@@ -204,9 +204,9 @@
         <!-- Header -->
         <div class="report-header">
             <h2 class="report-company-name">{{ $company->name }}</h2>
-            <h1 class="report-title">Laporan Laba Rugi</h1>
+            <h1 class="report-title">Income Statement</h1>
             <p class="report-date">
-                Periode {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} s/d {{
+                Period {{ \Carbon\Carbon::parse($startDate)->format('d M Y') }} to {{
                 \Carbon\Carbon::parse($endDate)->format('d M Y') }}
             </p>
         </div>
@@ -223,7 +223,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Pendapatan Operasional</td>
+                        Operating Revenue</td>
                 </tr>
                 @php $opRevNodes = ($operatingRevenues->count() === 1 && $operatingRevenues->first()->is_header) ?
                 $operatingRevenues->first()->children : $operatingRevenues; @endphp
@@ -231,7 +231,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Pendapatan Operasional</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Operating Revenue</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalOperatingRevenue, 2,
                         ',', '.') }}</td>
                 </tr>
@@ -241,7 +241,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Harga Pokok Penjualan</td>
+                        Cost of Goods Sold</td>
                 </tr>
                 @php $cogsNodes = ($costOfGoodsSold->count() === 1 && $costOfGoodsSold->first()->is_header) ?
                 $costOfGoodsSold->first()->children : $costOfGoodsSold; @endphp
@@ -249,7 +249,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Harga Pokok Penjualan</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Cost of Goods Sold</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalCogs, 2, ',', '.') }}
                     </td>
                 </tr>
@@ -259,7 +259,7 @@
                 <tr style="background-color: #f9fafb;">
                     <td
                         style="font-weight: bold; color: #111827; padding-left: 1.6rem; font-size: 1.05em; padding-top: 1rem; padding-bottom: 1rem;">
-                        Laba Kotor (Gross Profit)</td>
+                        Gross Profit</td>
                     <td class="num"
                         style="font-weight: bold; color: #111827; font-size: 1.05em; border-top: 2px solid #111827; padding-top: 1rem; padding-bottom: 1rem;">
                         {{ number_format($grossProfit, 2, ',', '.') }}</td>
@@ -269,7 +269,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Beban Operasional</td>
+                        Operating Expenses</td>
                 </tr>
                 @php $opExpNodes = ($operatingExpenses->count() === 1 && $operatingExpenses->first()->is_header) ?
                 $operatingExpenses->first()->children : $operatingExpenses; @endphp
@@ -277,7 +277,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Beban Operasional</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Operating Expenses</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalOperatingExpense, 2,
                         ',', '.') }}</td>
                 </tr>
@@ -286,7 +286,7 @@
                 <tr style="background-color: #f9fafb;">
                     <td
                         style="font-weight: bold; color: #111827; padding-left: 1.6rem; font-size: 1.05em; padding-top: 1rem; padding-bottom: 1rem;">
-                        Laba Operasional (Operating Profit)</td>
+                        Operating Profit</td>
                     <td class="num"
                         style="font-weight: bold; color: #111827; font-size: 1.05em; border-top: 2px solid #111827; padding-top: 1rem; padding-bottom: 1rem;">
                         {{ number_format($operatingProfit, 2, ',', '.') }}</td>
@@ -297,7 +297,7 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: white; text-transform: uppercase;">
-                        Pendapatan & Beban Lain-lain</td>
+                        Other Revenue & Expenses</td>
                 </tr>
                 @endif
 
@@ -308,7 +308,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Pendapatan Lain-lain</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Other Revenue</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalOtherRevenue, 2, ',',
                         '.') }}</td>
                 </tr>
@@ -321,7 +321,7 @@
                 @include('filament.pages.reports.partials.account-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Beban Lain-lain</td>
+                    <td style="font-weight: bold; color: #000; padding-left: 1.6rem;">Total Other Expenses</td>
                     <td class="num" style="font-weight: bold; color: #000;">{{ number_format($totalOtherExpense, 2, ',',
                         '.') }}</td>
                 </tr>
@@ -331,7 +331,7 @@
                 <tr style="background-color: #f3f4f6;">
                     <td
                         style="font-weight: bold; color: #111827; padding-left: 1.6rem; font-size: 1.1em; border-top: 2px solid #1f2937; padding-top: 1rem; padding-bottom: 1rem;">
-                        Laba / Rugi Bersih (Net Income)</td>
+                        Net Income</td>
                     <td class="num"
                         style="font-weight: bold; color: #111827; font-size: 1.1em; border-top: 2px solid #111827; padding-top: 1rem; padding-bottom: 1rem;">
                         {{ number_format($netIncome, 2, ',', '.') }}</td>
@@ -349,8 +349,8 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
-        <p>Pilih perusahaan tertentu untuk melihat laporan.</p>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
+        <p>Select a specific company to view the report.</p>
     </div>
     @endif
 </x-filament-panels::page>

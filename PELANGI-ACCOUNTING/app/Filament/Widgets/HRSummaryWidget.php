@@ -73,7 +73,7 @@ class HRSummaryWidget extends BaseWidget
                 ->color($attendanceRate > 90 ? 'success' : ($attendanceRate > 75 ? 'warning' : 'danger')),
 
             Stat::make('Total Yearly Payroll', 'Rp ' . number_format($payrollTotal, 0, ',', '.'))
-                ->description(abs(round($payGrowth, 1)) . '% ' . ($payGrowth >= 0 ? 'naik' : 'turun') . ' YoY')
+                ->description(abs(round($payGrowth, 1)) . '% ' . ($payGrowth >= 0 ? 'up' : 'down') . ' YoY')
                 ->descriptionIcon($payGrowth >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($payGrowth >= 0 ? 'primary' : 'success'),
         ];

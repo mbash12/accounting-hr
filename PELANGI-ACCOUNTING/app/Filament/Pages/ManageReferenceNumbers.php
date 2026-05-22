@@ -25,19 +25,19 @@ class ManageReferenceNumbers extends Page implements HasForms
 
     public array $data = [];
 
-    protected static ?string $navigationLabel = 'Nomor Referensi';
+    protected static ?string $navigationLabel = 'Reference Numbers';
 
     protected static string|UnitEnum|null $navigationGroup = 'Master Data';
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $title = 'Nomor Referensi';
+    protected static ?string $title = 'Reference Numbers';
 
     protected string $view = 'filament.pages.manage-reference-numbers';
 
     public static function getNavigationLabel(): string
     {
-        return __('Nomor Referensi');
+        return __('Reference Numbers');
     }
 
     public static function getNavigationGroup(): ?string
@@ -47,7 +47,7 @@ class ManageReferenceNumbers extends Page implements HasForms
 
     public function getTitle(): string
     {
-        return __('Nomor Referensi');
+        return __('Reference Numbers');
     }
 
     public function mount(): void
@@ -67,37 +67,28 @@ class ManageReferenceNumbers extends Page implements HasForms
     {
         $selectedCompanyId = session('selected_company_id');
 
-        // Get records for the selected company (or all companies if specific company is selected)
         if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-            // Get company-specific records and global records
             $records = DocumentNumbering::where(function ($query) use ($selectedCompanyId) {
                 $query->where('company_id', $selectedCompanyId)
                       ->orWhereNull('company_id');
             })->get();
 
-            // Key by document_type, prioritizing company-specific records (non-null company_id)
-            // keyBy uses the last item for a key, so we sort such that company specific items are last
             $records = $records->sortBy(function ($record) {
                 return $record->company_id === null ? 0 : 1;
             })->keyBy('document_type');
         } else {
-            // When 'all' is selected, we should not show any records
             return [];
         }
 
-        // Get all document types
         $documentTypes = $this->getDocumentTypes();
 
         $result = [];
 
-        // Process each document type
         foreach ($documentTypes as $documentType => $label) {
             if (isset($records[$documentType])) {
-                // Process existing record
                 $record = $records[$documentType];
                 $formatComponents = $record->format_components;
 
-                // Migration for existing records without format_components
                 if (empty($formatComponents)) {
                     $format = $record->format;
                     if ($format === '{prefix}{number}')
@@ -113,7 +104,7 @@ class ManageReferenceNumbers extends Page implements HasForms
                     elseif ($format === '{prefix}{year}{month}{number}')
                         $formatComponents = ['prefix', 'year_full', 'month_short', 'number'];
                     else
-                        $formatComponents = ['prefix', 'number']; // Default fallback
+                        $formatComponents = ['prefix', 'number'];
                 }
 
                 $result[] = [
@@ -130,7 +121,6 @@ class ManageReferenceNumbers extends Page implements HasForms
                     'reset_period' => $record->reset_period,
                 ];
             } else {
-                // Add default entry for missing document type
                 $result[] = [
                     'document_type' => $documentType,
                     'document_type_display' => $this->getDocumentTypes()[$documentType] ?? $documentType,
@@ -146,7 +136,6 @@ class ManageReferenceNumbers extends Page implements HasForms
             }
         }
 
-        // Sort by document type label name
         usort($result, function ($a, $b) use ($documentTypes) {
             return strcmp($documentTypes[$a['document_type']] ?? $a['document_type'],
                          $documentTypes[$b['document_type']] ?? $b['document_type']);
@@ -203,43 +192,43 @@ class ManageReferenceNumbers extends Page implements HasForms
     public function getDocumentTypes(): array
     {
         return [
-            'advance_disbursement' => 'Pengeluaran Uang Muka',
-            'advance_receipt' => 'Penerimaan Uang Muka',
-            'cash_disbursement' => 'Pengeluaran Kas',
-            'cash_receipt' => 'Penerimaan Kas',
-            'cash_transfer' => 'Transfer Kas',
-            'check_disbursement' => 'Pengeluaran Cek',
-            'delivery_document' => 'Dokumen Pengiriman',
-            'fixed_asset_transaction' => 'Transaksi Aset Tetap',
-            'goods_receipt' => 'Penerimaan Barang',
-            'inventory_adjustment' => 'Penyesuaian Persediaan',
-            'journal_entry' => 'Jurnal Umum',
-            'overpayment_receipt' => 'Penerimaan Kelebihan Bayar',
-            'overpayment_refund' => 'Pengembalian Kelebihan Bayar',
-            'payable_payment' => 'Pembayaran Hutang',
-            'purchase_invoice' => 'Faktur Pembelian',
-            'purchase_order' => 'Pesanan Pembelian',
-            'purchase_return' => 'Retur Pembelian',
-            'receivable_payment' => 'Pembayaran Piutang',
-            'sales_invoice' => 'Faktur Penjualan',
-            'sales_order' => 'Pesanan Penjualan',
-            'sales_return' => 'Retur Penjualan',
-            'stock_opname' => 'Stok Opname',
-            'warehouse_transfer' => 'Transfer Gudang',
-            'product' => 'Produk',
-            'product_group' => 'Grup Produk',
-            'fixed_asset' => 'Aset Tetap',
-            'unit_measurement' => 'Satuan',
-            'bank_account' => 'Rekening Bank',
-            'warehouse' => 'Gudang',
-            'department' => 'Departemen',
-            'tax' => 'Pajak',
-            'expedition' => 'Ekspedisi',
-            'contact' => 'Kontak',
+            'advance_disbursement' => 'Advance Disbursement',
+            'advance_receipt' => 'Advance Receipt',
+            'cash_disbursement' => 'Cash Disbursement',
+            'cash_receipt' => 'Cash Receipt',
+            'cash_transfer' => 'Cash Transfer',
+            'check_disbursement' => 'Check Disbursement',
+            'delivery_document' => 'Delivery Document',
+            'fixed_asset_transaction' => 'Fixed Asset Transaction',
+            'goods_receipt' => 'Goods Receipt',
+            'inventory_adjustment' => 'Inventory Adjustment',
+            'journal_entry' => 'Journal Entry',
+            'overpayment_receipt' => 'Overpayment Receipt',
+            'overpayment_refund' => 'Overpayment Refund',
+            'payable_payment' => 'Payable Payment',
+            'purchase_invoice' => 'Purchase Invoice',
+            'purchase_order' => 'Purchase Order',
+            'purchase_return' => 'Purchase Return',
+            'receivable_payment' => 'Receivable Payment',
+            'sales_invoice' => 'Sales Invoice',
+            'sales_order' => 'Sales Order',
+            'sales_return' => 'Sales Return',
+            'stock_opname' => 'Stock Opname',
+            'warehouse_transfer' => 'Warehouse Transfer',
+            'product' => 'Product',
+            'product_group' => 'Product Group',
+            'fixed_asset' => 'Fixed Asset',
+            'unit_measurement' => 'Unit of Measurement',
+            'bank_account' => 'Bank Account',
+            'warehouse' => 'Warehouse',
+            'department' => 'Department',
+            'tax' => 'Tax',
+            'expedition' => 'Expedition',
+            'contact' => 'Contact',
             'bank' => 'Bank',
-            'business_type' => 'Jenis Usaha',
-            'payment_term' => 'Termin Pembayaran',
-            'project' => 'Proyek',
+            'business_type' => 'Business Type',
+            'payment_term' => 'Payment Term',
+            'project' => 'Project',
         ];
     }
 
@@ -260,19 +249,19 @@ class ManageReferenceNumbers extends Page implements HasForms
     public function getResetPeriodOptions(): array
     {
         return [
-            'never' => 'Tidak Pernah',
-            'daily' => 'Harian',
-            'weekly' => 'Mingguan',
-            'monthly' => 'Bulanan',
-            'quarterly' => 'Triwulanan',
-            'yearly' => 'Tahunan',
+            'never' => 'Never',
+            'daily' => 'Daily',
+            'weekly' => 'Weekly',
+            'monthly' => 'Monthly',
+            'quarterly' => 'Quarterly',
+            'yearly' => 'Yearly',
         ];
     }
 
     private function generatePreview(string $prefix, array $formatComponents, int $nextNumber): string
     {
         $previewParts = [];
-        $nextNumber++; // Add 1 to show what the NEXT generated number will be
+        $nextNumber++;
 
         foreach ($formatComponents as $component) {
             switch ($component) {
@@ -309,22 +298,22 @@ class ManageReferenceNumbers extends Page implements HasForms
     {
         return [
             Repeater::make('document_numberings')
-                ->label('Pengaturan Nomor Referensi')
+                ->label('Reference Number Settings')
                 ->table([
-                    TableColumn::make('Nama Modul'),
-                    TableColumn::make('Kode')->width('10%'),
+                    TableColumn::make('Module Name'),
+                    TableColumn::make('Code')->width('10%'),
                     TableColumn::make('Format')->width('40%'),
-                    TableColumn::make('Nomor')->width('10%'),
-                    TableColumn::make('Contoh'),
+                    TableColumn::make('Number')->width('10%'),
+                    TableColumn::make('Example'),
                     TableColumn::make('Reset'),
-                    TableColumn::make('Otomatis')->width('1%'),
+                    TableColumn::make('Automatic')->width('1%'),
                 ])
                 ->schema([
                     \Filament\Forms\Components\Hidden::make('id'),
                     \Filament\Forms\Components\Hidden::make('document_type'),
 
                     TextEntry::make('document_type_display')
-                        ->label('Nama Modul')
+                        ->label('Module Name')
                         ->formatStateUsing(fn($state, $record): string => $this->getDocumentTypes()[$record['document_type'] ?? $state] ?? ($record['document_type'] ?? $state)),
 
                     TextInput::make('prefix')
@@ -355,7 +344,6 @@ class ManageReferenceNumbers extends Page implements HasForms
                         ->content(function ($get) {
                             $components = $get('format_components') ?? [];
                             $prefix = $get('prefix') ?? 'TR';
-                            // Add 1 to next_number to show what the NEXT generated number will be
                             $nextNumber = ($get('next_number') ?? 0) + 1;
 
                             $previewParts = [];
@@ -436,14 +424,12 @@ class ManageReferenceNumbers extends Page implements HasForms
 
         try {
             foreach ($data['document_numberings'] as $item) {
-                // Check if document_type exists, otherwise skip this item
                 if (!isset($item['document_type'])) {
-                    continue; // Skip items without document_type
+                    continue;
                 }
 
                 $updateData = [
                     'prefix' => $item['prefix'],
-                    // 'format' => $item['format'], // Format is generated from components in model
                     'format_components' => $item['format_components'],
                     'next_number' => $item['next_number'],
                     'is_active' => $item['is_automatic'],
@@ -451,13 +437,9 @@ class ManageReferenceNumbers extends Page implements HasForms
                 ];
 
                 if (isset($item['id']) && $item['id']) {
-                    // Update existing record
                     $documentNumbering = DocumentNumbering::find($item['id']);
                     if ($documentNumbering) {
-                        // Only update if the record belongs to the current company or is global
-                        // Use loose comparison for company_id to handle string/int differences
                         if ($documentNumbering->company_id == $selectedCompanyId || $documentNumbering->company_id === null) {
-                            // If it's a global record, create a company-specific copy instead
                             if ($documentNumbering->company_id === null) {
                                 DocumentNumbering::create(array_merge($updateData, [
                                     'document_type' => $item['document_type'],
@@ -470,7 +452,6 @@ class ManageReferenceNumbers extends Page implements HasForms
                         }
                     }
                 } else {
-                    // Create new record
                     DocumentNumbering::create(array_merge($updateData, [
                         'document_type' => $item['document_type'],
                         'company_id' => $selectedCompanyId,
@@ -483,11 +464,10 @@ class ManageReferenceNumbers extends Page implements HasForms
 
             Notification::make()
                 ->success()
-                ->title('Berhasil')
-                ->body('Pengaturan nomor referensi telah disimpan.')
+                ->title('Success')
+                ->body('Reference number settings have been saved.')
                 ->send();
 
-            // Refresh the data
             $this->mount();
 
         } catch (\Exception $e) {
@@ -496,7 +476,7 @@ class ManageReferenceNumbers extends Page implements HasForms
             Notification::make()
                 ->danger()
                 ->title('Error')
-                ->body('Terjadi kesalahan saat menyimpan pengaturan: ' . $e->getMessage())
+                ->body('An error occurred while saving settings: ' . $e->getMessage())
                 ->send();
         }
     }

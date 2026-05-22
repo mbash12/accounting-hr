@@ -12,41 +12,41 @@ class FixedAssetTemplateExport implements FromArray, WithHeadings, WithTitle
     {
         return [
             [
-                'Mobil Toyota Avanza',
+                'Toyota Avanza Company Car',
                 'AST-001',
-                'KENDARAAN',
+                'VEHICLES',
                 '2023-01-15',
-                'Aset Tetap untuk transportasi operasional',
+                'Fixed asset for operational transportation',
                 '25000000',
                 '5',
                 'Yes'
             ],
             [
-                'Mesin Produksi Type A',
+                'Production Machine Type A',
                 'AST-002',
-                'MESIN',
+                'MACHINERY',
                 '2022-06-10',
-                'Mesin produksi untuk makanan',
+                'Production machine for food products',
                 '500000000',
                 '10',
                 'Yes'
             ],
             [
-                'Laptop Dell Inspiron',
+                'Dell Inspiron Laptop',
                 'AST-003',
-                'KOMPUTER',
+                'COMPUTER',
                 '2023-07-05',
-                'Laptop untuk staf administrasi',
+                'Laptop for administrative staff',
                 '12000000',
                 '3',
                 'Yes'
             ],
             [
-                'Kursi Kantor Ergonomis',
+                'Ergonomic Office Chair',
                 'AST-004',
-                'PERALATAN',
+                'EQUIPMENT',
                 '2021-12-01',
-                'Kursi untuk staf kantor',
+                'Chair for office staff',
                 '2500000',
                 '5',
                 'Yes'
@@ -70,6 +70,6 @@ class FixedAssetTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Aset Tetap';
+        return 'Fixed Asset Import Template';
     }
 }

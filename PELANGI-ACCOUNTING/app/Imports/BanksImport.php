@@ -77,10 +77,10 @@ class BanksImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'bank_code.required' => 'Kode Bank wajib diisi.',
-            'bank_code.max' => 'Kode Bank tidak boleh lebih dari 20 karakter.',
-            'bank_name.required' => 'Nama Bank wajib diisi.',
-            'bank_name.max' => 'Nama Bank tidak boleh lebih dari 255 karakter.',
+            'bank_code.required' => 'Bank Code is required.',
+            'bank_code.max' => 'Bank Code cannot exceed 20 characters.',
+            'bank_name.required' => 'Bank Name is required.',
+            'bank_name.max' => 'Bank Name cannot exceed 255 characters.',
         ];
     }
 }

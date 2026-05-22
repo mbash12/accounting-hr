@@ -24,9 +24,9 @@ class WarehousesExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         return [
-            'Kode Gudang',
-            'Nama Gudang',
-            'Status Aktif',
+            'Warehouse Code',
+            'Warehouse Name',
+            'Active Status',
         ];
     }
 
@@ -35,7 +35,7 @@ class WarehousesExport implements FromCollection, WithHeadings, WithMapping
         return [
             $warehouse->code,
             $warehouse->name,
-            $warehouse->is_active ? 'Ya' : 'Tidak',
+            $warehouse->is_active ? 'Yes' : 'No',
         ];
     }
 }

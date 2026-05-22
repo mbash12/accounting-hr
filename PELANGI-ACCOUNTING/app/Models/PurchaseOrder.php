@@ -54,8 +54,8 @@ class PurchaseOrder extends Model
             if ($hasLockedReceipts || $hasLockedInvoices) {
                 \Filament\Notifications\Notification::make()
                     ->danger()
-                    ->title('Tidak dapat menghapus')
-                    ->body('Pesanan memiliki penerimaan barang atau invoice yang terkunci.')
+                    ->title('Cannot delete')
+                    ->body('This order has locked goods receipts or invoices.')
                     ->send();
                 return false;
             }
@@ -69,7 +69,6 @@ class PurchaseOrder extends Model
      */
     protected $fillable = [
         'purchase_order_no',
-        'order_type',
         'date',
         'is_closed',
         'reference_no',
@@ -85,12 +84,7 @@ class PurchaseOrder extends Model
         'status',
         'receipt_meta',
         'invoice_meta',
-        'sales_order_id',
         'supplier_id',
-        'job_id',
-        'related_order_id',
-        'advance_payment_id',
-        'department_id',
         'other_charges_account_id',
         'discount_account_id',
         'company_id',
@@ -108,7 +102,6 @@ class PurchaseOrder extends Model
         return [
             'id' => 'integer',
             'date' => 'date',
-            'order_type' => 'string',
             'is_closed' => 'boolean',
             'valid_until' => 'date',
             'other_charges' => 'decimal:2',
@@ -121,12 +114,7 @@ class PurchaseOrder extends Model
             'status' => 'string',
             'receipt_meta' => 'array',
             'invoice_meta' => 'array',
-            'sales_order_id' => 'integer',
             'supplier_id' => 'integer',
-            'job_id' => 'integer',
-            'related_order_id' => 'integer',
-            'advance_payment_id' => 'integer',
-            'department_id' => 'integer',
             'other_charges_account_id' => 'integer',
             'discount_account_id' => 'integer',
             'company_id' => 'integer',
@@ -138,21 +126,6 @@ class PurchaseOrder extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Contact::class);
-    }
-
-    public function salesOrder(): BelongsTo
-    {
-        return $this->belongsTo(SalesOrder::class);
-    }
-
-    public function job(): BelongsTo
-    {
-        return $this->belongsTo(Project::class);
-    }
-
-    public function department(): BelongsTo
-    {
-        return $this->belongsTo(Department::class);
     }
 
     public function otherChargesAccount(): BelongsTo
@@ -178,16 +151,6 @@ class PurchaseOrder extends Model
     public function updatedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function relatedOrder(): BelongsTo
-    {
-        return $this->belongsTo(PurchaseOrder::class, 'related_order_id');
-    }
-
-    public function advancePayment(): BelongsTo
-    {
-        return $this->belongsTo(AdvancePayment::class);
     }
 
     public function items(): HasMany

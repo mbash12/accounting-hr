@@ -110,7 +110,7 @@ class SalesDeliveryForm
                             })
                             ->columnSpanFull(),
                         Select::make('customer_id')
-                            ->label('Pelanggan')
+                            ->label('Customer')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'customer',
@@ -136,9 +136,9 @@ class SalesDeliveryForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Contacts\Schemas\ContactForm)->getCodeField('contact_code', 'Kode Kontak')
+                                (new \App\Filament\Resources\Contacts\Schemas\ContactForm)->getCodeField('contact_code', 'Contact Code')
                                     ->unique(\App\Models\Contact::class, 'contact_code', ignoreRecord: true,
                                         modifyRuleUsing: function ($rule) {
                                             // Get the company_id from the session
@@ -157,7 +157,7 @@ class SalesDeliveryForm
                                     ->label('Email')
                                     ->email(),
                                 TextInput::make('phone')
-                                    ->label('Telepon')
+                                    ->label('Phone')
                                     ->tel(),
                                 Hidden::make('is_customer')
                                     ->default(true),
@@ -176,7 +176,7 @@ class SalesDeliveryForm
                                 return $contact->id;
                             }),
                         Select::make('sales_order_id')
-                            ->label('Pesanan Penjualan')
+                            ->label('Sales Order')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'salesOrder',
@@ -249,22 +249,22 @@ class SalesDeliveryForm
                             })
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->order_number . ' - ' . $record->customer?->name),
                         Select::make('delivery_type')
-                            ->label(__('Jenis Pengiriman'))
+                            ->label(__('Delivery Type'))
                             ->options([
-                                'goods' => 'Barang',
-                                'document' => 'Dokumen',
+                                'goods' => 'Goods',
+                                'document' => 'Document',
                             ])
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->required()
                             ->reactive(),
                         DatePicker::make('date')
-                            ->label(__('Tanggal'))
+                            ->label(__('Date'))
                             ->required()
                             ->default(now()),                       
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Nomor Referensi'),
-                        (new static)->getCodeField()->label('Nomor Pengiriman')
+                            ->label('Reference No.'),
+                        (new static)->getCodeField()->label('Delivery No.')
                             ->unique(ignoreRecord: true,
                                 modifyRuleUsing: fn ($rule, $record) => $rule->where(function ($query) use ($record) {
                                     $companyId = session('selected_company_id');
@@ -283,7 +283,7 @@ class SalesDeliveryForm
                         Textarea::make('description')
                             ->rows(1)
                             ->maxLength(65535)
-                            ->label('Deskripsi'),
+                            ->label('Description'),
                         Select::make('status')
                             ->label('Status')
                             ->options([
@@ -303,22 +303,22 @@ class SalesDeliveryForm
                 Repeater::make('items')
                     ->relationship()
                     ->hiddenLabel()
-                    ->addActionLabel('Tambah Item Baru')
+                    ->addActionLabel('Add New Item')
                     ->required()
                     ->addable(fn (callable $get) => !(bool) $get('is_locked'))
                     ->defaultItems(0) // No default items, will load from sales order
                     ->table([
-                        TableColumn::make('Produk')->width('30%')->alignment(Alignment::Start),
-                        TableColumn::make('Jumlah')->width('15%')->alignment(Alignment::End),
-                        TableColumn::make('Satuan')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('40%')->alignment(Alignment::Start),
+                        TableColumn::make('Product')->width('30%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('15%')->alignment(Alignment::End),
+                        TableColumn::make('Unit')->width('15%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('40%')->alignment(Alignment::Start),
                     ])
                     ->schema([
                         Hidden::make('sales_order_item_id'),
                         Select::make('product_id')
                             ->required()
                             ->searchable(['name', 'code'])
-                            ->label(__('Produk'))
+                            ->label(__('Product'))
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'product',
@@ -340,9 +340,9 @@ class SalesDeliveryForm
                             ->live(onBlur: true) // Make it reactive to form changes
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Kode Produk')
+                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Product Code')
                                     ->unique(
                                         \App\Models\Product::class,
                                         'code',
@@ -361,7 +361,7 @@ class SalesDeliveryForm
                                         },
                                     ),
                                 Select::make('product_group_id')
-                                    ->label('Kelompok Produk')
+                                    ->label('Product Group')
                                     ->relationship(
                                         "productGroup",
                                         "name",
@@ -378,12 +378,12 @@ class SalesDeliveryForm
                                     ->required(),
                                 ...RoundedIntegerMoneyInput::schema(
                                     name: 'selling_price',
-                                    label: 'Harga Jual',
+                                    label: 'Selling Price',
                                     required: false,
                                     defaultDecimal: '0.00',
                                 ),
                                 Select::make('unit_id')
-                                    ->label('Satuan')
+                                    ->label('Unit')
                                     ->searchable()
                                     ->options(function () {
                                         $selectedCompanyId = session('selected_company_id');
@@ -398,7 +398,7 @@ class SalesDeliveryForm
                                         return $q->orderBy('name')->pluck('name', 'id')->toArray();
                                     }),
                                 Textarea::make('description')
-                                    ->label('Deskripsi')
+                                    ->label('Description')
                                     ->rows(2),
                                 Hidden::make('company_id')
                                     ->default(function () {
@@ -415,13 +415,13 @@ class SalesDeliveryForm
                             }),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
-                            label: 'Jumlah',
+                            label: 'Quantity',
                             required: true,
                             defaultDecimal: '1.00',
                         ),
                         Select::make('unit_id')
                             ->searchable()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'unit',
@@ -439,7 +439,7 @@ class SalesDeliveryForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
 
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->rows(1),
                     ])
@@ -449,24 +449,24 @@ class SalesDeliveryForm
                     ->columnSpan('full'),
 
                 // Document Upload Section - Only show when delivery type is document
-                Section::make('Lampiran Dokumen')
+                Section::make('Document Attachments')
                     ->schema([
                         FileUpload::make('bast_document')
-                            ->label('Dokumen BAST')
+                            ->label('BAST Document')
                             ->disk('public')
                             ->directory('delivery-documents/bast')
                             ->maxSize(10240) // 10MB
                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                             ->downloadable(),
                         FileUpload::make('tpb_document')
-                            ->label('Dokumen TPB')
+                            ->label('TPB Document')
                             ->disk('public')
                             ->directory('delivery-documents/tpb')
                             ->maxSize(10240) // 10MB
                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                             ->downloadable(),
                         Textarea::make('internal_notes')
-                            ->label('Catatan Internal')
+                            ->label('Internal Notes')
                             ->rows(2)
                             ->maxLength(65535)
                             ->columnSpanFull(),

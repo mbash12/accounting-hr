@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Slip Gaji - {{ $period->name }}</title>
+    <title>Payslip - {{ $period->name }}</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -293,9 +293,9 @@
 
 @php
     $monthNames = [
-        1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-        5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-        9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
+        5 => 'May', 6 => 'June', 7 => 'July', 8 => 'August',
+        9 => 'September', 10 => 'October', 11 => 'November', 12 => 'December',
     ];
 
     function fmtRp($amount): string {
@@ -327,17 +327,17 @@
             @if($company?->billing_address_line_1)
                 <div class="slip-period" style="margin-top:2px;">{{ $company->billing_address_line_1 }}{{ $company->billing_city ? ', '.$company->billing_city : '' }}</div>
             @endif
-            <div class="slip-title">SLIP GAJI KARYAWAN</div>
+            <div class="slip-title">EMPLOYEE PAYSLIP</div>
             <div class="slip-period">
-                Periode: {{ $monthNames[$period->month] }} {{ $period->year }}
+                Period: {{ $monthNames[$period->month] }} {{ $period->year }}
                 @if($period->start_date && $period->end_date)
                     &nbsp;({{ $period->start_date->format('d/m/Y') }} – {{ $period->end_date->format('d/m/Y') }})
                 @endif
             </div>
         </div>
         <div class="slip-number">
-            No. Slip: <strong>{{ $payslip->number }}</strong><br>
-            Tgl Cetak: {{ \Carbon\Carbon::now()->format('d/m/Y') }}
+            Slip No.: <strong>{{ $payslip->number }}</strong><br>
+            Print Date: {{ \Carbon\Carbon::now()->format('d/m/Y') }}
         </div>
     </div>
 
@@ -345,22 +345,22 @@
     <div class="employee-section">
         <div class="employee-col">
             <div class="info-row">
-                <div class="info-label">Nama Karyawan</div>
+                <div class="info-label">Employee Name</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->name }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">ID Karyawan</div>
+                <div class="info-label">Employee ID</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->employee_id ?? '-' }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Departemen</div>
+                <div class="info-label">Department</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->department?->name ?? '-' }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Jabatan</div>
+                <div class="info-label">Position</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">{{ $employee->position ?? '-' }}</div>
             </div>
@@ -382,7 +382,7 @@
                 <div class="info-value">{{ $employee->ptkp_status ?? '-' }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Bank / Rekening</div>
+                <div class="info-label">Bank / Account</div>
                 <div class="info-sep">:</div>
                 <div class="info-value">
                     {{ $employee->bank_name ?? '' }}
@@ -394,12 +394,12 @@
 
     {{-- Salary Items --}}
     <div class="salary-section">
-        {{-- Left: Pendapatan --}}
+        {{-- Left: Earnings --}}
         <div class="salary-col-left">
-            <div class="salary-group-title earn">Pendapatan</div>
+            <div class="salary-group-title earn">Earnings</div>
             <table class="salary-items">
                 <tr>
-                    <td>Gaji Pokok</td>
+                    <td>Basic Salary</td>
                     <td class="amount">{{ fmtRp($payslip->basic_salary) }}</td>
                 </tr>
                 @foreach($allowances as $item)
@@ -409,15 +409,15 @@
                 </tr>
                 @endforeach
                 <tr class="subtotal">
-                    <td>Total Pendapatan</td>
+                    <td>Total Earnings</td>
                     <td class="amount">{{ fmtRp($payslip->gross_salary) }}</td>
                 </tr>
             </table>
         </div>
 
-        {{-- Right: Potongan --}}
+        {{-- Right: Deductions --}}
         <div class="salary-col-right">
-            <div class="salary-group-title deduct">Potongan</div>
+            <div class="salary-group-title deduct">Deductions</div>
             <table class="salary-items">
                 @foreach($deductions as $item)
                 <tr>
@@ -433,12 +433,12 @@
                 @endif
                 @if($bpjsEmp > 0)
                 <tr>
-                    <td>BPJS (Karyawan)</td>
+                    <td>BPJS (Employee)</td>
                     <td class="amount">{{ fmtRp($bpjsEmp) }}</td>
                 </tr>
                 @endif
                 <tr class="subtotal deduct">
-                    <td>Total Potongan</td>
+                    <td>Total Deductions</td>
                     <td class="amount">{{ fmtRp($payslip->total_deduction + $payslip->pph21 + $bpjsEmp) }}</td>
                 </tr>
             </table>
@@ -449,31 +449,31 @@
     <div class="summary-box">
         <table>
             <tr>
-                <td class="label">Gaji Pokok</td>
+                <td class="label">Basic Salary</td>
                 <td class="value">{{ fmtRp($payslip->basic_salary) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS Kesehatan (Karyawan)</td>
+                <td class="label" style="padding-left:20px;">BPJS Kesehatan (Employee)</td>
                 <td class="value">{{ fmtRp($payslip->bpjs_kesehatan_employee) }}</td>
             </tr>
             <tr>
-                <td class="label">Total Tunjangan</td>
+                <td class="label">Total Allowances</td>
                 <td class="value">{{ fmtRp($payslip->total_allowance) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS Ketenagakerjaan (Karyawan)</td>
+                <td class="label" style="padding-left:20px;">BPJS Employment (Employee)</td>
                 <td class="value">{{ fmtRp($payslip->bpjs_ketenagakerjaan_employee) }}</td>
             </tr>
             <tr>
-                <td class="label">Gaji Bruto</td>
+                <td class="label">Gross Salary</td>
                 <td class="value">{{ fmtRp($payslip->gross_salary) }}</td>
                 <td class="label" style="padding-left:20px;">PPh 21</td>
                 <td class="value">{{ fmtRp($payslip->pph21) }}</td>
             </tr>
             <tr>
-                <td class="label">Total Potongan Lain</td>
+                <td class="label">Total Other Deductions</td>
                 <td class="value">{{ fmtRp($payslip->total_deduction) }}</td>
-                <td class="label" style="padding-left:20px;">BPJS (Ditanggung Perusahaan)</td>
+                <td class="label" style="padding-left:20px;">BPJS (Company Borne)</td>
                 <td class="value" style="color:#6b7280;">{{ fmtRp($bpjsPer) }}</td>
             </tr>
             <tr class="net-row">
-                <td colspan="2">GAJI BERSIH (TAKE HOME PAY)</td>
+                <td colspan="2">NET SALARY (TAKE HOME PAY)</td>
                 <td colspan="2" style="text-align:right;">{{ fmtRp($payslip->net_salary) }}</td>
             </tr>
         </table>
@@ -483,19 +483,19 @@
     <div class="slip-footer">
         <div class="sign-col">
             <div class="sign-box"></div>
-            <div class="sign-label">Karyawan</div>
+            <div class="sign-label">Employee</div>
             <div style="margin-top:2px;font-weight:bold;">{{ $employee->name }}</div>
         </div>
         <div class="sign-col"></div>
         <div class="sign-col">
             <div class="sign-box"></div>
-            <div class="sign-label">Disetujui oleh</div>
+            <div class="sign-label">Approved By</div>
             <div style="margin-top:2px;font-weight:bold;">{{ $company?->name }}</div>
         </div>
     </div>
 
     <div class="note-text">
-        Dokumen ini dicetak secara otomatis oleh sistem. Berlaku sebagai bukti sah pembayaran gaji.
+        This document is automatically generated by the system. Valid as proof of salary payment.
     </div>
 
 </div>

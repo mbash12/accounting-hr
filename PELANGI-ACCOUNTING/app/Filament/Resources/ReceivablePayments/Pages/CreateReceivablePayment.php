@@ -20,7 +20,7 @@ class CreateReceivablePayment extends CreateRecord
         $cacheKey = 'receivable_payment_creating_' . Auth::id() . '_' . request()->ip();
         if (cache()->has($cacheKey)) {
             throw ValidationException::withMessages([
-                'items' => __('Proses penyimpanan sedang berlangsung. Mohon tunggu sebentar.'),
+                'items' => __('Save is in progress. Please wait a moment.'),
             ]);
         }
         
@@ -30,7 +30,7 @@ class CreateReceivablePayment extends CreateRecord
         if (empty($items)) {
             cache()->forget($cacheKey);
             throw ValidationException::withMessages([
-                'items' => __('Minimal satu item diperlukan.'),
+                'items' => __('At least one item is required.'),
             ]);
         }
 
@@ -38,13 +38,13 @@ class CreateReceivablePayment extends CreateRecord
         foreach ($items as $index => $item) {
             if (empty($item['sales_invoice_id'])) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.sales_invoice_id" => __('Nomor faktur harus dipilih untuk setiap item.'),
+                    "items.{$index}.sales_invoice_id" => __('Invoice number must be selected for each item.'),
                 ]);
             }
             
             if (in_array($item['sales_invoice_id'], $invoiceIds)) {
                 throw ValidationException::withMessages([
-                    "items.{$index}.sales_invoice_id" => __('Nomor faktur tidak boleh sama. Faktur ini sudah digunakan pada item lain.'),
+                    "items.{$index}.sales_invoice_id" => __('Invoice number cannot be duplicated. This invoice is already used in another item.'),
                 ]);
             }
             
@@ -72,7 +72,6 @@ class CreateReceivablePayment extends CreateRecord
                     ->where('is_active', true)
                     ->where(function ($q) {
                         $q->where('code', 'like', '2102%')
-                            ->orWhere('name', 'like', '%Uang Muka Penjualan%')
                             ->orWhere('name', 'like', '%Advance Sales%');
                     })
                     ->where(function ($q) use ($data) {

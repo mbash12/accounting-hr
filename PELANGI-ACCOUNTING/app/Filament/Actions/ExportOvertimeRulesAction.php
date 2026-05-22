@@ -12,19 +12,19 @@ class ExportOvertimeRulesAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
                     return Excel::download(
                         new OvertimeRulesExport(),
-                        'aturan-lembur-' . date('Y-m-d') . '.xlsx'
+                        'overtime-rules-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data aturan lembur: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting overtime rules: ' . $e->getMessage())
                         ->send();
                 }
             });

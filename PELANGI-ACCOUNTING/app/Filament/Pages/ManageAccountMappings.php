@@ -17,52 +17,52 @@ use UnitEnum;
 class ManageAccountMappings extends Page implements HasForms
 {
     use InteractsWithForms, HasPageShield;
-    protected static ?string $navigationLabel = 'Pemetaan Akun';
+    protected static ?string $navigationLabel = 'Account Mapping';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Buku Besar';
+    protected static string|UnitEnum|null $navigationGroup = 'General Ledger';
 
     protected static ?int $navigationSort = 2;
 
-    protected static ?string $title = 'Pemetaan Akun & Jurnal';
+    protected static ?string $title = 'Account Mapping & Journal';
 
     public static function getNavigationLabel(): string
     {
-        return __('Pemetaan Akun');
+        return __('Account Mapping');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Buku Besar');
+        return __('General Ledger');
     }
 
     public function getTitle(): string
     {
-        return __('Pemetaan Akun & Jurnal');
+        return __('Account Mapping & Journal');
     }
 
     protected string $view = 'filament.pages.manage-account-mappings';
 
     public $selectedDocumentType = null;
 
-    public array $allMappings = []; // Store all mappings for all document types
-    
-    public array $originalMappings = []; // Store original state to detect changes
+    public array $allMappings = [];
+
+    public array $originalMappings = [];
 
     protected function getHeaderActions(): array
     {
         return [
             Action::make('auto_map')
-                ->label('Pemetaan Otomatis')
+                ->label('Auto Map')
                 ->icon('heroicon-o-sparkles')
                 ->color('gray')
                 ->action('autoMapAccounts')
                 ->requiresConfirmation()
-                ->modalHeading('Pemetaan Otomatis Akun')
-                ->modalDescription('Sistem akan mencari dan memetakan akun secara otomatis berdasarkan kode akun standar. Pemetaan yang sudah ada akan diganti.')
-                ->modalSubmitActionLabel('Ya, Petakan Otomatis')
+                ->modalHeading('Auto Map Accounts')
+                ->modalDescription('The system will automatically find and map accounts based on standard account codes. Existing mappings will be replaced.')
+                ->modalSubmitActionLabel('Yes, Auto Map')
                 ->disabled(fn () => !session('selected_company_id') || session('selected_company_id') === 'all'),
             Action::make('save')
-                ->label('Simpan Semua')
+                ->label('Save All')
                 ->icon('heroicon-o-check')
                 ->color('primary')
                 ->action('saveAllMappings')
@@ -72,27 +72,25 @@ class ManageAccountMappings extends Page implements HasForms
 
     public function mount(): void
     {
-        // Default to the first document type if none selected
         if (empty($this->selectedDocumentType)) {
             $documentTypes = array_keys($this->getDocumentTypes());
             $this->selectedDocumentType = $documentTypes[0] ?? null;
         }
 
-        // If selected type is not in allowed types, reset to first allowed
         $allowedTypes = array_keys($this->getDocumentTypes());
         if (!in_array($this->selectedDocumentType, $allowedTypes)) {
             $this->selectedDocumentType = $allowedTypes[0] ?? null;
         }
 
         $this->loadAllMappings();
-        $this->originalMappings = $this->allMappings; // Store original state
+        $this->originalMappings = $this->allMappings;
     }
 
     public function selectDocumentType($type): void
     {
         $this->selectedDocumentType = $type;
     }
-    
+
     public function hasChanges($documentType = null): bool
     {
         if ($documentType) {
@@ -100,7 +98,7 @@ class ManageAccountMappings extends Page implements HasForms
         }
         return $this->allMappings !== $this->originalMappings;
     }
-    
+
     public function hasFieldChanged($documentType, $mappingType): bool
     {
         $current = $this->allMappings[$documentType][$mappingType]['account_id'] ?? '';
@@ -117,9 +115,8 @@ class ManageAccountMappings extends Page implements HasForms
             return;
         }
 
-        // Load all mappings for all document types at once
         $documentTypes = array_keys($this->getDocumentTypes());
-        
+
         foreach ($documentTypes as $documentType) {
             $existingMappings = AccountMapping::where('company_id', $companyId)
                 ->where('document_type', $documentType)
@@ -146,7 +143,6 @@ class ManageAccountMappings extends Page implements HasForms
     {
         $allTypes = AccountMapping::DOCUMENT_TYPES;
 
-        // Only show sales and purchase related types for now
         $allowedTypes = [
             'sales_order',
             'delivery_document',
@@ -163,22 +159,20 @@ class ManageAccountMappings extends Page implements HasForms
 
             $types = array_intersect_key($allTypes, array_flip($allowedTypes));
 
-            // Translate to Bahasa Indonesia
             $translations = [
-            'sales_order' => 'Pesanan Penjualan',
-            'delivery_document' => 'Pengiriman Penjualan',
-            'sales_invoice' => 'Faktur Penjualan',
-            'sales_return' => 'Retur Penjualan',
-            'purchase_order' => 'Pesanan Pembelian',
-            'goods_receipt' => 'Penerimaan Barang',
-            'purchase_invoice' => 'Faktur Pembelian',
-            'purchase_return' => 'Retur Pembelian',
-            'receivable_payment' => 'Pembayaran Piutang',
-            'payable_payment' => 'Pembayaran Utang',
-            'payroll' => 'Gaji & Upah (Payroll)',
+            'sales_order' => 'Sales Order',
+            'delivery_document' => 'Sales Delivery',
+            'sales_invoice' => 'Sales Invoice',
+            'sales_return' => 'Sales Return',
+            'purchase_order' => 'Purchase Order',
+            'goods_receipt' => 'Goods Receipt',
+            'purchase_invoice' => 'Purchase Invoice',
+            'purchase_return' => 'Purchase Return',
+            'receivable_payment' => 'Receivable Payment',
+            'payable_payment' => 'Payable Payment',
+            'payroll' => 'Payroll',
             ];
 
-        
         return array_map(fn($key) => $translations[$key] ?? $types[$key], array_combine(array_keys($types), array_keys($types)));
     }
 
@@ -189,35 +183,34 @@ class ManageAccountMappings extends Page implements HasForms
         }
 
         $mappingTypes = AccountMapping::DOCUMENT_MAPPING_TYPES[$this->selectedDocumentType] ?? [];
-        
-        // Translate to Bahasa Indonesia
+
         $translations = [
-            'sales' => 'Pendapatan Penjualan',
-            'accounts_receivable' => 'Piutang Usaha',
-            'discount' => 'Diskon',
-            'tax' => 'Pajak',
-            'other_charges' => 'Biaya Lain',
-            'cogs' => 'Harga Pokok Penjualan',
-            'inventory' => 'Persediaan',
-            'accounts_payable' => 'Hutang Usaha',
-            'purchases' => 'Pembelian/Beban',
-            'sales_return' => 'Retur Penjualan',
-            'purchase_return' => 'Retur Pembelian',
-            'advance_receivable' => 'Uang Muka Penjualan',
-            'advance_payable' => 'Uang Muka Pembelian',
-            'grni' => 'Barang Diterima Belum Difaktur',
-            'cash' => 'Kas',
+            'sales' => 'Sales Revenue',
+            'accounts_receivable' => 'Accounts Receivable',
+            'discount' => 'Discount',
+            'tax' => 'Tax',
+            'other_charges' => 'Other Charges',
+            'cogs' => 'Cost of Goods Sold',
+            'inventory' => 'Inventory',
+            'accounts_payable' => 'Accounts Payable',
+            'purchases' => 'Purchases/Expenses',
+            'sales_return' => 'Sales Return',
+            'purchase_return' => 'Purchase Return',
+            'advance_receivable' => 'Advance Receivable',
+            'advance_payable' => 'Advance Payable',
+            'grni' => 'GRNI (Goods Received Not Invoiced)',
+            'cash' => 'Cash',
             'bank' => 'Bank',
-            'expense' => 'Beban',
-            'gain' => 'Pendapatan Lain',
-            'loss' => 'Beban Lain',
-            'write_off' => 'Penghapusan (Write Off)',
-            'salary_expense' => 'Beban Gaji',
-            'thr_expense' => 'Beban THR',
-            'bpjs_expense' => 'Beban BPJS (Perusahaan)',
-            'salary_payable' => 'Utang Gaji (Bersih)',
-            'pph21_payable' => 'Utang PPh21',
-            'bpjs_payable' => 'Utang BPJS (Total)',
+            'expense' => 'Expense',
+            'gain' => 'Other Income',
+            'loss' => 'Other Expense',
+            'write_off' => 'Write Off',
+            'salary_expense' => 'Salary Expense',
+            'thr_expense' => 'THR Expense',
+            'bpjs_expense' => 'BPJS Expense (Company)',
+            'salary_payable' => 'Salary Payable (Net)',
+            'pph21_payable' => 'PPh21 Payable',
+            'bpjs_payable' => 'BPJS Payable (Total)',
         ];
 
         return array_map(function ($mappingType) use ($translations) {
@@ -274,12 +267,11 @@ class ManageAccountMappings extends Page implements HasForms
             Notification::make()
                 ->danger()
                 ->title('Error')
-                ->body('Silakan pilih perusahaan terlebih dahulu')
+                ->body('Please select a company first.')
                 ->send();
             return;
         }
 
-        // Standard account code mappings
         $accountCodes = [
             'accounts_receivable' => '11000300',
             'sales' => '40000100',
@@ -296,7 +288,6 @@ class ManageAccountMappings extends Page implements HasForms
             'advance_payable' => '11000400',
         ];
 
-        // Load accounts by code
         $accounts = Account::where('company_id', $companyId)
             ->whereIn('code', array_values($accountCodes))
             ->where('is_active', true)
@@ -323,14 +314,14 @@ class ManageAccountMappings extends Page implements HasForms
         if ($mappedCount > 0) {
             Notification::make()
                 ->success()
-                ->title('Berhasil')
-                ->body("Berhasil memetakan {$mappedCount} akun secara otomatis. Klik 'Simpan Semua' untuk menyimpan.")
+                ->title('Success')
+                ->body("Successfully auto-mapped {$mappedCount} accounts. Click 'Save All' to save.")
                 ->send();
         } else {
             Notification::make()
                 ->warning()
-                ->title('Tidak Ada Pemetaan')
-                ->body('Tidak ditemukan akun dengan kode standar untuk dipetakan.')
+                ->title('No Mappings Found')
+                ->body('No accounts with standard codes found to map.')
                 ->send();
         }
     }
@@ -343,7 +334,7 @@ class ManageAccountMappings extends Page implements HasForms
             Notification::make()
                 ->danger()
                 ->title('Error')
-                ->body('Silakan pilih perusahaan terlebih dahulu')
+                ->body('Please select a company first.')
                 ->send();
             return;
         }
@@ -352,8 +343,7 @@ class ManageAccountMappings extends Page implements HasForms
             DB::beginTransaction();
 
             $savedCount = 0;
-            
-            // Save all mappings for all document types
+
             foreach ($this->allMappings as $documentType => $mappings) {
                 foreach ($mappings as $mappingType => $data) {
                     if (empty($data['account_id'])) {
@@ -372,7 +362,7 @@ class ManageAccountMappings extends Page implements HasForms
                             'is_active' => true,
                         ]
                     );
-                    
+
                     $savedCount++;
                 }
             }
@@ -381,11 +371,10 @@ class ManageAccountMappings extends Page implements HasForms
 
             Notification::make()
                 ->success()
-                ->title('Berhasil')
-                ->body("Berhasil menyimpan {$savedCount} pemetaan akun")
+                ->title('Success')
+                ->body("Successfully saved {$savedCount} account mappings.")
                 ->send();
-            
-            // Update original state after successful save
+
             $this->originalMappings = $this->allMappings;
 
         } catch (\Exception $e) {
@@ -394,7 +383,7 @@ class ManageAccountMappings extends Page implements HasForms
             Notification::make()
                 ->danger()
                 ->title('Error')
-                ->body('Gagal menyimpan pemetaan: ' . $e->getMessage())
+                ->body('Failed to save mappings: ' . $e->getMessage())
                 ->send();
         }
     }

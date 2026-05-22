@@ -7,7 +7,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Schemas\Schema;
 
 class EditProduct extends EditRecord
 {
@@ -15,34 +14,10 @@ class EditProduct extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        if (ProductResource::isReadOnly()) {
-            return [];
-        }
-
         return [
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
-    }
-
-    protected function getFormActions(): array
-    {
-        if (ProductResource::isReadOnly()) {
-            return [
-                $this->getCancelFormAction(),
-            ];
-        }
-
-        return [
-            $this->getSaveFormAction(),
-            $this->getCancelFormAction(),
-        ];
-    }
-
-    public function form(Schema $schema): Schema
-    {
-        return parent::form($schema)
-            ->disabled(ProductResource::isReadOnly());
     }
 }

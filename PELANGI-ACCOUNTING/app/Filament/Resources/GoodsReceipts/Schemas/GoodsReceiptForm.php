@@ -90,7 +90,7 @@ class GoodsReceiptForm
                             ->nullable()
                             ->columnSpanFull(),
                         Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'supplier',
@@ -156,7 +156,7 @@ class GoodsReceiptForm
                                 return $contact->id;
                             }),
                         Select::make('purchase_order_id')
-                            ->label('Pesanan Pembelian')
+                            ->label('Purchase Order')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
                                 name: 'purchaseOrder',
@@ -208,7 +208,6 @@ class GoodsReceiptForm
                                             foreach ($purchaseOrder->items as $poItem) {
                                                 $items[] = [
                                                     'product_id' => $poItem->product_id,
-                                                    'item_name' => $poItem->item_name ?? $poItem->product?->name,
                                                     'quantity' => $poItem->quantity,
                                                     'quantity_display' => NumberInput::formatRoundedIntegerDisplay($poItem->quantity),
                                                     'description' => $poItem->description,
@@ -221,13 +220,13 @@ class GoodsReceiptForm
                                 }
                             }),
                         DatePicker::make('date')
-                            ->label('Tanggal')
+                            ->label('Date')
                             ->required()
                             ->default(now()),
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Nomor Referensi'),
-                        (new static)->getCodeField('receipt_number', 'No. Penerimaan Barang')
+                            ->label('Reference No.'),
+                        (new static)->getCodeField('receipt_number', 'Receipt No.')
                             ->unique('goods_receipts', 'receipt_number', ignoreRecord: true,
                                 modifyRuleUsing: fn ($rule) => $rule->where(function ($query) {
                                     $companyId = session('selected_company_id');
@@ -267,11 +266,10 @@ class GoodsReceiptForm
                     ->required()
                     ->addable(fn (callable $get) => !(bool) $get('is_locked'))
                     ->table([
-                        TableColumn::make('Produk')->width('30%')->alignment(Alignment::Start),
-                        TableColumn::make('Nama Barang')->width('20%')->alignment(Alignment::Start),
-                        TableColumn::make('Jumlah')->width('15%')->alignment(Alignment::End),
-                        TableColumn::make('Satuan')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('20%')->alignment(Alignment::Start),
+                        TableColumn::make('Product')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('20%')->alignment(Alignment::End),
+                        TableColumn::make('Unit')->width('15%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('20%')->alignment(Alignment::Start),
                     ])
                     ->schema([
                         Hidden::make('purchase_order_item_id'),
@@ -279,7 +277,7 @@ class GoodsReceiptForm
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->label('Produk')
+                            ->label('Product')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->relationship(
                                 name: 'product',
@@ -301,8 +299,6 @@ class GoodsReceiptForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
                                     }
@@ -313,9 +309,9 @@ class GoodsReceiptForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Kode Produk')
+                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Product Code')
                                     ->unique(
                                         \App\Models\Product::class,
                                         'code',
@@ -329,7 +325,7 @@ class GoodsReceiptForm
                                         },
                                     ),
                                 Select::make('product_group_id')
-                                    ->label('Kelompok Produk')
+                                    ->label('Product Group')
                                     ->relationship(
                                         "productGroup",
                                         "name",
@@ -346,12 +342,12 @@ class GoodsReceiptForm
                                     ->required(),
                                 ...RoundedIntegerMoneyInput::schema(
                                     name: 'cost_price',
-                                    label: 'Harga Beli',
+                                    label: 'Cost Price',
                                     required: false,
                                     defaultDecimal: '0.00',
                                 ),
                                 Select::make('unit_id')
-                                    ->label('Satuan')
+                                    ->label('Unit')
                                     ->searchable()
                                     ->options(function () {
                                         $selectedCompanyId = session('selected_company_id');
@@ -364,7 +360,7 @@ class GoodsReceiptForm
                                         return $q->orderBy('name')->pluck('name', 'id')->toArray();
                                     }),
                                 Textarea::make('description')
-                                    ->label('Deskripsi')
+                                    ->label('Description')
                                     ->rows(2),
                                 Hidden::make('company_id')
                                     ->default(function () {
@@ -380,20 +376,16 @@ class GoodsReceiptForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
-                            label: 'Jumlah',
+                            label: 'Quantity',
                             required: true,
                             defaultDecimal: '1.00',
                         ),
                         Select::make('unit_id')
                             ->searchable()
                             ->preload()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->relationship(
                                 name: 'unit',
                                 titleAttribute: 'name',
@@ -409,7 +401,7 @@ class GoodsReceiptForm
                             )
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->rows(1),
                     ])
                     ->defaultItems(0)

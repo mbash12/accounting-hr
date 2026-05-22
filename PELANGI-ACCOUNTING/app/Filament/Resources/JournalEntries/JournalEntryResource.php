@@ -19,11 +19,11 @@ class JournalEntryResource extends Resource
 {
     protected static ?string $model = JournalEntry::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Buku Besar';
+    protected static UnitEnum|string|null $navigationGroup = 'General Ledger';
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Buku Besar');
+        return __('General Ledger');
     }
 
     public static function getNavigationLabel(): string

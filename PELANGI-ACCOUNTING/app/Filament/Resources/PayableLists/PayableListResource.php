@@ -24,12 +24,12 @@ class PayableListResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Daftar Hutang Usaha');
+        return __('Accounts Payable');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Hutang Usaha');
+        return __('Payable');
     }
 
     public static function getNavigationSort(): int
@@ -39,7 +39,7 @@ class PayableListResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('Daftar Hutang Usaha');
+        return __('Accounts Payable');
     }
 
     public static function table(Table $table): Table

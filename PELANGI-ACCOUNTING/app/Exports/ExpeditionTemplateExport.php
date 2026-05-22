@@ -50,6 +50,6 @@ class ExpeditionTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Ekspedisi';
+        return 'Expedition Import Template';
     }
 }

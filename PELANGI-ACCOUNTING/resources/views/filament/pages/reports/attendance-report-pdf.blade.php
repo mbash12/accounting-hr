@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Kehadiran</title>
+    <title>Attendance Report</title>
     <style>
         body { font-family: sans-serif; font-size: 11px; color: #333; }
         .header { text-align: center; margin-bottom: 20px; }
@@ -19,21 +19,21 @@
         <div class="company-name">{{ $company?->name }}</div>
         <div class="report-title">LAPORAN REKAPITULASI KEHADIRAN</div>
         <div class="report-meta">
-            Bulan: {{ $month_name }} {{ $year }}
-            @if($department) | Departemen: {{ $department->name }} @endif
+            Month: {{ $month_name }} {{ $year }}
+            @if($department) | Department: {{ $department->name }} @endif
         </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Karyawan</th>
-                <th>Departemen</th>
+                <th>Employee</th>
+                <th>Department</th>
                 <th class="num">Hadir</th>
                 <th class="num">Lbt</th>
                 <th class="num">Alpa</th>
-                <th class="num">Izin</th>
-                <th class="num">Cuti</th>
+                <th class="num">Permit</th>
+                <th class="num">Leave</th>
                 <th class="num">Total</th>
             </tr>
         </thead>

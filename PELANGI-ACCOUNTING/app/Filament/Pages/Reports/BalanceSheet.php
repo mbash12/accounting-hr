@@ -29,20 +29,20 @@ class BalanceSheet extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.balance-sheet';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan Keuangan';
+    protected static string|UnitEnum|null $navigationGroup = 'Financial Reports';
 
-    protected static ?string $navigationLabel = 'Neraca';
+    protected static ?string $navigationLabel = 'Balance Sheet';
 
     protected static ?string $title = 'Balance Sheet';
 
     public function getTitle(): string
     {
-        return 'Laporan Neraca';
+        return 'Balance Sheet';
     }
 
     public function getHeading(): string
     {
-        return 'Laporan Neraca';
+        return 'Balance Sheet';
     }
 
     public ?array $data = [];
@@ -59,7 +59,7 @@ class BalanceSheet extends Page implements HasForms
         return $form
             ->schema([
             DatePicker::make('date')
-            ->label('Tanggal')
+            ->label('Date')
             ->required()
             ->default(now())
             ->reactive(false) // Disable reactive behavior
@@ -98,7 +98,7 @@ class BalanceSheet extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Laporan_Neraca_' . now()->format('Y-m-d') . '.pdf');
+        }, 'Balance_Sheet_' . now()->format('Y-m-d') . '.pdf');
     }
 
     protected function getViewData(): array
@@ -213,7 +213,7 @@ class BalanceSheet extends Page implements HasForms
         if ($equityRoot) {
             if ($priorYearNetIncome != 0) {
                 $reAccount = new Account();
-                $reAccount->name = 'Laba Ditahan Sebelumnya (Retained Earnings)';
+                $reAccount->name = 'Prior Retained Earnings';
                 $reAccount->code = '';
                 $reAccount->is_header = false;
                 $reAccount->calculated_balance = $priorYearNetIncome;
@@ -223,7 +223,7 @@ class BalanceSheet extends Page implements HasForms
             }
 
             $netIncomeAccount = new Account();
-            $netIncomeAccount->name = 'Laba Tahun Berjalan (Current Earnings)';
+            $netIncomeAccount->name = 'Current Year Earnings';
             $netIncomeAccount->code = '';
             $netIncomeAccount->is_header = false;
             $netIncomeAccount->calculated_balance = $currentYearNetIncome;

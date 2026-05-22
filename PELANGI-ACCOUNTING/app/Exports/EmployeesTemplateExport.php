@@ -77,6 +77,6 @@ class EmployeesTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Karyawan';
+        return 'Employees Import Template';
     }
 }

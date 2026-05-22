@@ -12,19 +12,19 @@ class ExportPurchaseInvoiceWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
                     return Excel::download(
                         new PurchaseInvoiceWithItemsExport(),
-                        'faktur-pembelian-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'purchase-invoice-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data faktur pembelian dan item: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting purchase invoice with items: ' . $e->getMessage())
                         ->send();
                 }
             });

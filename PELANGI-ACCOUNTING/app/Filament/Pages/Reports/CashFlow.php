@@ -24,20 +24,20 @@ class CashFlow extends Page implements HasForms
 
     protected string $view = 'filament.pages.reports.cash-flow';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Laporan Keuangan';
+    protected static string|UnitEnum|null $navigationGroup = 'Financial Reports';
 
-    protected static ?string $navigationLabel = 'Arus Kas';
+    protected static ?string $navigationLabel = 'Cash Flow';
 
-    protected static ?string $title = 'Laporan Arus Kas';
+    protected static ?string $title = 'Cash Flow Statement';
 
     public function getTitle(): string
     {
-        return 'Laporan Arus Kas';
+        return 'Cash Flow Statement';
     }
 
     public function getHeading(): string
     {
-        return 'Laporan Arus Kas';
+        return 'Cash Flow Statement';
     }
 
     public ?array $data = [];
@@ -55,12 +55,12 @@ class CashFlow extends Page implements HasForms
         return $form
             ->schema([
             DatePicker::make('start_date')
-            ->label('Dari Tanggal')
+            ->label('From Date')
             ->required()
             ->default(now()->startOfMonth()),
 
             DatePicker::make('end_date')
-            ->label('Sampai Tanggal')
+            ->label('To Date')
             ->required()
             ->default(now()),
         ])
@@ -85,7 +85,7 @@ class CashFlow extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Laporan_Arus_Kas_' . now()->format('Ymd') . '.pdf');
+        }, 'Cash_Flow_' . now()->format('Ymd') . '.pdf');
     }
 
     public function getReportData(): array
@@ -96,7 +96,7 @@ class CashFlow extends Page implements HasForms
 
         if (!$companyId || $companyId === 'all') {
             return [
-                'error' => 'Silakan pilih perusahaan tertentu.',
+                'error' => 'Please select a specific company.',
                 'company' => null,
             ];
         }

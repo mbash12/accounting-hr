@@ -29,14 +29,14 @@ class HolidaysExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Nama Hari Libur',
-            'Tanggal',
-            'Cuti Bersama',
+            'Holiday Name',
+            'Date',
+            'Joint Leave',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Hari Libur';
+        return 'Holidays Data';
     }
 }

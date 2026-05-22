@@ -41,8 +41,6 @@ class SalesOrderItem extends Model
         'invoiced_quantity',
         'sales_order_id',
         'product_id',
-        'item_name',
-        'is_production',
         'unit_id',
         'tax_id',
     ];
@@ -68,7 +66,6 @@ class SalesOrderItem extends Model
             'product_id' => 'integer',
             'unit_id' => 'integer',
             'tax_id' => 'integer',
-            'is_production' => 'boolean',
         ];
     }
 

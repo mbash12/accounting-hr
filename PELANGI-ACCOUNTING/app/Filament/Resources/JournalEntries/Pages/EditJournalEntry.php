@@ -31,22 +31,22 @@ class EditJournalEntry extends EditRecord
     {
         return [
             Action::make('save')
-                ->label(__('Simpan'))
+                ->label(__('Save'))
                 ->action(function (array $data) {
                     $this->reason = $data['reason'] ?? null;
                     $this->save();
                 })
-                ->modalHeading(__('Alasan Ubah'))
+                ->modalHeading(__('Change Reason'))
                 ->modalWidth('md')
                 ->form([
                     TextInput::make('reason')
-                        ->label(__('Alasan'))
+                        ->label(__('Reason'))
                         ->required()
-                        ->placeholder(__('Alasan diisi minimal 5 karakter'))
+                        ->placeholder(__('Reason must be at least 5 characters'))
                         ->minLength(5),
                 ])
-                ->modalSubmitActionLabel(__('Proses'))
-                ->modalCancelActionLabel(__('Batal'))
+                ->modalSubmitActionLabel(__('Submit'))
+                ->modalCancelActionLabel(__('Cancel'))
                 ->keyBindings(['mod+s'])
                 ->visible(function () {
                     $items = $this->data['items'] ?? [];
@@ -88,11 +88,11 @@ class EditJournalEntry extends EditRecord
             $credit = NumberInput::parseToFloat($itemArray['credit'] ?? $itemArray['credit_display'] ?? 0);
             
             if ($debit <= 0 && $credit <= 0) {
-                $this->NotificationHalt(__('Item :index harus memiliki nilai debit atau kredit.', ['index' => $index + 1]));
+                $this->NotificationHalt(__('Item :index must have a debit or credit value.', ['index' => $index + 1]));
             }
             
             if ($debit > 0 && $credit > 0) {
-                $this->NotificationHalt(__('Item :index tidak boleh memiliki nilai debit dan kredit sekaligus.', ['index' => $index + 1]));
+                $this->NotificationHalt(__('Item :index cannot have both debit and credit values.', ['index' => $index + 1]));
             }
             
             if (empty($item['cost_center_id'])) {

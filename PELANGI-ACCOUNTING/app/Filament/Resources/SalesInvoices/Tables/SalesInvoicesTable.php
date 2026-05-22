@@ -25,26 +25,26 @@ class SalesInvoicesTable
         return $table
             ->columns([
                 TextColumn::make("invoice_number")
-                    ->label(__("No. Faktur"))
+                    ->label(__("Invoice No."))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("date")
-                    ->label(__("Tanggal Faktur"))
+                    ->label(__("Invoice Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("customer.name")
-                    ->label(__("Pelanggan"))
+                    ->label(__("Customer"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("paymentTerm.name")
-                    ->label(__("Termin"))
+                    ->label(__("Payment Term"))
                     ->searchable()
                     ->sortable()
                     ->toggleable()
                     ->placeholder('-'),
                 TextColumn::make("due_date")
-                    ->label(__("Jatuh Tempo"))
+                    ->label(__("Due Date"))
                     ->date()
                     ->sortable()
                     ->toggleable()
@@ -74,34 +74,26 @@ class SalesInvoicesTable
                         },
                     ),
                 TextColumn::make("salesOrder.order_number")
-                    ->label(__("No. Pesanan Penjualan"))
+                    ->label(__("Sales Order No."))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make("salesOrder.client_po_number")
-                    ->label(__("No. PO Pelanggan"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("salesOrder.jb_job_number")
-                    ->label(__("No. Job JB"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("job.title")
-                    ->label(__("Proyek"))
+                    ->label(__("Project"))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -119,9 +111,9 @@ class SalesInvoicesTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -137,17 +129,17 @@ class SalesInvoicesTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('customer')
                     ->form([
                         \Filament\Forms\Components\Select::make('customer_id')
-                            ->label('Pelanggan')
+                            ->label('Customer')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_customer', true);
@@ -189,12 +181,12 @@ class SalesInvoicesTable
                             return null;
                         }
                         $customer = \App\Models\Contact::find($data['customer_id']);
-                        return 'Pelanggan: ' . ($customer?->name ?? $data['customer_id']);
+                        return 'Customer: ' . ($customer?->name ?? $data['customer_id']);
                     }),
                 Filter::make('sales_order')
                     ->form([
                         \Filament\Forms\Components\Select::make('sales_order_id')
-                            ->label('No. Pesanan Penjualan')
+                            ->label('Sales Order No.')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\SalesOrder::query();
@@ -265,7 +257,7 @@ class SalesInvoicesTable
                 ExportSalesInvoiceWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([

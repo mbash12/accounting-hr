@@ -29,39 +29,39 @@ class DepartmentForm
     {
         return $schema
             ->components([
-                Section::make(__('Informasi Departemen'))
+                Section::make(__('Department Information'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
-                            ->label(__('Nama Departemen')),
-                        (new static)->getCodeField('code', __('Kode Departemen'))
+                            ->label(__('Department Name')),
+                        (new static)->getCodeField('code', __('Department Code'))
                             ->rule('required'),
                         Toggle::make('is_active')
                             ->required()
-                            ->label(__('Aktif'))
+                            ->label(__('Active'))
                             ->default(true),
                     ])
                     ->columns(2),
-                Section::make(__('Jadwal Kerja'))
+                Section::make(__('Work Schedule'))
                     ->schema([
                         TimePicker::make('work_start_time')
-                            ->label(__('Jam Masuk'))
+                            ->label(__('Start Time'))
                             ->default('08:00:00')
                             ->required(),
                         TimePicker::make('work_end_time')
-                            ->label(__('Jam Pulang'))
+                            ->label(__('End Time'))
                             ->default('17:00:00')
                             ->required(),
                         CheckboxList::make('working_days')
-                            ->label(__('Hari Kerja'))
+                            ->label(__('Working Days'))
                             ->options([
-                                'Monday' => __('Senin'),
-                                'Tuesday' => __('Selasa'),
-                                'Wednesday' => __('Rabu'),
-                                'Thursday' => __('Kamis'),
-                                'Friday' => __('Jumat'),
-                                'Saturday' => __('Sabtu'),
-                                'Sunday' => __('Minggu'),
+                                'Monday' => __('Monday'),
+                                'Tuesday' => __('Tuesday'),
+                                'Wednesday' => __('Wednesday'),
+                                'Thursday' => __('Thursday'),
+                                'Friday' => __('Friday'),
+                                'Saturday' => __('Saturday'),
+                                'Sunday' => __('Sunday'),
                             ])
                             ->columns(3)
                             ->default(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
@@ -69,7 +69,7 @@ class DepartmentForm
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Section::make(__('Sistem'))
+                Section::make(__('System'))
                     ->collapsible()
                     ->schema([
                         Select::make('company_id')
@@ -78,11 +78,11 @@ class DepartmentForm
                                 titleAttribute: 'name'
                             )
                             ->disabled()
-                            ->label(__('Perusahaan')),
+                            ->label(__('Company')),
                         Select::make('created_by_user_id')
                             ->relationship('createdByUser', 'name')
                             ->disabled()
-                            ->label(__('Dibuat Oleh')),
+                            ->label(__('Created By')),
                     ])
                     ->columns(2)
                     ->hidden(),

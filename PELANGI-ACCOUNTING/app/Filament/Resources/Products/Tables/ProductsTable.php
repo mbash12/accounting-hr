@@ -30,11 +30,11 @@ class ProductsTable
                 TextColumn::make("code")
                     ->searchable()
                     ->copyable()
-                    ->label(__("Kode Produk")),
+                    ->label(__("Product Code")),
                 TextColumn::make("productGroup.name")
-                    ->label(__("Kelompok"))
+                    ->label(__("Group"))
                     ->searchable(),
-                TextColumn::make("unit.name")->label(__("Satuan"))->searchable(),
+                TextColumn::make("unit.name")->label(__("Unit"))->searchable(),
                 TextColumn::make("selling_price")
                     ->money("IDR")
                     ->sortable()
@@ -70,17 +70,8 @@ class ProductsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("supplier.name")
-                    ->label(__("Pemasok"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("min_order_qty")
-                    ->label(__("Jumlah Min Pesanan"))
-                    ->numeric()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("product_type")
-                    ->label(__("Jenis Produk"))
+                    ->label(__("Product Type"))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'good' => 'success',
@@ -91,20 +82,16 @@ class ProductsTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    EditAction::make()
-                        ->visible(fn (): bool => !\App\Filament\Resources\Products\ProductResource::isReadOnly()),
-                    DeleteAction::make()
-                        ->visible(fn (): bool => !\App\Filament\Resources\Products\ProductResource::isReadOnly()),
+                    EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ])
             ->toolbarActions([
-                ImportProductsAction::make()
-                    ->visible(fn (): bool => !\App\Filament\Resources\Products\ProductResource::isReadOnly()),
+                ImportProductsAction::make(),
                 ExportProductsAction::make(),
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()
-                        ->visible(fn (): bool => !\App\Filament\Resources\Products\ProductResource::isReadOnly()),
-                ])->visible(fn (): bool => !\App\Filament\Resources\Products\ProductResource::isReadOnly()),
+                    DeleteBulkAction::make(),
+                ]),
             ]);
     }
 }

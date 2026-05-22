@@ -24,7 +24,6 @@ class PurchaseReturnItem extends Model
         'purchase_return_id',
         'goods_receipt_item_id',
         'product_id',
-        'item_name',
         'unit_id',
     ];
 
@@ -52,7 +51,7 @@ class PurchaseReturnItem extends Model
         static::creating(function ($model) {
             if ($model->purchaseReturn && $model->purchaseReturn->is_locked) {
                 throw ValidationException::withMessages([
-                    'items' => 'Tidak dapat menambah item baru pada retur yang terkunci.',
+                    'items' => 'Cannot add new item to a locked return.',
                 ]);
             }
         });
@@ -68,7 +67,7 @@ class PurchaseReturnItem extends Model
                 $newQty = (float) ($model->quantity ?? 0);
                 if ($newQty > $originalQty) {
                     throw ValidationException::withMessages([
-                        'items' => 'Kuantitas tidak boleh ditambah pada retur yang terkunci.',
+                        'items' => 'Quantity cannot be increased on a locked return.',
                     ]);
                 }
             }
@@ -87,7 +86,7 @@ class PurchaseReturnItem extends Model
                     
                     if (($totalReturned + $model->quantity) > $receiptItem->quantity) {
                         throw ValidationException::withMessages([
-                            'quantity' => 'Total kuantitas retur tidak boleh melebihi kuantitas penerimaan.',
+                            'quantity' => 'Total return quantity cannot exceed receipt quantity.',
                         ]);
                     }
                 }

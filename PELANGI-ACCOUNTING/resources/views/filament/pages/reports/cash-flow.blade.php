@@ -158,10 +158,10 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="filterReport" color="primary" icon="heroicon-m-funnel">
-                Terapkan Filter
+                Apply Filter
             </x-filament::button>
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                Unduh PDF
+                Download PDF
             </x-filament::button>
         </div>
     </div>
@@ -180,14 +180,14 @@
                 </path>
             </svg>
         </div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Pilih Perusahaan</h3>
-        <p>{{ $reportData['error'] ?? 'Silakan pilih perusahaan tertentu.' }}</p>
+        <h3 style="font-size: 1.5rem; font-weight: 600; color: #1f2937; margin: 0 0 0.5rem 0;">Select Company</h3>
+        <p>{{ $reportData['error'] ?? 'Please select a specific company.' }}</p>
     </div>
     @else
     <div class="report-page">
         <div class="report-header">
             <h2 class="report-company-name">{{ $reportData['company']->name }}</h2>
-            <h1 class="report-title">Laporan Arus Kas (Metode Tidak Langsung)</h1>
+            <h1 class="report-title">Cash Flow Statement (Indirect Method)</h1>
             <p class="report-date">Period {{ \Carbon\Carbon::parse($reportData['start_date'])->isoFormat('MMMM YYYY') }}
                 to {{ \Carbon\Carbon::parse($reportData['end_date'])->isoFormat('MMMM YYYY') }}</p>
         </div>
@@ -196,7 +196,7 @@
             <thead>
                 <tr>
                     <th>Description</th>
-                    <th class="right" style="width: 250px;">Saldo</th>
+                    <th class="right" style="width: 250px;">Balance</th>
                 </tr>
             </thead>
             <tbody>
@@ -204,13 +204,13 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Arus Kas dari Aktivitas Operasi</td>
+                        Cash Flow from Operating Activities</td>
                 </tr>
                 @foreach($reportData['plTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Laba(Rugi) Bersih Operasi</td>
+                    <td style="font-weight: bold; color: #1f2937;">Net Operating Profit (Loss)</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @if($reportData['plTotal'] < 0) - {{ number_format(abs($reportData['plTotal']), 0, ',' , '.' )
                             }} @else {{ number_format($reportData['plTotal'], 0, ',' , '.' ) }} @endif </td>
@@ -221,13 +221,13 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Penyesuaian Non-Kas (Penyusutan & Amortisasi)</td>
+                        Non-Cash Adjustments (Depreciation & Amortization)</td>
                 </tr>
                 @foreach($reportData['nonCashTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 1px solid #9ca3af; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Jumlah Penyesuaian Non-Kas</td>
+                    <td style="font-weight: bold; color: #1f2937;">Total Non-Cash Adjustments</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @if($reportData['nonCashTotal'] < 0) - {{ number_format(abs($reportData['nonCashTotal']), 0, ','
                             , '.' ) }} @else {{ number_format($reportData['nonCashTotal'], 0, ',' , '.' ) }} @endif
@@ -236,7 +236,7 @@
                 @endif
 
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Laba(Rugi) Operasi sebelum perubahan Modal Kerja</td>
+                    <td style="font-weight: bold; color: #1f2937;">Operating Profit (Loss) Before Working Capital Changes</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @php $adjPlTotal = $reportData['plTotal'] + $reportData['nonCashTotal']; @endphp
                         @if($adjPlTotal < 0) - {{ number_format(abs($adjPlTotal), 0, ',' , '.' ) }} @else {{
@@ -247,13 +247,13 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Berkurang(Bertambah) pada Operasi Aktiva</td>
+                        Decrease (Increase) in Operating Assets</td>
                 </tr>
                 @foreach($reportData['opAssetsTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Jumlah Berkurang(Bertambah) pada Operasi Aktiva</td>
+                    <td style="font-weight: bold; color: #1f2937;">Total Decrease (Increase) in Operating Assets</td>
                     <td class="num" style="font-weight: bold; color: #1f2937;">
                         @if($reportData['opAssetsTotal'] < 0) - {{ number_format(abs($reportData['opAssetsTotal']),
                             0, ',' , '.' ) }} @else {{ number_format($reportData['opAssetsTotal'], 0, ',' , '.' ) }}
@@ -264,13 +264,13 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Bertambah (berkurang) pada Operasi Kewajiban</td>
+                        Increase (Decrease) in Operating Liabilities</td>
                 </tr>
                 @foreach($reportData['opLiabTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #1f2937;">Jumlah Bertambah (berkurang) pada Operasi Kewajiban
+                    <td style="font-weight: bold; color: #1f2937;">Total Increase (Decrease) in Operating Liabilities
                     </td>
                     <td class="num"
                         style="font-weight: bold; color: {{ $reportData['opLiabTotal'] < 0 ? '#dc2626' : '#1f2937' }};">
@@ -280,8 +280,7 @@
 
                 <!-- Net Operating Cash Flow -->
                 <tr style="border-top: 2px solid #1e3a8a; background-color: #eff6ff !important;">
-                    <td style="font-weight: bold; color: #1e3a8a;">Kas bersih (dipakai)/dihasilkan oleh Aktivitas
-                        Operasi</td>
+                    <td style="font-weight: bold; color: #1e3a8a;">Net cash (used)/generated by Operating Activities</td>
                     <td class="num" style="font-weight: bold; color: #1e3a8a;">
                         @if($reportData['operatingTotal'] < 0) - {{ number_format(abs($reportData['operatingTotal']),
                             0, ',' , '.' ) }} @else {{ number_format($reportData['operatingTotal'], 0, ',' , '.' ) }}
@@ -292,14 +291,13 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Arus Kas dari Aktivitas Investasi</td>
+                        Cash Flow from Investing Activities</td>
                 </tr>
                 @foreach($reportData['invTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1e3a8a; background-color: #eff6ff !important;">
-                    <td style="font-weight: bold; color: #1e3a8a;">Kas bersih yg dihasilkan / (dipakai) oleh Aktivitas
-                        Investasi</td>
+                    <td style="font-weight: bold; color: #1e3a8a;">Net cash generated / (used) by Investing Activities</td>
                     <td class="num" style="font-weight: bold; color: #1e3a8a;">
                         @if($reportData['invTotal'] < 0) - {{ number_format(abs($reportData['invTotal']), 0, ',' , '.' )
                             }} @else {{ number_format($reportData['invTotal'], 0, ',' , '.' ) }} @endif </td>
@@ -309,14 +307,13 @@
                 <tr>
                     <td colspan="2"
                         style="font-weight: bold; color: #1e3a8a; padding-top: 1.5rem; background-color: #f9fafb; text-transform: uppercase;">
-                        Arus Kas dari Aktivitas Pendanaan</td>
+                        Cash Flow from Financing Activities</td>
                 </tr>
                 @foreach($reportData['finTree'] as $node)
                 @include('filament.pages.reports.partials.cash-flow-row', ['account' => $node, 'level' => 0])
                 @endforeach
                 <tr style="border-top: 2px solid #1e3a8a; background-color: #eff6ff !important;">
-                    <td style="font-weight: bold; color: #1e3a8a;">Kas bersih yg dihasilkan dari / (dipakai) oleh
-                        Aktivitas Pendanaan</td>
+                    <td style="font-weight: bold; color: #1e3a8a;">Net cash generated from / (used) by Financing Activities</td>
                     <td class="num" style="font-weight: bold; color: #1e3a8a;">
                         @if($reportData['finTotal'] < 0) - {{ number_format(abs($reportData['finTotal']), 0, ',' , '.' )
                             }} @else {{ number_format($reportData['finTotal'], 0, ',' , '.' ) }} @endif </td>
@@ -328,22 +325,20 @@
 
                 <!-- Final Totals -->
                 <tr style="border-top: 2px solid #1f2937; background-color: white;">
-                    <td style="font-weight: bold; color: #000; text-transform: uppercase;">Kas bersih dihasilkan oleh /
-                        (dipakai) di Periode ini</td>
+                    <td style="font-weight: bold; color: #000; text-transform: uppercase;">Net Cash Generated / (Used) in This Period</td>
                     <td class="num" style="font-weight: bold; color: #000;">
                         @if($reportData['netCashFlow'] < 0) - {{ number_format(abs($reportData['netCashFlow']), 0, ','
                             , '.' ) }} @else {{ number_format($reportData['netCashFlow'], 0, ',' , '.' ) }} @endif </td>
                 </tr>
                 <tr style="background-color: white;">
-                    <td style="font-weight: bold; color: #374151;">Kas & Setara Kas pada Awal Periode</td>
+                    <td style="font-weight: bold; color: #374151;">Cash & Cash Equivalents at Beginning of Period</td>
                     <td class="num" style="font-weight: bold; color: #374151;">
                         @if($reportData['beginningCash'] < 0) - {{ number_format(abs($reportData['beginningCash']),
                             0, ',' , '.' ) }} @else {{ number_format($reportData['beginningCash'], 0, ',' , '.' ) }}
                             @endif </td>
                 </tr>
                 <tr style="border-top: 2px solid #1e3a8a; background-color: #eff6ff !important;">
-                    <td style="font-weight: bold; color: #1e3a8a; text-transform: uppercase;">Kas & Setara Kas pada
-                        Akhir Periode</td>
+                    <td style="font-weight: bold; color: #1e3a8a; text-transform: uppercase;">Cash & Cash Equivalents at End of Period</td>
                     <td class="num" style="font-weight: bold; color: #1e3a8a;">
                         @if($reportData['endingCash'] < 0) - {{ number_format(abs($reportData['endingCash']), 0, ','
                             , '.' ) }} @else {{ number_format($reportData['endingCash'], 0, ',' , '.' ) }} @endif </td>

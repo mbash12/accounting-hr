@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ config('app.locale') }}">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Buku Besar</title>
+    <title>General Ledger Report</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,10 +58,9 @@
 <body>
     <div class="header text-center">
         <h1>{{ $company->name }}</h1>
-        <h2>Laporan Buku Besar</h2>
+        <h2>General Ledger Report</h2>
         <p>
-            Periode: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} 
-            s/d {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
+            Period: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} to {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
         </p>
     </div>
 
@@ -79,20 +78,20 @@
     @endphp
 
     <div style="margin-top: {{ $index > 0 ? '30px' : '0' }}; margin-bottom: 10px; font-weight: bold; border-top: {{ $index > 0 ? '1px solid #000' : 'none' }}; padding-top: {{ $index > 0 ? '10px' : '0' }};">
-        Akun: {{ $account->code }} - {{ $account->name }}
+        Account: {{ $account->code }} - {{ $account->name }}
     </div>
 
     <table>
         <thead>
             <tr>
-                <th class="text-left">Tanggal</th>
-                <th class="text-left">No. Sumber</th>
-                <th class="text-left">No. Cek</th>
-                <th class="text-left">Keterangan</th>
-                <th class="text-right">Pemasukan (Dr)</th>
-                <th class="text-right">Pengeluaran (Cr)</th>
-                <th class="text-right">Saldo</th>
-                <th class="text-center">Terekonsiliasi</th>
+                <th class="text-left">Date</th>
+                <th class="text-left">Source No.</th>
+                <th class="text-left">Check No.</th>
+                <th class="text-left">Description</th>
+                <th class="text-right">Receipt (Dr)</th>
+                <th class="text-right">Payment (Cr)</th>
+                <th class="text-right">Balance</th>
+                <th class="text-center">Reconciled</th>
             </tr>
         </thead>
         <tbody>
@@ -121,7 +120,7 @@
             @empty
             <tr>
                 <td colspan="8" class="text-center" style="padding: 20px;">
-                    Tidak ada transaksi untuk periode ini.
+                    No transactions for this period.
                 </td>
             </tr>
             @endforelse

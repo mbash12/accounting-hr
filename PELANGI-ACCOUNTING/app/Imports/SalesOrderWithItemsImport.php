@@ -19,50 +19,49 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
     public function collection(Collection $rows)
     {
         $companyId = session('selected_company_id') && session('selected_company_id') !== 'all' ? session('selected_company_id') : null;
-        
+
         // Group rows by order number to process orders and their items together
         $ordersData = [];
-        
+
         foreach ($rows as $row) {
-            $orderNumber = (string) $row['nomor_pesanan'];
-            
+            $orderNumber = (string) $row['order_no'];
+
             if (!isset($ordersData[$orderNumber])) {
                 // Create the order data
                 $customerId = null;
-                if (!empty($row['kode_customer'])) {
-                    $customer = Contact::where('contact_code', (string) $row['kode_customer'])
+                if (!empty($row['customer_code'])) {
+                    $customer = Contact::where('contact_code', (string) $row['customer_code'])
                         ->where('company_id', $companyId)
                         ->where('is_customer', true)
                         ->first();
                     if (!$customer) {
-                        throw new \Exception("Customer with code '{$row['kode_customer']}' not found or is not marked as customer in current company");
+                        throw new \Exception("Customer with code '{$row['customer_code']}' not found or is not marked as customer in current company");
                     }
                     $customerId = $customer->id;
-                } elseif (!empty($row['nama_customer'])) {
-                    $customer = Contact::where('name', (string) $row['nama_customer'])
+                } elseif (!empty($row['customer_name'])) {
+                    $customer = Contact::where('name', (string) $row['customer_name'])
                         ->where('company_id', $companyId)
                         ->where('is_customer', true)
                         ->first();
                     if (!$customer) {
-                        throw new \Exception("Customer with name '{$row['nama_customer']}' not found or is not marked as customer in current company");
+                        throw new \Exception("Customer with name '{$row['customer_name']}' not found or is not marked as customer in current company");
                     }
                     $customerId = $customer->id;
                 } else {
-                    throw new \Exception("Either Kode Customer or Nama Customer is required for order {$orderNumber}");
+                    throw new \Exception("Either Customer Code or Customer Name is required for order {$orderNumber}");
                 }
-                
+
                 $ordersData[$orderNumber] = [
                     'order_data' => [
                         'order_number' => $orderNumber,
-                        'order_type' => $this->mapOrderType(isset($row['tipe_pesanan']) ? (string) $row['tipe_pesanan'] : 'standar'),
-                        'date' => isset($row['tanggal']) ? $this->parseDate($row['tanggal']) : now()->format('Y-m-d'),
-                        'reference_no' => isset($row['referensi']) ? (string) $row['referensi'] : null,
-                        'description' => isset($row['deskripsi']) ? (string) $row['deskripsi'] : null,
-                        'discount_percentage' => isset($row['diskon_persen']) ? (float) $row['diskon_persen'] : 0,
-                        'other_charges' => isset($row['biaya_lainnya']) ? (float) $row['biaya_lainnya'] : 0,
-                        'discount' => isset($row['diskon']) ? (float) $row['diskon'] : 0,
+                        'date' => isset($row['date']) ? $this->parseDate($row['date']) : now()->format('Y-m-d'),
+                        'reference_no' => isset($row['reference']) ? (string) $row['reference'] : null,
+                        'description' => isset($row['order_description']) ? (string) $row['order_description'] : null,
+                        'discount_percentage' => isset($row['discount_pct']) ? (float) $row['discount_pct'] : 0,
+                        'other_charges' => isset($row['other_charges']) ? (float) $row['other_charges'] : 0,
+                        'discount' => isset($row['discount']) ? (float) $row['discount'] : 0,
                         'subtotal' => isset($row['subtotal']) ? (float) $row['subtotal'] : 0,
-                        'tax_amount' => isset($row['pajak']) ? (float) $row['pajak'] : 0,
+                        'tax_amount' => isset($row['tax']) ? (float) $row['tax'] : 0,
                         'total_amount' => isset($row['total']) ? (float) $row['total'] : 0,
                         'status' => isset($row['status']) ? (string) $row['status'] : 'draft',
                         'customer_id' => $customerId,
@@ -72,66 +71,66 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
                     'items' => []
                 ];
             }
-            
+
             // Process the item for this order
             $productId = null;
-            if (!empty($row['kode_produk'])) {
-                $product = Product::where('code', (string) $row['kode_produk'])
+            if (!empty($row['product_code'])) {
+                $product = Product::where('code', (string) $row['product_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$product) {
-                    throw new \Exception("Product with code '{$row['kode_produk']}' not found in current company for order {$orderNumber}");
+                    throw new \Exception("Product with code '{$row['product_code']}' not found in current company for order {$orderNumber}");
                 }
                 $productId = $product->id;
-            } elseif (!empty($row['nama_produk'])) {
-                $product = Product::where('name', (string) $row['nama_produk'])
+            } elseif (!empty($row['product_name'])) {
+                $product = Product::where('name', (string) $row['product_name'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$product) {
-                    throw new \Exception("Product with name '{$row['nama_produk']}' not found in current company for order {$orderNumber}");
+                    throw new \Exception("Product with name '{$row['product_name']}' not found in current company for order {$orderNumber}");
                 }
                 $productId = $product->id;
             } else {
-                throw new \Exception("Either Kode Produk or Nama Produk is required for order {$orderNumber}");
+                throw new \Exception("Either Product Code or Product Name is required for order {$orderNumber}");
             }
 
             $unitId = null;
-            if (!empty($row['kode_satuan'])) {
-                $unit = Unit::where('code', (string) $row['kode_satuan'])
+            if (!empty($row['unit_code'])) {
+                $unit = Unit::where('code', (string) $row['unit_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$unit) {
-                    throw new \Exception("Unit with code '{$row['kode_satuan']}' not found in current company for order {$orderNumber}");
+                    throw new \Exception("Unit with code '{$row['unit_code']}' not found in current company for order {$orderNumber}");
                 }
                 $unitId = $unit->id;
             }
 
             $taxId = null;
-            if (!empty($row['kode_pajak'])) {
-                $tax = Tax::where('code', (string) $row['kode_pajak'])
+            if (!empty($row['tax_code'])) {
+                $tax = Tax::where('code', (string) $row['tax_code'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$tax) {
-                    throw new \Exception("Tax with code '{$row['kode_pajak']}' not found in current company for order {$orderNumber}");
+                    throw new \Exception("Tax with code '{$row['tax_code']}' not found in current company for order {$orderNumber}");
                 }
                 $taxId = $tax->id;
             }
-            
+
             $ordersData[$orderNumber]['items'][] = [
-                'description' => isset($row['deskripsi_item']) ? (string) $row['deskripsi_item'] : null,
-                'quantity' => isset($row['jumlah']) ? (float) $row['jumlah'] : 0,
-                'unit_price' => isset($row['harga_satuan']) ? (float) $row['harga_satuan'] : 0,
-                'total' => isset($row['total_item']) ? (float) $row['total_item'] : 0,
-                'discount' => isset($row['diskon_item']) ? (float) $row['diskon_item'] : 0,
-                'discount_percentage' => isset($row['diskon_persen_item']) ? (float) $row['diskon_persen_item'] : 0,
-                'tax_amount' => isset($row['pajak_item']) ? (float) $row['pajak_item'] : 0,
+                'description' => isset($row['item_description']) ? (string) $row['item_description'] : null,
+                'quantity' => isset($row['quantity']) ? (float) $row['quantity'] : 0,
+                'unit_price' => isset($row['unit_price']) ? (float) $row['unit_price'] : 0,
+                'total' => isset($row['item_total']) ? (float) $row['item_total'] : 0,
+                'discount' => isset($row['item_discount']) ? (float) $row['item_discount'] : 0,
+                'discount_percentage' => isset($row['item_discount_pct']) ? (float) $row['item_discount_pct'] : 0,
+                'tax_amount' => isset($row['item_tax']) ? (float) $row['item_tax'] : 0,
                 'product_id' => $productId,
                 'unit_id' => $unitId,
                 'tax_id' => $taxId,
                 'created_by_user_id' => Auth::id(),
             ];
         }
-        
+
         // Process each order and its items
         foreach ($ordersData as $orderNumber => $orderData) {
             $salesOrder = SalesOrder::where('order_number', $orderNumber)
@@ -193,31 +192,30 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
     public function prepareForValidation($data, $index)
     {
         return [
-            'nomor_pesanan' => isset($data['nomor_pesanan']) ? (string) $data['nomor_pesanan'] : null,
-            'tanggal' => isset($data['tanggal']) ? (string) $data['tanggal'] : null,
-            'tipe_pesanan' => isset($data['tipe_pesanan']) ? (string) $data['tipe_pesanan'] : null,
-            'referensi' => isset($data['referensi']) ? (string) $data['referensi'] : null,
-            'deskripsi' => isset($data['deskripsi']) ? (string) $data['deskripsi'] : null,
-            'diskon_persen' => isset($data['diskon_persen']) ? (string) $data['diskon_persen'] : null,
-            'biaya_lainnya' => isset($data['biaya_lainnya']) ? (string) $data['biaya_lainnya'] : null,
-            'diskon' => isset($data['diskon']) ? (string) $data['diskon'] : null,
+            'order_no' => isset($data['order_no']) ? (string) $data['order_no'] : null,
+            'date' => isset($data['date']) ? (string) $data['date'] : null,
+            'reference' => isset($data['reference']) ? (string) $data['reference'] : null,
+            'order_description' => isset($data['order_description']) ? (string) $data['order_description'] : null,
+            'discount_pct' => isset($data['discount_pct']) ? (string) $data['discount_pct'] : null,
+            'other_charges' => isset($data['other_charges']) ? (string) $data['other_charges'] : null,
+            'discount' => isset($data['discount']) ? (string) $data['discount'] : null,
             'subtotal' => isset($data['subtotal']) ? (string) $data['subtotal'] : null,
-            'pajak' => isset($data['pajak']) ? (string) $data['pajak'] : null,
+            'tax' => isset($data['tax']) ? (string) $data['tax'] : null,
             'total' => isset($data['total']) ? (string) $data['total'] : null,
             'status' => isset($data['status']) ? (string) $data['status'] : null,
-            'kode_customer' => isset($data['kode_customer']) ? (string) $data['kode_customer'] : null,
-            'nama_customer' => isset($data['nama_customer']) ? (string) $data['nama_customer'] : null,
-            'kode_produk' => isset($data['kode_produk']) ? (string) $data['kode_produk'] : null,
-            'nama_produk' => isset($data['nama_produk']) ? (string) $data['nama_produk'] : null,
-            'deskripsi_item' => isset($data['deskripsi_item']) ? (string) $data['deskripsi_item'] : null,
-            'jumlah' => isset($data['jumlah']) ? (string) $data['jumlah'] : null,
-            'harga_satuan' => isset($data['harga_satuan']) ? (string) $data['harga_satuan'] : null,
-            'total_item' => isset($data['total_item']) ? (string) $data['total_item'] : null,
-            'diskon_item' => isset($data['diskon_item']) ? (string) $data['diskon_item'] : null,
-            'diskon_persen_item' => isset($data['diskon_persen_item']) ? (string) $data['diskon_persen_item'] : null,
-            'pajak_item' => isset($data['pajak_item']) ? (string) $data['pajak_item'] : null,
-            'kode_satuan' => isset($data['kode_satuan']) ? (string) $data['kode_satuan'] : null,
-            'kode_pajak' => isset($data['kode_pajak']) ? (string) $data['kode_pajak'] : null,
+            'customer_code' => isset($data['customer_code']) ? (string) $data['customer_code'] : null,
+            'customer_name' => isset($data['customer_name']) ? (string) $data['customer_name'] : null,
+            'product_code' => isset($data['product_code']) ? (string) $data['product_code'] : null,
+            'product_name' => isset($data['product_name']) ? (string) $data['product_name'] : null,
+            'item_description' => isset($data['item_description']) ? (string) $data['item_description'] : null,
+            'quantity' => isset($data['quantity']) ? (string) $data['quantity'] : null,
+            'unit_price' => isset($data['unit_price']) ? (string) $data['unit_price'] : null,
+            'item_total' => isset($data['item_total']) ? (string) $data['item_total'] : null,
+            'item_discount' => isset($data['item_discount']) ? (string) $data['item_discount'] : null,
+            'item_discount_pct' => isset($data['item_discount_pct']) ? (string) $data['item_discount_pct'] : null,
+            'item_tax' => isset($data['item_tax']) ? (string) $data['item_tax'] : null,
+            'unit_code' => isset($data['unit_code']) ? (string) $data['unit_code'] : null,
+            'tax_code' => isset($data['tax_code']) ? (string) $data['tax_code'] : null,
         ];
     }
 
@@ -227,61 +225,31 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
         $companyId = ($selectedCompanyId && $selectedCompanyId !== 'all') ? $selectedCompanyId : null;
 
         return [
-            'nomor_pesanan' => 'required|string|max:50',
-            'tanggal' => 'required',
-            'tipe_pesanan' => 'nullable|string|in:standar,deposit,aktual|max:50',
-            'referensi' => 'nullable|string|max:100',
-            'deskripsi' => 'nullable|string|max:1000',
-            'diskon_persen' => 'nullable|numeric|min:0|max:100',
-            'biaya_lainnya' => 'nullable|numeric|min:0',
-            'diskon' => 'nullable|numeric|min:0',
+            'order_no' => 'required|string|max:50',
+            'date' => 'required',
+            'reference' => 'nullable|string|max:100',
+            'order_description' => 'nullable|string|max:1000',
+            'discount_pct' => 'nullable|numeric|min:0|max:100',
+            'other_charges' => 'nullable|numeric|min:0',
+            'discount' => 'nullable|numeric|min:0',
             'subtotal' => 'nullable|numeric|min:0',
-            'pajak' => 'nullable|numeric|min:0',
+            'tax' => 'nullable|numeric|min:0',
             'total' => 'nullable|numeric|min:0',
             'status' => 'nullable|in:draft,posted',
-            'kode_customer' => 'nullable|string|max:50',
-            'nama_customer' => 'nullable|string|max:255',
-            'kode_produk' => 'required_without:nama_produk|string|max:50',
-            'nama_produk' => 'required_without:kode_produk|string|max:255',
-            'deskripsi_item' => 'nullable|string|max:1000',
-            'jumlah' => 'required|numeric|min:0',
-            'harga_satuan' => 'required|numeric|min:0',
-            'total_item' => 'nullable|numeric|min:0',
-            'diskon_item' => 'nullable|numeric|min:0',
-            'diskon_persen_item' => 'nullable|numeric|min:0|max:100',
-            'pajak_item' => 'nullable|numeric|min:0',
-            'kode_satuan' => 'nullable|string|max:20',
-            'kode_pajak' => 'nullable|string|max:50',
+            'customer_code' => 'nullable|string|max:50',
+            'customer_name' => 'nullable|string|max:255',
+            'product_code' => 'required_without:product_name|string|max:50',
+            'product_name' => 'required_without:product_code|string|max:255',
+            'item_description' => 'nullable|string|max:1000',
+            'quantity' => 'required|numeric|min:0',
+            'unit_price' => 'required|numeric|min:0',
+            'item_total' => 'nullable|numeric|min:0',
+            'item_discount' => 'nullable|numeric|min:0',
+            'item_discount_pct' => 'nullable|numeric|min:0|max:100',
+            'item_tax' => 'nullable|numeric|min:0',
+            'unit_code' => 'nullable|string|max:20',
+            'tax_code' => 'nullable|string|max:50',
         ];
-    }
-
-    /**
-     * Map order type from form values to database values
-     */
-    private function mapOrderType($orderType)
-    {
-        $mapping = [
-            'standar' => 'standar', // Current DB value
-            'standard' => 'standar', // Map standard to standar for compatibility
-            'deposit' => 'deposit', // Current DB value
-            'aktual' => 'aktual', // Current DB value
-            'cash' => 'cash', // In case we need to map old values
-            'credit' => 'credit',
-            'consignment' => 'consignment',
-            'service' => 'service',
-        ];
-
-        // If the mapped value exists, return it; otherwise, default to 'standar'
-        $mapped = $mapping[strtolower($orderType)] ?? null;
-
-        // Check if the mapped value is valid according to current DB constraints
-        $validValues = ['standar', 'deposit', 'aktual'];
-        if ($mapped && in_array($mapped, $validValues)) {
-            return $mapped;
-        }
-
-        // If not valid or not mapped, default to 'standar' (the most common value)
-        return 'standar';
     }
 
     /**
@@ -315,46 +283,45 @@ class SalesOrderWithItemsImport implements ToCollection, WithHeadingRow, WithVal
     public function customValidationMessages()
     {
         return [
-            'nomor_pesanan.required' => 'Nomor Pesanan wajib diisi.',
-            'nomor_pesanan.max' => 'Nomor Pesanan tidak boleh lebih dari 50 karakter.',
-            'tanggal.required' => 'Tanggal wajib diisi.',
-            'tipe_pesanan.max' => 'Tipe Pesanan tidak boleh lebih dari 50 karakter.',
-            'referensi.max' => 'Referensi tidak boleh lebih dari 100 karakter.',
-            'deskripsi.max' => 'Deskripsi tidak boleh lebih dari 1000 karakter.',
-            'diskon_persen.min' => 'Diskon Persen tidak boleh kurang dari 0.',
-            'diskon_persen.max' => 'Diskon Persen tidak boleh lebih dari 100.',
-            'diskon_persen.numeric' => 'Diskon Persen harus berupa angka.',
-            'biaya_lainnya.min' => 'Biaya Lainnya tidak boleh kurang dari 0.',
-            'biaya_lainnya.numeric' => 'Biaya Lainnya harus berupa angka.',
-            'diskon.min' => 'Diskon tidak boleh kurang dari 0.',
-            'diskon.numeric' => 'Diskon harus berupa angka.',
-            'subtotal.min' => 'Subtotal tidak boleh kurang dari 0.',
-            'subtotal.numeric' => 'Subtotal harus berupa angka.',
-            'pajak.min' => 'Pajak tidak boleh kurang dari 0.',
-            'pajak.numeric' => 'Pajak harus berupa angka.',
-            'total.min' => 'Total tidak boleh kurang dari 0.',
-            'total.numeric' => 'Total harus berupa angka.',
-            'kode_customer.max' => 'Kode Customer tidak boleh lebih dari 50 karakter.',
-            'nama_customer.max' => 'Nama Customer tidak boleh lebih dari 255 karakter.',
-            'kode_produk.max' => 'Kode Produk tidak boleh lebih dari 50 karakter.',
-            'nama_produk.max' => 'Nama Produk tidak boleh lebih dari 255 karakter.',
-            'jumlah.required' => 'Jumlah wajib diisi.',
-            'jumlah.min' => 'Jumlah tidak boleh kurang dari 0.',
-            'jumlah.numeric' => 'Jumlah harus berupa angka.',
-            'harga_satuan.required' => 'Harga Satuan wajib diisi.',
-            'harga_satuan.min' => 'Harga Satuan tidak boleh kurang dari 0.',
-            'harga_satuan.numeric' => 'Harga Satuan harus berupa angka.',
-            'total_item.min' => 'Total Item tidak boleh kurang dari 0.',
-            'total_item.numeric' => 'Total Item harus berupa angka.',
-            'diskon_item.min' => 'Diskon Item tidak boleh kurang dari 0.',
-            'diskon_item.numeric' => 'Diskon Item harus berupa angka.',
-            'diskon_persen_item.min' => 'Diskon Persen Item tidak boleh kurang dari 0.',
-            'diskon_persen_item.max' => 'Diskon Persen Item tidak boleh lebih dari 100.',
-            'diskon_persen_item.numeric' => 'Diskon Persen Item harus berupa angka.',
-            'pajak_item.min' => 'Pajak Item tidak boleh kurang dari 0.',
-            'pajak_item.numeric' => 'Pajak Item harus berupa angka.',
-            'kode_satuan.max' => 'Kode Satuan tidak boleh lebih dari 20 karakter.',
-            'kode_pajak.max' => 'Kode Pajak tidak boleh lebih dari 50 karakter.',
+            'order_no.required' => 'Order Number is required.',
+            'order_no.max' => 'Order Number cannot exceed 50 characters.',
+            'date.required' => 'Date is required.',
+            'reference.max' => 'Reference cannot exceed 100 characters.',
+            'order_description.max' => 'Description cannot exceed 1000 characters.',
+            'discount_pct.min' => 'Discount Percentage cannot be less than 0.',
+            'discount_pct.max' => 'Discount Percentage cannot exceed 100.',
+            'discount_pct.numeric' => 'Discount Percentage must be a number.',
+            'other_charges.min' => 'Other Charges cannot be less than 0.',
+            'other_charges.numeric' => 'Other Charges must be a number.',
+            'discount.min' => 'Discount cannot be less than 0.',
+            'discount.numeric' => 'Discount must be a number.',
+            'subtotal.min' => 'Subtotal cannot be less than 0.',
+            'subtotal.numeric' => 'Subtotal must be a number.',
+            'tax.min' => 'Tax cannot be less than 0.',
+            'tax.numeric' => 'Tax must be a number.',
+            'total.min' => 'Total cannot be less than 0.',
+            'total.numeric' => 'Total must be a number.',
+            'customer_code.max' => 'Customer Code cannot exceed 50 characters.',
+            'customer_name.max' => 'Customer Name cannot exceed 255 characters.',
+            'product_code.max' => 'Product Code cannot exceed 50 characters.',
+            'product_name.max' => 'Product Name cannot exceed 255 characters.',
+            'quantity.required' => 'Quantity is required.',
+            'quantity.min' => 'Quantity cannot be less than 0.',
+            'quantity.numeric' => 'Quantity must be a number.',
+            'unit_price.required' => 'Unit Price is required.',
+            'unit_price.min' => 'Unit Price cannot be less than 0.',
+            'unit_price.numeric' => 'Unit Price must be a number.',
+            'item_total.min' => 'Item Total cannot be less than 0.',
+            'item_total.numeric' => 'Item Total must be a number.',
+            'item_discount.min' => 'Item Discount cannot be less than 0.',
+            'item_discount.numeric' => 'Item Discount must be a number.',
+            'item_discount_pct.min' => 'Item Discount Percentage cannot be less than 0.',
+            'item_discount_pct.max' => 'Item Discount Percentage cannot exceed 100.',
+            'item_discount_pct.numeric' => 'Item Discount Percentage must be a number.',
+            'item_tax.min' => 'Item Tax cannot be less than 0.',
+            'item_tax.numeric' => 'Item Tax must be a number.',
+            'unit_code.max' => 'Unit Code cannot exceed 20 characters.',
+            'tax_code.max' => 'Tax Code cannot exceed 50 characters.',
         ];
     }
 }

@@ -21,7 +21,7 @@ class AttendanceSpotsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Nama Spot'))
+                    ->label(__('Spot Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('latitude')
@@ -34,7 +34,7 @@ class AttendanceSpotsTable
                     ->label(__('Radius (m)'))
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label(__('Aktif'))
+                    ->label(__('Active'))
                     ->boolean(),
             ])
             ->filters([

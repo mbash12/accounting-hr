@@ -45,7 +45,7 @@ class EditCashTransfer extends EditRecord
         if (isset($data['from_account_id']) && isset($data['to_account_id'])) {
             if ($data['from_account_id'] == $data['to_account_id']) {
                 throw ValidationException::withMessages([
-                    'to_account_id' => 'Rekening asal dan tujuan tidak boleh sama.',
+                    'to_account_id' => 'Source and destination accounts cannot be the same.',
                 ]);
             }
         }

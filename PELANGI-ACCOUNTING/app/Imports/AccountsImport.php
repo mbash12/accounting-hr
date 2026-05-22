@@ -17,7 +17,7 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation
         $companyId = session('selected_company_id') && session('selected_company_id') !== 'all' ? session('selected_company_id') : null;
 
         if (!$companyId) {
-            throw new \Exception('Company ID tidak ditemukan. Silakan pilih perusahaan terlebih dahulu.');
+            throw new \Exception('Company ID not found. Please select a company first.');
         }
 
         DB::beginTransaction();
@@ -199,15 +199,15 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'code.required' => 'Kode Akun wajib diisi.',
-            'code.max' => 'Kode Akun tidak boleh lebih dari 50 karakter.',
-            'name.required' => 'Nama Akun wajib diisi.',
-            'name.max' => 'Nama Akun tidak boleh lebih dari 200 karakter.',
-            'classification_type.required' => 'Jenis Klasifikasi wajib diisi.',
-            'classification_type.in' => 'Jenis Klasifikasi harus salah satu dari: asset, liability, equity, revenue, expense.',
-            'level.required' => 'Level wajib diisi.',
-            'level.integer' => 'Level harus berupa angka.',
-            'level.min' => 'Level minimal adalah 1.',
+            'code.required' => 'Account Code is required.',
+            'code.max' => 'Account Code cannot exceed 50 characters.',
+            'name.required' => 'Account Name is required.',
+            'name.max' => 'Account Name cannot exceed 200 characters.',
+            'classification_type.required' => 'Classification Type is required.',
+            'classification_type.in' => 'Classification Type must be one of: asset, liability, equity, revenue, expense.',
+            'level.required' => 'Level is required.',
+            'level.integer' => 'Level must be a number.',
+            'level.min' => 'Level must be at least 1.',
         ];
     }
 }

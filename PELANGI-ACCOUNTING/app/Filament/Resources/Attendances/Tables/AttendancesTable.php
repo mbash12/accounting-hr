@@ -23,26 +23,26 @@ class AttendancesTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('employee.name')
-                    ->label(__('Karyawan'))
+                    ->label(__('Employee'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('date')
-                    ->label(__('Tanggal'))
+                    ->label(__('Date'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('check_in')
-                    ->label(__('Jam Masuk'))
+                    ->label(__('Check-in Time'))
                     ->time(),
                 TextColumn::make('check_out')
-                    ->label(__('Jam Keluar'))
+                    ->label(__('Check-out Time'))
                     ->time(),
                 TextColumn::make('late_minutes')
-                    ->label(__('Lbt (Min)'))
+                    ->label(__('Late (Min)'))
                     ->numeric()
                     ->sortable()
                     ->color('danger'),
                 TextColumn::make('early_departure_minutes')
-                    ->label(__('Plg Cepat (Min)'))
+                    ->label(__('Early (Min)'))
                     ->numeric()
                     ->sortable()
                     ->color('danger'),
@@ -50,11 +50,11 @@ class AttendancesTable
                     ->label(__('Status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'present' => __('Hadir'),
-                        'late' => __('Terlambat'),
-                        'absent' => __('Alpa'),
-                        'permit' => __('Izin'),
-                        'leave' => __('Cuti'),
+                        'present' => __('Present'),
+                        'late' => __('Late'),
+                        'absent' => __('Absent'),
+                        'permit' => __('Permit'),
+                        'leave' => __('Leave'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {

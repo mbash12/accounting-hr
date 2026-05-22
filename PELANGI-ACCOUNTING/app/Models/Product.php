@@ -94,8 +94,6 @@ class Product extends Model
         'product_group_id',
         'company_id',
         'created_by_user_id',
-        'supplier_id',
-        'min_order_qty',
         'tax_id',
     ];
 
@@ -113,13 +111,11 @@ class Product extends Model
             'reorder_level' => 'decimal:2',
             'max_stock' => 'decimal:2',
             'weight' => 'decimal:3',
-            'min_order_qty' => 'decimal:2',
             'is_active' => 'boolean',
             'unit_id' => 'integer',
             'product_group_id' => 'integer',
             'company_id' => 'integer',
             'created_by_user_id' => 'integer',
-            'supplier_id' => 'integer',
             'tax_id' => 'integer',
         ];
     }
@@ -142,11 +138,6 @@ class Product extends Model
     public function createdByUser(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function supplier(): BelongsTo
-    {
-        return $this->belongsTo(Contact::class);
     }
 
     public function tax(): BelongsTo

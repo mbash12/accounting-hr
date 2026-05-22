@@ -12,7 +12,7 @@ class ListEmployeeLeaveQuotas extends ListRecords
 
     public function getTitle(): string
     {
-        return __('Daftar Kuota Cuti');
+        return __('Leave Quota List');
     }
 
     protected function getHeaderActions(): array

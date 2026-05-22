@@ -67,11 +67,11 @@ class SalaryComponentsImport implements ToCollection, WithHeadingRow, WithValida
     public function customValidationMessages()
     {
         return [
-            'code.required' => 'Kode komponen wajib diisi.',
-            'code.max'      => 'Kode komponen tidak boleh lebih dari 50 karakter.',
-            'name.required' => 'Nama komponen wajib diisi.',
-            'type.required' => 'Tipe komponen wajib diisi.',
-            'type.in'       => 'Tipe komponen harus berisi "allowance", "deduction", "tunjangan", atau "potongan".',
+            'code.required' => 'Component code is required.',
+            'code.max'      => 'Component code must not exceed 50 characters.',
+            'name.required' => 'Component name is required.',
+            'type.required' => 'Component type is required.',
+            'type.in'       => 'Component type must be "allowance", "deduction", "tunjangan", or "potongan".',
         ];
     }
 

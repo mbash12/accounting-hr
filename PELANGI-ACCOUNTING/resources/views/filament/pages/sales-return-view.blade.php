@@ -312,7 +312,7 @@
                         <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                         <!-- Fallback if no logo: Just Company Name styling -->
-                        <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}</h1>
+                        <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}</h1>
                     @endif
 
                     <div class="company-details">
@@ -322,26 +322,26 @@
                             @if($record->company->billing_address_line_2)<br>{!! nl2br(e($record->company->billing_address_line_2)) !!}@endif
                             @if($record->company->billing_city)<br>{!! nl2br(e($record->company->billing_city)) !!}, {!! nl2br(e($record->company->billing_state)) !!} {!! nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
 
                 <div class="document-info">
-                    <h2 class="doc-title">RETUR PENJUALAN</h2>
+                    <h2 class="doc-title">SALES RETURN</h2>
                     <table class="doc-meta-table">
                         <tr>
-                            <td class="doc-meta-label">No. Retur:</td>
+                            <td class="doc-meta-label">Return No.:</td>
                             <td class="doc-meta-value">{{ $record->return_number }}</td>
                         </tr>
                         <tr>
-                            <td class="doc-meta-label">Tanggal:</td>
+                            <td class="doc-meta-label">Date:</td>
                             <td class="doc-meta-value">{{ $record->date ? $record->date->format('d M Y') : '-' }}</td>
                         </tr>
                          @if($record->salesInvoice)
                         <tr>
-                            <td class="doc-meta-label">Ref. Faktur:</td>
+                            <td class="doc-meta-label">Invoice Ref.:</td>
                             <td class="doc-meta-value">{{ $record->salesInvoice->invoice_number }}</td>
                         </tr>
                         @endif
@@ -352,7 +352,7 @@
             <!-- ADDRESSES -->
             <div class="address-section">
                 <div class="address-box">
-                    <div class="address-title">Detail Pelanggan</div>
+                    <div class="address-title">Customer Details</div>
                     @if($record->customer)
                         <p class="recipient-name">{{ $record->customer->name }}</p>
                         <p>
@@ -363,19 +363,19 @@
                             @if($record->customer->billing_state), {!! nl2br(e($record->customer->billing_state)) !!}@endif
                             {!! nl2br(e($record->customer->billing_postal_code)) !!}
                         </p>
-                        @if($record->customer->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->customer->tax_id }}</p>@endif
+                        @if($record->customer->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->customer->tax_id }}</p>@endif
                     @else
-                        <p class="text-muted">Tidak ada pelanggan dipilih</p>
+                        <p class="text-muted">No customer selected</p>
                     @endif
                 </div>
 
                  <div class="address-box">
-                    <div class="address-title">Detail Retur</div>
+                    <div class="address-title">Return Details</div>
                     @if($record->job)
-                        <p><span class="text-muted">Proyek:</span> <strong>{{ $record->job->name }}</strong></p>
+                        <p><span class="text-muted">Project:</span> <strong>{{ $record->job->name }}</strong></p>
                     @endif
                     @if($record->reference_no)
-                        <p><span class="text-muted">Ref. Eksternal:</span> {{ $record->reference_no }}</p>
+                        <p><span class="text-muted">Ext. Ref.:</span> {{ $record->reference_no }}</p>
                     @endif
                 </div>
             </div>
@@ -386,9 +386,9 @@
                     <thead>
                         <tr>
                             <th class="col-idx">#</th>
-                            <th class="col-desc">Deskripsi Barang</th>
-                            <th class="col-qty" style="text-align: right;">Jumlah</th>
-                            <th class="col-reason">Alasan Retur</th>
+                            <th class="col-desc">Description</th>
+                            <th class="col-qty" style="text-align: right;">Quantity</th>
+                            <th class="col-reason">Return Reason</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -396,8 +396,8 @@
                         <tr>
                             <td class="col-idx">{{ $index + 1 }}</td>
                             <td class="col-desc">
-                                <strong>{{ $item->item_name ?? $item->product->name ?? $item->description ?? 'Barang' }}</strong>
-                                @if($item->description && $item->description !== ($item->item_name ?? $item->product->name ?? ''))
+                                <strong>{{ $item->product->name ?? $item->description ?? '' }}</strong>
+                                @if($item->description && $item->description !== ($item->product->name ?? ''))
                                     <div class="text-sm text-muted">{{ $item->description }}</div>
                                 @endif
                             </td>
@@ -411,7 +411,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center" style="padding: 20px;">Tidak ada barang dalam retur ini</td>
+                            <td colspan="4" class="text-center" style="padding: 20px;">No items in this return</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -421,23 +421,23 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Kebijakan Retur & Catatan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Return Policy & Notes</h4>
                     <p class="text-sm text-muted">
-                        Semua barang yang dikembalikan harus dalam kondisi dan kemasan asli.
+                        All returned items must be in their original condition and packaging.
                         <br>
-                        Kredit atau pengembalian dana akan diproses dalam 7-14 hari kerja setelah persetujuan.
+                        Credit or refund will be processed within 7-14 business days after approval.
                     </p>
                     @if($record->description)
                         <div style="margin-top: 10px; font-style: italic;" class="text-sm">
-                            Alasan: {{ $record->description }}
+                            Reason: {{ $record->description }}
                         </div>
                     @endif
                 </div>
                 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Diterima Oleh</div>
+                    <div style="margin-bottom: 40px;">Received By</div>
                     <div class="signature-line"></div>
-                    <div class="text-sm text-bold">{{ $record->company->name ?? 'Manajemen' }}</div>
+                    <div class="text-sm text-bold">{{ $record->company->name ?? 'Management' }}</div>
                 </div>
             </div>
 

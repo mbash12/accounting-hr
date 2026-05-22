@@ -2,9 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\JournalVoucherController;
-use App\Http\Controllers\Api\InvoiceSyncController;
 use App\Http\Controllers\PayslipPdfController;
-use App\Services\InventorySyncService;
 
 use App\Http\Controllers\OpeningBalanceUpdateController;
 
@@ -29,14 +27,4 @@ Route::middleware(['auth', 'web'])->group(function () {
     // Route to update existing opening balance dates
     Route::post('/internal/opening-balances/update-dates', [OpeningBalanceUpdateController::class, 'updateDates'])->name('opening-balances.update-dates');
 
-    // Invoice Sync Monitoring Routes (internal use - no API token required)
-    Route::prefix('internal/invoice-sync')->group(function () {
-        Route::get('/', [InvoiceSyncController::class, 'index']);
-        Route::get('/stats', [InvoiceSyncController::class, 'stats']);
-        Route::post('/bulk-retry', [InvoiceSyncController::class, 'bulkRetry']);
-        Route::get('/{syncJobId}/status', [InvoiceSyncController::class, 'status']);
-        Route::post('/{syncJobId}/retry', [InvoiceSyncController::class, 'retrySync']);
-        Route::post('/{syncJobId}/queue-retry', [InvoiceSyncController::class, 'queueRetry']);
-        Route::delete('/clear-data', [InvoiceSyncController::class, 'clearData']);
-    });
 });

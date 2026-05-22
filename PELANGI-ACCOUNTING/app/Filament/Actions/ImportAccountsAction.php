@@ -17,15 +17,15 @@ class ImportAccountsAction extends Action
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Akun')
-                    ->helperText('Upload file Excel (.xlsx) dengan data akun termasuk kolom: code, name, description, classification_type, is_header, is_cash_bank, is_active, level, parent_code')
+                    ->label('Account Data File')
+                    ->helperText('Upload Excel file (.xlsx) with account data including columns: code, name, description, classification_type, is_header, is_cash_bank, is_active, level, parent_code')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Import Data Akun')
-            ->modalDescription('Upload file Excel dengan informasi akun. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan. Kolom yang diharapkan: code, name, description, classification_type, is_header, is_cash_bank, is_active, level, parent_code.')
+            ->modalHeading('Import Accounts')
+            ->modalDescription('Upload Excel file with account information. You can download the template below to see the expected format. Expected columns: code, name, description, classification_type, is_header, is_cash_bank, is_active, level, parent_code.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')
@@ -40,8 +40,8 @@ class ImportAccountsAction extends Action
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Download Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template akun: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the account template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportAccountsAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Import Berhasil')
-                        ->body('Data akun berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Account data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Import Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data akun: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing account data: ' . $e->getMessage())
                         ->send();
                 }
             });

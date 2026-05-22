@@ -59,7 +59,7 @@ class DeliveryDocumentItem extends Model
         static::creating(function ($model) {
             if ($model->deliveryDocument && $model->deliveryDocument->is_locked) {
                 throw ValidationException::withMessages([
-                    'items' => 'Tidak dapat menambah item baru pada pengiriman yang terkunci.',
+                    'items' => 'Cannot add new item to a locked delivery.',
                 ]);
             }
 
@@ -80,7 +80,7 @@ class DeliveryDocumentItem extends Model
                 $newQty = (float) ($model->quantity ?? 0);
                 if ($newQty > $originalQty) {
                     throw ValidationException::withMessages([
-                        'items' => 'Kuantitas tidak boleh ditambah pada pengiriman yang terkunci.',
+                        'items' => 'Quantity cannot be increased on a locked delivery.',
                     ]);
                 }
             }
@@ -104,7 +104,7 @@ class DeliveryDocumentItem extends Model
                     
                     if (($totalDelivered + $model->quantity) > $orderItem->quantity) {
                         throw ValidationException::withMessages([
-                            'quantity' => 'Total kuantitas pengiriman tidak boleh melebihi kuantitas pesanan.',
+                            'quantity' => 'Total delivery quantity cannot exceed order quantity.',
                         ]);
                     }
                 }

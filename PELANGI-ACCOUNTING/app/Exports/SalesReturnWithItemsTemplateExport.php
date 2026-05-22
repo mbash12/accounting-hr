@@ -15,48 +15,48 @@ class SalesReturnWithItemsTemplateExport implements FromArray, WithHeadings, Wit
                 'RET-001',
                 '2024-01-01',
                 'REF-001',
-                'Retur pertama dari pelanggan A',
+                'First return from customer A',
                 'draft',
                 'CUST-001',
-                'PT. Pelanggan A',
+                'PT. Customer A',
                 'DEL-001',
                 'PROD-001',
-                'Laptop Gaming',
-                'Laptop gaming dengan spesifikasi tinggi',
+                'Gaming Laptop',
+                'Gaming laptop with high specifications',
                 1,
-                'Rusak',
+                'Damaged',
                 'PCS'
             ],
             [
                 'RET-002',
                 '2024-01-02',
                 'REF-002',
-                'Retur dari pelanggan B',
+                'Return from customer B',
                 'posted',
                 'CUST-002',
-                'CV. Pelanggan B',
+                'CV. Customer B',
                 'DEL-002',
                 'PROD-002',
-                'Mouse Wireless',
-                'Mouse wireless dengan teknologi bluetooth',
+                'Wireless Mouse',
+                'Wireless mouse with bluetooth technology',
                 2,
-                'Salah barang',
+                'Wrong item',
                 'PCS'
             ],
             [
                 'RET-003',
                 '2024-01-03',
                 'REF-003',
-                'Retur dari pelanggan C',
+                'Return from customer C',
                 'draft',
                 'CUST-003',
-                'PT. Pelanggan C',
+                'PT. Customer C',
                 'DEL-003',
                 'PROD-003',
-                'Keyboard Mechanical',
-                'Keyboard mekanik dengan RGB',
+                'Mechanical Keyboard',
+                'Mechanical keyboard with RGB',
                 1,
-                'Tidak dibutuhkan',
+                'Not needed',
                 'PCS'
             ],
         ];
@@ -65,25 +65,25 @@ class SalesReturnWithItemsTemplateExport implements FromArray, WithHeadings, Wit
     public function headings(): array
     {
         return [
-            'Nomor Retur',
-            'Tanggal',
-            'Nomor Referensi',
-            'Deskripsi',
+            'Return No.',
+            'Date',
+            'Reference No.',
+            'Description',
             'Status',
-            'Kode Customer',
-            'Nama Customer',
-            'Nomor Pengiriman',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Alasan Retur',
-            'Kode Satuan',
+            'Customer Code',
+            'Customer Name',
+            'Delivery No.',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Return Reason',
+            'Unit Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Template Impor Retur Penjualan dan Item';
+        return 'Sales Return Import Template';
     }
 }

@@ -28,19 +28,19 @@ class OvertimeLogResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Lembur');
+        return __('Overtime');
     }
 
     protected static ?int $navigationSort = 5;
 
     public static function getModelLabel(): string
     {
-        return __('Lembur');
+        return __('Overtime');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Lembur');
+        return __('Overtime');
     }
 
     public static function form(Schema $schema): Schema

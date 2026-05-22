@@ -123,7 +123,7 @@ class PurchaseOrderForm
                             ->nullable()
                             ->columnSpanFull(),
                         Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->relationship(
                                 name: 'supplier',
                                 titleAttribute: 'name',
@@ -183,110 +183,14 @@ class PurchaseOrderForm
                                 $contact = \App\Models\Contact::create($data);
                                 return $contact->id;
                             }),
-                        Select::make('sales_order_id')
-                            ->label('Sales Order')
-                            ->relationship(
-                                name: 'salesOrder',
-                                titleAttribute: 'order_number',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('order_number');
-                                }
-                            )
-                            ->searchable()
-                            ->preload()
-                            ->nullable()
-                            ->live()
-                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                // When sales order is selected, auto-fill items and other fields
-                                if ($state) {
-                                    $salesOrder = \App\Models\SalesOrder::with(['items.product', 'customer'])->find($state);
-                                    if ($salesOrder) {
-                                        // Auto-fill items from sales order
-                                        $items = [];
-                                        foreach ($salesOrder->items as $item) {
-                                            $items[] = [
-                                                'product_id' => $item->product_id,
-                                                'item_name' => $item->item_name ?? $item->product?->name,
-                                                'quantity' => $item->quantity,
-                                                'quantity_display' => \App\Filament\Forms\Components\NumberInput::formatRoundedIntegerDisplay($item->quantity),
-                                                'unit_price' => $item->product?->cost_price ?? $item->unit_price,
-                                                'unit_price_display' => \App\Filament\Forms\Components\NumberInput::formatRoundedIntegerDisplay($item->product?->cost_price ?? $item->unit_price),
-                                                'tax_id' => $item->tax_id,
-                                                'unit_id' => $item->unit_id,
-                                                'description' => $item->description,
-                                                'total' => $item->quantity * ($item->product?->cost_price ?? $item->unit_price),
-                                            ];
-                                        }
-                                        $set('items', $items);
-
-                                        // Set discount and other charges from sales order
-                                        $subtotal = collect($items)->sum('total');
-                                        $discountAmount = $salesOrder->discount ?? 0;
-                                        $otherCharges = $salesOrder->other_charges ?? 0;
-                                        
-                                        // Calculate discount percentage from sales order discount amount
-                                        $discountPercentage = $subtotal > 0 ? ($discountAmount / $subtotal) * 100 : 0;
-                                        
-                                        $set('other_charges', $otherCharges);
-                                        $set('other_charges_display', \App\Filament\Forms\Components\NumberInput::formatRoundedIntegerDisplay($otherCharges));
-                                        $set('discount_percentage', $discountPercentage);
-
-                                        // Calculate and update all totals
-                                        $c = self::calculateTotals(function($key) use ($items, $discountPercentage, $otherCharges) {
-                                            if ($key === 'items') return $items;
-                                            if ($key === 'discount_percentage') return $discountPercentage;
-                                            if ($key === 'other_charges') return $otherCharges;
-                                            return null;
-                                        });
-                                        $set('subtotal', $c['subtotal']);
-                                        $set('discount', $c['discount']);
-                                        $set('tax_amount', $c['tax']);
-                                        $set('total_amount', $c['total']);
-                                    }
-                                } else if (!$state) {
-                                    // Clear items if no sales order selected
-                                    $set('items', []);
-                                    $set('other_charges', 0);
-                                    $set('other_charges_display', \App\Filament\Forms\Components\NumberInput::formatRoundedIntegerDisplay(0));
-                                    $set('discount_percentage', 0);
-                                    $set('subtotal', 0);
-                                    $set('discount', 0);
-                                    $set('tax_amount', 0);
-                                    $set('total_amount', 0);
-                                }
-                            }),
-                        Select::make('department_id')
-                            ->label('Departemen')
-                            ->relationship(
-                                name: 'department',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('name');
-                                }
-                            )
-                            ->searchable()
-                            ->preload()
-                            ->nullable(),
                         DatePicker::make('date')
-                            ->label('Tanggal')
+                            ->label('Date')
                             ->required()
                             ->default(now()),
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Nomor Referensi'),
-                        (new static)->getCodeField('purchase_order_no', 'No. Pesanan Pembelian')
+                            ->label('Reference No.'),
+                        (new static)->getCodeField('purchase_order_no', 'Purchase Order No.')
                             ->unique('purchase_orders', 'purchase_order_no', ignoreRecord: true,
                                 modifyRuleUsing: fn ($rule) => $rule->where(function ($query) {
                                     $companyId = session('selected_company_id');
@@ -313,8 +217,6 @@ class PurchaseOrderForm
                             ->native(false)
                             ->disabled(fn ($record) => $record && ($record->goodsReceipts()->exists() || $record->purchaseInvoices()->exists()))
                             ->live(),
-                        Hidden::make('order_type')
-                            ->default('standar'),
                     ])
                     ->columns(3)
                     ->columnSpanFull(),
@@ -326,20 +228,19 @@ class PurchaseOrderForm
                     ->addActionLabel(__('Add New Item'))
                     ->required()
                     ->table([
-                        TableColumn::make('Produk')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Nama Barang')->width('15%')->alignment(Alignment::Start),
-                        TableColumn::make('Jumlah')->width('8%')->alignment(Alignment::End),
-                        TableColumn::make('Harga Satuan')->width('14%')->alignment(Alignment::End),
-                        TableColumn::make('Pajak')->width('11%')->alignment(Alignment::Start),
-                        TableColumn::make('Satuan')->width('11%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('16%')->alignment(Alignment::Start),
+                        TableColumn::make('Product')->width('18%')->alignment(Alignment::Start),
+                        TableColumn::make('Quantity')->width('10%')->alignment(Alignment::End),
+                        TableColumn::make('Unit Price')->width('14%')->alignment(Alignment::End),
+                        TableColumn::make('Tax')->width('11%')->alignment(Alignment::Start),
+                        TableColumn::make('Unit')->width('11%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('16%')->alignment(Alignment::Start),
                         TableColumn::make('Total')->width('10%')->alignment(Alignment::End),
                     ])
                     ->schema([
                         Select::make('product_id')
                             ->required()
                             ->searchable()
-                            ->label('Produk')
+                            ->label('Product')
                             ->relationship(
                                 name: 'product',
                                 titleAttribute: 'name',
@@ -360,8 +261,6 @@ class PurchaseOrderForm
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $product = \App\Models\Product::find($state);
                                 if ($product) {
-                                    // Auto-fill item_name from product name
-                                    $set('item_name', $product->name);
                                     if ($product->cost_price) {
                                         $set('unit_price', $product->cost_price);
                                         $set('unit_price_display', NumberInput::formatRoundedIntegerDisplay($product->cost_price));
@@ -391,9 +290,9 @@ class PurchaseOrderForm
                             })
                             ->createOptionForm([
                                 TextInput::make('name')
-                                    ->label('Nama')
+                                    ->label('Name')
                                     ->required(),
-                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Kode Produk')
+                                (new \App\Filament\Resources\Products\Schemas\ProductForm)->getCodeField('code', 'Product Code')
                                     ->unique(
                                         \App\Models\Product::class,
                                         'code',
@@ -412,7 +311,7 @@ class PurchaseOrderForm
                                         },
                                     ),
                                 Select::make('product_group_id')
-                                    ->label('Kelompok Produk')
+                                    ->label('Product Group')
                                     ->relationship(
                                         "productGroup",
                                         "name",
@@ -429,12 +328,12 @@ class PurchaseOrderForm
                                     ->required(),
                                 ...RoundedIntegerMoneyInput::schema(
                                     name: 'cost_price',
-                                    label: 'Harga Beli',
+                                    label: 'Cost Price',
                                     required: false,
                                     defaultDecimal: '0.00',
                                 ),
                                 Select::make('unit_id')
-                                    ->label('Satuan')
+                                    ->label('Unit')
                                     ->searchable()
                                     ->options(function () {
                                         $selectedCompanyId = session('selected_company_id');
@@ -447,7 +346,7 @@ class PurchaseOrderForm
                                         return $q->orderBy('name')->pluck('name', 'id')->toArray();
                                     }),
                                 Textarea::make('description')
-                                    ->label('Deskripsi')
+                                    ->label('Description')
                                     ->rows(2),
                                 Hidden::make('company_id')
                                     ->default(function () {
@@ -463,13 +362,9 @@ class PurchaseOrderForm
                                 $product = \App\Models\Product::create($data);
                                 return $product->id;
                             }),
-                        TextInput::make('item_name')
-                            ->label('Nama Barang')
-                            ->required()
-                            ->maxLength(255),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'quantity',
-                            label: 'Jumlah',
+                            label: 'Quantity',
                             required: true,
                             defaultDecimal: '1.00',
                             afterUpdated: function ($decimal, callable $set, callable $get) {
@@ -498,7 +393,7 @@ class PurchaseOrderForm
                         ),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'unit_price',
-                            label: 'Harga Satuan',
+                            label: 'Unit Price',
                             required: true,
                             afterUpdated: function ($decimal, callable $set, callable $get) {
                                 $quantity = NumberInput::parseToFloat($get('quantity') ?? 0);
@@ -526,7 +421,7 @@ class PurchaseOrderForm
                         ),
                         Select::make('tax_id')
                             ->searchable()
-                            ->label('Pajak')
+                            ->label('Tax')
                             ->relationship(
                                 'tax',
                                 'name',
@@ -552,7 +447,7 @@ class PurchaseOrderForm
                             }),
                         Select::make('unit_id')
                             ->searchable()
-                            ->label('Satuan')
+                            ->label('Unit')
                             ->relationship(
                                 name: 'unit',
                                 titleAttribute: 'name',
@@ -570,7 +465,7 @@ class PurchaseOrderForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
 
                         Textarea::make('description')
-                            ->label('Deskripsi')
+                            ->label('Description')
                             ->rows(1),
                         Hidden::make('total')
                             ->default(0)
@@ -617,7 +512,7 @@ class PurchaseOrderForm
                             ->columnSpan(1),
                         ...RoundedIntegerMoneyInput::schema(
                             name: 'other_charges',
-                            label: 'Biaya Lainnya',
+                            label: 'Other Charges',
                             inlineLabel: true,
                             defaultDecimal: '0.00',
                             columnSpan: 1,
@@ -637,7 +532,7 @@ class PurchaseOrderForm
                             ->numeric()
                             ->suffix('%')
                             ->inlineLabel()
-                            ->label('Diskon')
+                            ->label('Discount')
                             ->extraInputAttributes(['style' => 'text-align:right'])
                             ->live(onBlur: true)
                             ->afterStateHydrated(function ($component, $state, $record) {
@@ -661,7 +556,7 @@ class PurchaseOrderForm
                             ->columnSpan(1),
                         Placeholder::make('discount_amount_display')
                             ->inlineLabel()
-                            ->label('Jumlah Diskon')
+                            ->label('Discount Amount')
                             ->content(function (callable $get) {
                                 $c = self::calculateTotals($get);
                                 return 'Rp ' . number_format($c['discount'], 0, ',', '.');

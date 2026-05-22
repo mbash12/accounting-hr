@@ -43,28 +43,28 @@ class EmployeesExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'ID Karyawan',
-            'Nama',
+            'Employee ID',
+            'Name',
             'Email',
             'NIK',
             'NPWP',
-            'Kode Departemen',
-            'Jabatan',
-            'Tanggal Mulai Kerja',
+            'Department Code',
+            'Position',
+            'Hire Date',
             'Status',
-            'Status PTKP',
-            'Nama Bank',
-            'Nomor Rekening',
-            'Pemilik Rekening',
-            'No BPJS Kesehatan',
-            'No BPJS Ketenagakerjaan',
-            'Gaji Pokok',
-            'Status Aktif',
+            'PTKP Status',
+            'Bank Name',
+            'Account Number',
+            'Account Holder',
+            'BPJS Health No.',
+            'BPJS Employment No.',
+            'Basic Salary',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Karyawan';
+        return 'Employees Data';
     }
 }

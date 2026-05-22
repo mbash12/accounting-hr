@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ config('app.locale') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -311,7 +311,7 @@
 </head>
 <body>
     <div class="no-print">
-        <button onclick="window.print()" class="btn">Cetak</button>
+        <button onclick="window.print()" class="btn">Print</button>
     </div>
 
     @php
@@ -335,8 +335,8 @@
         <div class="header">
             <div class="left-header-section">
                 <div class="company-info">
-                    <strong>{{ $cashDisbursement->company->name ?? 'PT. PELANGI SENTRAL KREASI' }}</strong>
-                    {!! nl2br(e($cashDisbursement->company->address ?? 'JL. KH. MOH. MANSYUR BLOK 15A/12'."\n".'JAKARTA PUSAT')) !!}
+                    <strong>{{ $cashDisbursement->company->name ?? 'Company Name' }}</strong>
+                    {!! nl2br(e($cashDisbursement->company->address ?? 'Company Address')) !!}
                 </div>
                 
                 <div class="payer-info-box">
@@ -447,7 +447,7 @@
                                 $say = \App\Helpers\TerbilangHelper::convert($rupiah);
                                 
                                 if ($sen > 0) {
-                                    $say .= ' koma ' . \App\Helpers\TerbilangHelper::convert($sen);
+                                    $say .= ' point ' . \App\Helpers\TerbilangHelper::convert($sen);
                                 }
                                 
                                 echo ucfirst(strtolower(trim($say)));

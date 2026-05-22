@@ -29,12 +29,12 @@ class ProductGroupsTable
 
                 IconColumn::make("is_active")->boolean()->label(__("Active")),
                 TextColumn::make("shipping_type")
-                    ->label(__("Jenis Produk"))
+                    ->label(__("Product Type"))
                     ->searchable()
                     ->formatStateUsing(
                         fn(string $state): string => match ($state) {
-                            "physical" => __("Produk Fisik"),
-                            "digital" => __("Produk Digital"),
+                            "physical" => __("Physical Product"),
+                            "digital" => __("Digital Product"),
                             default => $state,
                         },
                     )

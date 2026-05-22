@@ -28,13 +28,13 @@ class TaxForm
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make(__("Informasi Pajak"))
+            Section::make(__("Tax Information"))
                 ->schema([
                     TextInput::make("name")
-                        ->label(__("Nama Pajak"))
+                        ->label(__("Tax Name"))
                         ->required()
                         ->columnSpanFull(),
-                    (new static)->getCodeField('code', __('Kode Pajak'))
+                    (new static)->getCodeField('code', __('Tax Code'))
                         ->rule('required')
                         ->rule(function (?\App\Models\Tax $record) {
                             return function (string $attribute, $value, \Closure $fail) use ($record) {
@@ -59,20 +59,20 @@ class TaxForm
                             };
                         }),
                     NumberInput::make("tax_percentage")
-                        ->label(__("Persentase Pajak"))
+                        ->label(__("Tax Percentage"))
                         ->required()
                         ->suffix("%")
                         ->decimal(true),
                     Textarea::make("description")
-                        ->label(__("Keterangan"))
+                        ->label(__("Description"))
                         ->columnSpanFull(),
-                    Toggle::make("is_active")->required()->label(__("Aktif")),
+                    Toggle::make("is_active")->required()->label(__("Active")),
                 ])
                 ->columns(2),
 
 
 
-            Section::make(__("Pemetaan Akun"))
+            Section::make(__("Account Mapping"))
                 ->schema([
                     Select::make("company_id")
                         ->relationship(
@@ -112,7 +112,7 @@ class TaxForm
                             $set('purchase_account_id', null);
                             $set('sales_account_id', null);
                         })
-                        ->label(__("Perusahaan")),
+                        ->label(__("Company")),
                     Select::make("purchase_account_id")
                         ->getOptionLabelUsing(function ($value) {
                             $account = \App\Models\Account::find($value);
@@ -164,7 +164,7 @@ class TaxForm
                         })
                         ->live()
                         ->nullable()
-                        ->label(__("Akun Pembelian"))
+                        ->label(__("Purchase Account"))
                         ->columnSpanFull(),
                     Select::make("sales_account_id")
                         ->getOptionLabelUsing(function ($value) {
@@ -217,7 +217,7 @@ class TaxForm
                         })
                         ->live()
                         ->nullable()
-                        ->label(__("Akun Penjualan"))
+                        ->label(__("Sales Account"))
                         ->columnSpanFull(),
                 ])
                 ->columns(2),

@@ -30,15 +30,15 @@ class EmployeeLeaveQuotasExport implements FromCollection, WithHeadings, WithTit
     public function headings(): array
     {
         return [
-            'ID Karyawan',
-            'Tahun',
-            'Total Kuota (Hari)',
-            'Terpakai (Hari)',
+            'Employee ID',
+            'Year',
+            'Total Quota (Days)',
+            'Used (Days)',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Kuota Cuti Karyawan';
+        return 'Employee Leave Quotas Data';
     }
 }

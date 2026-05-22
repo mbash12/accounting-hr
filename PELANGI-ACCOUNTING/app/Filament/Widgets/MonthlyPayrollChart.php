@@ -13,7 +13,7 @@ class MonthlyPayrollChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Tren Pengeluaran Gaji (12 Bulan)';
+    protected ?string $heading = 'Salary Expenditure Trend (12 Months)';
     protected static ?int $sort = 22;
     protected int | string | array $columnSpan = 'full';
 
@@ -53,13 +53,13 @@ class MonthlyPayrollChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Gaji Kotor',
+                    'label' => 'Gross Salary',
                     'data' => $grossData,
                     'borderColor' => 'rgb(255, 99, 132)',
                     'backgroundColor' => 'rgba(255, 99, 132, 0.5)',
                 ],
                 [
-                    'label' => 'Gaji Bersih',
+                    'label' => 'Net Salary',
                     'data' => $netData,
                     'borderColor' => 'rgb(54, 162, 235)',
                     'backgroundColor' => 'rgba(54, 162, 235, 0.5)',

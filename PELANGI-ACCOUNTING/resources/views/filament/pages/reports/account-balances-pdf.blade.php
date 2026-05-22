@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Laporan Saldo Akun</title>
+    <title>Account Balance Report</title>
     <style>
         body {
             font-family: sans-serif;
@@ -72,17 +72,17 @@
 <body>
     <div class="report-header">
         <div class="report-company-name">{{ $company->name }}</div>
-        <div class="report-title">Laporan Saldo Akun</div>
-        <div class="report-date">Per Tgl. {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
+        <div class="report-title">Account Balance Report</div>
+        <div class="report-date">As of {{ \Carbon\Carbon::parse($date)->format('d M Y') }}</div>
     </div>
 
     <table>
         <thead>
             <tr>
                 <th>Account Number</th>
-                <th>Nama Akun</th>
-                <th>Tipe Akun</th>
-                <th class="amount">Saldo</th>
+                <th>Account Name</th>
+                <th>Account Type</th>
+                <th class="amount">Balance</th>
             </tr>
         </thead>
         <tbody>

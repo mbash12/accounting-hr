@@ -26,19 +26,19 @@ class DepartmentResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Departemen');
+        return __('Department');
     }
 
     protected static ?int $navigationSort = 2;
 
     public static function getModelLabel(): string
     {
-        return __('Departemen');
+        return __('Department');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Departemen');
+        return __('Department');
     }
 
     public static function form(Schema $schema): Schema

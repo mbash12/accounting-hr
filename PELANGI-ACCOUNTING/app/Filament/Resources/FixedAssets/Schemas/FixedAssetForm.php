@@ -36,13 +36,13 @@ class FixedAssetForm
     {
         return $schema
             ->components([
-                Section::make('Informasi Harta Tetap')
+                Section::make(__('Fixed Asset Information'))
                     ->schema([
                         TextInput::make('name')
                             ->required()
                             ->maxLength(200)
                             ->columnSpanFull(),
-                        (new static)->getCodeField('code', 'Kode Aset')
+                        (new static)->getCodeField('code', __('Asset Code'))
                             ->rule('required')
                             ->rule(function (?FixedAsset $record) {
                                 return function (string $attribute, $value, \Closure $fail) use ($record) {
@@ -84,20 +84,20 @@ class FixedAssetForm
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->label('Kategori Aset'),
+                            ->label('Asset Category'),
                         DatePicker::make('acquisition_date')
                             ->required()
-                            ->label('Tanggal Perolehan'),
+                            ->label('Acquisition Date'),
                         NumberInput::make('acquisition_value')
                             ->prefix('Rp')
                             ->required()
                             ->decimal(false)
-                            ->label('Nilai Perolehan'),
+                            ->label('Acquisition Value'),
                         NumberInput::make('book_value')
                             ->prefix('Rp')
                             ->required()
                             ->decimal(false)
-                            ->label('Nilai Buku'),
+                            ->label('Book Value'),
                         Select::make('company_id')
                             ->relationship(
                                 name: 'company',
@@ -130,14 +130,14 @@ class FixedAssetForm
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->label('Perusahaan'),
+                            ->label('Company'),
                         Toggle::make('is_active')
                             ->required()
                             ->default(true)
-                            ->label('Aktif'),
+                            ->label('Active'),
                         Toggle::make('create_acquisition_transaction')
-                            ->label('Buat Transaksi Perolehan')
-                            ->helperText('Buat transaksi perolehan otomatis dengan jurnal')
+                            ->label('Create Acquisition Transaction')
+                            ->helperText('Automatically create acquisition transaction with journal entry')
                             ->default(true)
                             ->visibleOn('create'),
                     ])

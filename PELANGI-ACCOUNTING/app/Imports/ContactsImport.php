@@ -97,17 +97,17 @@ class ContactsImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'name.required' => 'Nama Kontak wajib diisi.',
-            'name.max' => 'Nama Kontak tidak boleh lebih dari 200 karakter.',
-            'contact_code.required' => 'Kode Kontak wajib diisi.',
-            'contact_code.max' => 'Kode Kontak tidak boleh lebih dari 50 karakter.',
-            'email.email' => 'Format email tidak valid.',
-            'email.max' => 'Email tidak boleh lebih dari 150 karakter.',
-            'email.unique' => 'Email sudah digunakan.',
-            'contact_person.max' => 'Nama Kontak Person tidak boleh lebih dari 200 karakter.',
-            'billing_address_line_1.max' => 'Alamat Tagihan tidak boleh lebih dari 1000 karakter.',
-            'delivery_address_line_1.max' => 'Alamat Pengiriman tidak boleh lebih dari 1000 karakter.',
-            'tax.max' => 'NPWP/KTP tidak boleh lebih dari 50 karakter.',
+            'name.required' => 'Contact Name is required.',
+            'name.max' => 'Contact Name cannot exceed 200 characters.',
+            'contact_code.required' => 'Contact Code is required.',
+            'contact_code.max' => 'Contact Code cannot exceed 50 characters.',
+            'email.email' => 'Email format is not valid.',
+            'email.max' => 'Email cannot exceed 150 characters.',
+            'email.unique' => 'Email is already in use.',
+            'contact_person.max' => 'Contact Person Name cannot exceed 200 characters.',
+            'billing_address_line_1.max' => 'Billing Address cannot exceed 1000 characters.',
+            'delivery_address_line_1.max' => 'Delivery Address cannot exceed 1000 characters.',
+            'tax.max' => 'Tax ID cannot exceed 50 characters.',
         ];
     }
 

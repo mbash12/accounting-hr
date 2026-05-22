@@ -185,18 +185,18 @@ class JournalEntryForm
                                 }
                                 
                                 if ($debit <= 0 && $credit <= 0) {
-                                    $fail(__('Item :index harus memiliki nilai debit atau kredit.', ['index' => $loopIndex]));
+                                    $fail(__('Item :index must have a debit or credit value.', ['index' => $loopIndex]));
                                 }
                                 
                                 if ($debit > 0 && $credit > 0) {
-                                    $fail(__('Item :index tidak boleh memiliki nilai debit dan kredit sekaligus.', ['index' => $loopIndex]));
+                                    $fail(__('Item :index cannot have both debit and credit values.', ['index' => $loopIndex]));
                                 }
                             }
                         },
                     ])
                     ->table([
-                        TableColumn::make('Akun')->width('25%')->alignment(Alignment::Start),
-                        TableColumn::make('Deskripsi')->width('35%')->alignment(Alignment::Start),
+                        TableColumn::make('Account')->width('25%')->alignment(Alignment::Start),
+                        TableColumn::make('Description')->width('35%')->alignment(Alignment::Start),
                         TableColumn::make('Debit')->width('20%')->alignment(Alignment::End),
                         TableColumn::make('Kredit')->width('20%')->alignment(Alignment::End),
                     ])
@@ -327,7 +327,7 @@ class JournalEntryForm
                             ->hiddenLabel()
                             ->columnSpan(2),
                         Placeholder::make('balance')
-                            ->label(__('SELISIH'))
+                            ->label(__('DIFFERENCE'))
                             ->content(function (callable $get) {
                                 $items = $get('items') ?? [];
                                 $totals = self::calculateTotalsFromItems($items);

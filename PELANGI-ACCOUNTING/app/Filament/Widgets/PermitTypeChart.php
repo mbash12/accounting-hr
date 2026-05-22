@@ -12,7 +12,7 @@ class PermitTypeChart extends ChartWidget
 {
     use InteractsWithPageFilters;
 
-    protected ?string $heading = 'Distribusi Izin & Cuti';
+    protected ?string $heading = 'Permit & Leave Distribution';
     protected static ?int $sort = 32;
     protected int | string | array $columnSpan = 1;
 
@@ -37,7 +37,7 @@ class PermitTypeChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Total Izin',
+                    'label' => 'Total Permits',
                     'data' => $permits->pluck('total')->toArray(),
                     'backgroundColor' => [
                         '#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'

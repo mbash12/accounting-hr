@@ -388,7 +388,7 @@
                     <img src="{{ Storage::url($record->company->photo) }}" alt="Company Logo" class="company-logo">
                     @else
                     <!-- Fallback if no logo: Just Company Name styling -->
-                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Nama Perusahaan' }}
+                    <h1 style="margin-bottom: 10px; font-size: 16pt;">{{ $record->company->name ?? 'Company Name' }}
                     </h1>
                     @endif
 
@@ -403,26 +403,26 @@
                             nl2br(e($record->company->billing_state)) !!} {!!
                             nl2br(e($record->company->billing_postal_code)) !!}@endif
                         </p>
-                        @if($record->company->tax_id)<p>NPWP: {{ $record->company->tax_id }}</p>@endif
-                        @if($record->company->phone)<p>Telp: {{ $record->company->phone }}</p>@endif
+                        @if($record->company->tax_id)<p>Tax ID: {{ $record->company->tax_id }}</p>@endif
+                        @if($record->company->phone)<p>Phone: {{ $record->company->phone }}</p>@endif
                         @if($record->company->email)<p>Email: {{ $record->company->email }}</p>@endif
                     </div>
                 </div>
 
                 <div class="document-info">
-                    <h2 class="doc-title">PENERIMAAN BARANG</h2>
+                    <h2 class="doc-title">GOODS RECEIPT</h2>
                     <table class="doc-meta-table">
                         <tr>
-                            <td class="doc-meta-label">No. Penerimaan:</td>
+                            <td class="doc-meta-label">Receipt No.:</td>
                             <td class="doc-meta-value">{{ $record->receipt_number }}</td>
                         </tr>
                         <tr>
-                            <td class="doc-meta-label">Tanggal:</td>
+                            <td class="doc-meta-label">Date:</td>
                             <td class="doc-meta-value">{{ $record->date ? $record->date->format('d M Y') : '-' }}</td>
                         </tr>
                         @if($record->reference_no)
                         <tr>
-                            <td class="doc-meta-label">Referensi:</td>
+                            <td class="doc-meta-label">Reference:</td>
                             <td class="doc-meta-value">{{ $record->reference_no }}</td>
                         </tr>
                         @endif
@@ -433,7 +433,7 @@
             <!-- ADDRESSES -->
             <div class="address-section">
                 <div class="address-box">
-                    <div class="address-title">Detail Supplier</div>
+                    <div class="address-title">Supplier Details</div>
                     @if($record->supplier)
                     <p class="recipient-name">{{ $record->supplier->name }}</p>
                     <p>
@@ -445,24 +445,24 @@
                         @if($record->supplier->billing_state), {!! nl2br(e($record->supplier->billing_state)) !!}@endif
                         {!! nl2br(e($record->supplier->billing_postal_code)) !!}
                     </p>
-                    @if($record->supplier->tax_id)<p class="text-sm text-muted">NPWP: {{ $record->supplier->tax_id }}
+                    @if($record->supplier->tax_id)<p class="text-sm text-muted">Tax ID: {{ $record->supplier->tax_id }}
                     </p>@endif
                     @else
-                    <p class="text-muted">Tidak ada supplier dipilih</p>
+                    <p class="text-muted">No supplier selected</p>
                     @endif
                 </div>
 
                 <div class="address-box">
-                    <div class="address-title">Detail Penerimaan</div>
+                    <div class="address-title">Receipt Details</div>
                     @if($record->purchase_order)
-                    <p><span class="text-muted">Ref. Pembelian:</span> <strong>{{
+                    <p><span class="text-muted">Purchase Ref.:</span> <strong>{{
                             $record->purchase_order->purchase_order_no }}</strong></p>
                     @endif
                     @if($record->received_by)
-                    <p><span class="text-muted">Diterima Oleh:</span> {{ $record->received_by }}</p>
+                    <p><span class="text-muted">Received By:</span> {{ $record->received_by }}</p>
                     @endif
                     @if($record->receipt_type)
-                    <p><span class="text-muted">Tipe Penerimaan:</span> {{ ucfirst($record->receipt_type) }}</p>
+                    <p><span class="text-muted">Receipt Type:</span> {{ ucfirst($record->receipt_type) }}</p>
                     @endif
                 </div>
             </div>
@@ -473,8 +473,8 @@
                     <thead>
                         <tr>
                             <th class="col-idx">#</th>
-                            <th class="col-desc">Deskripsi Barang</th>
-                            <th class="col-qty" style="text-align: right;">Jumlah</th>
+                            <th class="col-desc">Description</th>
+                            <th class="col-qty" style="text-align: right;">Quantity</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -482,10 +482,9 @@
                         <tr>
                             <td class="col-idx">{{ $index + 1 }}</td>
                             <td class="col-desc">
-                                <strong>{{ $item->item_name ?? $item->product->name ?? $item->description ?? 'Barang'
+                                <strong>{{ $item->product->name ?? $item->description ?? ''
                                     }}</strong>
-                                @if($item->description && $item->description !== ($item->item_name ??
-                                $item->product->name ?? ''))
+                                @if($item->description && $item->description !== ($item->product->name ?? ''))
                                 <div class="text-sm text-muted">{{ $item->description }}</div>
                                 @endif
                             </td>
@@ -496,8 +495,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="3" class="text-center" style="padding: 20px;">Tidak ada barang dalam penerimaan
-                                ini</td>
+                            <td colspan="3" class="text-center" style="padding: 20px;">No items in this receipt</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -508,23 +506,23 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
-                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Catatan Penerimaan</h4>
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Receipt Notes</h4>
                     <p class="text-sm text-muted">
-                        Mohon periksa semua barang saat diterima. Ketidaksesuaian harus dilaporkan dalam 24 jam.
+                        Please inspect all items upon receipt. Discrepancies must be reported within 24 hours.
                         <br>
-                        Dengan menandatangani di bawah ini, Anda menyatakan telah menerima barang dalam kondisi baik.
+                        By signing below, you acknowledge that you have received the goods in good condition.
                     </p>
                     @if($record->description)
                     <div style="margin-top: 10px; font-style: italic;" class="text-sm">
-                        Catatan: {{ $record->description }}
+                        Notes: {{ $record->description }}
                     </div>
                     @endif
                 </div>
 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Diterima Oleh</div>
+                    <div style="margin-bottom: 40px;">Received By</div>
                     <div class="signature-line"></div>
-                    <div class="text-sm text-bold">Tanggal: __________________</div>
+                    <div class="text-sm text-bold">Date: __________________</div>
                 </div>
             </div>
 

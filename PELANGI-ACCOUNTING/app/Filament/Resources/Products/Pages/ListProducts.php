@@ -12,10 +12,6 @@ class ListProducts extends ListRecords
 
     protected function getHeaderActions(): array
     {
-        if (ProductResource::isReadOnly()) {
-            return [];
-        }
-
         return [
             CreateAction::make(),
         ];

@@ -20,15 +20,15 @@ class TransactionClassificationsTable
         return $table
             ->columns([
                 TextColumn::make("code")
-                    ->label(__("Kode"))
+                    ->label(__("Code"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("name")
-                    ->label(__("Nama"))
+                    ->label(__("Name"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("classification_type")
-                    ->label(__("Tipe Klasifikasi"))
+                    ->label(__("Classification Type"))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'operating' => __('Operating'),
@@ -47,7 +47,7 @@ class TransactionClassificationsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("tax_impact")
-                    ->label(__("Dampak Pajak"))
+                    ->label(__("Tax Impact"))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => $state ? match ($state) {
                         'taxable' => __('Taxable'),
@@ -67,7 +67,7 @@ class TransactionClassificationsTable
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("defaultAccount.code")
-                    ->label(__("Akun Default"))
+                    ->label(__("Default Account"))
                     ->formatStateUsing(function ($record) {
                         if ($record->defaultAccount) {
                             return "{$record->defaultAccount->code} - {$record->defaultAccount->name}";
@@ -77,25 +77,25 @@ class TransactionClassificationsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("company.name")
-                    ->label(__("Perusahaan"))
+                    ->label(__("Company"))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 IconColumn::make("is_active")
                     ->boolean()
-                    ->label(__("Aktif"))
+                    ->label(__("Active"))
                     ->sortable(),
                 TextColumn::make("createdByUser.name")
-                    ->label(__("Dibuat Oleh"))
+                    ->label(__("Created By"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

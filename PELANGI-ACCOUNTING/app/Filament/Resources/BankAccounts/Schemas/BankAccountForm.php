@@ -146,7 +146,7 @@ class BankAccountForm
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->helperText(__('Pilih akun dari Chart of Accounts yang digunakan untuk transaksi kas/bank ini.')),
+                        ->helperText(__('Select an account from the Chart of Accounts used for this cash/bank transaction.')),
                 ])
                 ->columns(2),
 

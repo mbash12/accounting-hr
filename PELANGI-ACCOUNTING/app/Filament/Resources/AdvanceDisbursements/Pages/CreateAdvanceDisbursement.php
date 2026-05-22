@@ -65,32 +65,32 @@ class CreateAdvanceDisbursement extends CreateRecord
             
             if (empty($items)) {
                 throw ValidationException::withMessages([
-                    'items' => __('Minimal satu item diperlukan.'),
+                    'items' => __('At least one item is required.'),
                 ]);
             }
 
             foreach ($items as $index => $item) {
                 if (empty($item['transaction_classification_id'])) {
                     throw ValidationException::withMessages([
-                        "items.{$index}.transaction_classification_id" => __('Transaction Classification harus dipilih untuk setiap item.'),
+                        "items.{$index}.transaction_classification_id" => __('Transaction Classification must be selected for each item.'),
                     ]);
                 }
                 if (empty($item['amount']) || (float)($item['amount'] ?? 0) <= 0) {
                     throw ValidationException::withMessages([
-                        "items.{$index}.amount" => __('Amount harus lebih dari 0 untuk setiap item.'),
+                        "items.{$index}.amount" => __('Amount must be greater than 0 for each item.'),
                     ]);
                 }
             }
 
             if (empty($data['from_account_id'])) {
                 throw ValidationException::withMessages([
-                    'from_account_id' => __('Cash/Bank Account harus dipilih.'),
+                    'from_account_id' => __('Cash/Bank Account must be selected.'),
                 ]);
             }
 
             if (empty($data['recipient_id'])) {
                 throw ValidationException::withMessages([
-                    'recipient_id' => __('Recipient harus dipilih.'),
+                    'recipient_id' => __('Recipient must be selected.'),
                 ]);
             }
 
@@ -132,7 +132,7 @@ class CreateAdvanceDisbursement extends CreateRecord
             
             Notification::make()
                 ->title(__('Success'))
-                ->body(__('Advance Disbursement berhasil dibuat.'))
+                ->body(__('Advance Disbursement created successfully.'))
                 ->success()
                 ->send();
 
@@ -140,7 +140,7 @@ class CreateAdvanceDisbursement extends CreateRecord
         } catch (ValidationException $e) {
             Notification::make()
                 ->title(__('Validation Error'))
-                ->body(__('Mohon periksa kembali data yang diisi.'))
+                ->body(__('Please review the submitted data.'))
                 ->danger()
                 ->send();
             throw $e;
@@ -162,12 +162,12 @@ class CreateAdvanceDisbursement extends CreateRecord
 
             Notification::make()
                 ->title(__('Error'))
-                ->body(__('Terjadi kesalahan: ' . $e->getMessage()))
+                ->body(__('An error occurred: ' . $e->getMessage()))
                 ->danger()
                 ->send();
 
             throw ValidationException::withMessages([
-                'form' => __('Terjadi kesalahan: ' . $e->getMessage()),
+                'form' => __('An error occurred: ' . $e->getMessage()),
             ]);
         }
     }

@@ -43,7 +43,7 @@
         </div>
         <div class="report-actions">
             <x-filament::button wire:click="downloadPdf" color="success" icon="heroicon-o-arrow-down-tray">
-                {{ __('Unduh PDF') }}
+                {{ __('Download PDF') }}
             </x-filament::button>
         </div>
     </div>
@@ -61,21 +61,21 @@
                 <h1 class="text-2xl font-bold text-blue-900">{{ __('LAPORAN REKAPITULASI KEHADIRAN') }}</h1>
                 <p class="text-gray-600 font-semibold uppercase">
                     {{ __('Bulan') }}: {{ __($reportData['month_name']) }} {{ $reportData['year'] }}
-                    @if($reportData['department']) | {{ __('Departemen') }}: {{ $reportData['department']->name }} @endif
+                    @if($reportData['department']) | {{ __('Department') }}: {{ $reportData['department']->name }} @endif
                 </p>
             </div>
 
             <table class="tb-table">
                 <thead>
                     <tr>
-                        <th>{{ __('Karyawan') }}</th>
-                        <th>{{ __('Departemen') }}</th>
+                        <th>{{ __('Employee') }}</th>
+                        <th>{{ __('Department') }}</th>
                         <th class="num">{{ __('Hadir') }}</th>
                         <th class="num">{{ __('Terlambat') }}</th>
                         <th class="num">{{ __('Alpa') }}</th>
-                        <th class="num">{{ __('Izin') }}</th>
-                        <th class="num">{{ __('Cuti') }}</th>
-                        <th class="num font-bold">{{ __('Total Hari Kerja') }}</th>
+                        <th class="num">{{ __('Permit') }}</th>
+                        <th class="num">{{ __('Leave') }}</th>
+                        <th class="num font-bold">{{ __('Total Working Days') }}</th>
                     </tr>
                 </thead>
                 <tbody>

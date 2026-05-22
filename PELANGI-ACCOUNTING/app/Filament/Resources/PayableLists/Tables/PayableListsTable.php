@@ -16,24 +16,24 @@ class PayableListsTable
         return $table
             ->columns([
                 TextColumn::make("name")
-                    ->label(__("Nama Pemasok"))
+                    ->label(__("Supplier Name"))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
                 TextColumn::make("total_payable")
-                    ->label(__("Total Hutang Usaha"))
+                    ->label(__("Total Payable"))
                     ->numeric()
                     ->money("IDR")
                     ->sortable()
                     ->alignEnd(),
                 TextColumn::make("total_paid")
-                    ->label(__("Dibayar"))
+                    ->label(__("Paid"))
                     ->numeric()
                     ->money("IDR")
                     ->sortable()
                     ->alignEnd(),
                 TextColumn::make("total_outstanding")
-                    ->label(__("Sisa"))
+                    ->label(__("Outstanding"))
                     ->numeric()
                     ->money("IDR")
                     ->sortable()
@@ -45,14 +45,14 @@ class PayableListsTable
             ->actions([
                 \Filament\Actions\ActionGroup::make([
                     \Filament\Actions\ViewAction::make()
-                        ->label(__('Detail'))
+                        ->label(__('Details'))
                         ->url(fn ($record) => PayableListResource::getUrl('view', ['record' => $record])),
                 ]),
             ])
             ->defaultSort('latest_invoice_date', 'desc')
             ->recordUrl(fn ($record) => PayableListResource::getUrl('view', ['record' => $record]))
-            ->emptyStateHeading(__('Tidak ada hutang ditemukan'))
-            ->emptyStateDescription(__('Semua faktur telah dibayar.'));
+            ->emptyStateHeading(__('No payables found'))
+            ->emptyStateDescription(__('All invoices have been paid.'));
     }
 }
 

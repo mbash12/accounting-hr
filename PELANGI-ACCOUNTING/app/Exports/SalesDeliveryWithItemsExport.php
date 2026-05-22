@@ -28,39 +28,39 @@ class SalesDeliveryWithItemsExport implements FromCollection, WithHeadings, With
             if ($delivery->items->count() > 0) {
                 foreach ($delivery->items as $item) {
                     $results->push([
-                        'Nomor Pengiriman' => $delivery->delivery_number,
-                        'Tanggal' => $delivery->date ? $delivery->date->format('Y-m-d') : null,
-                        'Jenis Pengiriman' => $delivery->delivery_type,
-                        'Nomor Referensi' => $delivery->reference_no,
-                        'Deskripsi' => $delivery->description,
+                        'Delivery No.' => $delivery->delivery_number,
+                        'Date' => $delivery->date ? $delivery->date->format('Y-m-d') : null,
+                        'Delivery Type' => $delivery->delivery_type,
+                        'Reference No.' => $delivery->reference_no,
+                        'Description' => $delivery->description,
                         'Status' => $delivery->status,
-                        'Kode Customer' => $delivery->customer ? $delivery->customer->contact_code : null,
-                        'Nama Customer' => $delivery->customer ? $delivery->customer->name : null,
-                        'Nomor Pesanan Penjualan' => $delivery->salesOrder ? $delivery->salesOrder->order_number : null,
-                        'Kode Produk' => $item->product ? $item->product->code : null,
-                        'Nama Produk' => $item->product ? $item->product->name : null,
-                        'Deskripsi Item' => $item->description,
-                        'Jumlah' => $item->quantity,
-                        'Kode Satuan' => $item->unit ? $item->unit->code : null,
+                        'Customer Code' => $delivery->customer ? $delivery->customer->contact_code : null,
+                        'Customer Name' => $delivery->customer ? $delivery->customer->name : null,
+                        'Sales Order No.' => $delivery->salesOrder ? $delivery->salesOrder->order_number : null,
+                        'Product Code' => $item->product ? $item->product->code : null,
+                        'Product Name' => $item->product ? $item->product->name : null,
+                        'Item Description' => $item->description,
+                        'Quantity' => $item->quantity,
+                        'Unit Code' => $item->unit ? $item->unit->code : null,
                     ]);
                 }
             } else {
                 // If delivery has no items, still add the delivery row with empty item fields
                 $results->push([
-                    'Nomor Pengiriman' => $delivery->delivery_number,
-                    'Tanggal' => $delivery->date ? $delivery->date->format('Y-m-d') : null,
-                    'Jenis Pengiriman' => $delivery->delivery_type,
-                    'Nomor Referensi' => $delivery->reference_no,
-                    'Deskripsi' => $delivery->description,
+                    'Delivery No.' => $delivery->delivery_number,
+                    'Date' => $delivery->date ? $delivery->date->format('Y-m-d') : null,
+                    'Delivery Type' => $delivery->delivery_type,
+                    'Reference No.' => $delivery->reference_no,
+                    'Description' => $delivery->description,
                     'Status' => $delivery->status,
-                    'Kode Customer' => $delivery->customer ? $delivery->customer->contact_code : null,
-                    'Nama Customer' => $delivery->customer ? $delivery->customer->name : null,
-                    'Nomor Pesanan Penjualan' => $delivery->salesOrder ? $delivery->salesOrder->order_number : null,
-                    'Kode Produk' => null,
-                    'Nama Produk' => null,
-                    'Deskripsi Item' => null,
-                    'Jumlah' => null,
-                    'Kode Satuan' => null,
+                    'Customer Code' => $delivery->customer ? $delivery->customer->contact_code : null,
+                    'Customer Name' => $delivery->customer ? $delivery->customer->name : null,
+                    'Sales Order No.' => $delivery->salesOrder ? $delivery->salesOrder->order_number : null,
+                    'Product Code' => null,
+                    'Product Name' => null,
+                    'Item Description' => null,
+                    'Quantity' => null,
+                    'Unit Code' => null,
                 ]);
             }
         }
@@ -71,25 +71,25 @@ class SalesDeliveryWithItemsExport implements FromCollection, WithHeadings, With
     public function headings(): array
     {
         return [
-            'Nomor Pengiriman',
-            'Tanggal',
-            'Jenis Pengiriman',
-            'Nomor Referensi',
-            'Deskripsi',
+            'Delivery No.',
+            'Date',
+            'Delivery Type',
+            'Reference No.',
+            'Description',
             'Status',
-            'Kode Customer',
-            'Nama Customer',
-            'Nomor Pesanan Penjualan',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Kode Satuan',
+            'Customer Code',
+            'Customer Name',
+            'Sales Order No.',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Unit Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Pengiriman Penjualan dan Item';
+        return 'Sales Deliveries and Items';
     }
 }

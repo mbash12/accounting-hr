@@ -16,7 +16,7 @@ class EditBonusCalculation extends EditRecord
     {
         return [
             Action::make('calculateBonus')
-                ->label(__('Hitung Pajak Bonus'))
+                ->label(__('Calculate Bonus Tax'))
                 ->icon('heroicon-o-cpu-chip')
                 ->requiresConfirmation()
                 ->visible(fn () => $this->record->status !== 'posted')
@@ -28,12 +28,12 @@ class EditBonusCalculation extends EditRecord
                         $this->refreshFormData(['status', 'total_amount', 'total_pph21']);
                         
                         Notification::make()
-                            ->title(__('Pajak bonus berhasil dihitung'))
+                            ->title(__('Bonus tax calculated successfully'))
                             ->success()
                             ->send();
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Gagal menghitung bonus'))
+                            ->title(__('Failed to calculate bonus'))
                             ->body($e->getMessage())
                             ->danger()
                             ->persistent()
@@ -41,7 +41,7 @@ class EditBonusCalculation extends EditRecord
                     }
                 }),
             Action::make('postToLedger')
-                ->label(__('Posting ke Jurnal'))
+                ->label(__('Post to Journal'))
                 ->icon('heroicon-o-book-open')
                 ->requiresConfirmation()
                 ->visible(fn () => $this->record->status === 'processed')
@@ -53,12 +53,12 @@ class EditBonusCalculation extends EditRecord
                         $this->refreshFormData(['status']);
                         
                         Notification::make()
-                            ->title(__('Bonus berhasil diposting ke jurnal'))
+                            ->title(__('Bonus posted to journal successfully'))
                             ->success()
                             ->send();
                     } catch (\Exception $e) {
                         Notification::make()
-                            ->title(__('Gagal posting ke jurnal'))
+                            ->title(__('Failed to post to journal'))
                             ->body($e->getMessage())
                             ->danger()
                             ->persistent()

@@ -98,11 +98,6 @@ class SalesInvoice extends Model
         'is_settlement_invoice',
         'is_locked',
         'status',
-        'synced_to_inventory_at',
-        'sync_status',
-        'sync_error',
-        'sync_retry_count',
-        'last_sync_attempt_at',
         'customer_id',
         'payment_term_id',
         'sales_order_id',
@@ -146,11 +141,6 @@ class SalesInvoice extends Model
             'created_by_user_id' => 'integer',
             'updated_by_user_id' => 'integer',
             'status' => 'string',
-            'synced_to_inventory_at' => 'datetime',
-            'sync_status' => 'string',
-            'sync_error' => 'string',
-            'sync_retry_count' => 'integer',
-            'last_sync_attempt_at' => 'datetime',
         ];
     }
 

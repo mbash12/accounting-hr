@@ -73,8 +73,8 @@ class GoodsReceipt extends Model
             if ($hasLockedReturns) {
                 \Filament\Notifications\Notification::make()
                     ->danger()
-                    ->title('Tidak dapat menghapus')
-                    ->body('Penerimaan memiliki retur yang terkunci.')
+                    ->title('Cannot delete')
+                    ->body('This receipt has locked returns.')
                     ->send();
                 return false;
             }

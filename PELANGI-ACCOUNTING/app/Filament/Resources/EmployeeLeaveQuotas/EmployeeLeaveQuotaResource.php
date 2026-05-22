@@ -28,19 +28,19 @@ class EmployeeLeaveQuotaResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Kuota Cuti');
+        return __('Leave Quota');
     }
 
     protected static ?int $navigationSort = 12;
 
     public static function getModelLabel(): string
     {
-        return __('Kuota Cuti');
+        return __('Leave Quota');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Kuota Cuti');
+        return __('Leave Quota');
     }
 
     public static function form(Schema $schema): Schema

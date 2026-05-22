@@ -13,10 +13,10 @@ class AttendanceSpotForm
     {
         return $schema
             ->components([
-                Section::make(__('Detail Spot Absensi'))
+                Section::make(__('Attendance Spot Details'))
                     ->schema([
                         TextInput::make('name')
-                            ->label(__('Nama Spot'))
+                            ->label(__('Spot Name'))
                             ->required()
                             ->maxLength(200),
                         TextInput::make('latitude')
@@ -35,7 +35,7 @@ class AttendanceSpotForm
                             ->numeric()
                             ->minValue(1),
                         Toggle::make('is_active')
-                            ->label(__('Aktif'))
+                            ->label(__('Active'))
                             ->default(true),
                     ])
                     ->columns(2)

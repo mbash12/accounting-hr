@@ -15,7 +15,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ManageOpeningBalances;
 use App\Filament\Pages\ManageAccountMappings;
-use App\Filament\Pages\SyncMonitoring;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -64,49 +63,6 @@ class MainPanelProvider extends PanelProvider
                     $userName = auth()->user() ? e(auth()->user()->name) : '';
                     return '
                         <link rel="icon" type="image/x-icon" href="' . asset('fav.png') . '">
-                        <link rel="preconnect" href="https://fonts.googleapis.com">
-                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-                        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-                        <link rel="stylesheet" href="' . asset('css/filament/admin/theme.css') . '">
-                        <script>
-                            // Force light mode immediately
-                            document.documentElement.classList.remove("dark");
-                            document.documentElement.classList.add("light");
-                            document.documentElement.setAttribute("data-theme", "light");
-
-                            // Clear any theme preferences
-                            localStorage.removeItem("theme");
-                            localStorage.removeItem("filament-theme");
-                            localStorage.setItem("theme", "light");
-
-                            document.addEventListener("DOMContentLoaded", function () {
-                                const userMenu = document.querySelector(".fi-user-menu .fi-link");
-                                if (userMenu && "' . $userName . '") {
-                                    userMenu.setAttribute("data-user-name", "' . $userName . '");
-                                }
-
-                                // Continuously enforce light mode
-                                setInterval(() => {
-                                    document.documentElement.classList.remove("dark");
-                                    document.documentElement.classList.add("light");
-                                }, 100);
-                            });
-
-                            // Also enforce light mode after DOM is loaded
-                            window.addEventListener("load", function () {
-                                document.documentElement.classList.remove("dark");
-                                document.documentElement.classList.add("light");
-                            });
-                        </script>
-                    ';
-                },
-            )
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                function (): string {
-                    $userName = auth()->user() ? e(auth()->user()->name) : '';
-                    $isLoginPage = request()->routeIs('filament.main.auth.login');
-                    return '
                         <link rel="preconnect" href="https://fonts.googleapis.com">
                         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
                         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -209,13 +165,11 @@ class MainPanelProvider extends PanelProvider
                     ->icon(asset('icons/users.svg')),
                 NavigationGroup::make(__('Cash & Bank'))
                     ->icon(asset('icons/cash.svg')),
-                NavigationGroup::make(__('Ledger'))
+                NavigationGroup::make(__('General Ledger'))
                     ->icon(asset('icons/ledger.svg')),
-                NavigationGroup::make(__('Buku Besar'))
-                    ->icon(asset('icons/ledger.svg')),
-                NavigationGroup::make(__('Laporan Keuangan'))
+                NavigationGroup::make(__('Financial Reports'))
                     ->icon(asset('icons/report.svg')),
-                NavigationGroup::make(__('Laporan HR & Payroll'))
+                NavigationGroup::make(__('HR & Payroll Reports'))
                     ->icon(asset('icons/report.svg')),
             ])
 
@@ -226,7 +180,6 @@ class MainPanelProvider extends PanelProvider
                 Dashboard::class,
                 ManageOpeningBalances::class,
                 ManageAccountMappings::class,
-                SyncMonitoring::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([

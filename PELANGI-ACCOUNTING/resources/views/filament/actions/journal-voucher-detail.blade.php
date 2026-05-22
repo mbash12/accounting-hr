@@ -1,18 +1,18 @@
 <div class="journal-voucher-wrapper" style="background: white; padding: 0;">
     <div style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="font-size: 24px; font-weight: 700; color: #111827; margin: 0;">{{ __('Voucher Jurnal') }}</h2>
+        <h2 style="font-size: 24px; font-weight: 700; color: #111827; margin: 0;">{{ __('Journal Voucher') }}</h2>
         <div style="display: flex; gap: 8px;">
             <a href="{{ route('journal-voucher.print', $journalEntry->id) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #6b7280; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500;">
                 <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                 </svg>
-                {{ __('Cetak (A4)') }}
+                {{ __('Print (A4)') }}
             </a>
             <a href="{{ route('journal-voucher.pdf', $journalEntry->id) }}" target="_blank" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #6b7280; color: white; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 500;">
                 <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
-                {{ __('Ekspor ke PDF') }}
+                {{ __('Export to PDF') }}
             </a>
         </div>
     </div>
@@ -20,15 +20,15 @@
     <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Nomor Entri') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Entry Number') }}</div>
                 <div style="font-size: 14px; font-weight: 600; color: #111827;">{{ $journalEntry->entry_number }}</div>
             </div>
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Tanggal') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Date') }}</div>
                 <div style="font-size: 14px; font-weight: 600; color: #111827;">{{ $journalEntry->date->format('d/m/Y') }}</div>
             </div>
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Nomor Referensi') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Reference Number') }}</div>
                 <div style="font-size: 14px; font-weight: 600; color: #111827;">{{ $journalEntry->reference_no ?? '-' }}</div>
             </div>
             <div>
@@ -40,25 +40,25 @@
             </div>
             @if($journalEntry->description)
             <div style="grid-column: span 2;">
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Deskripsi') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Description') }}</div>
                 <div style="font-size: 14px; color: #111827;">{{ $journalEntry->description }}</div>
             </div>
             @endif
             {{-- @if($journalEntry->department)
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Departemen') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Department') }}</div>
                 <div style="font-size: 14px; color: #111827;">{{ $journalEntry->department->name }}</div>
             </div>
             @endif --}}
             @if($journalEntry->company)
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Perusahaan') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Company') }}</div>
                 <div style="font-size: 14px; color: #111827;">{{ $journalEntry->company->name }}</div>
             </div>
             @endif
             @if($journalEntry->postedByUser)
             <div>
-                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Diposting Oleh') }}</div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Posted By') }}</div>
                 <div style="font-size: 14px; color: #111827;">{{ $journalEntry->postedByUser->name }}</div>
             </div>
             @endif
@@ -76,12 +76,12 @@
             </colgroup>
             <thead>
                 <tr style="background: #eff6ff; border-bottom: 2px solid #bfdbfe;">
-                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Kode Akun') }}</th>
-                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Nama Akun') }}</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Account Code') }}</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Account Name') }}</th>
                     {{-- <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Pusat Biaya') }}</th> --}}
                     <th style="padding: 12px 16px; text-align: right; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Debit') }}</th>
-                    <th style="padding: 12px 16px; text-align: right; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Kredit') }}</th>
-                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af;">{{ __('Catatan') }}</th>
+                    <th style="padding: 12px 16px; text-align: right; font-size: 12px; font-weight: 600; color: #1e40af; border-right: 1px solid #bfdbfe;">{{ __('Credit') }}</th>
+                    <th style="padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; color: #1e40af;">{{ __('Notes') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -132,17 +132,17 @@
     <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="color: #dc2626; font-size: 16px;">⚠️</span>
-            <span style="font-size: 13px; font-weight: 500; color: #991b1b;">{{ __('Peringatan: Total Debit dan Kredit tidak seimbang!') }}</span>
+            <span style="font-size: 13px; font-weight: 500; color: #991b1b;">{{ __('Warning: Total Debit and Credit are not balanced!') }}</span>
         </div>
         <div style="font-size: 12px; color: #b91c1c; margin-top: 4px; margin-left: 24px;">
-            {{ __('Selisih: Rp') }} {{ number_format(abs($totalDebit - $totalCredit), 0, ',', '.') }}
+            {{ __('Difference: Rp') }} {{ number_format(abs($totalDebit - $totalCredit), 0, ',', '.') }}
         </div>
     </div>
     @else
     <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
         <div style="display: flex; align-items: center; gap: 8px;">
             <span style="color: #16a34a; font-size: 16px;">✓</span>
-            <span style="font-size: 13px; font-weight: 500; color: #166534;">{{ __('Jurnal seimbang: Total Debit = Total Kredit') }}</span>
+            <span style="font-size: 13px; font-weight: 500; color: #166534;">{{ __('Journal balanced: Total Debit = Total Credit') }}</span>
         </div>
     </div>
     @endif
@@ -151,12 +151,12 @@
     <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;">
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
             <div>
-                <div style="font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Diposting Pada') }}</div>
+                <div style="font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Posted At') }}</div>
                 <div style="font-size: 12px; color: #111827;">{{ $journalEntry->posted_at->format('d/m/Y H:i:s') }}</div>
             </div>
             @if($journalEntry->createdByUser)
             <div>
-                <div style="font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Dibuat Oleh') }}</div>
+                <div style="font-size: 11px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Created By') }}</div>
                 <div style="font-size: 12px; color: #111827;">{{ $journalEntry->createdByUser->name }}</div>
             </div>
             @endif

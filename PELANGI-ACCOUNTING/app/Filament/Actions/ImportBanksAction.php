@@ -13,35 +13,35 @@ class ImportBanksAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'import')
-            ->label('Impor')
+            ->label('Import')
             ->icon('heroicon-o-arrow-up-tray')
             ->form([
                 FileUpload::make('file')
-                    ->label('File Data Bank')
-                    ->helperText('Unggah file Excel (.xlsx) dengan data bank termasuk kolom: bank_code, bank_name, country, clearing_code, skn_code, active_status')
+                    ->label('Bank Data File')
+                    ->helperText('Upload Excel file (.xlsx) with bank data including columns: bank_code, bank_name, country, clearing_code, skn_code, active_status')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
-            ->modalHeading('Impor Data Bank')
-            ->modalDescription('Unggah file Excel dengan informasi bank. Anda dapat mengunduh template di bawah untuk melihat format yang diharapkan.')
+            ->modalHeading('Import Banks')
+            ->modalDescription('Upload Excel file with bank information. You can download the template below to see the expected format.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
-                    ->label('Unduh Template')
+                    ->label('Download Template')
                     ->icon('heroicon-o-arrow-down-tray')
                     ->color('gray')
                     ->action(function () {
                         try {
                             return Excel::download(
                                 new \App\Exports\BanksTemplateExport(),
-                                'template-impor-bank.xlsx'
+                                'bank-import-template.xlsx'
                             );
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title('Unduh Template Gagal')
-                                ->body('Terjadi kesalahan saat mengunduh template bank: ' . $e->getMessage())
+                                ->title('Template Download Failed')
+                                ->body('An error occurred while downloading the bank template: ' . $e->getMessage())
                                 ->send();
                         }
                     }),
@@ -53,14 +53,14 @@ class ImportBanksAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Impor Berhasil')
-                        ->body('Data bank berhasil diimpor.')
+                        ->title('Import Successful')
+                        ->body('Bank data imported successfully.')
                         ->send();
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Impor Gagal')
-                        ->body('Terjadi kesalahan saat mengimpor data bank: ' . $e->getMessage())
+                        ->title('Import Failed')
+                        ->body('An error occurred while importing bank data: ' . $e->getMessage())
                         ->send();
                 }
             });

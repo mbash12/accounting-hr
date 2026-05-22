@@ -18,7 +18,7 @@ class GoodsReceiptItem extends Model
         static::creating(function ($model) {
             if ($model->goodsReceipt && $model->goodsReceipt->is_locked) {
                 throw \Illuminate\Validation\ValidationException::withMessages([
-                    'items' => 'Tidak dapat menambah item baru pada penerimaan yang terkunci.',
+                    'items' => 'Cannot add new item to a locked receipt.',
                 ]);
             }
         });
@@ -34,7 +34,7 @@ class GoodsReceiptItem extends Model
                 $newQty = (float) ($model->quantity ?? 0);
                 if ($newQty > $originalQty) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
-                        'items' => 'Kuantitas tidak boleh ditambah pada penerimaan yang terkunci.',
+                        'items' => 'Quantity cannot be increased on a locked receipt.',
                     ]);
                 }
             }
@@ -53,7 +53,7 @@ class GoodsReceiptItem extends Model
                     
                     if (($totalReceived + $model->quantity) > $orderItem->quantity) {
                         throw \Illuminate\Validation\ValidationException::withMessages([
-                            'quantity' => 'Total kuantitas penerimaan tidak boleh melebihi kuantitas pesanan.',
+                            'quantity' => 'Total received quantity cannot exceed order quantity.',
                         ]);
                     }
                 }
@@ -76,7 +76,6 @@ class GoodsReceiptItem extends Model
         'goods_receipt_id',
         'purchase_order_item_id',
         'product_id',
-        'item_name',
         'unit_id',
         'warehouse_id',
     ];

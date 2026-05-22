@@ -18,7 +18,7 @@ class ListHolidays extends ListRecords
     {
         return [
             Action::make('syncHolidays')
-                ->label(__('Sinkronisasi Hari Libur'))
+                ->label(__('Sync Holidays'))
                 ->icon('heroicon-o-arrow-path')
                 ->color('info')
                 ->requiresConfirmation()
@@ -31,7 +31,7 @@ class ListHolidays extends ListRecords
     {
         $companyId = session('selected_company_id');
         if (!$companyId || $companyId === 'all') {
-            Notification::make()->title(__('Pilih perusahaan terlebih dahulu'))->danger()->send();
+            Notification::make()->title(__('Please select a company first'))->danger()->send();
             return;
         }
 
@@ -67,8 +67,8 @@ class ListHolidays extends ListRecords
         }
 
         Notification::make()
-            ->title(__('Sinkronisasi Berhasil'))
-            ->body(__('Berhasil mengimpor :count hari libur', ['count' => $count]))
+            ->title(__('Sync Successful'))
+            ->body(__('Successfully imported :count holidays', ['count' => $count]))
             ->success()
             ->send();
     }

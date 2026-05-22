@@ -35,7 +35,7 @@ class FixedAssetCategoryExport implements FromCollection, WithHeadings, WithTitl
                     'asset_account_code' => $category->assetAccount?->code ?? '',
                     'accumulated_depreciation_account_code' => $category->accumulatedDepreciationAccount?->code ?? '',
                     'depreciation_account_code' => $category->depreciationAccount?->code ?? '',
-                    'is_active' => $category->is_active ? 'ya' : 'tidak',
+                    'is_active' => $category->is_active ? 'Yes' : 'No',
                 ];
             });
     }
@@ -43,19 +43,19 @@ class FixedAssetCategoryExport implements FromCollection, WithHeadings, WithTitl
     public function headings(): array
     {
         return [
-            'Nama Kategori Aset Tetap',
-            'Metode Penyusutan',
-            'Masa Manfaat (Tahun)',
-            'Kode Akun Penjualan',
-            'Kode Akun Aset',
-            'Kode Akun Akumulasi Penyusutan',
-            'Kode Akun Penyusutan',
-            'Status Aktif',
+            'Fixed Asset Category Name',
+            'Depreciation Method',
+            'Useful Life (Years)',
+            'Sales Account Code',
+            'Asset Account Code',
+            'Accumulated Depreciation Account Code',
+            'Depreciation Account Code',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Kategori Aset Tetap';
+        return 'Fixed Asset Category Data';
     }
 }

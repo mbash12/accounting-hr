@@ -12,19 +12,19 @@ class ExportPurchaseOrderWithItemsAction extends Action
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Ekspor')
+            ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
                     return Excel::download(
                         new PurchaseOrderWithItemsExport(),
-                        'pesanan-pembelian-dan-item-' . date('Y-m-d') . '.xlsx'
+                        'purchase-order-with-items-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
-                        ->title('Ekspor Gagal')
-                        ->body('Terjadi kesalahan saat mengekspor data pesanan pembelian dan item: ' . $e->getMessage())
+                        ->title('Export Failed')
+                        ->body('An error occurred while exporting purchase order with items: ' . $e->getMessage())
                         ->send();
                 }
             });

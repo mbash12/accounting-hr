@@ -22,17 +22,17 @@ class SalesInvoiceResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Penjualan';
+        return __('Sales');
     }
 
     public static function getNavigationLabel(): string
     {
-        return 'Faktur Penjualan';
+        return __('Sales Invoices');
     }
 
     public static function getModelLabel(): string
     {
-        return 'Faktur Penjualan';
+        return __('Sales Invoices');
     }
 
     public static function getNavigationSort(): int
@@ -42,7 +42,7 @@ class SalesInvoiceResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return 'Faktur Penjualan';
+        return __('Sales Invoices');
     }
 
     public static function form(Schema $schema): Schema

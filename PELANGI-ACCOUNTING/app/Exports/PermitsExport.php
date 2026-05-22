@@ -32,17 +32,17 @@ class PermitsExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'ID Karyawan',
-            'Tipe Izin',
-            'Tanggal Mulai',
-            'Tanggal Selesai',
-            'Alasan',
+            'Employee ID',
+            'Permit Type',
+            'Start Date',
+            'End Date',
+            'Reason',
             'Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Izin & Cuti';
+        return 'Permits & Leave Data';
     }
 }

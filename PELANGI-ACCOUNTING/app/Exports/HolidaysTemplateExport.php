@@ -11,9 +11,9 @@ class HolidaysTemplateExport implements FromArray, WithHeadings, WithTitle
     public function array(): array
     {
         return [
-            ['Hari Raya Idul Fitri', '2025-03-30', 'yes'],
-            ['Hari Kemerdekaan RI', '2025-08-17', 'no'],
-            ['Tahun Baru Masehi', '2025-01-01', 'no'],
+            ['Eid al-Fitr', '2025-03-30', 'yes'],
+            ['Indonesian Independence Day', '2025-08-17', 'no'],
+            ['New Year', '2025-01-01', 'no'],
         ];
     }
 
@@ -28,6 +28,6 @@ class HolidaysTemplateExport implements FromArray, WithHeadings, WithTitle
 
     public function title(): string
     {
-        return 'Template Impor Hari Libur';
+        return 'Holidays Import Template';
     }
 }

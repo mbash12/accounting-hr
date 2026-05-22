@@ -13,11 +13,11 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
 {
     public function collection(): Collection
     {
-        $query = PurchaseOrder::with(['supplier', 'department', 'items.product', 'items.unit', 'items.tax'])
+        $query = PurchaseOrder::with(['supplier', 'items.product', 'items.unit', 'items.tax'])
             ->select([
-                'id', 'purchase_order_no', 'order_type', 'date', 'reference_no', 'description',
+                'id', 'purchase_order_no', 'date', 'reference_no', 'description',
                 'other_charges', 'discount', 'discount_percentage', 'subtotal', 'tax_amount', 'total',
-                'total_amount', 'status', 'supplier_id', 'department_id', 'company_id'
+                'total_amount', 'status', 'supplier_id', 'company_id'
             ]);
 
         $query = CompanyFilterService::applyCompanyFilter($query);
@@ -29,63 +29,59 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
             if ($order->items->count() > 0) {
                 foreach ($order->items as $item) {
                     $results->push([
-                        'No. Pesanan Pembelian' => $order->purchase_order_no,
-                        'Tanggal' => $order->date ? $order->date->format('Y-m-d') : null,
-                        'Nomor Referensi' => $order->reference_no,
-                        'Deskripsi' => $order->description,
-                        'Biaya Lainnya' => $order->other_charges,
-                        'Diskon' => $order->discount,
-                        'Diskon Persen' => $order->discount_percentage,
+                        'Purchase Order No.' => $order->purchase_order_no,
+                        'Date' => $order->date ? $order->date->format('Y-m-d') : null,
+                        'Reference No.' => $order->reference_no,
+                        'Description' => $order->description,
+                        'Other Charges' => $order->other_charges,
+                        'Discount' => $order->discount,
+                        'Discount %' => $order->discount_percentage,
                         'Subtotal' => $order->subtotal,
-                        'Pajak' => $order->tax_amount,
+                        'Tax' => $order->tax_amount,
                         'Total' => $order->total_amount,
                         'Status' => $order->status,
-                        'Kode Pemasok' => $order->supplier ? $order->supplier->contact_code : null,
-                        'Nama Pemasok' => $order->supplier ? $order->supplier->name : null,
-                        'Kode Departemen' => $order->department ? $order->department->code : null,
-                        'Nama Departemen' => $order->department ? $order->department->name : null,
-                        'Kode Produk' => $item->product ? $item->product->code : null,
-                        'Nama Produk' => $item->product ? $item->product->name : null,
-                        'Deskripsi Item' => $item->description,
-                        'Jumlah' => $item->quantity,
-                        'Harga Satuan' => $item->unit_price,
-                        'Total Item' => $item->total,
-                        'Diskon Item' => $item->discount,
-                        'Diskon Persen Item' => $item->discount_percentage,
-                        'Pajak Item' => $item->tax_amount,
-                        'Kode Satuan' => $item->unit ? $item->unit->code : null,
-                        'Kode Pajak' => $item->tax ? $item->tax->code : null,
+                        'Supplier Code' => $order->supplier ? $order->supplier->contact_code : null,
+                        'Supplier Name' => $order->supplier ? $order->supplier->name : null,
+                        'Product Code' => $item->product ? $item->product->code : null,
+                        'Product Name' => $item->product ? $item->product->name : null,
+                        'Item Description' => $item->description,
+                        'Quantity' => $item->quantity,
+                        'Unit Price' => $item->unit_price,
+                        'Item Total' => $item->total,
+                        'Item Discount' => $item->discount,
+                        'Item Discount %' => $item->discount_percentage,
+                        'Item Tax' => $item->tax_amount,
+                        'Unit Code' => $item->unit ? $item->unit->code : null,
+                        'Tax Code' => $item->tax ? $item->tax->code : null,
                     ]);
                 }
             } else {
                 // If order has no items, still add the order row with empty item fields
                 $results->push([
-                    'No. Pesanan Pembelian' => $order->purchase_order_no,
-                    'Tanggal' => $order->date ? $order->date->format('Y-m-d') : null,
-                    'Nomor Referensi' => $order->reference_no,
-                    'Deskripsi' => $order->description,
-                    'Biaya Lainnya' => $order->other_charges,
-                    'Diskon' => $order->discount,
-                    'Diskon Persen' => $order->discount_percentage,
+                    'Purchase Order No.' => $order->purchase_order_no,
+                    'Date' => $order->date ? $order->date->format('Y-m-d') : null,
+                    'Reference No.' => $order->reference_no,
+                    'Description' => $order->description,
+                    'Other Charges' => $order->other_charges,
+                    'Discount' => $order->discount,
+                    'Discount %' => $order->discount_percentage,
                     'Subtotal' => $order->subtotal,
-                    'Pajak' => $order->tax_amount,
+                    'Tax' => $order->tax_amount,
                     'Total' => $order->total_amount,
                     'Status' => $order->status,
-                    'Kode Pemasok' => $order->supplier ? $order->supplier->contact_code : null,
-                    'Nama Pemasok' => $order->supplier ? $order->supplier->name : null,
-                    'Kode Departemen' => $order->department ? $order->department->code : null,
-                    'Nama Departemen' => $order->department ? $order->department->name : null,
-                    'Kode Produk' => null,
-                    'Nama Produk' => null,
-                    'Deskripsi Item' => null,
-                    'Jumlah' => null,
-                    'Harga Satuan' => null,
-                    'Total Item' => null,
-                    'Diskon Item' => null,
-                    'Diskon Persen Item' => null,
-                    'Pajak Item' => null,
-                    'Kode Satuan' => null,
-                    'Kode Pajak' => null,
+                    'Supplier Code' => $order->supplier ? $order->supplier->contact_code : null,
+                    'Supplier Name' => $order->supplier ? $order->supplier->name : null,
+                    'Product Code' => null,
+                    'Product Name' => null,
+                    'Item Description' => null,
+                    'Quantity' => null,
+                    'Unit Price' => null,
+                    'Item Total' => null,
+                    'Item Discount' => null,
+                    'Item Discount %' => null,
+                    'Item Tax' => null,
+                    'Unit Code' => null,
+                    'Tax Code' => null,
                 ]);
             }
         }
@@ -96,37 +92,35 @@ class PurchaseOrderWithItemsExport implements FromCollection, WithHeadings, With
     public function headings(): array
     {
         return [
-            'No. Pesanan Pembelian',
-            'Tanggal',
-            'Nomor Referensi',
-            'Deskripsi',
-            'Biaya Lainnya',
-            'Diskon',
-            'Diskon Persen',
+            'Purchase Order No.',
+            'Date',
+            'Reference No.',
+            'Description',
+            'Other Charges',
+            'Discount',
+            'Discount %',
             'Subtotal',
-            'Pajak',
+            'Tax',
             'Total',
             'Status',
-            'Kode Pemasok',
-            'Nama Pemasok',
-            'Kode Departemen',
-            'Nama Departemen',
-            'Kode Produk',
-            'Nama Produk',
-            'Deskripsi Item',
-            'Jumlah',
-            'Harga Satuan',
-            'Total Item',
-            'Diskon Item',
-            'Diskon Persen Item',
-            'Pajak Item',
-            'Kode Satuan',
-            'Kode Pajak',
+            'Supplier Code',
+            'Supplier Name',
+            'Product Code',
+            'Product Name',
+            'Item Description',
+            'Quantity',
+            'Unit Price',
+            'Item Total',
+            'Item Discount',
+            'Item Discount %',
+            'Item Tax',
+            'Unit Code',
+            'Tax Code',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Pesanan Pembelian dan Item';
+        return 'Purchase Orders and Items';
     }
 }

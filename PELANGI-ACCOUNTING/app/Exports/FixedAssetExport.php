@@ -40,7 +40,7 @@ class FixedAssetExport implements FromCollection, WithHeadings, WithTitle
                     'book_value' => $asset->book_value,
                     'category_code' => $asset->category?->code ?? '',
                     // 'department_code' => $asset->department?->code ?? '',
-                    'is_active' => $asset->is_active ? 'ya' : 'tidak',
+                    'is_active' => $asset->is_active ? 'Yes' : 'No',
                 ];
             });
     }
@@ -48,24 +48,24 @@ class FixedAssetExport implements FromCollection, WithHeadings, WithTitle
     public function headings(): array
     {
         return [
-            'Kode Aset',
-            'Nama Aset Tetap',
-            'Tanggal Perolehan',
-            'Deskripsi',
-            'Nilai Perolehan',
-            // 'Penyusutan Bulanan',
-            // 'Metode Penyusutan',
-            // 'Akumulasi Penyusutan',
-            'Masa Manfaat',
-            'Nilai Buku',
-            'Kode Kategori',
-            // 'Kode Departemen',
-            'Status Aktif',
+            'Asset Code',
+            'Fixed Asset Name',
+            'Acquisition Date',
+            'Description',
+            'Acquisition Value',
+            // 'Monthly Depreciation',
+            // 'Depreciation Method',
+            // 'Accumulated Depreciation',
+            'Useful Life',
+            'Book Value',
+            'Category Code',
+            // 'Department Code',
+            'Active Status',
         ];
     }
 
     public function title(): string
     {
-        return 'Data Aset Tetap';
+        return 'Fixed Asset Data';
     }
 }

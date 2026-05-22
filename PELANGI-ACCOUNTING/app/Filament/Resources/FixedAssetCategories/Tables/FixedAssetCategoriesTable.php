@@ -20,39 +20,39 @@ class FixedAssetCategoriesTable
         return $table
             ->columns([
                 TextColumn::make("name")
-                    ->label(__("Nama Kategori"))
+                    ->label(__("Category Name"))
                     ->searchable()
                     ->weight("bold"),
                 TextColumn::make("code")
-                    ->label(__("Kode Kategori"))
+                    ->label(__("Category Code"))
                     ->searchable()
                     ->weight("bold"),
                 TextColumn::make("depreciation_method")
-                    ->label(__("Metode Penyusutan"))
+                    ->label(__("Depreciation Method"))
                     ->searchable()
                     ->formatStateUsing(
                         fn(string $state): string => match ($state) {
-                            "straight_line" => __("Garis Lurus"),
-                            "declining_balance" => __("Saldo Menurun"),
-                            "double_declining" => __("Saldo Menurun Ganda"),
-                            "sum_of_years" => __("Jumlah Angka Tahun"),
-                            "units_of_production" => __("Satuan Hasil Produksi"),
+                            "straight_line" => __("Straight Line"),
+                            "declining_balance" => __("Declining Balance"),
+                            "double_declining" => __("Double Declining"),
+                            "sum_of_years" => __("Sum of Years"),
+                            "units_of_production" => __("Units of Production"),
                             default => $state,
                         },
                     ),
                 TextColumn::make("useful_life")
-                    ->label(__("Masa Manfaat"))
+                    ->label(__("Useful Life"))
                     ->numeric()
                     ->sortable()
-                    ->suffix(" " . __("tahun")),
+                    ->suffix(" " . __("years")),
 
-                IconColumn::make("is_active")->boolean()->label(__("Aktif")),
+                IconColumn::make("is_active")->boolean()->label(__("Active")),
                 TextColumn::make("assetAccount.name")
-                    ->label(__("Akun Aset"))
+                    ->label(__("Asset Account"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("depreciationAccount.name")
-                    ->label(__("Akun Penyusutan"))
+                    ->label(__("Depreciation Account"))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("createdByUser.name")

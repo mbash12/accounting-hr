@@ -4,9 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
-use App\Models\SalesInvoice;
 use App\Models\OvertimeLog;
-use App\Observers\SalesInvoiceObserver;
 use App\Observers\OvertimeLogObserver;
 
 class AppServiceProvider extends ServiceProvider
@@ -24,9 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Register observer for back-sync to Inventory
-        SalesInvoice::observe(SalesInvoiceObserver::class);
-
         // Auto-calculate overtime allowance on approval
         OvertimeLog::observe(OvertimeLogObserver::class);
         FilamentView::registerRenderHook(

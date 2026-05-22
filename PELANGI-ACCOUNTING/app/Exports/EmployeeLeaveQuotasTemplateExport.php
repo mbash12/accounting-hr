@@ -29,6 +29,6 @@ class EmployeeLeaveQuotasTemplateExport implements FromArray, WithHeadings, With
 
     public function title(): string
     {
-        return 'Template Impor Kuota Cuti';
+        return 'Employee Leave Quotas Import Template';
     }
 }

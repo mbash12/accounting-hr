@@ -19,12 +19,12 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
             $companyId = session('selected_company_id') && session('selected_company_id') !== 'all' ? session('selected_company_id') : null;
 
             // Find purchase account from account code
-            if (!empty($row['akun_pembelian'])) {
-                $account = Account::where('code', 'ilike', (string) $row['akun_pembelian'])
+            if (!empty($row['purchase_account'])) {
+                $account = Account::where('code', 'ilike', (string) $row['purchase_account'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$account) {
-                    throw new \Exception("Account with code '{$row['akun_pembelian']}' not found in current company");
+                    throw new \Exception("Account with code '{$row['purchase_account']}' not found in current company");
                 }
                 $purchaseAccountId = $account->id;
             } else {
@@ -32,27 +32,27 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
             }
 
             // Find sales account from account code
-            if (!empty($row['akun_penjualan'])) {
-                $account = Account::where('code', 'ilike', (string) $row['akun_penjualan'])
+            if (!empty($row['sales_account'])) {
+                $account = Account::where('code', 'ilike', (string) $row['sales_account'])
                     ->where('company_id', $companyId)
                     ->first();
                 if (!$account) {
-                    throw new \Exception("Account with code '{$row['akun_penjualan']}' not found in current company");
+                    throw new \Exception("Account with code '{$row['sales_account']}' not found in current company");
                 }
                 $salesAccountId = $account->id;
             } else {
                 $salesAccountId = null; // Sales account is optional
             }
 
-            $tax = Tax::where('code', (string) $row['kode_pajak'])
+            $tax = Tax::where('code', (string) $row['tax_code'])
                 ->where('company_id', $companyId)
                 ->first();
 
             // Clean the tax percentage value before converting to float
             $taxPercentage = 0;
-            if (isset($row['persentase_pajak'])) {
+            if (isset($row['tax_percentage'])) {
                 // Clean the value by removing any non-numeric characters except decimal point and minus
-                $cleanedValue = preg_replace('/[^0-9.\-]/', '', trim((string) $row['persentase_pajak'], '"\' '));
+                $cleanedValue = preg_replace('/[^0-9.\-]/', '', trim((string) $row['tax_percentage'], '"\' '));
 
                 // Handle edge case: if value starts with decimal point, prepend 0
                 if ($cleanedValue !== '' && $cleanedValue[0] === '.') {
@@ -69,17 +69,17 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
             }
 
             $data = [
-                'name' => isset($row['nama_pajak']) ? (string) $row['nama_pajak'] : null,
+                'name' => isset($row['tax_name']) ? (string) $row['tax_name'] : null,
                 'tax_percentage' => $taxPercentage,
-                'tax_type' => isset($row['jenis_pajak']) ? (string) $row['jenis_pajak'] : 'vat',
-                'is_purchase_tax' => isset($row['pajak_pembelian']) &&
-                    (strtolower((string) $row['pajak_pembelian']) === 'ya' ||
-                        strtolower((string) $row['pajak_pembelian']) === 'true' ||
-                        (string) $row['pajak_pembelian'] === '1'),
-                'is_sales_tax' => isset($row['pajak_penjualan']) &&
-                    (strtolower((string) $row['pajak_penjualan']) === 'ya' ||
-                        strtolower((string) $row['pajak_penjualan']) === 'true' ||
-                        (string) $row['pajak_penjualan'] === '1'),
+                'tax_type' => isset($row['tax_type']) ? (string) $row['tax_type'] : 'vat',
+                'is_purchase_tax' => isset($row['purchase_tax']) &&
+                    (strtolower((string) $row['purchase_tax']) === 'ya' ||
+                        strtolower((string) $row['purchase_tax']) === 'true' ||
+                        (string) $row['purchase_tax'] === '1'),
+                'is_sales_tax' => isset($row['sales_tax']) &&
+                    (strtolower((string) $row['sales_tax']) === 'ya' ||
+                        strtolower((string) $row['sales_tax']) === 'true' ||
+                        (string) $row['sales_tax'] === '1'),
                 'effective_date' => isset($row['tanggal_berlaku']) ?
                     (\DateTime::createFromFormat('Y-m-d', (string) $row['tanggal_berlaku']) ?:
                         \DateTime::createFromFormat('d/m/Y', (string) $row['tanggal_berlaku'])) :
@@ -92,10 +92,10 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
                     (strtolower((string) $row['pajak_majemuk']) === 'ya' ||
                         strtolower((string) $row['pajak_majemuk']) === 'true' ||
                         (string) $row['pajak_majemuk'] === '1'),
-                'is_active' => isset($row['status_aktif']) &&
-                    (strtolower((string) $row['status_aktif']) === 'ya' ||
-                        strtolower((string) $row['status_aktif']) === 'true' ||
-                        (string) $row['status_aktif'] === '1'),
+                'is_active' => isset($row['active_status']) &&
+                    (strtolower((string) $row['active_status']) === 'ya' ||
+                        strtolower((string) $row['active_status']) === 'true' ||
+                        (string) $row['active_status'] === '1'),
                 'purchase_account_id' => $purchaseAccountId,
                 'sales_account_id' => $salesAccountId,
                 'created_by_user_id' => Auth::id(),
@@ -104,7 +104,7 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
             if ($tax) {
                 $tax->update($data);
             } else {
-                $data['code'] = (string) $row['kode_pajak'];
+                $data['code'] = (string) $row['tax_code'];
                 $data['company_id'] = $companyId;
                 Tax::create($data);
             }
@@ -118,34 +118,34 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
     {
         // Convert boolean fields from text to boolean before validation
         $isPurchaseTax = false;
-        if (isset($data['pajak_pembelian'])) {
+        if (isset($data['purchase_tax'])) {
             $isPurchaseTax = \in_array(
-                strtolower((string) $data['pajak_pembelian']),
+                strtolower((string) $data['purchase_tax']),
                 ['ya', 'true', '1']
             );
         }
 
         $isSalesTax = false;
-        if (isset($data['pajak_penjualan'])) {
+        if (isset($data['sales_tax'])) {
             $isSalesTax = \in_array(
-                strtolower((string) $data['pajak_penjualan']),
+                strtolower((string) $data['sales_tax']),
                 ['ya', 'true', '1']
             );
         }
 
         $isActive = false;
-        if (isset($data['status_aktif'])) {
+        if (isset($data['active_status'])) {
             $isActive = \in_array(
-                strtolower((string) $data['status_aktif']),
+                strtolower((string) $data['active_status']),
                 ['ya', 'true', '1']
             );
         }
 
         // Clean percentage value - remove any non-numeric characters except decimal point and minus
         $persentasePajak = null;
-        if (isset($data['persentase_pajak'])) {
+        if (isset($data['tax_percentage'])) {
             // First, trim any quotes and whitespace
-            $rawValue = trim((string) $data['persentase_pajak'], '"\' ');
+            $rawValue = trim((string) $data['tax_percentage'], '"\' ');
             // Remove any non-numeric characters except decimal point and minus
             $cleaned = preg_replace('/[^0-9.\-]/', '', $rawValue);
             // Handle edge case: if value starts with decimal point, prepend 0
@@ -160,15 +160,15 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
         }
 
         return [
-            'nama_pajak' => isset($data['nama_pajak']) ? (string) $data['nama_pajak'] : null,
-            'kode_pajak' => isset($data['kode_pajak']) ? (string) $data['kode_pajak'] : null,
-            'persentase_pajak' => $persentasePajak,
-            'jenis_pajak' => isset($data['jenis_pajak']) ? (string) $data['jenis_pajak'] : null,
-            'pajak_pembelian' => $isPurchaseTax,
-            'pajak_penjualan' => $isSalesTax,
-            'status_aktif' => $isActive,
-            'akun_pembelian' => isset($data['akun_pembelian']) ? (string) $data['akun_pembelian'] : null,
-            'akun_penjualan' => isset($data['akun_penjualan']) ? (string) $data['akun_penjualan'] : null,
+            'tax_name' => isset($data['tax_name']) ? (string) $data['tax_name'] : null,
+            'tax_code' => isset($data['tax_code']) ? (string) $data['tax_code'] : null,
+            'tax_percentage' => $persentasePajak,
+            'tax_type' => isset($data['tax_type']) ? (string) $data['tax_type'] : null,
+            'purchase_tax' => $isPurchaseTax,
+            'sales_tax' => $isSalesTax,
+            'active_status' => $isActive,
+            'purchase_account' => isset($data['purchase_account']) ? (string) $data['purchase_account'] : null,
+            'sales_account' => isset($data['sales_account']) ? (string) $data['sales_account'] : null,
             'created_by_user_id' => Auth::check() ? Auth::id() : null,
         ];
     }
@@ -180,9 +180,9 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
         $companyId = ($selectedCompanyId && $selectedCompanyId !== 'all') ? $selectedCompanyId : null;
 
         return [
-            'nama_pajak' => 'required|string|max:200',
-            'kode_pajak' => 'required|string|max:50',
-            'persentase_pajak' => [
+            'tax_name' => 'required|string|max:200',
+            'tax_code' => 'required|string|max:50',
+            'tax_percentage' => [
                 'required',
                 'string',
                 function ($attribute, $value, $fail) {
@@ -209,12 +209,12 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
                     }
                 }
             ],
-            'jenis_pajak' => 'required|in:vat,sales_tax,service_tax,withholding_tax,excise_tax',
-            'pajak_pembelian' => 'nullable|boolean',
-            'pajak_penjualan' => 'nullable|boolean',
-            'status_aktif' => 'nullable|boolean',
-            'akun_pembelian' => 'nullable|string|max:50',
-            'akun_penjualan' => 'nullable|string|max:50',
+            'tax_type' => 'required|in:vat,sales_tax,service_tax,withholding_tax,excise_tax',
+            'purchase_tax' => 'nullable|boolean',
+            'sales_tax' => 'nullable|boolean',
+            'active_status' => 'nullable|boolean',
+            'purchase_account' => 'nullable|string|max:50',
+            'sales_account' => 'nullable|string|max:50',
             'created_by_user_id' => 'nullable|integer',
         ];
     }
@@ -222,15 +222,15 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
     public function customValidationMessages()
     {
         return [
-            'nama_pajak.required' => 'Nama Pajak wajib diisi.',
-            'nama_pajak.max' => 'Nama Pajak tidak boleh lebih dari 200 karakter.',
-            'kode_pajak.required' => 'Kode Pajak wajib diisi.',
-            'kode_pajak.max' => 'Kode Pajak tidak boleh lebih dari 50 karakter.',
-            'persentase_pajak.required' => 'Persentase Pajak wajib diisi.',
-            'jenis_pajak.required' => 'Jenis Pajak wajib diisi.',
-            'jenis_pajak.in' => 'Jenis Pajak harus salah satu dari: vat, sales_tax, service_tax, withholding_tax, excise_tax.',
-            'akun_pembelian.max' => 'Kode Akun Pembelian tidak boleh lebih dari 50 karakter.',
-            'akun_penjualan.max' => 'Kode Akun Penjualan tidak boleh lebih dari 50 karakter.',
+            'tax_name.required' => 'Tax Name is required.',
+            'tax_name.max' => 'Tax Name cannot exceed 200 characters.',
+            'tax_code.required' => 'Tax Code is required.',
+            'tax_code.max' => 'Tax Code cannot exceed 50 characters.',
+            'tax_percentage.required' => 'Tax Percentage is required.',
+            'tax_type.required' => 'Tax Type is required.',
+            'tax_type.in' => 'Tax Type must be one of: vat, sales_tax, service_tax, withholding_tax, excise_tax.',
+            'purchase_account.max' => 'Purchase Account Code cannot exceed 50 characters.',
+            'sales_account.max' => 'Sales Account Code cannot exceed 50 characters.',
         ];
     }
 
@@ -240,15 +240,15 @@ class TaxImport implements ToCollection, WithHeadingRow, WithValidation
     public function validationAttributes()
     {
         return [
-            'nama_pajak' => 'Nama Pajak',
-            'kode_pajak' => 'Kode Pajak',
-            'persentase_pajak' => 'Persentase Pajak',
-            'jenis_pajak' => 'Jenis Pajak',
-            'pajak_pembelian' => 'Pajak Pembelian',
-            'pajak_penjualan' => 'Pajak Penjualan',
-            'status_aktif' => 'Status Aktif',
-            'akun_pembelian' => 'Akun Pembelian',
-            'akun_penjualan' => 'Akun Penjualan',
+            'tax_name' => 'Tax Name',
+            'tax_code' => 'Tax Code',
+            'tax_percentage' => 'Tax Percentage',
+            'tax_type' => 'Tax Type',
+            'purchase_tax' => 'Purchase Tax',
+            'sales_tax' => 'Sales Tax',
+            'active_status' => 'Active Status',
+            'purchase_account' => 'Purchase Account',
+            'sales_account' => 'Sales Account',
         ];
     }
 }

@@ -17,25 +17,25 @@ class ProductGroupsImport implements ToCollection, WithHeadingRow, WithValidatio
             // Convert all values to strings to avoid type errors
             $companyId = session('selected_company_id') && session('selected_company_id') !== 'all' ? session('selected_company_id') : null;
 
-            $productGroup = ProductGroup::where('code', (string) $row['kode_grup_produk'])
+            $productGroup = ProductGroup::where('code', (string) $row['product_group_code'])
                 ->where('company_id', $companyId)
                 ->first();
 
             $data = [
-                'code' => (string) $row['kode_grup_produk'],
-                'shipping_type' => (string) $row['tipe_pengiriman'],
-                'is_active' => isset($row['status_aktif']) &&
-                    (strtolower((string) $row['status_aktif']) === 'ya' ||
-                        strtolower((string) $row['status_aktif']) === 'yes' ||
-                        strtolower((string) $row['status_aktif']) === 'true' ||
-                        (string) $row['status_aktif'] === '1'),
+                'code' => (string) $row['product_group_code'],
+                'shipping_type' => (string) $row['shipping_type'],
+                'is_active' => isset($row['active_status']) &&
+                    (strtolower((string) $row['active_status']) === 'ya' ||
+                        strtolower((string) $row['active_status']) === 'yes' ||
+                        strtolower((string) $row['active_status']) === 'true' ||
+                        (string) $row['active_status'] === '1'),
                 'created_by_user_id' => Auth::id(),
             ];
 
             if ($productGroup) {
                 $productGroup->update($data);
             } else {
-                $data['name'] = (string) $row['nama_grup_produk'];
+                $data['name'] = (string) $row['product_group_name'];
                 $data['company_id'] = $companyId;
                 ProductGroup::create($data);
             }
@@ -49,10 +49,10 @@ class ProductGroupsImport implements ToCollection, WithHeadingRow, WithValidatio
     {
         // Convert all fields to strings to satisfy validation rules
         return [
-            'nama_grup_produk' => isset($data['nama_grup_produk']) ? (string) $data['nama_grup_produk'] : null,
-            'kode_grup_produk' => isset($data['kode_grup_produk']) ? (string) $data['kode_grup_produk'] : null,
-            'tipe_pengiriman' => isset($data['tipe_pengiriman']) ? (string) $data['tipe_pengiriman'] : null,
-            'status_aktif' => isset($data['status_aktif']) ? (string) $data['status_aktif'] : null,
+            'product_group_name' => isset($data['product_group_name']) ? (string) $data['product_group_name'] : null,
+            'product_group_code' => isset($data['product_group_code']) ? (string) $data['product_group_code'] : null,
+            'shipping_type' => isset($data['shipping_type']) ? (string) $data['shipping_type'] : null,
+            'active_status' => isset($data['active_status']) ? (string) $data['active_status'] : null,
         ];
     }
 
@@ -62,22 +62,22 @@ class ProductGroupsImport implements ToCollection, WithHeadingRow, WithValidatio
         $companyId = ($selectedCompanyId && $selectedCompanyId !== 'all') ? $selectedCompanyId : null;
 
         return [
-            'nama_grup_produk' => 'required|string|max:255',
-            'kode_grup_produk' => 'required|string|max:255',
-            'tipe_pengiriman' => 'required|string|in:physical,digital',
-            'status_aktif' => 'nullable|string',
+            'product_group_name' => 'required|string|max:255',
+            'product_group_code' => 'required|string|max:255',
+            'shipping_type' => 'required|string|in:physical,digital',
+            'active_status' => 'nullable|string',
         ];
     }
 
     public function customValidationMessages()
     {
         return [
-            'nama_grup_produk.required' => 'Nama Grup Produk wajib diisi.',
-            'nama_grup_produk.max' => 'Nama Grup Produk tidak boleh lebih dari 255 karakter.',
-            'kode_grup_produk.required' => 'Kode Grup Produk wajib diisi.',
-            'kode_grup_produk.max' => 'Kode Grup Produk tidak boleh lebih dari 255 karakter.',
-            'tipe_pengiriman.required' => 'Tipe Pengiriman wajib diisi.',
-            'tipe_pengiriman.in' => 'Tipe Pengiriman harus "physical" atau "digital".',
+            'product_group_name.required' => 'Product Group Name is required.',
+            'product_group_name.max' => 'Product Group Name cannot exceed 255 characters.',
+            'product_group_code.required' => 'Product Group Code is required.',
+            'product_group_code.max' => 'Product Group Code cannot exceed 255 characters.',
+            'shipping_type.required' => 'Shipping Type is required.',
+            'shipping_type.in' => 'Shipping Type must be "physical" or "digital".',
         ];
     }
 }

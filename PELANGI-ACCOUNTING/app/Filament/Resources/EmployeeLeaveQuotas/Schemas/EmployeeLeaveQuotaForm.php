@@ -16,10 +16,10 @@ class EmployeeLeaveQuotaForm
     {
         return $schema
             ->components([
-                Section::make(__('Kuota Cuti Karyawan'))
+                Section::make(__('Employee Leave Quota'))
                     ->schema([
                         Select::make('employee_id')
-                            ->label(__('Karyawan'))
+                            ->label(__('Employee'))
                             ->relationship(
                                 name: 'employee', 
                                 titleAttribute: 'name',
@@ -37,29 +37,29 @@ class EmployeeLeaveQuotaForm
                             ->searchable()
                             ->preload(),
                         TextInput::make('year')
-                            ->label(__('Tahun'))
+                            ->label(__('Year'))
                             ->required()
                             ->numeric()
                             ->default(now()->year)
                             ->minLength(4)
                             ->maxLength(4),
                         NumberInput::make('total_quota')
-                            ->label(__('Total Kuota (Hari)'))
+                            ->label(__('Total Quota (Days)'))
                             ->required()
                             ->default(12)
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => self::updateRemaining($get, $set))
                             ->decimal(false),
                         NumberInput::make('used_quota')
-                            ->label(__('Kuota Terpakai (Hari)'))
+                            ->label(__('Used Quota (Days)'))
                             ->required()
                             ->default(0)
                             ->live()
                             ->afterStateUpdated(fn (Get $get, Set $set) => self::updateRemaining($get, $set))
-                            ->helperText(__('Sesuaikan manual jika sistem baru digunakan di tengah tahun.'))
+                            ->helperText(__('Adjust manually if the system was adopted mid-year.'))
                             ->decimal(false),
                         NumberInput::make('remaining_quota')
-                            ->label(__('Sisa Kuota (Hari)'))
+                            ->label(__('Remaining Quota (Days)'))
                             ->required()
                             ->readOnly()
                             ->default(12)
@@ -67,16 +67,16 @@ class EmployeeLeaveQuotaForm
                     ])
                     ->columns(3)
                     ->columnSpanFull(),
-                Section::make(__('Sistem'))
+                Section::make(__('System'))
                     ->collapsible()
                     ->collapsed()
                     ->schema([
                         Select::make('company_id')
-                            ->label(__('Perusahaan'))
+                            ->label(__('Company'))
                             ->relationship('company', 'name')
                             ->disabled(),
                         Select::make('created_by_user_id')
-                            ->label(__('Dibuat Oleh'))
+                            ->label(__('Created By'))
                             ->relationship('createdByUser', 'name')
                             ->disabled(),
                     ])

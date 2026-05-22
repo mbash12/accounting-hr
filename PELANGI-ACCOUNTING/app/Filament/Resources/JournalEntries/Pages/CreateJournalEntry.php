@@ -25,7 +25,7 @@ class CreateJournalEntry extends CreateRecord
 
         return [
             Action::make('save')
-                ->label(__('Simpan'))
+                ->label(__('Save'))
                 ->action('create')
                 ->keyBindings(['mod+s'])
                 ->visible($isBalanced),
@@ -69,11 +69,11 @@ class CreateJournalEntry extends CreateRecord
             $credit = NumberInput::parseToFloat($itemArray['credit'] ?? $itemArray['credit_display'] ?? 0);
             
             if ($debit <= 0 && $credit <= 0) {
-                $this->NotificationHalt(__('Item :index harus memiliki nilai debit atau kredit.', ['index' => $index + 1]));
+                $this->NotificationHalt(__('Item :index must have a debit or credit value.', ['index' => $index + 1]));
             }
             
             if ($debit > 0 && $credit > 0) {
-                $this->NotificationHalt(__('Item :index tidak boleh memiliki nilai debit dan kredit sekaligus.', ['index' => $index + 1]));
+                $this->NotificationHalt(__('Item :index cannot have both debit and credit values.', ['index' => $index + 1]));
             }
         }
         

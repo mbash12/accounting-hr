@@ -23,14 +23,14 @@ class THRCalculationsTable
             ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('name')
-                    ->label(__('Nama'))
+                    ->label(__('Name'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('year')
-                    ->label(__('Tahun'))
+                    ->label(__('Year'))
                     ->sortable(),
                 TextColumn::make('payout_date')
-                    ->label(__('Tanggal Payout'))
+                    ->label(__('Payout Date'))
                     ->date()
                     ->sortable(),
                 TextColumn::make('status')
@@ -38,8 +38,8 @@ class THRCalculationsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'draft' => __('Draft'),
-                        'processed' => __('Diproses'),
-                        'posted' => __('Diposting'),
+                        'processed' => __('Processed'),
+                        'posted' => __('Posted'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -55,7 +55,7 @@ class THRCalculationsTable
             ->recordActions([
                 ActionGroup::make([
                     Action::make('calculateTHR')
-                        ->label(__('Hitung THR'))
+                        ->label(__('Calculate THR'))
                         ->icon('heroicon-o-cpu-chip')
                         ->requiresConfirmation()
                         ->visible(fn (THRCalculation $record): bool => $record->status !== 'posted')
@@ -63,12 +63,12 @@ class THRCalculationsTable
                             try {
                                 $service->calculateTHRForPeriod($record);
                                 Notification::make()
-                                    ->title(__('THR berhasil dihitung'))
+                                    ->title(__('THR calculated successfully'))
                                     ->success()
                                     ->send();
                             } catch (\Exception $e) {
                                 Notification::make()
-                                    ->title(__('Gagal menghitung THR'))
+                                    ->title(__('Failed to calculate THR'))
                                     ->body($e->getMessage())
                                     ->danger()
                                     ->persistent()
@@ -76,7 +76,7 @@ class THRCalculationsTable
                             }
                         }),
                     Action::make('postToLedger')
-                        ->label(__('Posting ke Jurnal'))
+                        ->label(__('Post to Journal'))
                         ->icon('heroicon-o-book-open')
                         ->requiresConfirmation()
                         ->visible(fn (THRCalculation $record): bool => $record->status === 'processed')
@@ -85,12 +85,12 @@ class THRCalculationsTable
                             try {
                                 $service->postTHRToLedger($record);
                                 Notification::make()
-                                    ->title(__('THR berhasil diposting ke jurnal'))
+                                    ->title(__('THR posted to journal successfully'))
                                     ->success()
                                     ->send();
                             } catch (\Exception $e) {
                                 Notification::make()
-                                    ->title(__('Gagal posting ke jurnal'))
+                                    ->title(__('Failed to post to journal'))
                                     ->body($e->getMessage())
                                     ->danger()
                                     ->persistent()

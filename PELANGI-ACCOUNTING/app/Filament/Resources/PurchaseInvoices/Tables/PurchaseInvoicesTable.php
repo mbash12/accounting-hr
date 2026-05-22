@@ -25,26 +25,26 @@ class PurchaseInvoicesTable
         return $table
             ->columns([
                 TextColumn::make("invoice_number")
-                    ->label(__("No. Faktur"))
+                    ->label(__("Invoice No."))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("date")
-                    ->label(__("Tanggal"))
+                    ->label(__("Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("due_date")
-                    ->label(__("Jatuh Tempo"))
+                    ->label(__("Due Date"))
                     ->date()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("paymentTerm.name")
-                    ->label(__("Termin"))
+                    ->label(__("Payment Term"))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make("supplier.name")
-                    ->label(__("Pemasok"))
+                    ->label(__("Supplier"))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("total")
@@ -72,34 +72,26 @@ class PurchaseInvoicesTable
                         },
                     ),
                 TextColumn::make("purchaseOrder.purchase_order_no")
-                    ->label(__("No. Pesanan Pembelian"))
+                    ->label(__("Purchase Order No."))
                     ->searchable()
                     ->sortable(),
-                TextColumn::make("purchaseOrder.salesOrder.client_po_number")
-                    ->label(__("No. PO Pelanggan"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("purchaseOrder.salesOrder.jb_job_number")
-                    ->label(__("No. Job JB"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("job.title")
-                    ->label(__("Proyek"))
+                    ->label(__("Project"))
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("created_at")
-                    ->label(__("Dibuat Pada"))
+                    ->label(__("Created At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("updated_at")
-                    ->label(__("Diperbarui Pada"))
+                    ->label(__("Updated At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make("deleted_at")
-                    ->label(__("Dihapus Pada"))
+                    ->label(__("Deleted At"))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -117,9 +109,9 @@ class PurchaseInvoicesTable
                 Filter::make('date')
                     ->form([
                         \Filament\Forms\Components\DatePicker::make('date_from')
-                            ->label('Dari Tanggal'),
+                            ->label('From Date'),
                         \Filament\Forms\Components\DatePicker::make('date_until')
-                            ->label('Sampai Tanggal'),
+                            ->label('To Date'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -135,17 +127,17 @@ class PurchaseInvoicesTable
                     ->indicateUsing(function (array $data): array {
                         $indicators = [];
                         if ($data['date_from'] ?? null) {
-                            $indicators[] = 'Dari: ' . $data['date_from'];
+                            $indicators[] = 'From: ' . $data['date_from'];
                         }
                         if ($data['date_until'] ?? null) {
-                            $indicators[] = 'Sampai: ' . $data['date_until'];
+                            $indicators[] = 'To: ' . $data['date_until'];
                         }
                         return $indicators;
                     }),
                 Filter::make('supplier')
                     ->form([
                         \Filament\Forms\Components\Select::make('supplier_id')
-                            ->label('Pemasok')
+                            ->label('Supplier')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\Contact::query()->where('is_supplier', true);
@@ -187,12 +179,12 @@ class PurchaseInvoicesTable
                             return null;
                         }
                         $supplier = \App\Models\Contact::find($data['supplier_id']);
-                        return 'Pemasok: ' . ($supplier?->name ?? $data['supplier_id']);
+                        return 'Supplier: ' . ($supplier?->name ?? $data['supplier_id']);
                     }),
                 Filter::make('purchase_order')
                     ->form([
                         \Filament\Forms\Components\Select::make('purchase_order_id')
-                            ->label('No. Pesanan Pembelian')
+                            ->label('Purchase Order No.')
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
                                 $query = \App\Models\PurchaseOrder::query();
@@ -263,7 +255,7 @@ class PurchaseInvoicesTable
                 ExportPurchaseInvoiceWithItemsAction::make(),
                 BulkActionGroup::make([
                     \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Ubah Status')
+                        ->label('Change Status')
                         ->icon('heroicon-o-pencil-square')
                         ->color('primary')
                         ->form([

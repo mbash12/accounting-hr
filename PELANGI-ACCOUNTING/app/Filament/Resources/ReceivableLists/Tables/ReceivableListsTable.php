@@ -46,7 +46,7 @@ class ReceivableListsTable
             ->actions([
                 \Filament\Actions\ActionGroup::make([
                     \Filament\Actions\ViewAction::make()
-                        ->label(__('Detail'))
+                        ->label(__('Details'))
                         ->url(fn ($record) => ReceivableListResource::getUrl('view', ['record' => $record])),
                 ]),
             ])
