@@ -38,6 +38,7 @@ class PurchaseInvoice extends Model
 
             $model->supplier_id = $model->getOriginal('supplier_id');
             $model->purchase_order_id = $model->getOriginal('purchase_order_id');
+            $model->goods_receipt_id = $model->getOriginal('goods_receipt_id');
             $model->company_id = $model->getOriginal('company_id');
             $model->job_id = $model->getOriginal('job_id');
             $model->is_locked = true;
@@ -88,6 +89,7 @@ class PurchaseInvoice extends Model
         'status',
         'supplier_id',
         'purchase_order_id',
+        'goods_receipt_id',
         'job_id',
         'other_charges_account_id',
         'discount_account_id',
@@ -121,6 +123,7 @@ class PurchaseInvoice extends Model
             'outstanding_amount' => 'decimal:2',
             'supplier_id' => 'integer',
             'purchase_order_id' => 'integer',
+            'goods_receipt_id' => 'integer',
             'job_id' => 'integer',
             'other_charges_account_id' => 'integer',
             'discount_account_id' => 'integer',
@@ -141,6 +144,11 @@ class PurchaseInvoice extends Model
     public function purchaseOrder(): BelongsTo
     {
         return $this->belongsTo(PurchaseOrder::class);
+    }
+
+    public function goodsReceipt(): BelongsTo
+    {
+        return $this->belongsTo(GoodsReceipt::class);
     }
 
     public function job(): BelongsTo

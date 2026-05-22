@@ -214,6 +214,11 @@ class GoodsReceipt extends Model
         return $this->hasMany(PurchaseReturn::class);
     }
 
+    public function purchaseInvoices(): HasMany
+    {
+        return $this->hasMany(PurchaseInvoice::class);
+    }
+
     public function journalEntries()
     {
         return $this->hasMany(\App\Models\JournalEntry::class, 'reference_id')

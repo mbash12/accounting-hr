@@ -274,94 +274,6 @@ class PurchaseOrdersTable
                                 return redirect()->to(GoodsReceiptResource::getUrl('edit', ['record' => $goodsReceipt]));
                             });
                         }),
-                    Action::make('createPurchaseInvoice')
-                        ->label('Create Purchase Invoice')
-                        ->icon('heroicon-o-document-text')
-                        ->color('success')
-                        ->visible(function (PurchaseOrder $record): bool {
-                            $meta = $record->invoice_meta ?: $record->computeInvoiceMeta();
-                            return (float) ($meta['remaining'] ?? 0) > 0 && $record->status === 'posted';
-                        })
-                        ->requiresConfirmation()
-                        ->modalHeading('Create Purchase Invoice')
-                        ->modalDescription('Are you sure you want to create a purchase invoice? The invoice will be created in locked status.')
-                        ->modalSubmitActionLabel('Yes, Create')
-                        ->action(function (PurchaseOrder $record) {
-                            $purchaseOrder = PurchaseOrder::query()
-                                ->with(['items'])
-                                ->findOrFail($record->id);
-
-                            $items = [];
-                            $subtotal = 0;
-                            foreach ($purchaseOrder->items as $poItem) {
-                                $remaining = max(0.0, (float) ($poItem->quantity ?? 0) - (float) ($poItem->invoiced_quantity ?? 0));
-                                if ($remaining <= 0) {
-                                    continue;
-                                }
-                                $lineTotal = $remaining * $poItem->unit_price;
-                                $subtotal += $lineTotal;
-                                
-                                $items[] = [
-                                    'purchase_order_item_id' => $poItem->id,
-                                    'product_id' => $poItem->product_id,
-                                    'unit_id' => $poItem->unit_id,
-                                    'quantity' => $remaining,
-                                    'unit_price' => $poItem->unit_price,
-                                    'tax_id' => $poItem->tax_id,
-                                    'description' => $poItem->description,
-                                    'total' => $lineTotal,
-                                ];
-                            }
-
-                            // Calculate totals from purchase order proportionally
-                            $originalSubtotal = $purchaseOrder->subtotal;
-                            $ratio = $originalSubtotal > 0 ? $subtotal / $originalSubtotal : 1;
-                            
-                            $discount = $purchaseOrder->discount * $ratio;
-                            $otherCharges = $purchaseOrder->other_charges * $ratio;
-                            $taxAmount = $purchaseOrder->tax_amount * $ratio;
-                            $total = $subtotal - $discount + $otherCharges + $taxAmount;
-
-                            return DB::transaction(function () use ($purchaseOrder, $items, $subtotal, $discount, $otherCharges, $taxAmount, $total) {
-                                $invoice = \App\Models\PurchaseInvoice::create([
-                                    'date' => now(),
-                                    'supplier_id' => $purchaseOrder->supplier_id,
-                                    'purchase_order_id' => $purchaseOrder->id,
-                                    'is_locked' => false,
-                                    'status' => 'draft',
-                                    'company_id' => $purchaseOrder->company_id,
-                                    'created_by_user_id' => auth()->id(),
-                                    'subtotal' => $subtotal,
-                                    'discount' => $discount,
-                                    'other_charges' => $otherCharges,
-                                    'tax_amount' => $taxAmount,
-                                    'total' => $total,
-                                    'paid_amount' => 0,
-                                    'outstanding_amount' => $total,
-                                ]);
-
-                                foreach ($items as $item) {
-                                    \App\Models\PurchaseInvoiceItem::create([
-                                        'purchase_invoice_id' => $invoice->id,
-                                        'purchase_order_item_id' => $item['purchase_order_item_id'],
-                                        'product_id' => $item['product_id'],
-                                        'unit_id' => $item['unit_id'],
-                                        'quantity' => $item['quantity'],
-                                        'unit_price' => $item['unit_price'],
-                                        'tax_id' => $item['tax_id'],
-                                        'description' => $item['description'],
-                                        'total' => $item['total'],
-                                    ]);
-                                }
-
-                                $invoice->is_locked = true;
-                                $invoice->save();
-
-                                $purchaseOrder->refreshInvoiceTracking();
-
-                                return redirect(\App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource::getUrl('edit', ['record' => $invoice]));
-                            });
-                        }),
                     Action::make('view')
                         ->label('View')
                         ->icon('heroicon-o-eye')
@@ -391,7 +303,27 @@ class PurchaseOrdersTable
                                 ->required(),
                         ])
                         ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
-                            $records->each(fn ($record) => $record->update(['status' => $data['status']]));
+                            $validTransitions = [
+                                'draft' => ['approved'],
+                                'approved' => ['posted'],
+                            ];
+                            $targetStatus = $data['status'];
+                            $updated = 0;
+                            $skipped = 0;
+                            $records->each(function ($record) use ($targetStatus, $validTransitions, &$updated, &$skipped) {
+                                if (isset($validTransitions[$record->status]) && in_array($targetStatus, $validTransitions[$record->status])) {
+                                    $record->update(['status' => $targetStatus]);
+                                    $updated++;
+                                } else {
+                                    $skipped++;
+                                }
+                            });
+
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Status Updated')
+                                ->body("Updated: {$updated}, Skipped (invalid transition): {$skipped}")
+                                ->send();
                         })
                         ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),

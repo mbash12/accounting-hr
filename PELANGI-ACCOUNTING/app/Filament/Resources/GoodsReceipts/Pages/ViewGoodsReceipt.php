@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\GoodsReceipts\Pages;
 
+use App\Filament\Actions\CreatePurchaseInvoiceFromGoodsReceipt;
 use App\Filament\Resources\GoodsReceipts\GoodsReceiptResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ViewRecord;
@@ -15,6 +16,7 @@ class ViewGoodsReceipt extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            CreatePurchaseInvoiceFromGoodsReceipt::make(),
             Action::make('print')
                 ->label('Print')
                 ->icon('heroicon-o-printer')

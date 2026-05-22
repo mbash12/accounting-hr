@@ -26,6 +26,7 @@ class PurchaseInvoiceItem extends Model
         static::updating(function ($model) {
             if ($model->purchaseInvoice?->getOriginal('is_locked')) {
                 $model->purchase_order_item_id = $model->getOriginal('purchase_order_item_id');
+                $model->goods_receipt_item_id = $model->getOriginal('goods_receipt_item_id');
                 $model->product_id = $model->getOriginal('product_id');
                 $model->unit_id = $model->getOriginal('unit_id');
                 $model->description = $model->getOriginal('description');
@@ -45,8 +46,26 @@ class PurchaseInvoiceItem extends Model
             $price = is_numeric($model->unit_price) ? (float) $model->unit_price : 0;
             $model->total = $qty * $price;
 
-            // Validate against order quantity
-            if ($model->purchase_order_item_id) {
+            // Validate against received quantity (GR-based invoicing)
+            if ($model->goods_receipt_item_id) {
+                $grItem = \App\Models\GoodsReceiptItem::find($model->goods_receipt_item_id);
+                if ($grItem) {
+                    $totalInvoiced = self::where('goods_receipt_item_id', $model->goods_receipt_item_id)
+                        ->where('id', '!=', $model->id ?? 0)
+                        ->whereHas('purchaseInvoice', function ($q) {
+                            $q->whereNull('deleted_at');
+                        })
+                        ->sum('quantity');
+
+                    $maxQty = (float) $grItem->quantity - (float) ($grItem->returned_quantity ?? 0);
+                    if (($totalInvoiced + $qty) > $maxQty) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'quantity' => 'Total invoice quantity cannot exceed received quantity.',
+                        ]);
+                    }
+                }
+            } elseif ($model->purchase_order_item_id) {
+                // Fallback: validate against order quantity for legacy PO-based items
                 $orderItem = \App\Models\PurchaseOrderItem::find($model->purchase_order_item_id);
                 if ($orderItem) {
                     $totalInvoiced = self::where('purchase_order_item_id', $model->purchase_order_item_id)
@@ -55,8 +74,8 @@ class PurchaseInvoiceItem extends Model
                             $q->whereNull('deleted_at');
                         })
                         ->sum('quantity');
-                    
-                    if (($totalInvoiced + $model->quantity) > $orderItem->quantity) {
+
+                    if (($totalInvoiced + $qty) > $orderItem->quantity) {
                         throw \Illuminate\Validation\ValidationException::withMessages([
                             'quantity' => 'Total invoice quantity cannot exceed order quantity.',
                         ]);
@@ -78,6 +97,7 @@ class PurchaseInvoiceItem extends Model
         'description',
         'purchase_invoice_id',
         'purchase_order_item_id',
+        'goods_receipt_item_id',
         'product_id',
         'unit_id',
         'tax_id',
@@ -98,6 +118,7 @@ class PurchaseInvoiceItem extends Model
             'total' => 'decimal:2',
             'purchase_invoice_id' => 'integer',
             'purchase_order_item_id' => 'integer',
+            'goods_receipt_item_id' => 'integer',
             'product_id' => 'integer',
             'unit_id' => 'integer',
             'tax_id' => 'integer',
@@ -113,6 +134,11 @@ class PurchaseInvoiceItem extends Model
     public function purchaseOrderItem(): BelongsTo
     {
         return $this->belongsTo(PurchaseOrderItem::class);
+    }
+
+    public function goodsReceiptItem(): BelongsTo
+    {
+        return $this->belongsTo(GoodsReceiptItem::class);
     }
 
     public function product(): BelongsTo

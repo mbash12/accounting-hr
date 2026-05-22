@@ -18,8 +18,8 @@ trait Journalable
                 if (property_exists($model, 'status')) {
                     // Process journal entries based on status
                     if ($model->isDirty('status')) {
-                        // If status changed to 'draft', delete any existing journal entry
-                        if ($model->status === 'draft') {
+                        // If status changed to any non-posted state, delete any existing journal entry
+                        if ($model->status !== 'posted') {
                             $model->deleteJournalEntry();
                         }
                         // If status changed to 'posted', create journal entry
@@ -44,19 +44,17 @@ trait Journalable
                                 $model,
                                 $model->getJournalEntryDescription()
                             );
-                        } else if ($model->status === 'draft' && $model->journalEntryExists()) {
-                            // If status is 'draft' but journal entry exists, delete it
+                        } else if ($model->status !== 'posted' && $model->journalEntryExists()) {
+                            // If status is non-posted but journal entry exists, delete it
                             // This handles cases where journal deletion might have failed previously
                             $model->deleteJournalEntry();
                         }
                     }
 
-                    // Additional safety check: ensure draft documents never have journal entries
+                    // Additional safety check: ensure non-posted documents never have journal entries
                     // This handles edge cases where journal entries might be created unexpectedly
-                    if ($model->status === 'draft') {
-                        if ($model->journalEntryExists()) {
-                            $model->deleteJournalEntry();
-                        }
+                    if ($model->status !== 'posted' && $model->journalEntryExists()) {
+                        $model->deleteJournalEntry();
                     }
                 } else {
                     // For models without status field, create journal entry as before

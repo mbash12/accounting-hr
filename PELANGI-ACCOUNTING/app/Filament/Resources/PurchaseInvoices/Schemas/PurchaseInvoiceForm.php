@@ -175,12 +175,12 @@ class PurchaseInvoiceForm
                                 $contact = \App\Models\Contact::create($data);
                                 return $contact->id;
                             }),
-                        Select::make('purchase_order_id')
-                            ->label('Purchase Order')
+                        Select::make('goods_receipt_id')
+                            ->label('Goods Receipt')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
                             ->relationship(
-                                name: 'purchaseOrder',
-                                titleAttribute: 'purchase_order_no',
+                                name: 'goodsReceipt',
+                                titleAttribute: 'receipt_number',
                                 modifyQueryUsing: function ($query, callable $get) {
                                     $companyId = self::resolveCompanyId($get);
                                     if ($companyId) {
@@ -195,68 +195,68 @@ class PurchaseInvoiceForm
                                         $query->where('supplier_id', $supplierId);
                                     }
 
-                                    // Only show purchase orders with 'posted' status
-                                    $query->where('status', 'posted');
+                                    // Only show locked goods receipts
+                                    $query->where('is_locked', true);
 
-                                    // Only exclude POs that already have locked purchase invoices when creating a new record
-                                    // PO menu creates locked invoices automatically, so this prevents manual creation
-                                    // if any invoice was created from PO menu
-                                    $currentRecordId = $get('../../record')?->id ?? null;
-                                    if (!$currentRecordId) {
-                                        $query->whereDoesntHave('purchaseInvoices', function ($invoiceQuery) {
-                                            $invoiceQuery->where('is_locked', true)
-                                                        ->whereNull('purchase_invoices.deleted_at');
-                                        });
-                                    }
-
-                                    return $query->orderBy('purchase_order_no', 'desc');
+                                    return $query->orderBy('receipt_number', 'desc');
                                 }
                             )
-                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->purchase_order_no} - {$record->supplier->name}")
-                            ->searchable(['purchase_order_no'])
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->receipt_number} - {$record->supplier->name}")
+                            ->searchable(['receipt_number'])
                             ->preload()
                             ->live()
                             ->nullable()
-                            ->placeholder('Select Purchase Order')
+                            ->placeholder('Select Goods Receipt')
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 if ($state) {
-                                    $purchaseOrder = \App\Models\PurchaseOrder::with('items')->find($state);
-                                    if ($purchaseOrder) {
-                                        $set('supplier_id', $purchaseOrder->supplier_id);
+                                    $goodsReceipt = \App\Models\GoodsReceipt::with(['items.purchaseOrderItem'])->find($state);
+                                    if ($goodsReceipt) {
+                                        $set('supplier_id', $goodsReceipt->supplier_id);
+                                        $set('purchase_order_id', $goodsReceipt->purchase_order_id);
 
-                                        // Copy totals from PO
-                                        if ($purchaseOrder->discount_percentage) {
-                                            $set('discount_percentage', $purchaseOrder->discount_percentage);
-                                        }
-                                        if ($purchaseOrder->other_charges) {
-                                            $set('other_charges', $purchaseOrder->other_charges);
-                                            $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay($purchaseOrder->other_charges));
+                                        // Copy totals from PO if available
+                                        $po = $goodsReceipt->purchaseOrder;
+                                        if ($po) {
+                                            if ($po->discount_percentage) {
+                                                $set('discount_percentage', $po->discount_percentage);
+                                            }
+                                            if ($po->other_charges) {
+                                                $set('other_charges', $po->other_charges);
+                                                $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay($po->other_charges));
+                                            }
                                         }
 
-                                        // Auto-populate items from PO
-                                        if ($purchaseOrder->items) {
+                                        // Auto-populate items from GR received quantities
+                                        if ($goodsReceipt->items) {
                                             $items = [];
-                                            foreach ($purchaseOrder->items as $poItem) {
-                                                $itemTotal = ($poItem->quantity ?? 0) * ($poItem->unit_price ?? 0);
+                                            foreach ($goodsReceipt->items as $grItem) {
+                                                $poItem = $grItem->purchaseOrderItem;
+                                                $receivedQty = (float) ($grItem->quantity ?? 0) - (float) ($grItem->returned_quantity ?? 0);
+                                                $unitPrice = $poItem ? (float) ($poItem->unit_price ?? 0) : 0;
+                                                $itemTotal = $receivedQty * $unitPrice;
                                                 $items[] = [
-                                                    'product_id' => $poItem->product_id,
-                                                    'quantity' => $poItem->quantity,
-                                                    'quantity_display' => NumberInput::formatRoundedIntegerDisplay($poItem->quantity),
-                                                    'unit_price' => $poItem->unit_price,
-                                                    'unit_price_display' => NumberInput::formatRoundedIntegerDisplay($poItem->unit_price),
-                                                    'tax_id' => $poItem->tax_id,
-                                                    'unit_id' => $poItem->unit_id,
-                                                    'description' => $poItem->description,
+                                                    'goods_receipt_item_id' => $grItem->id,
+                                                    'purchase_order_item_id' => $grItem->purchase_order_item_id,
+                                                    'product_id' => $grItem->product_id,
+                                                    'quantity' => $receivedQty,
+                                                    'quantity_display' => NumberInput::formatRoundedIntegerDisplay($receivedQty),
+                                                    'unit_price' => $unitPrice,
+                                                    'unit_price_display' => NumberInput::formatRoundedIntegerDisplay($unitPrice),
+                                                    'tax_id' => $poItem->tax_id ?? null,
+                                                    'unit_id' => $grItem->unit_id ?? ($poItem->unit_id ?? null),
+                                                    'description' => $grItem->description ?? ($poItem->description ?? null),
                                                     'total' => $itemTotal,
                                                 ];
                                             }
                                             $set('items', $items);
 
                                             // Calculate and update all totals
-                                            $dataForCalculation = function($key) use ($items, $purchaseOrder) {
+                                            $discountPercentage = $po->discount_percentage ?? 0;
+                                            $otherCharges = $po->other_charges ?? 0;
+                                            $dataForCalculation = function($key) use ($items, $discountPercentage, $otherCharges) {
                                                 if ($key === 'items') return $items;
-                                                if ($key === 'discount_percentage') return $purchaseOrder->discount_percentage;
-                                                if ($key === 'other_charges') return $purchaseOrder->other_charges;
+                                                if ($key === 'discount_percentage') return $discountPercentage;
+                                                if ($key === 'other_charges') return $otherCharges;
                                                 return null;
                                             };
 
@@ -269,8 +269,9 @@ class PurchaseInvoiceForm
                                         }
                                     }
                                 } else if (!$state) {
-                                    // Clear items if no purchase order selected
+                                    // Clear items if no goods receipt selected
                                     $set('items', []);
+                                    $set('purchase_order_id', null);
                                     $set('other_charges', 0);
                                     $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay(0));
                                     $set('discount_percentage', 0);
@@ -280,6 +281,7 @@ class PurchaseInvoiceForm
                                     $set('total', 0);
                                 }
                             }),
+                        Hidden::make('purchase_order_id'),
                         DatePicker::make('date')
                             ->label('Date')
                             ->required()
@@ -415,6 +417,7 @@ class PurchaseInvoiceForm
                     ])
                     ->schema([
                         Hidden::make('purchase_order_item_id'),
+                        Hidden::make('goods_receipt_item_id'),
                         Select::make('product_id')
                             ->required()
                             ->searchable()

@@ -302,6 +302,7 @@ class GoodsReceiptsTable
                                 return redirect(PurchaseReturnResource::getUrl('edit', ['record' => $return]));
                             });
                         }),
+                    \App\Filament\Actions\CreatePurchaseInvoiceFromGoodsReceipt::make(),
                     Action::make('view')
                         ->label('View')
                         ->icon('heroicon-o-eye')
