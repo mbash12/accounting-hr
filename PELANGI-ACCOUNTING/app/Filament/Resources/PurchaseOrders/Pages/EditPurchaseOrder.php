@@ -6,6 +6,7 @@ use App\Filament\Forms\Components\NumberInput;
 use App\Filament\Resources\PurchaseOrders\PurchaseOrderResource;
 use App\Models\PurchaseOrder;
 use App\Models\Tax;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -62,6 +63,42 @@ class EditPurchaseOrder extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('approve')
+                ->label('Approve')
+                ->icon('heroicon-o-check-circle')
+                ->color('warning')
+                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                ->requiresConfirmation()
+                ->modalHeading('Approve Purchase Order')
+                ->modalDescription('Are you sure you want to approve this purchase order?')
+                ->modalSubmitActionLabel('Yes, Approve')
+                ->action(function (PurchaseOrder $record) {
+                    $record->update(['status' => 'approved']);
+
+                    \Filament\Notifications\Notification::make()
+                        ->success()
+                        ->title('Purchase Order Approved')
+                        ->body("Purchase Order {$record->purchase_order_no} has been approved.")
+                        ->send();
+                }),
+            Action::make('post')
+                ->label('Post')
+                ->icon('heroicon-o-check-badge')
+                ->color('success')
+                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'approved')
+                ->requiresConfirmation()
+                ->modalHeading('Post Purchase Order')
+                ->modalDescription('Are you sure you want to post this purchase order? This will create journal entries.')
+                ->modalSubmitActionLabel('Yes, Post')
+                ->action(function (PurchaseOrder $record) {
+                    $record->update(['status' => 'posted']);
+
+                    \Filament\Notifications\Notification::make()
+                        ->success()
+                        ->title('Purchase Order Posted')
+                        ->body("Purchase Order {$record->purchase_order_no} has been posted.")
+                        ->send();
+                }),
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),

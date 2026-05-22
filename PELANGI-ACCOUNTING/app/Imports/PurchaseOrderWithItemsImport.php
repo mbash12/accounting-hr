@@ -236,7 +236,7 @@ class PurchaseOrderWithItemsImport implements ToCollection, WithHeadingRow, With
             'subtotal' => 'nullable|numeric|min:0',
             'tax' => 'nullable|numeric|min:0',
             'total' => 'nullable|numeric|min:0',
-            'status' => 'nullable|in:draft,posted',
+            'status' => 'nullable|in:draft,approved,posted',
             'supplier_code' => 'nullable|string|max:50',
             'supplier_name' => 'nullable|string|max:255',
             'product_code' => 'required_without:product_name|string|max:50',

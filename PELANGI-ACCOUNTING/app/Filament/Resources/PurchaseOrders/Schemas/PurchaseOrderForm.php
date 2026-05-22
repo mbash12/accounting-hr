@@ -210,9 +210,10 @@ class PurchaseOrderForm
                             ->label('Status')
                             ->options([
                                 'draft' => 'Draft',
+                                'approved' => 'Approved',
                                 'posted' => 'Posted',
                             ])
-                            ->default('posted')
+                            ->default('draft')
                             ->required()
                             ->native(false)
                             ->disabled(fn ($record) => $record && ($record->goodsReceipts()->exists() || $record->purchaseInvoices()->exists()))

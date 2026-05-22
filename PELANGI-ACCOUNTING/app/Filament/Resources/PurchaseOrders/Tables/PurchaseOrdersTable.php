@@ -53,6 +53,7 @@ class PurchaseOrdersTable
                     ->formatStateUsing(
                         fn(string $state): string => match ($state) {
                             "draft" => __("Draft"),
+                            "approved" => __("Approved"),
                             "posted" => __("Posted"),
                             default => $state,
                         },
@@ -60,6 +61,7 @@ class PurchaseOrdersTable
                     ->color(
                         fn(string $state): string => match ($state) {
                             "draft" => "gray",
+                            "approved" => "warning",
                             "posted" => "success",
                             default => "gray",
                         },
@@ -174,6 +176,42 @@ class PurchaseOrdersTable
             ->defaultSort('id', 'desc')
             ->recordActions([
                 ActionGroup::make([
+                    Action::make('approve')
+                        ->label('Approve')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('warning')
+                        ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                        ->requiresConfirmation()
+                        ->modalHeading('Approve Purchase Order')
+                        ->modalDescription('Are you sure you want to approve this purchase order?')
+                        ->modalSubmitActionLabel('Yes, Approve')
+                        ->action(function (PurchaseOrder $record) {
+                            $record->update(['status' => 'approved']);
+
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Purchase Order Approved')
+                                ->body("Purchase Order {$record->purchase_order_no} has been approved.")
+                                ->send();
+                        }),
+                    Action::make('post')
+                        ->label('Post')
+                        ->icon('heroicon-o-check-badge')
+                        ->color('success')
+                        ->visible(fn (PurchaseOrder $record): bool => $record->status === 'approved')
+                        ->requiresConfirmation()
+                        ->modalHeading('Post Purchase Order')
+                        ->modalDescription('Are you sure you want to post this purchase order? This will create journal entries.')
+                        ->modalSubmitActionLabel('Yes, Post')
+                        ->action(function (PurchaseOrder $record) {
+                            $record->update(['status' => 'posted']);
+
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Purchase Order Posted')
+                                ->body("Purchase Order {$record->purchase_order_no} has been posted.")
+                                ->send();
+                        }),
                     Action::make('createGoodsReceipt')
                         ->label('Create Goods Receipt')
                         ->icon('heroicon-o-inbox-arrow-down')
@@ -330,7 +368,7 @@ class PurchaseOrdersTable
                         ->url(fn ($record) => PurchaseOrderResource::getUrl('view', ['record' => $record])),
                     EditAction::make(),
                     RegenerateJournalEntry::make('regenerateJournalEntry')
-                        ->visible(fn ($record) => $record->status !== 'draft'),
+                        ->visible(fn ($record) => $record->status === 'posted'),
                     DeleteAction::make(),
                 ])
             ])
@@ -347,6 +385,7 @@ class PurchaseOrdersTable
                                 ->label('Status')
                                 ->options([
                                     'draft' => 'Draft',
+                                    'approved' => 'Approved',
                                     'posted' => 'Posted',
                                 ])
                                 ->required(),

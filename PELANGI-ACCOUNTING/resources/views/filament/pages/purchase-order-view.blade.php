@@ -436,6 +436,26 @@
                             <td class="doc-meta-value">{{ $record->reference_no }}</td>
                         </tr>
                         @endif
+                        <tr>
+                            <td class="doc-meta-label">Status:</td>
+                            <td class="doc-meta-value">
+                                @php
+                                    $stampClass = match($record->status) {
+                                        'draft' => 'stamp-draft',
+                                        'approved' => 'stamp-approved',
+                                        'posted' => 'stamp-approved',
+                                        default => 'stamp-draft',
+                                    };
+                                    $statusLabel = match($record->status) {
+                                        'draft' => 'Draft',
+                                        'approved' => 'Approved',
+                                        'posted' => 'Posted',
+                                        default => ucfirst($record->status),
+                                    };
+                                @endphp
+                                <span class="status-stamp {{ $stampClass }}">{{ $statusLabel }}</span>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </div>
@@ -559,9 +579,18 @@
                 </div>
 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Approved By</div>
+                    <div style="margin-bottom: 40px;">
+                        @if($record->status === 'approved' || $record->status === 'posted')
+                            Approved By
+                        @else
+                            Authorized By
+                        @endif
+                    </div>
                     <div class="signature-line"></div>
                     <div class="text-sm text-bold">{{ $record->company->name ?? 'Management' }}</div>
+                    @if($record->status === 'approved' || $record->status === 'posted')
+                        <div class="status-stamp stamp-approved" style="margin-top: 8px;">Approved</div>
+                    @endif
                 </div>
             </div>
 
