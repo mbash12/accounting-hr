@@ -111,10 +111,10 @@ class EmployeeApiAttendanceController extends Controller
                 ->first();
             $distance = $distanceResult->distance ?? 1.0;
 
-            // Jika distance terlalu jauh > 0.30, anggap foto tidak valid untuk absensi.
-            if ($distance > 0.30) {
+            // Jika distance terlalu jauh > 0.40, anggap foto tidak valid untuk absensi.
+            if ($distance > 0.40) {
                 return response()->json([
-                    'message' => 'Foto tidak valid, coba ambil foto yang lebih jelas. Max distance 0.30 untuk diterima.',
+                    'message' => 'Foto tidak valid, coba ambil foto yang lebih jelas. Max distance 0.40 untuk diterima.',
                     'distance' => $distance,
                 ], 422);
             }
