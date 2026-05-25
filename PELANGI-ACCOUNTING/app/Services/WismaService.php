@@ -3,11 +3,14 @@
 namespace App\Services;
 
 use App\Models\PurchaseOrder;
+use App\Models\Unit;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class WismaService
 {
+    protected static bool $suppressUomSync = false;
+
     /**
      * Sync approved purchase order to Wisma system
      *
@@ -102,6 +105,101 @@ class WismaService
             return [
                 'success' => false,
                 'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function withoutUomSync(callable $callback)
+    {
+        $previousState = self::$suppressUomSync;
+        self::$suppressUomSync = true;
+
+        try {
+            return $callback();
+        } finally {
+            self::$suppressUomSync = $previousState;
+        }
+    }
+
+    public function shouldSyncUom(): bool
+    {
+        return !self::$suppressUomSync;
+    }
+
+    public function syncUom(Unit $unit, string $action = 'update'): array
+    {
+        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://wisma-dev.pelangisentralkreasi.co.id/api'));
+        $apiToken = config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token'));
+
+        $endpoint = rtrim($apiUrl, '/') . '/uoms/sync';
+        $action = strtolower($action);
+
+        $payload = [
+            'code' => $unit->code,
+            'action' => $action,
+        ];
+
+        if ($action !== 'delete') {
+            $payload['name'] = $unit->name;
+            $payload['description'] = $unit->description;
+            $payload['is_active'] = $unit->trashed() ? 0 : (int) $unit->is_active;
+        }
+
+        try {
+            Log::info("Sending UOM sync to Wisma", [
+                'unit_id' => $unit->id,
+                'code' => $unit->code,
+                'action' => $action,
+                'endpoint' => $endpoint,
+                'payload' => $payload,
+            ]);
+
+            $response = Http::withHeaders([
+                'X-Accounting-Token' => $apiToken,
+                'Accept' => 'application/json',
+            ])->post($endpoint, $payload);
+
+            $responseBody = $response->json();
+
+            if ($response->successful()) {
+                Log::info("Successfully synced UOM to Wisma", [
+                    'unit_id' => $unit->id,
+                    'code' => $unit->code,
+                    'action' => $action,
+                ]);
+
+                return [
+                    'success' => true,
+                    'data' => $responseBody,
+                ];
+            }
+
+            $errorMessage = $responseBody['message'] ?? 'Unknown error';
+            Log::error("Failed to sync UOM to Wisma. Status: {$response->status()}", [
+                'unit_id' => $unit->id,
+                'code' => $unit->code,
+                'action' => $action,
+                'payload' => $payload,
+                'response' => $responseBody,
+            ]);
+
+            return [
+                'success' => false,
+                'message' => $errorMessage,
+                'response' => $responseBody,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Error syncing UOM to Wisma: " . $e->getMessage(), [
+                'exception' => $e,
+                'unit_id' => $unit->id,
+                'code' => $unit->code,
+                'action' => $action,
+                'payload' => $payload,
+            ]);
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
             ];
         }
     }

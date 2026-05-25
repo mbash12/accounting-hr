@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class Unit extends Model
 {
@@ -29,6 +30,24 @@ class Unit extends Model
                     $model->company_id = $selectedCompanyId;
                 }
             }
+        });
+
+        static::created(function ($model) {
+            $model->syncToWisma('update');
+        });
+
+        static::updated(function ($model) {
+            if ($model->wasChanged(['code', 'name', 'description', 'is_active', 'deleted_at'])) {
+                $model->syncToWisma('update');
+            }
+        });
+
+        static::deleted(function ($model) {
+            $model->syncToWisma('delete');
+        });
+
+        static::restored(function ($model) {
+            $model->syncToWisma('update');
         });
     }
 
@@ -79,5 +98,25 @@ class Unit extends Model
     public function createdByUser(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    protected function syncToWisma(string $action): void
+    {
+        try {
+            $wismaService = app(\App\Services\WismaService::class);
+
+            if (!$wismaService->shouldSyncUom()) {
+                return;
+            }
+
+            $wismaService->syncUom($this, $action);
+        } catch (\Throwable $e) {
+            Log::error('Failed to sync UOM to Wisma from model event: ' . $e->getMessage(), [
+                'exception' => $e,
+                'unit_id' => $this->id,
+                'code' => $this->code,
+                'action' => $action,
+            ]);
+        }
     }
 }
