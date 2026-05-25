@@ -93,6 +93,33 @@ class EmployeeApiAttendanceController extends Controller
             }
         }
 
+        if (!empty($validated['photo_in_path'])) {
+            /* validate the photo via vector extraction, if failed, return error response */
+            $full_path = storage_path('app/public/' . $validated['photo_in_path']); // Lebih clean dibanding __DIR__ manual
+            
+            if (!file_exists($full_path)) {
+                return response()->json([
+                    'message' => 'Foto tidak ditemukan di path yang diberikan.'
+                ], 422);
+            }
+            
+            $newVectorArray = \App\Services\GeminiService::generateFaceVectorWithVertexAI($full_path);
+            $newVector = new \Pgvector\Laravel\Vector($newVectorArray);
+            $distanceResult = \App\Models\Employee::query()
+                ->selectRaw('(? <=> foto_vector) as distance', [$newVector])
+                ->where('id', $employee->id)
+                ->first();
+            $distance = $distanceResult->distance ?? 1.0;
+
+            // Jika distance terlalu jauh > 0.30, anggap foto tidak valid untuk absensi.
+            if ($distance > 0.30) {
+                return response()->json([
+                    'message' => 'Foto tidak valid, coba ambil foto yang lebih jelas. Max distance 0.30 untuk diterima.',
+                    'distance' => $distance,
+                ], 422);
+            }
+        }
+
         $attendance = Attendance::query()
             ->where('employee_id', $employee->id)
             ->whereDate('date', $validated['date'])
