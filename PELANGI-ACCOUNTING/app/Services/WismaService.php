@@ -128,10 +128,10 @@ class WismaService
 
     public function syncUom(Unit $unit, string $action = 'update'): array
     {
-        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://wisma-dev.pelangisentralkreasi.co.id/api'));
+        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://api-dev.wismaatlet.id/api'));
         $apiToken = config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token'));
 
-        $endpoint = rtrim($apiUrl, '/') . '/uoms/sync';
+        $endpoint = rtrim($apiUrl, '/') . 'external/uoms/sync';
         $action = strtolower($action);
 
         $payload = [
