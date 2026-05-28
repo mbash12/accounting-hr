@@ -62,6 +62,8 @@ class Employee extends Model
         'basic_salary',
         'is_active',
         'company_id',
+        'foto',
+        'foto_vector',
         'created_by_user_id',
     ];
 
