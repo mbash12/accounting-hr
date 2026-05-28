@@ -201,7 +201,7 @@ class PurchaseInvoiceForm
                                     return $query->orderBy('receipt_number', 'desc');
                                 }
                             )
-                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->receipt_number} - {$record->supplier->name}")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->receipt_number} - " . ($record->supplier?->name ?? __('No Supplier')))
                             ->searchable(['receipt_number'])
                             ->preload()
                             ->live()

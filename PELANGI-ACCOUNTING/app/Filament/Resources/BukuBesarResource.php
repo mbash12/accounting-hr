@@ -63,7 +63,7 @@ class BukuBesarResource extends Resource
                     ->sortable(),
                 TextColumn::make('account.name')
                     ->label(__('Account'))
-                    ->description(fn (JournalEntryItem $record): string => $record->account->code)
+                    ->description(fn (JournalEntryItem $record): string => $record->account?->code ?? '')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('contact.name')

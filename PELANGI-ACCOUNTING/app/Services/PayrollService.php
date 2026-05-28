@@ -455,6 +455,7 @@ class PayrollService
 
         foreach ($empComponents->where('salaryComponent.type', 'allowance') as $comp) {
             $sc     = $comp->salaryComponent;
+            if (!$sc) continue;
             $amount = $sc->is_fixed
                 ? (float) $comp->amount
                 : round((float) $comp->amount * $prorateRatio, 2);
@@ -474,6 +475,7 @@ class PayrollService
         $totalDeduction = 0.0;
         foreach ($empComponents->where('salaryComponent.type', 'deduction') as $comp) {
             $sc     = $comp->salaryComponent;
+            if (!$sc) continue;
             $amount = $sc->is_fixed
                 ? (float) $comp->amount
                 : round((float) $comp->amount * $prorateRatio, 2);
