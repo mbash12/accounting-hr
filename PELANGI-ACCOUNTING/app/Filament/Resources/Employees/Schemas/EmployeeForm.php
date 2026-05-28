@@ -5,11 +5,13 @@ namespace App\Filament\Resources\Employees\Schemas;
 use App\Filament\Forms\Components\NumberInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class EmployeeForm
 {
@@ -19,6 +21,32 @@ class EmployeeForm
             ->components([
                 Section::make(__('Personal & Employment Information'))
                     ->schema([
+                        FileUpload::make('foto')
+                            ->label(__('Foto'))
+                            ->disk('public')
+                            ->directory('employees')
+                            ->visibility('public')
+                            ->formatStateUsing(function ($state) {
+                                
+                                if (! is_string($state) || $state === '') {
+                                    return $state;
+                                }
+
+                                // Normalize values from API/manual uploads into storage-relative paths.
+                                if (Str::startsWith($state, '/storage/')) {
+                                    return Str::after($state, '/storage/');
+                                }
+
+                                if (Str::contains($state, '/storage/')) {
+                                    return Str::after($state, '/storage/');
+                                }
+
+                                return $state;
+                            }),
+                        TextInput::make('name')
+                            ->label(__('Nama'))
+                            ->required()
+                            ->maxLength(200),
                         TextInput::make('name')
                             ->label(__('Name'))
                             ->required()
