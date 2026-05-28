@@ -23,12 +23,12 @@ class AttendanceSpotForm
                             ->label(__('Latitude'))
                             ->required()
                             ->numeric()
-                            ->step(0.000001),
+                            ->step(0.00000001),
                         TextInput::make('longitude')
                             ->label(__('Longitude'))
                             ->required()
                             ->numeric()
-                            ->step(0.000001),
+                            ->step(0.00000001),
                         TextInput::make('radius_meters')
                             ->label(__('Radius (meter)'))
                             ->required()

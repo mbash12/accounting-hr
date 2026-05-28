@@ -155,6 +155,11 @@ export const api = async (key, options = {}) => {
         });
 
         const result = await response.json();
+
+        if (!response.ok) {
+            throw { status: response.status, data: result };
+        }
+
         if (
             result.code === 1012 ||
             result.title === "Unauthorized" ||
@@ -169,10 +174,14 @@ export const api = async (key, options = {}) => {
 
         return result;
     } catch (error) {
-        const response = await error.response.text();
-        if (response.includes("<html")) {
-            logout();
-            location.reload();
+        if (error?.response) {
+            try {
+                const response = await error.response.text();
+                if (response.includes("<html")) {
+                    logout();
+                    location.reload();
+                }
+            } catch (_) {}
         }
         throw error;
     }

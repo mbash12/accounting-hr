@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\PurchaseOrderController;
 use App\Http\Middleware\EmployeeApiAuth;
 
 use App\Http\Controllers\Api\FaqController;
+use App\Http\Controllers\Api\BiometricEmployeeController;
+use App\Http\Controllers\Api\BiometricAttendanceController;
 
 Route::prefix('master')->middleware([Api::class])->group(function () {
     Route::get('/coa', [MasterDataController::class, 'coa']);
@@ -54,6 +56,19 @@ Route::prefix('employeeapi')->middleware([EmployeeApiAuth::class])->group(functi
     Route::post('/overtimes', [EmployeeApiOvertimeController::class, 'store']);
     Route::get('/overtimes/{overtimeLog}', [EmployeeApiOvertimeController::class, 'show']);
     Route::put('/overtimes/{overtimeLog}', [EmployeeApiOvertimeController::class, 'update']);
+    Route::post('/attendances/clock', [EmployeeApiAttendanceController::class, 'clock']);
     Route::get('/faqs', [FaqController::class, 'index']);
+});
+
+// Biometric device broker endpoints (machine-to-machine, API key auth).
+Route::prefix('v1/records')->middleware('api.key')->group(function () {
+    Route::get('/employees', [BiometricEmployeeController::class, 'index']);
+    Route::post('/employees', [BiometricEmployeeController::class, 'store']);
+    Route::post('/clocks', [BiometricAttendanceController::class, 'store']);
+});
+
+Route::prefix('v3')->middleware('api.key')->group(function () {
+    Route::post('/clear-log', [BiometricAttendanceController::class, 'clearLog']);
+    Route::post('/clear-usr', [BiometricEmployeeController::class, 'clear']);
 });
 

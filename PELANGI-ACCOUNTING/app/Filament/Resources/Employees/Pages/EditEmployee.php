@@ -28,23 +28,26 @@ class EditEmployee extends EditRecord
     protected function afterSave(): void
     {
         $employee = $this->record;
-        $photo_path = __DIR__ . '/../../../../../storage/app/public/' . $employee->foto;
+        if (! empty($employee->foto)) {
+            $photoPath = storage_path('app/public/' . $employee->foto);
 
-        if (file_exists($photo_path)) {
+            if (file_exists($photoPath)) {
+                try {
+                    DB::beginTransaction();
+                    $vector = GeminiService::generateFaceVectorWithVertexAI($photoPath);
+                    $employee->foto_vector = new Vector($vector);
+                    $employee->save();
+                    DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollback();
 
-            try {
-                DB::beginTransaction();
-                //code here
-                $vector = GeminiService::generateFaceVectorWithVertexAI($photo_path);
-                $employee->foto_vector = new Vector($vector);
-                $employee->save();
-                
-                DB::commit();
-            } catch (\Exception $e) {
-                DB::rollback();
-
-                dd($e);
+                    \Illuminate\Support\Facades\Log::error('Face vector generation failed: ' . $e->getMessage(), [
+                        'employee_id' => $employee->id,
+                        'photo_path' => $photoPath,
+                        'exception' => $e,
+                    ]);
+                }
             }
         }
-    }   
+    }
 }

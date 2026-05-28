@@ -56,16 +56,25 @@ const submit = async () => {
         note: state.form.description,
         status: "submitted",
     };
-    let res = await submitManual(data);
-    Swal({
-        icon: "success",
-        title: "Success",
-        text: "Pengajuan anda telah dikirim",
-        showConfirmButton: false,
-        timer: 2000,
-    }).then(async () => {
-        $router.push("/home");
-    });
+    try {
+        let res = await submitManual(data);
+        Swal({
+            icon: "success",
+            title: "Success",
+            text: "Pengajuan anda telah dikirim",
+            showConfirmButton: false,
+            timer: 2000,
+        }).then(async () => {
+            $router.push("/home");
+        });
+    } catch (error) {
+        const msg = error?.data?.message || error?.message || "Gagal mengirim. Silakan coba lagi.";
+        Swal({
+            icon: "error",
+            title: "Gagal",
+            text: msg,
+        });
+    }
 };
 </script>
 <template>

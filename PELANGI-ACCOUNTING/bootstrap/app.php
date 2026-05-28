@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
             '172.16.0.0/12',
             '192.168.0.0/16',
         ]);
+        $middleware->alias([
+            'api.key' => \App\Http\Middleware\ApiKeyMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

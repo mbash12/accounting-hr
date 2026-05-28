@@ -8,11 +8,17 @@ class GeminiService
 {
     public static function generateFaceVectorWithVertexAI(string $imagePath)
     {
-        // 1. TENTUKAN PATH FILE SERVICE ACCOUNT JSON ANDA
-        $jsonPath = __DIR__ . '/../../cert/' . env('GOOGLE_SERVICE_ACCOUNT_JSON');
-        
-        if (!file_exists($jsonPath)) {
-            throw new \Exception("File Service Account tidak ditemukan di: " . $jsonPath);
+        $credentialFile = env('GOOGLE_SERVICE_ACCOUNT_JSON');
+
+        if (empty($credentialFile)) {
+            throw new \Exception('GOOGLE_SERVICE_ACCOUNT_JSON is not set in .env');
+        }
+
+        // Resolve path relative to project root (cert/...)
+        $jsonPath = base_path('cert/' . $credentialFile);
+
+        if (! file_exists($jsonPath)) {
+            throw new \Exception('Google Service Account JSON file not found at: ' . $jsonPath);
         }
 
         $config = json_decode(file_get_contents($jsonPath), true);

@@ -97,17 +97,27 @@ const submit = async () => {
             latitude: state.form.latitude,
             longitude: state.form.longitude})
     };
-    let res = await submitManualWithPhoto(data, state.file);
-    localStorage.removeItem("manual");
-    $swal.fire({
-        icon: "success",
-        title: "Success",
-        text: "Pengajuan anda telah dikirim",
-        showConfirmButton: false,
-        timer: 2000,
-    }).then(async () => {
-        router.push("/manual");
-    });
+    try {
+        let res = await submitManualWithPhoto(data, state.file);
+        localStorage.removeItem("manual");
+        $swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Pengajuan anda telah dikirim",
+            showConfirmButton: false,
+            timer: 2000,
+        }).then(async () => {
+            router.push("/manual");
+        });
+    } catch (error) {
+        const msg = error?.data?.message || error?.message || "Gagal mengirim absensi. Silakan coba lagi.";
+        clearImage();
+        $swal.fire({
+            icon: "error",
+            title: "Gagal",
+            text: msg,
+        });
+    }
 };
 
 onMounted(() => {
