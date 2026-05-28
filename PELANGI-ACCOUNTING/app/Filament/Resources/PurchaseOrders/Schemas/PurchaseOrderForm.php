@@ -211,6 +211,7 @@ class PurchaseOrderForm
                             ->options([
                                 'draft' => 'Draft',
                                 'approved' => 'Approved',
+                                'rejected' => 'Rejected',
                                 'posted' => 'Posted',
                             ])
                             ->default('draft')

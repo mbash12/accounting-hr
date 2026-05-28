@@ -10,6 +10,7 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPurchaseOrder extends EditRecord
@@ -79,6 +80,34 @@ class EditPurchaseOrder extends EditRecord
                         ->success()
                         ->title('Purchase Order Approved')
                         ->body("Purchase Order {$record->purchase_order_no} has been approved.")
+                        ->send();
+                }),
+            Action::make('reject')
+                ->label('Reject')
+                ->icon('heroicon-o-x-circle')
+                ->color('danger')
+                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                ->form([
+                    Textarea::make('comment')
+                        ->label('Comment')
+                        ->rows(3)
+                        ->placeholder('Optional rejection comment for Wisma'),
+                ])
+                ->requiresConfirmation()
+                ->modalHeading('Reject Purchase Order')
+                ->modalDescription('Are you sure you want to reject this purchase order?')
+                ->modalSubmitActionLabel('Yes, Reject')
+                ->action(function (PurchaseOrder $record, array $data) {
+                    $record->wisma_sync_comment_override = $data['comment'] ?? null;
+                    $record->update([
+                        'status' => 'rejected',
+                        'updated_by_user_id' => auth()->id(),
+                    ]);
+
+                    \Filament\Notifications\Notification::make()
+                        ->danger()
+                        ->title('Purchase Order Rejected')
+                        ->body("Purchase Order {$record->purchase_order_no} has been rejected.")
                         ->send();
                 }),
             Action::make('post')

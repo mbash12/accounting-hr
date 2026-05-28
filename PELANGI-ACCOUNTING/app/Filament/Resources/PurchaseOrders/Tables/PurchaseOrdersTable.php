@@ -15,6 +15,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Textarea;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use App\Filament\Actions\RegenerateJournalEntry;
@@ -54,6 +55,7 @@ class PurchaseOrdersTable
                         fn(string $state): string => match ($state) {
                             "draft" => __("Draft"),
                             "approved" => __("Approved"),
+                            "rejected" => __("Rejected"),
                             "posted" => __("Posted"),
                             default => $state,
                         },
@@ -62,6 +64,7 @@ class PurchaseOrdersTable
                         fn(string $state): string => match ($state) {
                             "draft" => "gray",
                             "approved" => "warning",
+                            "rejected" => "danger",
                             "posted" => "success",
                             default => "gray",
                         },
@@ -194,6 +197,34 @@ class PurchaseOrdersTable
                                 ->body("Purchase Order {$record->purchase_order_no} has been approved.")
                                 ->send();
                         }),
+                    Action::make('reject')
+                        ->label('Reject')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                        ->form([
+                            Textarea::make('comment')
+                                ->label('Comment')
+                                ->rows(3)
+                                ->placeholder('Optional rejection comment for Wisma'),
+                        ])
+                        ->requiresConfirmation()
+                        ->modalHeading('Reject Purchase Order')
+                        ->modalDescription('Are you sure you want to reject this purchase order?')
+                        ->modalSubmitActionLabel('Yes, Reject')
+                        ->action(function (PurchaseOrder $record, array $data) {
+                            $record->wisma_sync_comment_override = $data['comment'] ?? null;
+                            $record->update([
+                                'status' => 'rejected',
+                                'updated_by_user_id' => auth()->id(),
+                            ]);
+
+                            \Filament\Notifications\Notification::make()
+                                ->danger()
+                                ->title('Purchase Order Rejected')
+                                ->body("Purchase Order {$record->purchase_order_no} has been rejected.")
+                                ->send();
+                        }),
                     Action::make('post')
                         ->label('Post')
                         ->icon('heroicon-o-check-badge')
@@ -298,13 +329,14 @@ class PurchaseOrdersTable
                                 ->options([
                                     'draft' => 'Draft',
                                     'approved' => 'Approved',
+                                    'rejected' => 'Rejected',
                                     'posted' => 'Posted',
                                 ])
                                 ->required(),
                         ])
                         ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
                             $validTransitions = [
-                                'draft' => ['approved'],
+                                'draft' => ['approved', 'rejected'],
                                 'approved' => ['posted'],
                             ];
                             $targetStatus = $data['status'];

@@ -109,6 +109,97 @@ class WismaService
         }
     }
 
+    public function syncRejectedPurchaseOrder(PurchaseOrder $purchaseOrder, ?string $comment = null): array
+    {
+        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://wisma-dev.pelangisentralkreasi.co.id/api'));
+        $apiToken = config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token'));
+
+        $endpoint = rtrim($apiUrl, '/') . '/external/purchase-requests/reject';
+
+        $prNo = $purchaseOrder->reference_no;
+        $poNo = $purchaseOrder->purchase_order_no;
+        $comment = $comment ?: $purchaseOrder->description;
+
+        if (empty($prNo)) {
+            $warnMessage = "Skipping Wisma PO rejection sync: Reference No (Purchase Request No) is empty for PO #{$poNo}";
+            Log::warning($warnMessage);
+
+            $this->notifyUser(
+                title: 'Wisma Sync Skipped',
+                body: "Reference No is empty. PO #{$poNo} rejected in Pelangi but could not be rejected in Wisma.",
+                type: 'warning',
+                persistent: true
+            );
+
+            return [
+                'success' => false,
+                'message' => 'Reference No is empty.'
+            ];
+        }
+
+        try {
+            Log::info("Sending PO rejection sync to Wisma for PO #{$poNo} (PR Ref: {$prNo})");
+
+            $response = Http::withHeaders([
+                'X-Accounting-Token' => $apiToken,
+                'Accept' => 'application/json',
+            ])->post($endpoint, [
+                'purchase_request_no' => $prNo,
+                'comment' => $comment,
+            ]);
+
+            $responseBody = $response->json();
+
+            if ($response->successful()) {
+                Log::info("Successfully synced PO rejection to Wisma for PO #{$poNo}");
+
+                $message = $responseBody['message'] ?? 'Purchase Request rejected successfully in Wisma.';
+                $this->notifyUser(
+                    title: 'Synced to Wisma',
+                    body: "PO #{$poNo}: " . $message,
+                    type: 'success'
+                );
+
+                return [
+                    'success' => true,
+                    'data' => $responseBody,
+                ];
+            }
+
+            $errorMessage = $responseBody['message'] ?? 'Unknown error';
+            Log::error("Failed to sync PO rejection to Wisma for PO #{$poNo}. Status: {$response->status()}, Response: " . json_encode($responseBody));
+
+            $this->notifyUser(
+                title: 'Wisma Sync Failed',
+                body: "Failed to reject PO #{$poNo} in Wisma: {$errorMessage} (HTTP {$response->status()})",
+                type: 'danger',
+                persistent: true
+            );
+
+            return [
+                'success' => false,
+                'message' => $errorMessage,
+                'response' => $responseBody,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Error syncing PO rejection to Wisma for PO #{$poNo}: " . $e->getMessage(), [
+                'exception' => $e
+            ]);
+
+            $this->notifyUser(
+                title: 'Wisma Sync Connection Error',
+                body: "Failed to connect to Wisma API for rejected PO #{$poNo}: " . $e->getMessage(),
+                type: 'danger',
+                persistent: true
+            );
+
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
     public function withoutUomSync(callable $callback)
     {
         $previousState = self::$suppressUomSync;
