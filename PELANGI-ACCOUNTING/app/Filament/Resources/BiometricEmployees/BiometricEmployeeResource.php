@@ -16,7 +16,7 @@ class BiometricEmployeeResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Employee Management');
+        return __('HR & Payroll');
     }
 
     public static function getNavigationLabel(): string
