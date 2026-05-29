@@ -101,7 +101,10 @@ export const checkLoggedin = async () => {
     return currentUser;
 };
 export const logout = () => {
-    api("auth_logout").catch(() => null);
+    const token = getAuthToken();
+    if (token) {
+        api("auth_logout").catch(() => null);
+    }
     setAuthToken(null);
     currentUser.auth = null;
     currentUser.user = null;
