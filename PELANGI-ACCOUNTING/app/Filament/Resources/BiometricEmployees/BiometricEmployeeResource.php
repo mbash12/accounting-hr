@@ -48,30 +48,26 @@ class BiometricEmployeeResource extends Resource
                     ->afterStateUpdated(fn ($state, $set) => $set('employee_id', null)),
                 Select::make('employee_id')
                     ->label(__('Employee'))
-                    ->relationship('employee', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->nullable()
-                    ->modifyQueryUsing(function ($query, $get) {
+                    ->options(function ($get) {
                         $companyId = $get('company_id');
-                        if ($companyId) {
-                            return $query->where('company_id', $companyId);
-                        }
+                        $query = \App\Models\Employee::query();
 
-                        $companyId = session('selected_company_id');
                         if ($companyId) {
-                            return $query->where('company_id', $companyId);
-                        }
-
-                        if (auth()->check()) {
+                            $query->where('company_id', $companyId);
+                        } elseif (session('selected_company_id')) {
+                            $query->where('company_id', session('selected_company_id'));
+                        } elseif (auth()->check()) {
                             $ids = auth()->user()->companies()->pluck('companies.id');
                             if ($ids->isNotEmpty()) {
-                                return $query->whereIn('company_id', $ids);
+                                $query->whereIn('company_id', $ids);
                             }
                         }
 
-                        return $query;
-                    }),
+                        return $query->pluck('name', 'id');
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->nullable(),
                 \Filament\Forms\Components\Toggle::make('is_active')
                     ->label(__('Active'))
                     ->default(true),
