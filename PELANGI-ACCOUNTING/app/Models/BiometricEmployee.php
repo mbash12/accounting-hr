@@ -14,6 +14,7 @@ class BiometricEmployee extends Model
     protected $fillable = [
         'machine_user_id',
         'name',
+        'company_id',
         'employee_id',
         'is_active',
     ];
@@ -25,6 +26,11 @@ class BiometricEmployee extends Model
             'employee_id' => 'integer',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function employee(): BelongsTo

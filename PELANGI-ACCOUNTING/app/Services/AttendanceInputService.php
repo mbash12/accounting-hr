@@ -14,7 +14,7 @@ use Pgvector\Laravel\Vector;
 class AttendanceInputService
 {
     /** Cosine distance threshold for face recognition acceptance. Lower = stricter match. */
-    private const FACE_MATCH_THRESHOLD = 0.20;
+    private const FACE_MATCH_THRESHOLD = 0.30;
 
     public function __construct(
         private readonly AttendanceClockService $clockService,
@@ -189,7 +189,8 @@ class AttendanceInputService
         }
 
         $employee = $biometric->employee;
-        $meta = ['company_id' => $employee?->company_id];
+        $companyId = $item['company_id'] ?? $employee?->company_id;
+        $meta = ['company_id' => $companyId];
         $date = (string) ($item['date'] ?? Carbon::parse($item['datetime'] ?? $item['clock_in'] ?? $item['clock_out'] ?? now())->toDateString());
 
         if (! empty($item['datetime']) && ! empty($item['type'])) {

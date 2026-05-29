@@ -33,12 +33,13 @@ class BiometricEmployeeController extends Controller
         $validated = $request->validate([
             '*.id' => ['required', 'integer'],
             '*.name' => ['required', 'string'],
+            '*.company_id' => ['nullable', 'integer'],
         ]);
 
         foreach ($validated as $item) {
             BiometricEmployee::updateOrCreate(
                 ['machine_user_id' => $item['id']],
-                ['name' => $item['name'], 'is_active' => true]
+                ['name' => $item['name'], 'company_id' => $item['company_id'] ?? null, 'is_active' => true]
             );
         }
 

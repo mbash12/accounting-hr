@@ -23,6 +23,7 @@ class BiometricAttendanceController extends Controller
     {
         $validated = $request->validate([
             '*.employee_id' => ['required', 'integer'],
+            '*.company_id' => ['nullable', 'integer'],
             '*.date' => ['nullable', 'date_format:Y-m-d'],
             '*.clock_in' => ['nullable', 'date_format:Y-m-d H:i:s'],
             '*.clock_out' => ['nullable', 'date_format:Y-m-d H:i:s'],

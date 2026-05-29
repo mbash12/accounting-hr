@@ -5,6 +5,7 @@ namespace App\Filament\Resources\BiometricEmployees;
 use App\Filament\Resources\BiometricEmployees\Pages\EditBiometricEmployee;
 use App\Filament\Resources\BiometricEmployees\Pages\ListBiometricEmployees;
 use App\Models\BiometricEmployee;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -38,12 +39,39 @@ class BiometricEmployeeResource extends Resource
                 \Filament\Forms\Components\TextInput::make('name')
                     ->label(__('Name'))
                     ->required(),
-                \Filament\Forms\Components\Select::make('employee_id')
+                Select::make('company_id')
+                    ->label(__('Company'))
+                    ->relationship('company', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->reactive()
+                    ->afterStateUpdated(fn ($state, $set) => $set('employee_id', null)),
+                Select::make('employee_id')
                     ->label(__('Employee'))
                     ->relationship('employee', 'name')
                     ->searchable()
                     ->preload()
-                    ->nullable(),
+                    ->nullable()
+                    ->modifyQueryUsing(function ($query, $get) {
+                        $companyId = $get('company_id');
+                        if ($companyId) {
+                            return $query->where('company_id', $companyId);
+                        }
+
+                        $companyId = session('selected_company_id');
+                        if ($companyId) {
+                            return $query->where('company_id', $companyId);
+                        }
+
+                        if (auth()->check()) {
+                            $ids = auth()->user()->companies()->pluck('companies.id');
+                            if ($ids->isNotEmpty()) {
+                                return $query->whereIn('company_id', $ids);
+                            }
+                        }
+
+                        return $query;
+                    }),
                 \Filament\Forms\Components\Toggle::make('is_active')
                     ->label(__('Active'))
                     ->default(true),
@@ -79,7 +107,22 @@ class BiometricEmployeeResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery();
+        $selectedCompanyId = session('selected_company_id');
+        $user = auth()->user();
+
+        return parent::getEloquentQuery()
+            ->where(function ($query) use ($selectedCompanyId, $user) {
+                if ($selectedCompanyId) {
+                    $query->where('company_id', $selectedCompanyId);
+                } else {
+                    if ($user) {
+                        $userCompanyIds = $user->companies()->pluck('companies.id');
+                        if ($userCompanyIds->isNotEmpty()) {
+                            $query->whereIn('company_id', $userCompanyIds);
+                        }
+                    }
+                }
+            });
     }
 
     public static function getPages(): array
