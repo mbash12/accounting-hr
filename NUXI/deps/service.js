@@ -157,6 +157,11 @@ export const api = async (key, options = {}) => {
         const result = await response.json();
 
         if (!response.ok) {
+            if (response.status === 401) {
+                logout();
+                navigateTo('/auth');
+                return;
+            }
             throw { status: response.status, data: result };
         }
 
