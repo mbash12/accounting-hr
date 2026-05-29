@@ -25,6 +25,8 @@ class PurchaseReturnItem extends Model
         'goods_receipt_item_id',
         'product_id',
         'unit_id',
+        'base_quantity',
+        'conversion_factor',
     ];
 
     /**
@@ -41,6 +43,8 @@ class PurchaseReturnItem extends Model
             'goods_receipt_item_id' => 'integer',
             'product_id' => 'integer',
             'unit_id' => 'integer',
+            'base_quantity' => 'decimal:2',
+            'conversion_factor' => 'decimal:6',
         ];
     }
 

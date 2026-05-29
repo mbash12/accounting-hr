@@ -272,6 +272,8 @@ class PurchaseOrdersTable
                                     'unit_id' => $poItem->unit_id,
                                     'quantity' => $remaining,
                                     'description' => $poItem->description,
+                                    'conversion_factor' => $poItem->conversion_factor ?? 1,
+                                    'base_quantity' => $poItem->base_quantity ?? $remaining,
                                 ];
                             }
 
@@ -294,6 +296,8 @@ class PurchaseOrdersTable
                                         'unit_id' => $item['unit_id'],
                                         'quantity' => $item['quantity'],
                                         'description' => $item['description'],
+                                        'conversion_factor' => $item['conversion_factor'],
+                                        'base_quantity' => $item['base_quantity'],
                                     ]);
                                 }
 

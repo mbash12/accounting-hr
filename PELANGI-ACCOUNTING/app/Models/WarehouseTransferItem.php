@@ -22,6 +22,8 @@ class WarehouseTransferItem extends Model
         'warehouse_transfer_id',
         'product_id',
         'unit_id',
+        'base_quantity',
+        'conversion_factor',
     ];
 
     /**
@@ -36,6 +38,8 @@ class WarehouseTransferItem extends Model
             'warehouse_transfer_id' => 'integer',
             'product_id' => 'integer',
             'unit_id' => 'integer',
+            'base_quantity' => 'decimal:2',
+            'conversion_factor' => 'decimal:6',
         ];
     }
 

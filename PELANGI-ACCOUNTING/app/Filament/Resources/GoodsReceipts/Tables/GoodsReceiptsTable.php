@@ -268,6 +268,8 @@ class GoodsReceiptsTable
                                     'unit_id' => $item->unit_id,
                                     'quantity' => $remaining,
                                     'description' => $item->description,
+                                    'conversion_factor' => $item->conversion_factor ?? 1,
+                                    'base_quantity' => $item->base_quantity ?? $remaining,
                                 ];
                             }
 
@@ -291,6 +293,8 @@ class GoodsReceiptsTable
                                         'quantity' => $item['quantity'],
                                         'description' => $item['description'],
                                         'return_reason' => 'Automatic return from goods receipt',
+                                        'conversion_factor' => $item['conversion_factor'],
+                                        'base_quantity' => $item['base_quantity'],
                                     ]);
                                 }
 

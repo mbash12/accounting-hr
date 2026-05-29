@@ -228,6 +228,8 @@ class SalesOrdersTable
                                     'tax_id' => $soItem->tax_id,
                                     'description' => $soItem->description,
                                     'total' => $lineTotal,
+                                    'conversion_factor' => $soItem->conversion_factor ?? 1,
+                                    'base_quantity' => $soItem->base_quantity ?? $remaining,
                                 ];
                             }
 
@@ -268,6 +270,8 @@ class SalesOrdersTable
                                         'tax_id' => $item['tax_id'],
                                         'description' => $item['description'],
                                         'total' => $item['total'],
+                                        'conversion_factor' => $item['conversion_factor'],
+                                        'base_quantity' => $item['base_quantity'],
                                     ]);
                                 }
 

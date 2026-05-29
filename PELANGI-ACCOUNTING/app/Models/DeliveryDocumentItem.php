@@ -29,6 +29,8 @@ class DeliveryDocumentItem extends Model
         'product_id',
         'unit_id',
         'warehouse_id',
+        'base_quantity',
+        'conversion_factor',
     ];
 
     /**
@@ -49,6 +51,8 @@ class DeliveryDocumentItem extends Model
             'product_id' => 'integer',
             'unit_id' => 'integer',
             'warehouse_id' => 'integer',
+            'base_quantity' => 'decimal:2',
+            'conversion_factor' => 'decimal:6',
         ];
     }
 

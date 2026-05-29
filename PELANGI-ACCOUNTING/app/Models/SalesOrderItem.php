@@ -43,6 +43,8 @@ class SalesOrderItem extends Model
         'product_id',
         'unit_id',
         'tax_id',
+        'base_quantity',
+        'conversion_factor',
     ];
 
     /**
@@ -66,6 +68,8 @@ class SalesOrderItem extends Model
             'product_id' => 'integer',
             'unit_id' => 'integer',
             'tax_id' => 'integer',
+            'base_quantity' => 'decimal:2',
+            'conversion_factor' => 'decimal:6',
         ];
     }
 

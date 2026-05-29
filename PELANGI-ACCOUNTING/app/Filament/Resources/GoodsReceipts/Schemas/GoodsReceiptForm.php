@@ -212,6 +212,8 @@ class GoodsReceiptForm
                                                     'quantity_display' => NumberInput::formatRoundedIntegerDisplay($poItem->quantity),
                                                     'description' => $poItem->description,
                                                     'unit_id' => $poItem->unit_id,
+                                                    'conversion_factor' => $poItem->conversion_factor ?? 1,
+                                                    'base_quantity' => $poItem->base_quantity ?? $poItem->quantity,
                                                 ];
                                             }
                                             $set('items', $items);
@@ -301,6 +303,8 @@ class GoodsReceiptForm
                                 if ($product) {
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
+                                        $set('conversion_factor', 1);
+                                        $set('base_quantity', \App\Filament\Forms\Components\NumberInput::parseToFloat($get('quantity') ?? 0));
                                     }
                                     if ($product->description) {
                                         $set('description', $product->description);
@@ -386,23 +390,37 @@ class GoodsReceiptForm
                             ->searchable()
                             ->preload()
                             ->label('Unit')
-                            ->relationship(
-                                name: 'unit',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('name');
+                            ->options(function (callable $get) {
+                                $productId = $get('product_id');
+                                if (!$productId) {
+                                    return [];
                                 }
-                            )
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
+                                $product = \App\Models\Product::find($productId);
+                                if (!$product) {
+                                    return [];
+                                }
+                                return app(\App\Services\UnitConversionService::class)->getUnitOptions($product, 'purchase');
+                            })
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $productId = $get('product_id');
+                                $quantity = \App\Filament\Forms\Components\NumberInput::parseToFloat($get('quantity') ?? 0);
+                                if ($productId && $state) {
+                                    $product = \App\Models\Product::find($productId);
+                                    if ($product) {
+                                        $factor = app(\App\Services\UnitConversionService::class)->getConversionFactor($product, (int) $state);
+                                        $set('conversion_factor', $factor);
+                                        $set('base_quantity', $quantity * $factor);
+                                    }
+                                }
+                            }),
                         Textarea::make('description')
                             ->label('Description')
                             ->rows(1),
+                        Hidden::make('base_quantity')
+                            ->default(0),
+                        Hidden::make('conversion_factor')
+                            ->default(1),
                     ])
                     ->defaultItems(0)
                     ->reorderable()

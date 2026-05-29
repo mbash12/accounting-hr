@@ -67,6 +67,8 @@ class CreatePurchaseInvoiceFromGoodsReceipt extends Action
                         'tax_id' => $poItem->tax_id ?? null,
                         'description' => $grItem->description ?? ($poItem->description ?? null),
                         'total' => $lineTotal,
+                        'conversion_factor' => $grItem->conversion_factor ?? 1,
+                        'base_quantity' => $grItem->base_quantity ?? $receivedQty,
                     ];
                 }
 
@@ -106,6 +108,8 @@ class CreatePurchaseInvoiceFromGoodsReceipt extends Action
                             'tax_id' => $item['tax_id'],
                             'description' => $item['description'],
                             'total' => $item['total'],
+                            'conversion_factor' => $item['conversion_factor'],
+                            'base_quantity' => $item['base_quantity'],
                         ]);
                     }
 

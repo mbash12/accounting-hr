@@ -102,6 +102,8 @@ class PurchaseInvoiceItem extends Model
         'unit_id',
         'tax_id',
         'cost_center_id',
+        'base_quantity',
+        'conversion_factor',
     ];
 
     /**
@@ -123,6 +125,8 @@ class PurchaseInvoiceItem extends Model
             'unit_id' => 'integer',
             'tax_id' => 'integer',
             'cost_center_id' => 'integer',
+            'base_quantity' => 'decimal:2',
+            'conversion_factor' => 'decimal:6',
         ];
     }
 

@@ -247,6 +247,8 @@ class PurchaseInvoiceForm
                                                     'unit_id' => $grItem->unit_id ?? ($poItem->unit_id ?? null),
                                                     'description' => $grItem->description ?? ($poItem->description ?? null),
                                                     'total' => $itemTotal,
+                                                    'conversion_factor' => $grItem->conversion_factor ?? 1,
+                                                    'base_quantity' => $grItem->base_quantity ?? $receivedQty,
                                                 ];
                                             }
                                             $set('items', $items);
@@ -450,6 +452,8 @@ class PurchaseInvoiceForm
                                     }
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
+                                        $set('conversion_factor', 1);
+                                        $set('base_quantity', \App\Filament\Forms\Components\NumberInput::parseToFloat($get('quantity') ?? 0));
                                     }
                                     if ($product->description) {
                                         $set('description', $product->description);
@@ -595,24 +599,55 @@ class PurchaseInvoiceForm
                             ->searchable()
                             ->preload()
                             ->label('Unit')
-                            ->relationship(
-                                name: 'unit',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('name');
+                            ->options(function (callable $get) {
+                                $productId = $get('product_id');
+                                if (!$productId) {
+                                    return [];
                                 }
-                            )
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
+                                $product = \App\Models\Product::find($productId);
+                                if (!$product) {
+                                    return [];
+                                }
+                                return app(\App\Services\UnitConversionService::class)->getUnitOptions($product, 'purchase');
+                            })
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $productId = $get('product_id');
+                                $quantity = NumberInput::parseToFloat($get('quantity') ?? 0);
+                                if ($productId && $state) {
+                                    $product = \App\Models\Product::find($productId);
+                                    if ($product) {
+                                        $service = app(\App\Services\UnitConversionService::class);
+                                        $factor = $service->getConversionFactor($product, (int) $state);
+                                        $set('conversion_factor', $factor);
+                                        $set('base_quantity', $quantity * $factor);
+
+                                        // Update unit price based on conversion factor
+                                        $basePrice = (float) ($product->cost_price ?? 0);
+                                        $newPrice = $basePrice * $factor;
+                                        $set('unit_price', $newPrice);
+                                        $set('unit_price_display', NumberInput::formatRoundedIntegerDisplay($newPrice));
+
+                                        // Recalculate item total and document totals
+                                        $itemTotal = $quantity * $newPrice;
+                                        $set('total', $itemTotal);
+
+                                        $c = self::calculateTotals($get);
+                                        $set('subtotal', $c['subtotal']);
+                                        $set('tax_amount', $c['tax']);
+                                        $set('total_amount', $c['total']);
+                                        $set('outstanding_amount', $c['total'] - NumberInput::parseToFloat($get('paid_amount') ?? 0));
+                                    }
+                                }
+                            }),
 
                         Textarea::make('description')
                             ->label('Description')
                             ->rows(1),
+                        Hidden::make('base_quantity')
+                            ->default(0),
+                        Hidden::make('conversion_factor')
+                            ->default(1),
                         Hidden::make('total')
                             ->default(0),
                         Placeholder::make('total_amount_display')

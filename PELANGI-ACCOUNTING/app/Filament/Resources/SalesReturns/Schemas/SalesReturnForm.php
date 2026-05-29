@@ -223,6 +223,8 @@ class SalesReturnForm
                                                 'unit_id' => $deliveryItem->unit_id,
                                                 'return_reason' => '',
                                                 'description' => $deliveryItem->description,
+                                                'conversion_factor' => $deliveryItem->conversion_factor ?? 1,
+                                                'base_quantity' => $deliveryItem->base_quantity ?? $deliveryItem->quantity,
                                             ];
                                         }
                                         $set('items', $items);
@@ -314,6 +316,8 @@ class SalesReturnForm
                                 if ($product) {
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
+                                        $set('conversion_factor', 1);
+                                        $set('base_quantity', \App\Filament\Forms\Components\RoundedIntegerMoneyInput::parseToFloat($get('quantity') ?? 0));
                                     }
                                 }
                             })
@@ -402,20 +406,30 @@ class SalesReturnForm
                             ->searchable()
                             ->label('Unit')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
-                            ->relationship(
-                                name: 'unit',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('name');
+                            ->options(function (callable $get) {
+                                $productId = $get('product_id');
+                                if (!$productId) {
+                                    return [];
                                 }
-                            )
-                            ->preload()
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
+                                $product = \App\Models\Product::find($productId);
+                                if (!$product) {
+                                    return [];
+                                }
+                                return app(\App\Services\UnitConversionService::class)->getUnitOptions($product, 'sales');
+                            })
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $productId = $get('product_id');
+                                $quantity = \App\Filament\Forms\Components\RoundedIntegerMoneyInput::parseToFloat($get('quantity') ?? 0);
+                                if ($productId && $state) {
+                                    $product = \App\Models\Product::find($productId);
+                                    if ($product) {
+                                        $factor = app(\App\Services\UnitConversionService::class)->getConversionFactor($product, (int) $state);
+                                        $set('conversion_factor', $factor);
+                                        $set('base_quantity', $quantity * $factor);
+                                    }
+                                }
+                            }),
                         TextInput::make('return_reason')
                             ->required()
                             ->label('Return Reason')
@@ -425,6 +439,10 @@ class SalesReturnForm
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->rows(1)
                             ->maxLength(255),
+                        Hidden::make('base_quantity')
+                            ->default(0),
+                        Hidden::make('conversion_factor')
+                            ->default(1),
                     ])
                     ->defaultItems(0)
                     ->addable(fn (callable $get) => !(bool) $get('is_locked'))

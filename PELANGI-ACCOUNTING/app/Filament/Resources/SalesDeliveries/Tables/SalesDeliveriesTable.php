@@ -273,6 +273,8 @@ class SalesDeliveriesTable
                                     'unit_id' => $item->unit_id,
                                     'quantity' => $remaining,
                                     'description' => $item->description,
+                                    'conversion_factor' => $item->conversion_factor ?? 1,
+                                    'base_quantity' => $item->base_quantity ?? $remaining,
                                 ];
                             }
 
@@ -296,6 +298,8 @@ class SalesDeliveriesTable
                                         'quantity' => $item['quantity'],
                                         'description' => $item['description'],
                                         'return_reason' => 'Automatic return from delivery',
+                                        'conversion_factor' => $item['conversion_factor'],
+                                        'base_quantity' => $item['base_quantity'],
                                     ]);
                                 }
 

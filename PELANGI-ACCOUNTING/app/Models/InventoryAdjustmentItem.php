@@ -24,6 +24,8 @@ class InventoryAdjustmentItem extends Model
         'product_id',
         'account_id',
         'unit_id',
+        'base_quantity',
+        'conversion_factor',
     ];
 
     /**
@@ -39,6 +41,8 @@ class InventoryAdjustmentItem extends Model
             'product_id' => 'integer',
             'account_id' => 'integer',
             'unit_id' => 'integer',
+            'base_quantity' => 'decimal:2',
+            'conversion_factor' => 'decimal:6',
         ];
     }
 

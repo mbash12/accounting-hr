@@ -237,6 +237,8 @@ class SalesDeliveryForm
                                                 'quantity_display' => NumberInput::formatRoundedIntegerDisplay($item->quantity),
                                                 'unit_id' => $item->unit_id,
                                                 'description' => $item->description,
+                                                'conversion_factor' => $item->conversion_factor ?? 1,
+                                                'base_quantity' => $item->base_quantity ?? $item->quantity,
                                             ];
                                         }
 
@@ -337,7 +339,17 @@ class SalesDeliveryForm
                             ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name} ({$record->code})")
                             ->preload()
                             ->reactive()
-                            ->live(onBlur: true) // Make it reactive to form changes
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $product = \App\Models\Product::find($state);
+                                if ($product) {
+                                    if ($product->unit_id) {
+                                        $set('unit_id', $product->unit_id);
+                                        $set('conversion_factor', 1);
+                                        $set('base_quantity', \App\Filament\Forms\Components\RoundedIntegerMoneyInput::parseToFloat($get('quantity') ?? 0));
+                                    }
+                                }
+                            })
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->label('Name')
@@ -423,25 +435,39 @@ class SalesDeliveryForm
                             ->searchable()
                             ->label('Unit')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
-                            ->relationship(
-                                name: 'unit',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('name');
+                            ->options(function (callable $get) {
+                                $productId = $get('product_id');
+                                if (!$productId) {
+                                    return [];
                                 }
-                            )
-                            ->preload()
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
+                                $product = \App\Models\Product::find($productId);
+                                if (!$product) {
+                                    return [];
+                                }
+                                return app(\App\Services\UnitConversionService::class)->getUnitOptions($product, 'sales');
+                            })
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $productId = $get('product_id');
+                                $quantity = \App\Filament\Forms\Components\RoundedIntegerMoneyInput::parseToFloat($get('quantity') ?? 0);
+                                if ($productId && $state) {
+                                    $product = \App\Models\Product::find($productId);
+                                    if ($product) {
+                                        $factor = app(\App\Services\UnitConversionService::class)->getConversionFactor($product, (int) $state);
+                                        $set('conversion_factor', $factor);
+                                        $set('base_quantity', $quantity * $factor);
+                                    }
+                                }
+                            }),
 
                         Textarea::make('description')
                             ->label('Description')
                             ->disabled(fn (callable $get) => (bool) $get('../../is_locked'))
                             ->rows(1),
+                        Hidden::make('base_quantity')
+                            ->default(0),
+                        Hidden::make('conversion_factor')
+                            ->default(1),
                     ])
                     ->reorderable()
                     ->collapsible()

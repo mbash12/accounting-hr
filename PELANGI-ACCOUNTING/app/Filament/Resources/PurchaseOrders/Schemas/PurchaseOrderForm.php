@@ -269,6 +269,8 @@ class PurchaseOrderForm
                                     }
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
+                                        $set('conversion_factor', 1);
+                                        $set('base_quantity', NumberInput::parseToFloat($get('quantity') ?? 0));
                                     }
                                     if ($product->description) {
                                         $set('description', $product->description);
@@ -386,6 +388,9 @@ class PurchaseOrderForm
 
                                 $set('total', $itemTotal);
 
+                                $conversionFactor = (float) ($get('conversion_factor') ?? 1);
+                                $set('base_quantity', $quantity * $conversionFactor);
+
                                 $c = self::calculateTotals($get);
                                 $set('../../subtotal', $c['subtotal']);
                                 $set('../../discount', $c['discount']);
@@ -450,25 +455,55 @@ class PurchaseOrderForm
                         Select::make('unit_id')
                             ->searchable()
                             ->label('Unit')
-                            ->relationship(
-                                name: 'unit',
-                                titleAttribute: 'name',
-                                modifyQueryUsing: function ($query, callable $get) {
-                                    $companyId = self::resolveCompanyId($get);
-                                    if ($companyId) {
-                                        $query->where('company_id', $companyId);
-                                    } else {
-                                        $query->whereNull('company_id');
-                                    }
-                                    return $query->orderBy('name');
+                            ->options(function (callable $get) {
+                                $productId = $get('product_id');
+                                if (!$productId) {
+                                    return [];
                                 }
-                            )
-                            ->preload()
-                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name),
+                                $product = \App\Models\Product::find($productId);
+                                if (!$product) {
+                                    return [];
+                                }
+                                return app(\App\Services\UnitConversionService::class)->getUnitOptions($product, 'purchase');
+                            })
+                            ->live()
+                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                $productId = $get('product_id');
+                                $quantity = NumberInput::parseToFloat($get('quantity') ?? 0);
+                                if ($productId && $state) {
+                                    $product = \App\Models\Product::find($productId);
+                                    if ($product) {
+                                        $service = app(\App\Services\UnitConversionService::class);
+                                        $factor = $service->getConversionFactor($product, (int) $state);
+                                        $set('conversion_factor', $factor);
+                                        $set('base_quantity', $quantity * $factor);
+
+                                        // Update unit price based on conversion factor
+                                        $basePrice = (float) ($product->cost_price ?? 0);
+                                        $newPrice = $basePrice * $factor;
+                                        $set('unit_price', $newPrice);
+                                        $set('unit_price_display', NumberInput::formatRoundedIntegerDisplay($newPrice));
+
+                                        // Recalculate item total and document totals
+                                        $itemTotal = $quantity * $newPrice;
+                                        $set('total', $itemTotal);
+
+                                        $c = self::calculateTotals($get);
+                                        $set('subtotal', $c['subtotal']);
+                                        $set('discount', $c['discount']);
+                                        $set('tax_amount', $c['tax']);
+                                        $set('total_amount', $c['total']);
+                                    }
+                                }
+                            }),
 
                         Textarea::make('description')
                             ->label('Description')
                             ->rows(1),
+                        Hidden::make('base_quantity')
+                            ->default(0),
+                        Hidden::make('conversion_factor')
+                            ->default(1),
                         Hidden::make('total')
                             ->default(0)
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
