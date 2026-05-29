@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasDependencyValidation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CostCenter extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasDependencyValidation;
 
     /**
      * The attributes that are mass assignable.
@@ -54,5 +55,13 @@ class CostCenter extends Model
     public function createdByUser(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getDependencyChecks(): array
+    {
+        return [
+            ['table' => 'sales_invoice_items', 'foreignKey' => 'cost_center_id', 'label' => 'sales invoice items'],
+            ['table' => 'purchase_invoice_items', 'foreignKey' => 'cost_center_id', 'label' => 'purchase invoice items'],
+        ];
     }
 }

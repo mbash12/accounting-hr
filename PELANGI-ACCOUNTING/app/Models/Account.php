@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasDependencyValidation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Account extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasDependencyValidation;
 
     /**
      * The attributes that are mass assignable.
@@ -134,5 +135,20 @@ class Account extends Model
         }
 
         return $ids;
+    }
+
+    public function getDependencyChecks(): array
+    {
+        return [
+            ['relation' => 'children', 'label' => 'child accounts'],
+            ['table' => 'journal_entry_items', 'foreignKey' => 'account_id', 'label' => 'journal entry items'],
+            ['table' => 'products', 'foreignKey' => 'tax_id', 'label' => 'products (as tax account)'],
+            ['table' => 'taxes', 'foreignKey' => 'purchase_account_id', 'label' => 'taxes (as purchase account)'],
+            ['table' => 'taxes', 'foreignKey' => 'sales_account_id', 'label' => 'taxes (as sales account)'],
+            ['table' => 'fixed_asset_categories', 'foreignKey' => 'asset_account_id', 'label' => 'fixed asset categories (as asset account)'],
+            ['table' => 'fixed_asset_categories', 'foreignKey' => 'depreciation_account_id', 'label' => 'fixed asset categories (as depreciation account)'],
+            ['table' => 'fixed_asset_categories', 'foreignKey' => 'accumulated_depreciation_account_id', 'label' => 'fixed asset categories (as accumulated depreciation account)'],
+            ['table' => 'fixed_asset_categories', 'foreignKey' => 'sales_account_id', 'label' => 'fixed asset categories (as sales account)'],
+        ];
     }
 }
