@@ -127,7 +127,7 @@ class SchedulesRelationManager extends RelationManager
 
                         $this->resetTable();
                     })
-                    ->visible(fn (DeferredRevenueSchedule $record) => $record->status === 'pending'),
+                    ->visible(fn (DeferredRevenueSchedule $record) => $record->status === 'pending' && $record->deferredRevenue?->status === 'active'),
 
                 Action::make('reverse')
                     ->label(__('Reverse'))
