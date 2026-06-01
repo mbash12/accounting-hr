@@ -23,12 +23,12 @@ class DeferredRevenueResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Amortisasi Pendapatan');
+        return __('Deferred Revenue');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Amortisasi Pendapatan');
+        return __('Deferred Revenue');
     }
 
     public static function getNavigationSort(): int
@@ -38,7 +38,7 @@ class DeferredRevenueResource extends Resource
 
     public static function getPluralModelLabel(): string
     {
-        return __('Amortisasi Pendapatan');
+        return __('Deferred Revenue');
     }
 
     public static function getNavigationGroup(): string

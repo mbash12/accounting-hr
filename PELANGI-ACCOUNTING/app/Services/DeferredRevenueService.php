@@ -109,7 +109,7 @@ class DeferredRevenueService
             $journalEntry = JournalEntry::create([
                 'entry_number' => $this->generateEntryNumber(),
                 'date' => $recognizedDate ?? now(),
-                'description' => "Amortisasi Pendapatan: {$deferredRevenue->contract_number} - Periode {$schedule->period_number}",
+                'description' => "Deferred Revenue Amortization: {$deferredRevenue->contract_number} - Period {$schedule->period_number}",
                 'amount' => $amount,
                 'total_amount' => $amount,
                 'status' => 'posted',
@@ -130,7 +130,7 @@ class DeferredRevenueService
                 'account_id' => $liabilityAccount->id,
                 'debit' => $amount,
                 'credit' => 0,
-                'notes' => "Amortisasi periode {$schedule->period_number}",
+                'notes' => "Amortization period {$schedule->period_number}",
             ]);
 
             // Cr: Revenue — recognize the revenue
@@ -139,7 +139,7 @@ class DeferredRevenueService
                 'account_id' => $revenueAccount->id,
                 'debit' => 0,
                 'credit' => $amount,
-                'notes' => "Amortisasi periode {$schedule->period_number}",
+                'notes' => "Amortization period {$schedule->period_number}",
             ]);
 
             // Update schedule line
