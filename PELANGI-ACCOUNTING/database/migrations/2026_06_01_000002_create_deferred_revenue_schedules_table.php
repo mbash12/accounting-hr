@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('planned_amount', 15, 2);
             $table->decimal('recognized_amount', 15, 2)->default(0);
             $table->date('recognized_date')->nullable();
-            $table->string('status', 20)->default('pending'); // pending, recognized, reversed
+            $table->string('status', 20)->default('pending');
             $table->text('notes')->nullable();
             $table->foreignId('deferred_revenue_id');
             $table->foreignId('journal_entry_id')->nullable();
