@@ -54,7 +54,7 @@ class DeferredRevenueForm
                                 if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                     $query->where('company_id', $selectedCompanyId);
                                 }
-                                return $query;
+                                return $query->where('is_customer', true);
                             })
                             ->searchable()
                             ->preload()
