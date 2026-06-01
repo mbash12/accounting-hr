@@ -27,7 +27,9 @@ class ListDeferredRevenues extends ListRecords
                 ->action(function () {
                     $service = app(DeferredRevenueService::class);
                     $companyId = session('selected_company_id');
-                    $count = $service->recognizeDue($companyId ? (int) $companyId : null);
+                    $count = $service->recognizeDue(
+                        ($companyId && $companyId !== 'all') ? (int) $companyId : null
+                    );
 
                     Notification::make()
                         ->title(__('Recognition complete'))

@@ -57,13 +57,16 @@ class DeferredRevenueService
                 'deferred_revenue_id' => $deferredRevenue->id,
             ]);
         }
+
+        // Refresh parent totals after schedule regeneration
+        $deferredRevenue->refreshTotals();
     }
 
     /**
      * Recognize revenue for a specific schedule line.
      * Creates the journal entry: Dr Deferred Revenue (Liability), Cr Revenue.
      */
-    public function recognizeRevenue(DeferredRevenueSchedule $schedule, ?string $recognizedDate = null): ?JournalEntry
+    public function recognizeRevenue(DeferredRevenueSchedule $schedule, ?string $recognizedDate = null, ?int $userId = null): ?JournalEntry
     {
         if ($schedule->status === 'recognized') {
             return $schedule->journalEntry;
@@ -94,6 +97,12 @@ class DeferredRevenueService
             return null;
         }
 
+        // Guard against CLI context where Auth::id() returns null
+        $actingUserId = $userId ?? Auth::id();
+        if (!$actingUserId) {
+            return null;
+        }
+
         DB::beginTransaction();
 
         try {
@@ -108,11 +117,11 @@ class DeferredRevenueService
                 'sub_module' => 'deferred_revenue',
                 'reference_type' => DeferredRevenue::class,
                 'reference_id' => $deferredRevenue->id,
-                'posted_by_user_id' => Auth::id(),
+                'posted_by_user_id' => $actingUserId,
                 'posted_at' => now(),
                 'company_id' => $companyId,
-                'created_by_user_id' => Auth::id(),
-                'updated_by_user_id' => Auth::id(),
+                'created_by_user_id' => $actingUserId,
+                'updated_by_user_id' => $actingUserId,
             ]);
 
             // Dr: Deferred Revenue (Liability) — reduce the liability
@@ -203,7 +212,7 @@ class DeferredRevenueService
     {
         $query = DeferredRevenueSchedule::where('status', 'pending')
             ->whereHas('deferredRevenue', function ($q) use ($companyId) {
-                $q->whereIn('status', ['active', 'draft']);
+                $q->where('status', 'active');
                 if ($companyId) {
                     $q->where('company_id', $companyId);
                 }

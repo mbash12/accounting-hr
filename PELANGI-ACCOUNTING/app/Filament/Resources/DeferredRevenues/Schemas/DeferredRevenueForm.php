@@ -35,11 +35,8 @@ class DeferredRevenueForm
             ->components([
                 Section::make(__('Contract Information'))
                     ->schema([
-                        TextInput::make('contract_number')
-                            ->required()
-                            ->maxLength(50)
-                            ->unique(ignoreRecord: true)
-                            ->label(__('Contract Number')),
+                        (new static)->getCodeField('contract_number', __('Contract Number'))
+                            ->unique(ignoreRecord: true),
                         DatePicker::make('date')
                             ->required()
                             ->default(now())
@@ -89,11 +86,17 @@ class DeferredRevenueForm
                             ->numeric()
                             ->minValue(1)
                             ->label(__('Number of Periods (Months)'))
-                            ->helperText(__('Number of months over which revenue will be recognized')),
+                            ->helperText(__('Number of months over which revenue will be recognized'))
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                $start = $get('period_start');
+                                if ($start && $state) {
+                                    $end = \Carbon\Carbon::parse($start)->addMonths((int) $state)->subDay();
+                                    $set('period_end', $end);
+                                }
+                            }),
                         Select::make('recognition_method')
                             ->options([
                                 'straight_line' => __('Straight Line (Equal Monthly)'),
-                                'custom' => __('Custom Schedule'),
                             ])
                             ->default('straight_line')
                             ->required()

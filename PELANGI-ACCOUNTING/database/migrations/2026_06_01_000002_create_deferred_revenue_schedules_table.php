@@ -27,6 +27,7 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('deferred_revenue_id')->references('id')->on('deferred_revenues')->onDelete('cascade');
+            $table->index(['status', 'period_end']);
         });
     }
 
