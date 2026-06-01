@@ -26,6 +26,7 @@ class DeferredRevenueSchedule extends Model
         'status',
         'notes',
         'deferred_revenue_id',
+        'company_id',
         'journal_entry_id',
     ];
 
@@ -44,6 +45,7 @@ class DeferredRevenueSchedule extends Model
             'planned_amount' => 'decimal:2',
             'recognized_amount' => 'decimal:2',
             'deferred_revenue_id' => 'integer',
+            'company_id' => 'integer',
             'journal_entry_id' => 'integer',
         ];
     }
@@ -56,5 +58,10 @@ class DeferredRevenueSchedule extends Model
     public function journalEntry(): BelongsTo
     {
         return $this->belongsTo(JournalEntry::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 }

@@ -55,6 +55,7 @@ class DeferredRevenueService
                 'recognized_amount' => 0,
                 'status' => 'pending',
                 'deferred_revenue_id' => $deferredRevenue->id,
+                'company_id' => $deferredRevenue->company_id,
             ]);
         }
 
