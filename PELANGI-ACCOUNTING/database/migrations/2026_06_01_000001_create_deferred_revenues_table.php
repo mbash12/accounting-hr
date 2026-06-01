@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('customer_name')->nullable();
             $table->decimal('total_amount', 15, 2);
             $table->integer('total_periods');
-            $table->string('recognition_method', 20)->default('straight_line'); // straight_line, custom
+            $table->string('recognition_method', 20)->default('straight_line');
             $table->date('period_start');
             $table->date('period_end');
             $table->decimal('recognized_amount', 15, 2)->default(0);

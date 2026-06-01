@@ -19,7 +19,6 @@ class DeferredRevenue extends Model
     protected static function boot()
     {
         parent::boot();
-
         static::creating(function ($model) {
             if (Auth::check() && !$model->created_by_user_id) {
                 $model->created_by_user_id = Auth::id();
@@ -30,6 +29,10 @@ class DeferredRevenue extends Model
                 if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                     $model->company_id = $selectedCompanyId;
                 }
+            }
+
+            if (!$model->remaining_amount && $model->total_amount) {
+                $model->remaining_amount = $model->total_amount;
             }
         });
     }
