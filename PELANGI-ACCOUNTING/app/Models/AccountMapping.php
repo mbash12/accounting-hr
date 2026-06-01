@@ -34,6 +34,7 @@ class AccountMapping extends Model
         'receivable_payment' => 'Receivable Payment',
         'payable_payment' => 'Payable Payment',
         'payroll' => 'Payroll',
+        'deferred_revenue' => 'Deferred Revenue',
     ];
 
     /**
@@ -68,6 +69,9 @@ class AccountMapping extends Model
         'salary_payable' => 'Salary Payable (Net)',
         'pph21_payable' => 'PPh21 Payable',
         'bpjs_payable' => 'BPJS Payable (Total)',
+        // Deferred Revenue mappings
+        'deferred_revenue_liability' => 'Deferred Revenue (Liability)',
+        'deferred_revenue_recognition' => 'Deferred Revenue Recognition (Revenue)',
     ];
 
     /**
@@ -93,6 +97,7 @@ class AccountMapping extends Model
         'receivable_payment' => ['other_charges', 'discount', 'write_off'],
         'payable_payment' => ['other_charges', 'discount', 'write_off'],
         'payroll' => ['salary_expense', 'thr_expense', 'bpjs_expense', 'salary_payable', 'pph21_payable', 'bpjs_payable'],
+        'deferred_revenue' => ['deferred_revenue_liability', 'deferred_revenue_recognition'],
     ];
 
     /**
