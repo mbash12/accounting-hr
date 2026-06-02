@@ -24,9 +24,12 @@ class WismaService
 
         $endpoint = rtrim($apiUrl, '/') . '/external/purchase-requests/approve';
 
+        $purchaseOrder->loadMissing('items.product');
+
         $prNo = $purchaseOrder->reference_no;
         $poNo = $purchaseOrder->purchase_order_no;
         $comment = $purchaseOrder->description;
+        $payload = $this->buildApprovedPurchaseOrderPayload($purchaseOrder);
 
         if (empty($prNo)) {
             $warnMessage = "Skipping Wisma PO approval sync: Reference No (Purchase Request No) is empty for PO #{$poNo}";
@@ -46,16 +49,14 @@ class WismaService
         }
 
         try {
-            Log::info("Sending PO approval sync to Wisma for PO #{$poNo} (PR Ref: {$prNo})");
+            Log::info("Sending PO approval sync to Wisma for PO #{$poNo} (PR Ref: {$prNo})", [
+                'payload' => $payload,
+            ]);
 
             $response = Http::withHeaders([
                 'X-Accounting-Token' => $apiToken,
                 'Accept' => 'application/json',
-            ])->post($endpoint, [
-                'purchase_request_no' => $prNo,
-                'po_no' => $poNo,
-                'comment' => $comment,
-            ]);
+            ])->post($endpoint, $payload);
 
             $responseBody = $response->json();
 
@@ -215,6 +216,119 @@ class WismaService
     public function shouldSyncUom(): bool
     {
         return !self::$suppressUomSync;
+    }
+
+    protected function buildApprovedPurchaseOrderPayload(PurchaseOrder $purchaseOrder): array
+    {
+        $payload = [
+            'po_no' => $purchaseOrder->purchase_order_no,
+            'comment' => $purchaseOrder->description,
+            'items' => $purchaseOrder->items
+                ->map(fn ($item) => $this->buildApprovedPurchaseOrderItemPayload($item))
+                ->filter()
+                ->values()
+                ->all(),
+            // Keep the legacy field for backward compatibility on the Wisma side.
+            'purchase_request_no' => $purchaseOrder->reference_no,
+        ];
+
+        $purchaseRequestId = $this->extractPurchaseRequestId($purchaseOrder);
+        if ($purchaseRequestId !== null) {
+            $payload['purchase_request_id'] = $purchaseRequestId;
+        }
+
+        return $payload;
+    }
+
+    protected function buildApprovedPurchaseOrderItemPayload(object $item): ?array
+    {
+        $payload = [
+            'unit_price' => $this->normalizeDecimalValue($item->unit_price ?? 0),
+            'qty_order' => $this->normalizeDecimalValue($item->quantity ?? 0),
+        ];
+
+        $purchaseRequestItemId = $this->extractPurchaseRequestItemId($item);
+        if ($purchaseRequestItemId !== null) {
+            $payload['purchase_request_item_id'] = $purchaseRequestItemId;
+        } else {
+            $materialId = $this->extractMaterialId($item);
+            if ($materialId !== null) {
+                $payload['material_id'] = $materialId;
+            }
+        }
+
+        if (!isset($payload['purchase_request_item_id']) && !isset($payload['material_id'])) {
+            return null;
+        }
+
+        return $payload;
+    }
+
+    protected function extractPurchaseRequestId(PurchaseOrder $purchaseOrder): ?int
+    {
+        $candidates = [
+            $purchaseOrder->purchase_request_id ?? null,
+            data_get($purchaseOrder, 'receipt_meta.purchase_request_id'),
+            data_get($purchaseOrder, 'invoice_meta.purchase_request_id'),
+            is_numeric($purchaseOrder->reference_no) ? $purchaseOrder->reference_no : null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate !== null && $candidate !== '' && is_numeric($candidate)) {
+                return (int) $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    protected function extractPurchaseRequestItemId(object $item): ?int
+    {
+        $candidates = [
+            $item->purchase_request_item_id ?? null,
+            data_get($item, 'meta.purchase_request_item_id'),
+            data_get($item, 'product.purchase_request_item_id'),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate !== null && $candidate !== '' && is_numeric($candidate)) {
+                return (int) $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    protected function extractMaterialId(object $item): ?int
+    {
+        $product = $item->product ?? null;
+
+        $candidates = [
+            $item->material_id ?? null,
+            data_get($item, 'meta.material_id'),
+            $product?->material_id,
+            is_numeric($product?->code) ? $product->code : null,
+            is_numeric($product?->id) ? $product->id : null,
+        ];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate !== null && $candidate !== '' && is_numeric($candidate)) {
+                return (int) $candidate;
+            }
+        }
+
+        return null;
+    }
+
+    protected function normalizeDecimalValue(mixed $value): int|float
+    {
+        $normalized = (float) $value;
+
+        if (fmod($normalized, 1.0) === 0.0) {
+            return (int) $normalized;
+        }
+
+        return round($normalized, 2);
     }
 
     public function syncUom(Unit $unit, string $action = 'update'): array
