@@ -28,7 +28,6 @@ class WismaService
 
         $prNo = $purchaseOrder->reference_no;
         $poNo = $purchaseOrder->purchase_order_no;
-        $comment = $purchaseOrder->description;
         $payload = $this->buildApprovedPurchaseOrderPayload($purchaseOrder);
 
         if (empty($prNo)) {
@@ -220,7 +219,8 @@ class WismaService
 
     protected function buildApprovedPurchaseOrderPayload(PurchaseOrder $purchaseOrder): array
     {
-        $payload = [
+        return [
+            'purchase_request_no' => $purchaseOrder->reference_no,
             'po_no' => $purchaseOrder->purchase_order_no,
             'comment' => $purchaseOrder->description,
             'items' => $purchaseOrder->items
@@ -228,92 +228,49 @@ class WismaService
                 ->filter()
                 ->values()
                 ->all(),
-            // Keep the legacy field for backward compatibility on the Wisma side.
-            'purchase_request_no' => $purchaseOrder->reference_no,
         ];
-
-        $purchaseRequestId = $this->extractPurchaseRequestId($purchaseOrder);
-        if ($purchaseRequestId !== null) {
-            $payload['purchase_request_id'] = $purchaseRequestId;
-        }
-
-        return $payload;
     }
 
     protected function buildApprovedPurchaseOrderItemPayload(object $item): ?array
     {
-        $payload = [
-            'unit_price' => $this->normalizeDecimalValue($item->unit_price ?? 0),
-            'qty_order' => $this->normalizeDecimalValue($item->quantity ?? 0),
-        ];
-
-        $purchaseRequestItemId = $this->extractPurchaseRequestItemId($item);
-        if ($purchaseRequestItemId !== null) {
-            $payload['purchase_request_item_id'] = $purchaseRequestItemId;
-        } else {
-            $materialId = $this->extractMaterialId($item);
-            if ($materialId !== null) {
-                $payload['material_id'] = $materialId;
-            }
+        $materialCode = $this->extractMaterialCode($item);
+        if ($materialCode === null) {
+            return null;
         }
 
-        if (!isset($payload['purchase_request_item_id']) && !isset($payload['material_id'])) {
-            return null;
+        $payload = [
+            'material_code' => $materialCode,
+            'unit_price' => $this->normalizeDecimalValue($item->unit_price ?? 0),
+        ];
+
+        $qtyOrder = $this->normalizeDecimalValue($item->quantity ?? 0);
+        if ($qtyOrder !== 0) {
+            $payload['qty_order'] = $qtyOrder;
         }
 
         return $payload;
     }
 
-    protected function extractPurchaseRequestId(PurchaseOrder $purchaseOrder): ?int
-    {
-        $candidates = [
-            $purchaseOrder->purchase_request_id ?? null,
-            data_get($purchaseOrder, 'receipt_meta.purchase_request_id'),
-            data_get($purchaseOrder, 'invoice_meta.purchase_request_id'),
-            is_numeric($purchaseOrder->reference_no) ? $purchaseOrder->reference_no : null,
-        ];
-
-        foreach ($candidates as $candidate) {
-            if ($candidate !== null && $candidate !== '' && is_numeric($candidate)) {
-                return (int) $candidate;
-            }
-        }
-
-        return null;
-    }
-
-    protected function extractPurchaseRequestItemId(object $item): ?int
-    {
-        $candidates = [
-            $item->purchase_request_item_id ?? null,
-            data_get($item, 'meta.purchase_request_item_id'),
-            data_get($item, 'product.purchase_request_item_id'),
-        ];
-
-        foreach ($candidates as $candidate) {
-            if ($candidate !== null && $candidate !== '' && is_numeric($candidate)) {
-                return (int) $candidate;
-            }
-        }
-
-        return null;
-    }
-
-    protected function extractMaterialId(object $item): ?int
+    protected function extractMaterialCode(object $item): ?string
     {
         $product = $item->product ?? null;
 
         $candidates = [
-            $item->material_id ?? null,
-            data_get($item, 'meta.material_id'),
-            $product?->material_id,
-            is_numeric($product?->code) ? $product->code : null,
-            is_numeric($product?->id) ? $product->id : null,
+            $item->material_code ?? null,
+            data_get($item, 'meta.material_code'),
+            $product?->material_code,
+            $product?->code,
         ];
 
         foreach ($candidates as $candidate) {
-            if ($candidate !== null && $candidate !== '' && is_numeric($candidate)) {
-                return (int) $candidate;
+            if (is_string($candidate)) {
+                $candidate = trim($candidate);
+                if ($candidate !== '') {
+                    return $candidate;
+                }
+            }
+            if (is_numeric($candidate)) {
+                return (string) $candidate;
             }
         }
 

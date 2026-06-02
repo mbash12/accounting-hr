@@ -189,7 +189,17 @@ class PurchaseOrdersTable
                         ->modalDescription('Are you sure you want to approve this purchase order?')
                         ->modalSubmitActionLabel('Yes, Approve')
                         ->action(function (PurchaseOrder $record) {
-                            $record->update(['status' => 'approved']);
+                            $result = $record->approveWithWisma();
+
+                            if (!($result['success'] ?? false)) {
+                                \Filament\Notifications\Notification::make()
+                                    ->danger()
+                                    ->title('Purchase Order Failed to Approve')
+                                    ->body("Purchase Order {$record->purchase_order_no} gagal diapprove ke Wisma, status lokal tidak diubah.")
+                                    ->send();
+
+                                return;
+                            }
 
                             \Filament\Notifications\Notification::make()
                                 ->success()
@@ -213,11 +223,17 @@ class PurchaseOrdersTable
                         ->modalDescription('Are you sure you want to reject this purchase order?')
                         ->modalSubmitActionLabel('Yes, Reject')
                         ->action(function (PurchaseOrder $record, array $data) {
-                            $record->wisma_sync_comment_override = $data['comment'] ?? null;
-                            $record->update([
-                                'status' => 'rejected',
-                                'updated_by_user_id' => auth()->id(),
-                            ]);
+                            $result = $record->rejectWithWisma($data['comment'] ?? null);
+
+                            if (!($result['success'] ?? false)) {
+                                \Filament\Notifications\Notification::make()
+                                    ->danger()
+                                    ->title('Purchase Order Failed to Reject')
+                                    ->body("Purchase Order {$record->purchase_order_no} gagal direject ke Wisma, status lokal tidak diubah.")
+                                    ->send();
+
+                                return;
+                            }
 
                             \Filament\Notifications\Notification::make()
                                 ->danger()
