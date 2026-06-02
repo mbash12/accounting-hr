@@ -28,6 +28,8 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
 
     protected string $view = 'filament.resources.bank-reconciliations.pages.view-bank-reconciliation';
 
+    public array $pendingMatches = [];
+
     public function infolist(Schema $schema): Schema
     {
         return $schema
@@ -143,6 +145,10 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     ->label(__('Invoice'))
                     ->placeholder(__('—'))
                     ->state(function (BankReconciliationItem $record): ?string {
+                        if (array_key_exists($record->id, $this->pendingMatches)) {
+                            return $this->pendingMatches[$record->id];
+                        }
+
                         if (! $record->suggested_invoice_id) {
                             return null;
                         }
@@ -155,20 +161,18 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                         $options = [];
 
                         if ($record->match_status === 'matched' && $record->suggested_invoice_id) {
-                            $label = $this->formatInvoiceLabel($record, $openSalesInvoices, $openPurchaseInvoices);
+                            $label = $this->formatInvoiceLabel($record);
 
                             return $record->suggested_invoice_id
                                 ? ["{$label['type']}:{$record->suggested_invoice_id}" => $label['label']]
                                 : [];
                         }
 
-                        // Add currently suggested/selected invoice first
                         if ($record->suggested_invoice_id) {
-                            $label = $this->formatInvoiceLabel($record, $openSalesInvoices, $openPurchaseInvoices);
+                            $label = $this->formatInvoiceLabel($record);
                             $options["{$label['type']}:{$record->suggested_invoice_id}"] = $label['label'];
                         }
 
-                        // Add available open invoices
                         if ($record->type === 'incoming') {
                             foreach ($openSalesInvoices as $id => $invoice) {
                                 $key = "sales:{$id}";
@@ -197,44 +201,22 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     })
                     ->searchableOptions()
                     ->native(true)
+                    ->extraAttributes(fn (BankReconciliationItem $record) => [
+                        'wire:key' => 'invoice-match-'.$record->id.'-'.($record->match_status ?? 'null'),
+                    ])
                     ->disabled(fn (BankReconciliationItem $record): bool => $record->match_status === 'matched')
                     ->updateStateUsing(function ($state, BankReconciliationItem $record) {
-                        $service = app(BankReconciliationService::class);
+                        $currentState = $record->suggested_invoice_id
+                            ? (($record->suggested_invoice_type === SalesInvoice::class ? 'sales' : 'purchase') . ':' . $record->suggested_invoice_id)
+                            : null;
 
-                        try {
-                            if (blank($state)) {
-                                if ($record->match_status === 'suggested') {
-                                    $service->unmatch($record);
-                                }
-
-                                $this->checkReconciliationComplete();
-                                Notification::make()
-                                    ->info()
-                                    ->title(__('Match removed.'))
-                                    ->send();
-
-                                return;
-                            }
-
-                            [$type, $id] = explode(':', $state);
-                            $invoiceType = $type === 'sales' ? SalesInvoice::class : PurchaseInvoice::class;
-
-                            $service->forceMatch($record, (int) $id, $invoiceType);
-                            $this->checkReconciliationComplete();
-
-                            Notification::make()
-                                ->success()
-                                ->title(__('Matched successfully. Payment created.'))
-                                ->send();
-                        } catch (\Exception $e) {
-                            Notification::make()
-                                ->danger()
-                                ->title(__('Match failed'))
-                                ->body($e->getMessage())
-                                ->send();
-
-                            throw $e;
+                        if ($state === $currentState) {
+                            unset($this->pendingMatches[$record->id]);
+                        } else {
+                            $this->pendingMatches[$record->id] = $state;
                         }
+
+                        $this->resetTable();
                     }),
             ])
             ->recordActions([
@@ -243,11 +225,25 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->size('sm')
-                    ->visible(fn (BankReconciliationItem $record): bool => $record->match_status === 'suggested')
+                    ->visible(function (BankReconciliationItem $record): bool {
+                        if (array_key_exists($record->id, $this->pendingMatches)) {
+                            return false;
+                        }
+
+                        return $record->match_status === 'suggested';
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading(__('Confirm Suggested Match'))
+                    ->modalDescription(function (BankReconciliationItem $record) {
+                        $label = $this->formatInvoiceLabel($record);
+
+                        return __('Confirm matching to invoice :invoice?', ['invoice' => $label['label']]);
+                    })
                     ->action(function (BankReconciliationItem $record) {
                         try {
                             app(BankReconciliationService::class)->confirmMatch($record);
                             $this->checkReconciliationComplete();
+                            $this->resetTable();
 
                             Notification::make()
                                 ->success()
@@ -268,6 +264,64 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('save_matches')
+                ->label(__('Save Matches'))
+                ->icon('heroicon-o-check-circle')
+                ->color('primary')
+                ->visible(fn () => filled($this->pendingMatches))
+                ->requiresConfirmation()
+                ->modalHeading(__('Save Matches'))
+                ->modalDescription(__('Apply all selected invoice matches?'))
+                ->action(function () {
+                    $service = app(BankReconciliationService::class);
+                    $applied = 0;
+                    $failed = [];
+
+                    foreach ($this->pendingMatches as $itemId => $pending) {
+                        $record = BankReconciliationItem::find($itemId);
+                        if (! $record) {
+                            continue;
+                        }
+
+                        try {
+                            if (blank($pending)) {
+                                if ($record->match_status === 'suggested') {
+                                    $service->unmatch($record);
+                                }
+                                continue;
+                            }
+
+                            [$type, $id] = explode(':', $pending);
+                            $invoiceType = $type === 'sales' ? SalesInvoice::class : PurchaseInvoice::class;
+
+                            $service->forceMatch($record, (int) $id, $invoiceType);
+                            $applied++;
+                        } catch (\Exception $e) {
+                            $failed[] = $record->bank_description . ': ' . $e->getMessage();
+                        }
+                    }
+
+                    $this->pendingMatches = [];
+                    $this->checkReconciliationComplete();
+                    $this->resetTable();
+
+                    if (count($failed)) {
+                        Notification::make()
+                            ->warning()
+                            ->title(__(':count applied, :failed failed.', [
+                                'count' => $applied,
+                                'failed' => count($failed),
+                            ]))
+                            ->body(implode("\n", $failed))
+                            ->send();
+                    } else {
+                        Notification::make()
+                            ->success()
+                            ->title(__(':count match(es) saved.', ['count' => $applied]))
+                            ->send();
+                    }
+                }),
+
             Action::make('confirm_all_suggested')
                 ->label(__('Confirm All Suggested'))
                 ->icon('heroicon-o-check')
@@ -288,6 +342,7 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     }
 
                     $this->checkReconciliationComplete();
+                    $this->resetTable();
 
                     Notification::make()
                         ->success()
@@ -315,23 +370,26 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
     }
 
     /**
-     * @param  \Illuminate\Support\Collection<int, SalesInvoice>  $openSalesInvoices
-     * @param  \Illuminate\Support\Collection<int, PurchaseInvoice>  $openPurchaseInvoices
      * @return array{type: string, label: string}
      */
-    private function formatInvoiceLabel(BankReconciliationItem $record, $openSalesInvoices, $openPurchaseInvoices): array
+    private function formatInvoiceLabel(BankReconciliationItem $record): array
     {
         $id = $record->suggested_invoice_id;
+
+        if (! $id) {
+            return ['type' => '', 'label' => '—'];
+        }
+
         $type = $record->suggested_invoice_type === SalesInvoice::class ? 'sales' : 'purchase';
         $amount = number_format((float) $record->suggested_invoice_amount, 2);
 
         if ($type === 'sales') {
-            $invoice = $openSalesInvoices->get($id);
+            $invoice = SalesInvoice::with('customer')->find($id);
             $label = $invoice
                 ? "{$invoice->invoice_number} — {$invoice->customer?->name} — Rp {$amount}"
                 : "Inv #{$id} — Rp {$amount}";
         } else {
-            $invoice = $openPurchaseInvoices->get($id);
+            $invoice = PurchaseInvoice::with('supplier')->find($id);
             $label = $invoice
                 ? "{$invoice->invoice_number} — {$invoice->supplier?->name} — Rp {$amount}"
                 : "Inv #{$id} — Rp {$amount}";
