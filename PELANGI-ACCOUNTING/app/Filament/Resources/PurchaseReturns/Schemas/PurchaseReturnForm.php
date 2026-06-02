@@ -258,9 +258,8 @@ class PurchaseReturnForm
                             ->label('Status')
                             ->options([
                                 'draft' => 'Draft',
-                                'posted' => 'Posted',
                             ])
-                            ->default('posted')
+                            ->default('draft')
                             ->required()
                             ->native(false)
                             ->live(),

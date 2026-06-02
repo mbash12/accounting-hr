@@ -360,7 +360,6 @@ class PurchaseInvoiceForm
                                 if (!$record || $get('status') === 'draft') {
                                     return [
                                         'draft' => 'Draft',
-                                        'posted' => 'Posted',
                                     ];
                                 }
                                 // Otherwise, show all options
@@ -375,7 +374,7 @@ class PurchaseInvoiceForm
                                     'cancelled' => 'Cancelled',
                                 ];
                             })
-                            ->default('posted')
+                            ->default('draft')
                             ->required()
                             ->native(false)
                             ->live()

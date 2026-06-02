@@ -197,18 +197,6 @@ class CashTransferForm
                             inlineLabel: true,
                             columnSpan: 2,
                         ),
-                        Toggle::make("is_posted")
-                            ->label(__("Posted"))
-                            ->helperText(__("Mark this entry as posted to the general ledger"))
-                            ->default(false)
-                            ->dehydrated(true)
-                            ->afterStateHydrated(function (callable $set, $state, $record) {
-                                if ($record) {
-                                    $isPosted = $record->status === 'posted';
-                                    $set('is_posted', $isPosted);
-                                }
-                            })
-                            ->columnSpan(2),
                         Select::make('company_id')
                             ->label(__('Company'))
                             ->relationship('company', 'name')

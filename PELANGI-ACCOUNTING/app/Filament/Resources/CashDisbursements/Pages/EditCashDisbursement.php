@@ -4,12 +4,10 @@ namespace App\Filament\Resources\CashDisbursements\Pages;
 
 use App\Filament\Resources\CashDisbursements\CashDisbursementResource;
 use App\Models\CashDisbursement;
-use App\Services\CashBankService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class EditCashDisbursement extends EditRecord
@@ -48,15 +46,11 @@ class EditCashDisbursement extends EditRecord
         return $data;
     }
 
-    protected ?string $oldStatus = null;
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $this->oldStatus = $this->record->status;
-
-        $isPosted = $data['is_posted'] ?? false;
-        $data['status'] = $isPosted ? 'posted' : 'draft';
-        unset($data['is_posted']); // Remove toggle from data
+        // Preserve existing status - use Posting Center to post
+        unset($data['is_posted']);
 
         $items = $data['items'] ?? [];
         if (empty($items)) {
@@ -75,8 +69,6 @@ class EditCashDisbursement extends EditRecord
         }
         $data['total'] = $total;
 
-        if ($this->record->status === 'posted' && !$isPosted) {
-        }
 
         if (empty($data['company_id'])) {
             $selectedCompanyId = session('selected_company_id');
@@ -113,16 +105,8 @@ class EditCashDisbursement extends EditRecord
             }
         }
 
-        $oldStatus = $this->oldStatus;
-        $this->record->refresh();
-        $newStatus = $this->record->status;
 
-        if ($oldStatus !== $newStatus || $newStatus === 'posted') {
-            DB::transaction(function () {
-                $service = app(CashBankService::class);
-                $service->createJournalEntryForRecord($this->record);
-            });
-        }
+        // Journal entry creation is handled by Posting Center
     }
 
     protected function getRedirectUrl(): string

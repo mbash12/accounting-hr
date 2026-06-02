@@ -104,9 +104,8 @@ class EditJournalEntry extends EditRecord
         $data['amount'] = $totals['total_debit'];
         $data['total_amount'] = $totals['total_debit'];
         
-        $isPosted = (bool) ($data['is_posted'] ?? true);
-        $data['is_posted'] = $isPosted;
-        $data['status'] = $isPosted ? 'posted' : 'draft';
+        // Preserve existing posted status - use Posting Center to post
+        unset($data['is_posted']);
 
         $data['updated_by_user_id'] = \Illuminate\Support\Facades\Auth::id();
 

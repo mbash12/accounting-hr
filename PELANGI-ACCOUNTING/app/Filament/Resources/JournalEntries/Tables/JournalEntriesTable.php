@@ -20,6 +20,10 @@ class JournalEntriesTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query
+                ->whereNull('sub_module')
+                ->whereNull('reference_type')
+            )
             ->columns([
                 TextColumn::make("entry_number")
                     ->label(__("Entry No."))

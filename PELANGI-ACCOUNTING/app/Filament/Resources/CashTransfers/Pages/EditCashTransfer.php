@@ -30,10 +30,8 @@ class EditCashTransfer extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->oldStatus = $this->record->status;
-        
-        $isPosted = $data['is_posted'] ?? false;
-        $data['status'] = $isPosted ? 'posted' : 'draft';
-        unset($data['is_posted']); // Remove toggle from data
+        // Preserve existing status - use Posting Center to post
+        unset($data['is_posted']);
 
         if (empty($data['company_id'])) {
             $selectedCompanyId = session('selected_company_id');
@@ -55,16 +53,7 @@ class EditCashTransfer extends EditRecord
 
     protected function afterSave(): void
     {
-        $oldStatus = $this->oldStatus;
-        $this->record->refresh();
-        $newStatus = $this->record->status;
-
-        if ($oldStatus !== $newStatus || $newStatus === 'posted') {
-            DB::transaction(function () {
-                $service = app(CashBankService::class);
-                $service->createJournalEntryForRecord($this->record);
-            });
-        }
+        // Journal entry creation is handled by Posting Center
     }
 
     protected function getRedirectUrl(): string

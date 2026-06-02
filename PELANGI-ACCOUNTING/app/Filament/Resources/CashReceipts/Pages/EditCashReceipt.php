@@ -55,10 +55,8 @@ class EditCashReceipt extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         $this->oldStatus = $this->record->status;
-
-        $isPosted = $data['is_posted'] ?? false;
-        $data['status'] = $isPosted ? 'posted' : 'draft';
-        unset($data['is_posted']); // Remove toggle from data
+        // Preserve existing status - use Posting Center to post
+        unset($data['is_posted']);
 
         $items = $data['items'] ?? [];
         if (empty($items)) {
@@ -116,12 +114,7 @@ class EditCashReceipt extends EditRecord
         $this->record->refresh();
         $newStatus = $this->record->status;
 
-        if ($oldStatus !== $newStatus || $newStatus === 'posted') {
-            DB::transaction(function () {
-                $service = app(CashBankService::class);
-                $service->createJournalEntryForRecord($this->record);
-            });
-        }
+        // Journal entry creation is handled by Posting Center
     }
 
     protected function getRedirectUrl(): string

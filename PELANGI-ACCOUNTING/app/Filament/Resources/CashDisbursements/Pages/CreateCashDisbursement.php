@@ -113,9 +113,7 @@ class CreateCashDisbursement extends CreateRecord
             try {
                 $glAccountId = $data['from_account_id'];
 
-                // Convert toggle is_posted to status
-                $isPosted = $data['is_posted'] ?? false;
-                $status = $isPosted ? 'posted' : 'draft';
+                $status = 'draft';
 
                 $disbursement = $service->createCashOut([
                     'date' => $data['date'],

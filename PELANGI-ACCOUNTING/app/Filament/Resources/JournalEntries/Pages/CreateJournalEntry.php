@@ -82,9 +82,8 @@ class CreateJournalEntry extends CreateRecord
         $data['amount'] = $totals['total_debit'];
         $data['total_amount'] = $totals['total_debit'];
         
-        $isPosted = (bool) ($data['is_posted'] ?? true);
-        $data['is_posted'] = $isPosted;
-        $data['status'] = $isPosted ? 'posted' : 'draft';
+        $data['is_posted'] = false;
+        $data['status'] = 'draft';
         $data['created_by_user_id'] = Filament::auth()->id();
         
         if (empty($data['company_id'])) {

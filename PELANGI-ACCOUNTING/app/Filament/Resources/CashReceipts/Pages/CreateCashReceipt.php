@@ -126,8 +126,7 @@ class CreateCashReceipt extends CreateRecord
             try {
                 $glAccountId = $data['to_account_id'];
 
-                $isPosted = $data['is_posted'] ?? false;
-                $status = $isPosted ? 'posted' : 'draft';
+                $status = 'draft';
 
                 $receipt = $service->createCashIn([
                     'date' => $data['date'],

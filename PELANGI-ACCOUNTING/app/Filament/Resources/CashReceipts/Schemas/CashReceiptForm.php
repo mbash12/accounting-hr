@@ -330,17 +330,6 @@ class CashReceiptForm
                     Placeholder::make("empty_col_2")
                         ->hiddenLabel()
                         ->columnSpan(1),
-                    Toggle::make("is_posted")
-                        ->label(__("Posted"))
-                        ->default(false)
-                        ->dehydrated(true)
-                        ->afterStateHydrated(function (callable $set, $state, $record) {
-                            if ($record) {
-                                $isPosted = $record->status === 'posted';
-                                $set('is_posted', $isPosted);
-                            }
-                        })
-                        ->columnSpan(2),
                 ])
                 ->columns(2)
                 ->columnSpanFull(),

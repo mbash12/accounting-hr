@@ -16,43 +16,13 @@ trait Journalable
         static::saved(function ($model) {
             try {
                 if (property_exists($model, 'status')) {
-                    // Process journal entries based on status
-                    if ($model->isDirty('status')) {
-                        // If status changed to any non-posted state, delete any existing journal entry
-                        if ($model->status !== 'posted') {
-                            $model->deleteJournalEntry();
-                        }
-                        // If status changed to 'posted', create journal entry
-                        else if ($model->status === 'posted') {
-                            $journalService = app(JournalService::class);
-
-                            $journalService->createJournalEntryFromDocument(
-                                $model->getDocumentType(),
-                                $model,
-                                $model->getJournalEntryDescription()
-                            );
-                        }
-                    } else {
-                        // Status hasn't changed
-                        if ($model->status === 'posted' && !$model->journalEntryExists()) {
-                            // If status is 'posted' but no journal entry exists, create one
-                            // This handles cases where journal creation might have failed previously
-                            $journalService = app(JournalService::class);
-
-                            $journalService->createJournalEntryFromDocument(
-                                $model->getDocumentType(),
-                                $model,
-                                $model->getJournalEntryDescription()
-                            );
-                        } else if ($model->status !== 'posted' && $model->journalEntryExists()) {
-                            // If status is non-posted but journal entry exists, delete it
-                            // This handles cases where journal deletion might have failed previously
-                            $model->deleteJournalEntry();
-                        }
+                    // Posting is now handled centrally by PostingCenter page.
+                    // Only handle cleanup: if status changes away from 'posted', delete journal entry.
+                    if ($model->isDirty('status') && $model->getOriginal('status') === 'posted' && $model->status !== 'posted') {
+                        $model->deleteJournalEntry();
                     }
 
-                    // Additional safety check: ensure non-posted documents never have journal entries
-                    // This handles edge cases where journal entries might be created unexpectedly
+                    // Safety check: ensure non-posted documents never have journal entries
                     if ($model->status !== 'posted' && $model->journalEntryExists()) {
                         $model->deleteJournalEntry();
                     }

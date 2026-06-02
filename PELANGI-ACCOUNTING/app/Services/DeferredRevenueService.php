@@ -98,8 +98,15 @@ class DeferredRevenueService
             return null;
         }
 
-        // Guard against CLI context where Auth::id() returns null
+        // Use passed user, authenticated user, or default to first admin user (CLI-safe)
         $actingUserId = $userId ?? Auth::id();
+        if (!$actingUserId) {
+            $actingUserId = \App\Models\User::query()
+                ->whereHas('roles', fn ($q) => $q->where('name', 'super_admin'))
+                ->value('id')
+                ?? \App\Models\User::min('id');
+        }
+
         if (!$actingUserId) {
             return null;
         }
@@ -225,8 +232,10 @@ class DeferredRevenueService
 
         foreach ($schedules as $schedule) {
             try {
-                $this->recognizeRevenue($schedule);
-                $count++;
+                $result = $this->recognizeRevenue($schedule);
+                if ($result) {
+                    $count++;
+                }
             } catch (\Exception $e) {
                 \Log::warning("Failed to recognize deferred revenue schedule #{$schedule->id}: " . $e->getMessage());
             }

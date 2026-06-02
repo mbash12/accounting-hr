@@ -381,7 +381,6 @@ class SalesInvoiceForm
                                 if (!$record || $get('status') === 'draft') {
                                     return [
                                         'draft' => 'Draft',
-                                        'posted' => 'Posted',
                                     ];
                                 }
                                 // Otherwise, show all options
@@ -396,7 +395,7 @@ class SalesInvoiceForm
                                     'cancelled' => 'Cancelled',
                                 ];
                             })
-                            ->default('posted')
+                            ->default('draft')
                             ->required()
                             ->native(false)
                             ->live()

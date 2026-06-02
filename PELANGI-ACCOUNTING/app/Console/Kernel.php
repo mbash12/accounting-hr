@@ -25,6 +25,12 @@ class Kernel extends ConsoleKernel
             ->everyMinute()
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/invoice-sync-scheduled.log'));
+
+        // Recognize due deferred revenue schedules
+        $schedule->command('deferred-revenue:recognize')
+            ->dailyAt('01:00')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/deferred-revenue-recognize.log'));
     }
 
     /**

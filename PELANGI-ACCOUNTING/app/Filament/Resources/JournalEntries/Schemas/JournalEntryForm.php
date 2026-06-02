@@ -381,14 +381,6 @@ class JournalEntryForm
                     ->columns(4)
                     ->columnSpanFull(),
 
-                Section::make(__('Entry Options'))
-                    ->schema([
-                        Toggle::make('is_posted')
-                            ->label(__('Posted'))
-                            // ->helperText(__('Mark this entry as posted to the ledger')),
-                    ])
-                    ->columns(2)
-                    ->columnSpanFull(),
 
             ]);
     }

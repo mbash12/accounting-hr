@@ -62,8 +62,7 @@ class CreateCashTransfer extends CreateRecord
             }
         }
 
-        $isPosted = $data['is_posted'] ?? false;
-        $status = $isPosted ? 'posted' : 'draft';
+        $status = 'draft';
 
         try {
             return $service->createCashTransfer([

@@ -225,24 +225,6 @@ class PurchaseOrdersTable
                                 ->body("Purchase Order {$record->purchase_order_no} has been rejected.")
                                 ->send();
                         }),
-                    Action::make('post')
-                        ->label('Post')
-                        ->icon('heroicon-o-check-badge')
-                        ->color('success')
-                        ->visible(fn (PurchaseOrder $record): bool => $record->status === 'approved')
-                        ->requiresConfirmation()
-                        ->modalHeading('Post Purchase Order')
-                        ->modalDescription('Are you sure you want to post this purchase order? This will create journal entries.')
-                        ->modalSubmitActionLabel('Yes, Post')
-                        ->action(function (PurchaseOrder $record) {
-                            $record->update(['status' => 'posted']);
-
-                            \Filament\Notifications\Notification::make()
-                                ->success()
-                                ->title('Purchase Order Posted')
-                                ->body("Purchase Order {$record->purchase_order_no} has been posted.")
-                                ->send();
-                        }),
                     Action::make('createGoodsReceipt')
                         ->label('Create Goods Receipt')
                         ->icon('heroicon-o-inbox-arrow-down')
@@ -334,14 +316,12 @@ class PurchaseOrdersTable
                                     'draft' => 'Draft',
                                     'approved' => 'Approved',
                                     'rejected' => 'Rejected',
-                                    'posted' => 'Posted',
                                 ])
                                 ->required(),
                         ])
                         ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
                             $validTransitions = [
                                 'draft' => ['approved', 'rejected'],
-                                'approved' => ['posted'],
                             ];
                             $targetStatus = $data['status'];
                             $updated = 0;

@@ -212,7 +212,6 @@ class PurchaseOrderForm
                                 'draft' => 'Draft',
                                 'approved' => 'Approved',
                                 'rejected' => 'Rejected',
-                                'posted' => 'Posted',
                             ])
                             ->default('draft')
                             ->required()

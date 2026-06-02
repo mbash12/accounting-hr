@@ -56,15 +56,18 @@ class JournalEntryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->where(function (Builder $query) {
-                $query->whereNull('sub_module')
-                    ->whereNull('reference_type');
-            })
             ->when(
                 session('selected_company_id') && session('selected_company_id') !== 'all',
                 fn(Builder $query) => $query->where('company_id', session('selected_company_id'))
             );
         // When 'all' is selected or no company selected, show all records (both global and company-specific)
+    }
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return parent::getRecordRouteBindingEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 
     public static function getRelations(): array
@@ -83,11 +86,4 @@ class JournalEntryResource extends Resource
         ];
     }
 
-    public static function getRecordRouteBindingEloquentQuery(): Builder
-    {
-        return parent::getRecordRouteBindingEloquentQuery()
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
-    }
 }
