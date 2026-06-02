@@ -85,6 +85,10 @@ class Bank extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function accounts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(BankAccount::class);
+    }
     public function getDependencyChecks(): array
     {
         return [

@@ -2,15 +2,15 @@
 
 namespace App\Filament\Resources\BankAccounts\Tables;
 
+use App\Filament\Actions\ExportBankAccountsAction;
+use App\Filament\Actions\ImportBankAccountsAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class BankAccountsTable
@@ -19,59 +19,47 @@ class BankAccountsTable
     {
         return $table
             ->columns([
-                TextColumn::make("account_number")
+                TextColumn::make('bank.name')
+                    ->label(__('Bank'))
                     ->searchable()
-                    ->copyable()
-                    ->weight("bold")
-                    ->label(__("Account #")),
-                TextColumn::make("account_name")
+                    ->sortable(),
+                TextColumn::make('account_number')
+                    ->label(__('Account Number'))
                     ->searchable()
-                    ->label(__("Account Name")),
-                TextColumn::make("account_type")
-                    ->label(__("Account Type"))
-                    ->searchable()
-                    ->formatStateUsing(
-                        fn(string $state): string => match ($state) {
-                            "checking" => __("Checking"),
-                            "savings" => __("Savings"),
-                            "credit_card" => __("Credit Card"),
-                            "investment" => __("Investment"),
-                            default => $state,
-                        },
-                    ),
-                TextColumn::make("balance")
-                    ->money("IDR")
-                    ->sortable()
-                    ->label(__("Balance")),
-                TextColumn::make("bank.name")->searchable()->label(__("Bank")),
-
-                IconColumn::make("is_active")->boolean()->label(__("Active")),
-                TextColumn::make("createdByUser.name")
-                    ->label(__("Created By"))
-                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('account_name')
+                    ->label(__('Account Name'))
+                    ->searchable(),
+                TextColumn::make('account_type')
+                    ->label(__('Type'))
+                    ->badge(),
+                TextColumn::make('balance')
+                    ->label(__('Balance'))
+                    ->money('IDR'),
+                TextColumn::make('company.name')
+                    ->label(__('Company'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("created_at")
-                    ->label(__("Created At"))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("updated_at")
-                    ->label(__("Updated At"))
+                IconColumn::make('is_active')
+                    ->label(__('Active'))
+                    ->boolean(),
+                TextColumn::make('created_at')
+                    ->label(__('Created'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([TrashedFilter::make()])
+            ->defaultSort('account_number')
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
+                    DeleteAction::make(),
                 ]),
             ])
             ->toolbarActions([
+                ImportBankAccountsAction::make(),
+                ExportBankAccountsAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
                 ]),
             ]);
     }

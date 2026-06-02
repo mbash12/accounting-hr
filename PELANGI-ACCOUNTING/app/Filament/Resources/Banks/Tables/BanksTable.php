@@ -2,18 +2,16 @@
 
 namespace App\Filament\Resources\Banks\Tables;
 
+use App\Filament\Actions\ExportBanksAction;
+use App\Filament\Actions\ImportBanksAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ImageColumn;
-
 use Filament\Tables\Table;
-use App\Filament\Actions\ExportBanksAction;
-use App\Filament\Actions\ImportBanksAction;
 
 class BanksTable
 {
@@ -21,42 +19,33 @@ class BanksTable
     {
         return $table
             ->columns([
-                ImageColumn::make("logo")
-                    ->label(__("Logo"))
-                    ->circular()
-                    ->disk("public"),
-                TextColumn::make("name")->label(__("Bank Name"))->searchable(),
-                TextColumn::make("code")
-                    ->label(__("Bank Code"))
+                TextColumn::make('code')
+                    ->label(__('Code'))
                     ->searchable()
-                    ->weight("bold"),
-
-                TextColumn::make("country")->label(__("Country"))->searchable(),
-
-                IconColumn::make("is_active")->boolean()->label(__("Active")),
-                TextColumn::make("clearing_code")
-                    ->label(__("Clearing Code"))
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label(__('Name'))
                     ->searchable()
+                    ->sortable(),
+                TextColumn::make('clearing_code')
+                    ->label(__('Clearing Code'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("skn_code")
-                    ->label(__("SKN Code"))
-                    ->searchable()
+                TextColumn::make('skn_code')
+                    ->label(__('SKN Code'))
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("createdByUser.name")
-                    ->label(__("Created By"))
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("created_at")
-                    ->label(__("Created At"))
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make("updated_at")
-                    ->label(__("Updated At"))
+                IconColumn::make('is_active')
+                    ->label(__('Active'))
+                    ->boolean(),
+                TextColumn::make('accounts_count')
+                    ->label(__('Accounts'))
+                    ->counts('accounts'),
+                TextColumn::make('created_at')
+                    ->label(__('Created'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('code')
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make(),
@@ -64,8 +53,8 @@ class BanksTable
                 ]),
             ])
             ->toolbarActions([
-                ImportBanksAction::make('import'),
-                ExportBanksAction::make('export'),
+                ImportBanksAction::make(),
+                ExportBanksAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
