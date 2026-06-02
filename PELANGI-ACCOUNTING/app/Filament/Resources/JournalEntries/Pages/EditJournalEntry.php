@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JournalEntries\Pages;
 
+use App\Filament\Actions\BulkInputJournalItemsAction;
 use App\Filament\Resources\JournalEntries\JournalEntryResource;
 use App\Filament\Resources\JournalEntries\Schemas\JournalEntryForm;
 use App\Filament\Forms\Components\NumberInput;
@@ -21,6 +22,7 @@ class EditJournalEntry extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            BulkInputJournalItemsAction::make(),
             DeleteAction::make(),
             ForceDeleteAction::make(),
             RestoreAction::make(),
@@ -62,16 +64,11 @@ class EditJournalEntry extends EditRecord
         
         // Filter out empty items
         $validItems = array_filter($items, function ($item) {
-            $itemArray = (array) $item;
-            
-            if (empty($itemArray['account_id'])) {
-                return false;
-            }
-            
-            $debit = NumberInput::parseToFloat($itemArray['debit'] ?? $itemArray['debit_display'] ?? 0);
-            $credit = NumberInput::parseToFloat($itemArray['credit'] ?? $itemArray['credit_display'] ?? 0);
-            
-            return $debit > 0 || $credit > 0;
+            $item = (array) $item;
+            $hasAccount = !empty($item['account_id'] ?? null);
+            $debit = (float) ($item['debit'] ?? 0);
+            $credit = (float) ($item['credit'] ?? 0);
+            return $hasAccount && ($debit > 0 || $credit > 0);
         });
         
         $validItems = array_values($validItems);
@@ -83,20 +80,16 @@ class EditJournalEntry extends EditRecord
         $totals = JournalEntryForm::calculateTotalsFromItems($validItems);
 
         foreach ($validItems as $index => $item) {
-            $itemArray = (array) $item;
-            $debit = NumberInput::parseToFloat($itemArray['debit'] ?? $itemArray['debit_display'] ?? 0);
-            $credit = NumberInput::parseToFloat($itemArray['credit'] ?? $itemArray['credit_display'] ?? 0);
+            $item = (array) $item;
+            $debit = (float) ($item['debit'] ?? 0);
+            $credit = (float) ($item['credit'] ?? 0);
             
             if ($debit <= 0 && $credit <= 0) {
-                $this->NotificationHalt(__('Item :index must have a debit or credit value.', ['index' => $index + 1]));
+                $this->NotificationHalt('Item ' . ($index + 1) . ' must have a debit or credit value.');
             }
             
             if ($debit > 0 && $credit > 0) {
-                $this->NotificationHalt(__('Item :index cannot have both debit and credit values.', ['index' => $index + 1]));
-            }
-            
-            if (empty($item['cost_center_id'])) {
-                $validItems[$index]['cost_center_id'] = null;
+                $this->NotificationHalt('Item ' . ($index + 1) . ' cannot have both debit and credit values.');
             }
         }
 
@@ -115,11 +108,10 @@ class EditJournalEntry extends EditRecord
     protected function NotificationHalt(string $message): void
     {
         \Filament\Notifications\Notification::make()
-            ->title('Validation Error')
-            ->body($message)
             ->danger()
+            ->title($message)
             ->send();
-            
+        
         $this->halt();
     }
 }

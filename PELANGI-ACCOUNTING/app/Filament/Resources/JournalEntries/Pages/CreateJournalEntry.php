@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\JournalEntries\Pages;
 
+use App\Filament\Actions\BulkInputJournalItemsAction;
 use App\Filament\Resources\JournalEntries\JournalEntryResource;
 use App\Filament\Resources\JournalEntries\Schemas\JournalEntryForm;
 use App\Filament\Forms\Components\NumberInput;
@@ -14,6 +15,13 @@ use Filament\Actions\ActionGroup;
 class CreateJournalEntry extends CreateRecord
 {
     protected static string $resource = JournalEntryResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            BulkInputJournalItemsAction::make(),
+        ];
+    }
 
     protected function getFormActions(): array
     {
@@ -39,16 +47,11 @@ class CreateJournalEntry extends CreateRecord
         $items = $this->data['items'] ?? [];
         
         $validItems = array_filter($items, function ($item) {
-            $itemArray = (array) $item;
-            
-            if (empty($itemArray['account_id'])) {
-                return false;
-            }
-            
-            $debit = NumberInput::parseToFloat($itemArray['debit'] ?? $itemArray['debit_display'] ?? 0);
-            $credit = NumberInput::parseToFloat($itemArray['credit'] ?? $itemArray['credit_display'] ?? 0);
-            
-            return $debit > 0 || $credit > 0;
+            $item = (array) $item;
+            $hasAccount = !empty($item['account_id'] ?? null);
+            $debit = (float) ($item['debit'] ?? 0);
+            $credit = (float) ($item['credit'] ?? 0);
+            return $hasAccount && ($debit > 0 || $credit > 0);
         });
         
         $validItems = array_values($validItems);
@@ -64,16 +67,16 @@ class CreateJournalEntry extends CreateRecord
         }
 
         foreach ($validItems as $index => $item) {
-            $itemArray = (array) $item;
-            $debit = NumberInput::parseToFloat($itemArray['debit'] ?? $itemArray['debit_display'] ?? 0);
-            $credit = NumberInput::parseToFloat($itemArray['credit'] ?? $itemArray['credit_display'] ?? 0);
+            $item = (array) $item;
+            $debit = (float) ($item['debit'] ?? 0);
+            $credit = (float) ($item['credit'] ?? 0);
             
             if ($debit <= 0 && $credit <= 0) {
-                $this->NotificationHalt(__('Item :index must have a debit or credit value.', ['index' => $index + 1]));
+                $this->NotificationHalt('Item ' . ($index + 1) . ' must have a debit or credit value.');
             }
             
             if ($debit > 0 && $credit > 0) {
-                $this->NotificationHalt(__('Item :index cannot have both debit and credit values.', ['index' => $index + 1]));
+                $this->NotificationHalt('Item ' . ($index + 1) . ' cannot have both debit and credit values.');
             }
         }
         
@@ -92,25 +95,16 @@ class CreateJournalEntry extends CreateRecord
                 $data['company_id'] = $selectedCompanyId;
             }
         }
-        if (isset($data['items']) && is_array($data['items'])) {
-            foreach ($data['items'] as $index => $item) {
-                if (empty($item['cost_center_id'])) {
-                    $data['items'][$index]['cost_center_id'] = null;
-                }
-            }
-        }
-
         return $data;
     }
 
     protected function NotificationHalt(string $message): void
     {
         \Filament\Notifications\Notification::make()
-            ->title('Validation Error')
-            ->body($message)
             ->danger()
+            ->title($message)
             ->send();
-            
+        
         $this->halt();
     }
 
