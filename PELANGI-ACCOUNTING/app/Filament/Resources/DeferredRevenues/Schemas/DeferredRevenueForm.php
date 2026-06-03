@@ -119,11 +119,13 @@ class DeferredRevenueForm
                         Select::make('deferred_revenue_account_id')
                             ->relationship('deferredRevenueAccount', 'name', modifyQueryUsing: function ($query) {
                                 $selectedCompanyId = session('selected_company_id');
+                                $query->where('is_header', false)->where('is_active', true)->where('account_type', 'current_liability');
                                 if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                     $query->where('company_id', $selectedCompanyId);
                                 }
                                 return $query;
                             })
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->code} - {$record->name}")
                             ->searchable()
                             ->preload()
                             ->label(__('Deferred Revenue Account (Liability)'))
@@ -131,11 +133,13 @@ class DeferredRevenueForm
                         Select::make('revenue_account_id')
                             ->relationship('revenueAccount', 'name', modifyQueryUsing: function ($query) {
                                 $selectedCompanyId = session('selected_company_id');
+                                $query->where('is_header', false)->where('is_active', true)->where('account_type', 'revenue');
                                 if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                     $query->where('company_id', $selectedCompanyId);
                                 }
                                 return $query;
                             })
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->code} - {$record->name}")
                             ->searchable()
                             ->preload()
                             ->label(__('Revenue Account'))

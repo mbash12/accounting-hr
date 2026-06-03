@@ -110,25 +110,6 @@ return new class extends Migration
             WHERE status != 'posted'
               AND deleted_at IS NULL
 
-            UNION ALL
-
-            -- Delivery Documents (no amount column — logistics only)
-            SELECT
-                'sales_delivery'::text,
-                delivery_number::text,
-                date,
-                COALESCE(reference_no, '')::text,
-                ''::text AS description,
-                0::numeric(20,2) AS amount,
-                status::text,
-                id,
-                'App\\\\Models\\\\DeliveryDocument'::text,
-                company_id,
-                created_at,
-                updated_at
-            FROM delivery_documents
-            WHERE status != 'posted'
-              AND deleted_at IS NULL
 
             UNION ALL
 
@@ -187,7 +168,7 @@ return new class extends Migration
                 created_at,
                 updated_at
             FROM purchase_orders
-            WHERE status != 'posted'
+            WHERE status = 'approved'
               AND deleted_at IS NULL
 
             UNION ALL

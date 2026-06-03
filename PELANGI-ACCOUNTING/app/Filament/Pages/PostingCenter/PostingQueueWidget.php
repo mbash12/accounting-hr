@@ -39,7 +39,7 @@ class PostingQueueWidget extends TableWidget
                     ->color(fn ($record) => match ($record->type) {
                         'journal_entry' => 'info',
                         'cash_disbursement', 'cash_receipt', 'cash_transfer' => 'warning',
-                        'sales_order', 'sales_delivery', 'sales_invoice', 'sales_return' => 'success',
+                        'sales_order', 'sales_invoice', 'sales_return' => 'success',
                         'purchase_order', 'goods_receipt', 'purchase_invoice', 'purchase_return' => 'danger',
                         default => 'gray',
                     })
@@ -76,6 +76,12 @@ class PostingQueueWidget extends TableWidget
                     }),
             ])
             ->actions([
+                Action::make('open')
+                    ->label(__('Open'))
+                    ->icon('heroicon-o-arrow-top-right-on-square')
+                    ->url(fn (PostingQueue $record) => $record->getResourceUrl())
+                    ->openUrlInNewTab()
+                    ->color('gray'),
                 Action::make('post')
                     ->label(__('Post'))
                     ->icon('heroicon-o-check-circle')
@@ -98,7 +104,6 @@ class PostingQueueWidget extends TableWidget
                         'cash_receipt' => __('Cash Receipt'),
                         'cash_transfer' => __('Cash Transfer'),
                         'sales_order' => __('Sales Order'),
-                        'sales_delivery' => __('Sales Delivery'),
                         'sales_invoice' => __('Sales Invoice'),
                         'sales_return' => __('Sales Return'),
                         'purchase_order' => __('Purchase Order'),

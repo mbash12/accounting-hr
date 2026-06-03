@@ -2,6 +2,17 @@
 
 namespace App\Models;
 
+use App\Filament\Resources\CashDisbursements\CashDisbursementResource;
+use App\Filament\Resources\CashReceipts\CashReceiptResource;
+use App\Filament\Resources\CashTransfers\CashTransferResource;
+use App\Filament\Resources\GoodsReceipts\GoodsReceiptResource;
+use App\Filament\Resources\JournalEntries\JournalEntryResource;
+use App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource;
+use App\Filament\Resources\PurchaseOrders\PurchaseOrderResource;
+use App\Filament\Resources\PurchaseReturns\PurchaseReturnResource;
+use App\Filament\Resources\SalesInvoices\SalesInvoiceResource;
+use App\Filament\Resources\SalesOrders\SalesOrderResource;
+use App\Filament\Resources\SalesReturns\SalesReturnResource;
 use Illuminate\Database\Eloquent\Model;
 
 class PostingQueue extends Model
@@ -13,6 +24,20 @@ class PostingQueue extends Model
     public $incrementing = false;
 
     protected $primaryKey = 'source_id';
+
+    protected static array $typeResourceMap = [
+        'journal_entry' => JournalEntryResource::class,
+        'cash_disbursement' => CashDisbursementResource::class,
+        'cash_receipt' => CashReceiptResource::class,
+        'cash_transfer' => CashTransferResource::class,
+        'sales_order' => SalesOrderResource::class,
+        'sales_invoice' => SalesInvoiceResource::class,
+        'sales_return' => SalesReturnResource::class,
+        'purchase_order' => PurchaseOrderResource::class,
+        'goods_receipt' => GoodsReceiptResource::class,
+        'purchase_invoice' => PurchaseInvoiceResource::class,
+        'purchase_return' => PurchaseReturnResource::class,
+    ];
 
     // Composite key: model doesn't have a real PK — prevent default sort on it
     public function getKeyName()
@@ -57,6 +82,17 @@ class PostingQueue extends Model
         return $class::find($this->source_id);
     }
 
+    public function getResourceUrl(): ?string
+    {
+        $resourceClass = static::$typeResourceMap[$this->type] ?? null;
+
+        if (!$resourceClass) {
+            return null;
+        }
+
+        return $resourceClass::getUrl('edit', ['record' => $this->source_id]);
+    }
+
     public function getTypeLabel(): string
     {
         return match ($this->type) {
@@ -65,7 +101,6 @@ class PostingQueue extends Model
             'cash_receipt' => __('Cash Receipt'),
             'cash_transfer' => __('Cash Transfer'),
             'sales_order' => __('Sales Order'),
-            'sales_delivery' => __('Sales Delivery'),
             'sales_invoice' => __('Sales Invoice'),
             'sales_return' => __('Sales Return'),
             'purchase_order' => __('Purchase Order'),
