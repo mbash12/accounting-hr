@@ -247,7 +247,7 @@ class PurchaseOrdersTable
                         ->color('primary')
                         ->visible(function (PurchaseOrder $record): bool {
                             $meta = $record->receipt_meta ?: $record->computeReceiptMeta();
-                            return (float) ($meta['remaining'] ?? 0) > 0 && $record->status === 'posted';
+                            return (float) ($meta['remaining'] ?? 0) > 0 && $record->status === 'approved';
                         })
                         ->requiresConfirmation()
                         ->modalHeading('Create Goods Receipt')
