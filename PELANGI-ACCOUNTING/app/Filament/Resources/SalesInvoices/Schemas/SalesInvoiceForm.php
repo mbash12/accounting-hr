@@ -221,9 +221,6 @@ class SalesInvoiceForm
                                         });
                                     }
 
-                                    // Only show sales orders with 'posted' status
-                                    $query->where('status', 'posted');
-
                                     // Only exclude sales orders that already have locked sales invoices when creating a new record
                                     // Sales order menu creates locked invoices automatically, so this prevents manual creation
                                     // if any invoice was created from sales order menu
