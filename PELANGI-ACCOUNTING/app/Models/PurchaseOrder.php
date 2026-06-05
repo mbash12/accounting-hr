@@ -201,10 +201,10 @@ class PurchaseOrder extends Model
         $this->total_amount = $subtotal - $discount + $otherCharges + $taxAmount;
     }
 
-    public function approveWithWisma(): array
+    public function approveWithWisma(?string $comment = null): array
     {
         $wismaService = app(\App\Services\WismaService::class);
-        $result = $wismaService->syncApprovedPurchaseOrder($this);
+        $result = $wismaService->syncApprovedPurchaseOrder($this, $comment);
 
         if (!($result['success'] ?? false)) {
             return $result;

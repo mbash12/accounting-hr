@@ -28,17 +28,17 @@ class WismaService
      * @param PurchaseOrder $purchaseOrder
      * @return array
      */
-    public function syncApprovedPurchaseOrder(PurchaseOrder $purchaseOrder): array
+    public function syncApprovedPurchaseOrder(PurchaseOrder $purchaseOrder, ?string $comment = null): array
     {
         ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
 
         $endpoint = rtrim($apiUrl, '/') . '/external/purchase-requests/approve';
 
-        $purchaseOrder->loadMissing('items.product', 'items.unit');
+        $purchaseOrder->loadMissing('items.product', 'items.unit', 'items.unit.unitCategory');
 
         $prNo = $purchaseOrder->reference_no;
         $poNo = $purchaseOrder->purchase_order_no;
-        $payload = $this->buildApprovedPurchaseOrderPayload($purchaseOrder);
+        $payload = $this->buildApprovedPurchaseOrderPayload($purchaseOrder, $comment);
 
         if (empty($prNo)) {
             $warnMessage = "Skipping Wisma PO approval sync: Reference No (Purchase Request No) is empty for PO #{$poNo}";
@@ -226,9 +226,9 @@ class WismaService
         return !self::$suppressUomSync;
     }
 
-    protected function buildApprovedPurchaseOrderPayload(PurchaseOrder $purchaseOrder): array
+    protected function buildApprovedPurchaseOrderPayload(PurchaseOrder $purchaseOrder, ?string $comment = null): array
     {
-        return [
+        $payload = [
             'purchase_request_no' => $purchaseOrder->reference_no,
             'po_no' => $purchaseOrder->purchase_order_no,
             'items' => $purchaseOrder->items
@@ -237,6 +237,12 @@ class WismaService
                 ->values()
                 ->all(),
         ];
+
+        if ($comment !== null) {
+            $payload['comment'] = $comment;
+        }
+
+        return $payload;
     }
 
     protected function buildApprovedPurchaseOrderItemPayload(object $item): ?array
@@ -248,14 +254,31 @@ class WismaService
 
         $unit = $item->unit ?? null;
         $conversionFactor = $unit ? (float) ($unit->conversion_factor ?? 1) : 1;
+        $quantity = $this->normalizeDecimalValue($item->quantity ?? 0);
+        $unitPrice = $this->normalizeDecimalValue($item->unit_price ?? 0);
+        $lineTotal = $this->normalizeDecimalValue($quantity * $unitPrice);
 
-        return [
+        $payload = [
             'material_code' => $materialCode,
-            'qty_order' => $this->normalizeDecimalValue($item->quantity ?? 0),
+            'qty_order' => $quantity,
             'uom_code' => $unit ? $unit->code : 'PCS',
             'factor_to_base' => $conversionFactor,
-            'unit_price' => $this->normalizeDecimalValue($item->unit_price ?? 0),
+            'unit_price' => $unitPrice,
+            'line_total' => $lineTotal,
         ];
+
+        // Add base UOM code from unit conversion category
+        if ($unit && $unit->unitCategory) {
+            $payload['base_uom_code'] = $unit->unitCategory->base_uom_code ?? null;
+            $payload['conversion_category_code'] = $unit->unitCategory->code ?? null;
+        }
+
+        // Add notes from item description
+        if (!empty($item->description)) {
+            $payload['notes'] = $item->description;
+        }
+
+        return $payload;
     }
 
     protected function extractMaterialCode(object $item): ?string
@@ -450,8 +473,11 @@ class WismaService
 
     /**
      * Sync UOM Conversions.
+     *
+     * @param array $conversions Array of conversion data
+     * @param string|null $syncMode 'replace' for full replace (omitted items disabled), null for upsert
      */
-    public function syncUomConversions(array $conversions): array
+    public function syncUomConversions(array $conversions, ?string $syncMode = null): array
     {
         ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
 
@@ -464,6 +490,10 @@ class WismaService
                 'factor_to_base' => $conv['factor_to_base'],
             ], $conversions),
         ];
+
+        if ($syncMode !== null) {
+            $payload['sync_mode'] = $syncMode;
+        }
 
         if (empty($payload['data'])) {
             return ['success' => false, 'message' => 'No conversions to sync.'];

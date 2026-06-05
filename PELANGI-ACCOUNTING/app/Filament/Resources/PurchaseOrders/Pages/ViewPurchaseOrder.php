@@ -23,12 +23,18 @@ class ViewPurchaseOrder extends ViewRecord
                 ->icon('heroicon-o-check-circle')
                 ->color('warning')
                 ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                ->form([
+                    Textarea::make('comment')
+                        ->label('Comment')
+                        ->rows(3)
+                        ->placeholder('Optional approval comment for Wisma'),
+                ])
                 ->requiresConfirmation()
                 ->modalHeading('Approve Purchase Order')
                 ->modalDescription('Are you sure you want to approve this purchase order?')
                 ->modalSubmitActionLabel('Yes, Approve')
-                ->action(function (PurchaseOrder $record) {
-                    $result = $record->approveWithWisma();
+                ->action(function (PurchaseOrder $record, array $data) {
+                    $result = $record->approveWithWisma($data['comment'] ?? null);
 
                     if (!($result['success'] ?? false)) {
                         \Filament\Notifications\Notification::make()
