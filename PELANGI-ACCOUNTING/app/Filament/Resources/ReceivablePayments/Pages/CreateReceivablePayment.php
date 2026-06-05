@@ -98,9 +98,9 @@ class CreateReceivablePayment extends CreateRecord
         $data['created_by_user_id'] = Auth::id();
         $data['updated_by_user_id'] = Auth::id();
         
-        // Set status jadi completed setelah submit
+        // Set status as draft - will be posted from Posting Center
         if (empty($data['status']) || $data['status'] === 'pending') {
-            $data['status'] = 'completed';
+            $data['status'] = 'draft';
         }
 
         $total = 0;
@@ -171,18 +171,6 @@ class CreateReceivablePayment extends CreateRecord
                             'trace' => $e->getTraceAsString(),
                         ]);
                     }
-                }
-            }
-
-            if ($this->record && $this->record->status === 'completed') {
-                try {
-                    $service = app(ReceivablePayableService::class);
-                    $service->createJournalEntryForReceivablePayment($this->record);
-                } catch (\Exception $e) {
-                    \Log::error('Error creating journal entry for receivable payment: ' . $e->getMessage(), [
-                        'payment_id' => $this->record->id,
-                        'trace' => $e->getTraceAsString(),
-                    ]);
                 }
             }
         }

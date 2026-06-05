@@ -8,7 +8,6 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Support\Facades\Auth;
@@ -93,34 +92,7 @@ class PostingQueueWidget extends TableWidget
                     ->modalDescription(__('Post this transaction? This will create journal entries in the general ledger.'))
                     ->modalSubmitActionLabel(__('Yes, post it')),
             ])
-            ->filters([
-                SelectFilter::make('type')
-                    ->label(__('Type'))
-                    ->multiple()
-                    ->searchable()
-                    ->preload()
-                    ->options([
-                        'journal_entry' => __('Journal Entry'),
-                        'cash_disbursement' => __('Cash Disbursement'),
-                        'cash_receipt' => __('Cash Receipt'),
-                        'cash_transfer' => __('Cash Transfer'),
-                        'receivable_payment' => __('Receivable Payment'),
-                        'payable_payment' => __('Payable Payment'),
-                        'sales_invoice' => __('Sales Invoice'),
-                        'sales_return' => __('Sales Return'),
-                        'goods_receipt' => __('Goods Receipt'),
-                        'purchase_invoice' => __('Purchase Invoice'),
-                        'purchase_return' => __('Purchase Return'),
-                    ]),
-                SelectFilter::make('status')
-                    ->label(__('Status'))
-                    ->multiple()
-                    ->preload()
-                    ->options([
-                        'draft' => __('Draft'),
-                        'posted' => __('Posted'),
-                    ]),
-            ], layout: FiltersLayout::AboveContent)
+            ->filters([], layout: FiltersLayout::AboveContent)
             ->headerActions([
                 Action::make('post_all')
                     ->label(__('Post All'))

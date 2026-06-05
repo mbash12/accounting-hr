@@ -99,7 +99,7 @@ class CreatePayablePayment extends CreateRecord
         $data['updated_by_user_id'] = Auth::id();
         
         if (empty($data['status']) || $data['status'] === 'pending') {
-            $data['status'] = 'completed';
+            $data['status'] = 'draft';
         }
 
         $total = 0;
@@ -170,18 +170,6 @@ class CreatePayablePayment extends CreateRecord
                             'trace' => $e->getTraceAsString(),
                         ]);
                     }
-                }
-            }
-
-            if ($this->record && $this->record->status === 'completed') {
-                try {
-                    $service = app(ReceivablePayableService::class);
-                    $service->createJournalEntryForPayablePayment($this->record);
-                } catch (\Exception $e) {
-                    \Log::error('Error creating journal entry for payable payment: ' . $e->getMessage(), [
-                        'payment_id' => $this->record->id,
-                        'trace' => $e->getTraceAsString(),
-                    ]);
                 }
             }
         }

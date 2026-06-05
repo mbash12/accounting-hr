@@ -12,6 +12,26 @@ return new class extends Migration
         DB::statement("
             CREATE OR REPLACE VIEW posting_queue AS
 
+            -- Standalone Journal Entries (draft, not from documents)
+            SELECT
+                'journal_entry'::text AS type,
+                entry_number::text AS document_number,
+                date,
+                COALESCE(reference_no, '')::text AS reference_no,
+                COALESCE(description, '')::text AS description,
+                amount::numeric(20,2) AS amount,
+                status::text,
+                id AS source_id,
+                'App\\\\Models\\\\JournalEntry'::text AS source_type,
+                company_id,
+                created_at,
+                updated_at
+            FROM journal_entries
+            WHERE is_posted = false
+              AND deleted_at IS NULL
+
+            UNION ALL
+
             -- Cash Disbursements
             SELECT
                 'cash_disbursement'::text AS type,
@@ -67,6 +87,46 @@ return new class extends Migration
                 created_at,
                 updated_at
             FROM cash_transfers
+            WHERE status = 'draft'
+              AND deleted_at IS NULL
+
+            UNION ALL
+
+            -- Receivable Payments
+            SELECT
+                'receivable_payment'::text,
+                payment_number::text,
+                payment_date AS date,
+                COALESCE(reference_no, '')::text,
+                COALESCE(description, '')::text,
+                total_payment::numeric(20,2),
+                status::text,
+                id,
+                'App\\\\Models\\\\ReceivablePayment'::text,
+                company_id,
+                created_at,
+                updated_at
+            FROM receivable_payments
+            WHERE status = 'draft'
+              AND deleted_at IS NULL
+
+            UNION ALL
+
+            -- Payable Payments
+            SELECT
+                'payable_payment'::text,
+                payment_number::text,
+                payment_date AS date,
+                COALESCE(reference_no, '')::text,
+                COALESCE(description, '')::text,
+                total_payment::numeric(20,2),
+                status::text,
+                id,
+                'App\\\\Models\\\\PayablePayment'::text,
+                company_id,
+                created_at,
+                updated_at
+            FROM payable_payments
             WHERE status = 'draft'
               AND deleted_at IS NULL
 
