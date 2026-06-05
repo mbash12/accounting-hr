@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\AccountMapping;
 use App\Models\BankAccount;
 use App\Models\BankReconciliation;
 use App\Models\BankReconciliationItem;
@@ -25,7 +26,7 @@ class BankReconciliationService
      *
      * Template columns: Date | Description | Debit (outgoing) | Credit (incoming)
      */
-    public function importFromExcel(string $filePath, int $bankAccountId, ?int $companyId): BankReconciliation
+    public function importFromExcel(string $filePath, int $bankAccountId, ?int $companyId): array
     {
         $bankAccount = BankAccount::findOrFail($bankAccountId);
         $bankLines = $this->readBankStatement($filePath);
@@ -55,9 +56,43 @@ class BankReconciliationService
 
             $matched = 0;
             $unmatched = 0;
+            $skipped = 0;
+            $journals = 0;
 
             foreach ($bankLines as $line) {
-                $suggestion = $this->findMatch($line, $bankAccount, $companyId);
+                // Duplicate check: date + amount + description + ref + account_code + invoice_no
+                $amount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
+                $desc = $line['description'] ?: null;
+                $ref = $line['reference_no'] ?: null;
+                $acctCode = $line['account_code'] ?: null;
+                $invNo = $line['invoice_no'] ?: null;
+
+                $isDuplicate = BankReconciliationItem::whereHas('bankReconciliation', function ($q) use ($bankAccount) {
+                    $q->where('bank_account_id', $bankAccount->id);
+                })
+                    ->where('bank_date', $line['date'])
+                    ->where(fn ($q) => $q->where('bank_debit', $amount)->orWhere('bank_credit', $amount))
+                    ->where(fn ($q) => $desc === null ? $q->whereNull('bank_description') : $q->where('bank_description', $desc))
+                    ->where(fn ($q) => $ref === null ? $q->whereNull('reference_no') : $q->where('reference_no', $ref))
+                    ->where(fn ($q) => $acctCode === null ? $q->whereNull('account_code') : $q->where('account_code', $acctCode))
+                    ->where(fn ($q) => $invNo === null ? $q->whereNull('invoice_no') : $q->where('invoice_no', $invNo))
+                    ->exists();
+
+                if ($isDuplicate) {
+                    $skipped++;
+                    continue;
+                }
+
+                // Determine action: invoice payment or journal
+                $invoiceNo = $line['invoice_no'] ?? null;
+                $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+
+                if ($invoiceNo) {
+                    // Find invoice by invoice_number
+                    $suggestion = $this->findInvoiceByNumber($invoiceNo, $companyId);
+                } else {
+                    $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+                }
 
                 $item = BankReconciliationItem::create([
                     'bank_reconciliation_id' => $reconciliation->id,
@@ -66,6 +101,9 @@ class BankReconciliationService
                     'bank_description' => $line['description'],
                     'bank_debit' => $line['debit'],
                     'bank_credit' => $line['credit'],
+                    'reference_no' => $line['reference_no'] ?? null,
+                    'account_code' => $line['account_code'] ?? null,
+                    'invoice_no' => $line['invoice_no'] ?? null,
                     'debit' => $line['debit'],
                     'credit' => $line['credit'],
                     'suggested_invoice_id' => $suggestion['invoice_id'],
@@ -74,19 +112,31 @@ class BankReconciliationService
                     'match_status' => $suggestion['status'],
                 ]);
 
-                if ($suggestion['status'] === 'matched') {
+                if ($suggestion['status'] === 'matched' && $suggestion['invoice_id']) {
+                    // Invoice payment — create payment
                     $matched++;
-
-                    // Auto-create payment for perfect matches
                     $this->createPayment($item, $line, $bankAccount, $suggestion, $companyId, $userId);
-                } elseif ($suggestion['status'] === 'suggested') {
-                    // Suggested but needs confirmation — leave for user review
+                } elseif (!$invoiceNo && !$suggestion['invoice_id']) {
+                    // No invoice number and no auto-match — create journal entry
+                    $accountCode = $line['account_code'] ?? null;
+                    if ($accountCode) {
+                        $this->createJournalEntry($line, $bankAccount, $accountCode, $companyId, $userId, $reconciliation->id);
+                        $journals++;
+                    } else {
+                        $unmatched++;
+                    }
                 } else {
                     $unmatched++;
                 }
             }
 
             // Update reconciliation summary
+            $imported = $matched + $unmatched + $journals;
+            if ($imported === 0) {
+                $reconciliation->delete();
+                throw new \Exception('All lines are duplicates. Nothing imported.');
+            }
+
             $reconciliation->update([
                 'difference' => (string) abs(round($totalDebit - $totalCredit, 2)),
                 'status' => $unmatched === 0 ? 'completed' : 'in_progress',
@@ -94,7 +144,7 @@ class BankReconciliationService
                 'reconciled_by_user_id' => $unmatched === 0 ? $userId : null,
             ]);
 
-            return $reconciliation;
+            return ['reconciliation' => $reconciliation, 'skipped' => $skipped];
         });
     }
 
@@ -144,16 +194,19 @@ class BankReconciliationService
         }
 
         $amount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
+        $bankCoa = $bankAccount->coaAccount;
 
         if ($suggestion['invoice_type'] === SalesInvoice::class) {
             // Incoming — customer payment
+            $invoice = SalesInvoice::find($suggestion['invoice_id']);
+
             $payment = ReceivablePayment::create([
                 'payment_date' => $line['date'],
                 'reference_no' => 'BANK-RECON-' . $item->bank_reconciliation_id,
                 'total_payment' => $amount,
                 'payment_method' => 'bank_transfer',
                 'status' => 'completed',
-                'customer_id' => SalesInvoice::find($suggestion['invoice_id'])->customer_id,
+                'customer_id' => $invoice->customer_id,
                 'bank_account_id' => $bankAccount->id,
                 'company_id' => $companyId,
                 'created_by_user_id' => $userId,
@@ -170,7 +223,6 @@ class BankReconciliationService
             ]);
 
             // Update invoice
-            $invoice = SalesInvoice::find($suggestion['invoice_id']);
             $newPaidAmount = (float) $invoice->paid_amount + $amount;
             $newOutstanding = (float) $invoice->total_amount - $newPaidAmount;
 
@@ -187,16 +239,55 @@ class BankReconciliationService
             }
 
             $invoice->save();
+
+            // Create draft journal entry: Debit Bank, Credit AR
+            if ($bankCoa) {
+                $arAccount = AccountMapping::getAccountMapping('sales_invoice', 'accounts_receivable', $companyId);
+                if ($arAccount) {
+                    $entryNumber = 'BANK-RECON-' . $item->bank_reconciliation_id . '-' . substr(uniqid(), -6);
+                    $journalEntry = JournalEntry::create([
+                        'entry_number' => $entryNumber,
+                        'date' => $line['date'],
+                        'reference_no' => $line['reference_no'] ?: $invoice->invoice_number,
+                        'description' => 'Pembayaran ' . $invoice->invoice_number,
+                        'amount' => $amount,
+                        'total_amount' => $amount,
+                        'status' => 'draft',
+                        'is_posted' => false,
+                        'sub_module' => 'bank_reconciliation',
+                        'reference_type' => ReceivablePayment::class,
+                        'reference_id' => $payment->id,
+                        'company_id' => $companyId,
+                        'created_by_user_id' => $userId,
+                    ]);
+                    JournalEntryItem::create([
+                        'journal_entry_id' => $journalEntry->id,
+                        'account_id' => $bankCoa->id,
+                        'debit' => $amount,
+                        'credit' => 0,
+                        'notes' => 'Bank - ' . $bankAccount->account_name,
+                    ]);
+                    JournalEntryItem::create([
+                        'journal_entry_id' => $journalEntry->id,
+                        'account_id' => $arAccount->id,
+                        'debit' => 0,
+                        'credit' => $amount,
+                        'notes' => 'Piutang - ' . $invoice->invoice_number,
+                    ]);
+                }
+            }
         }
 
         if ($suggestion['invoice_type'] === PurchaseInvoice::class) {
+            $invoice = PurchaseInvoice::find($suggestion['invoice_id']);
+
             $payment = PayablePayment::create([
                 'payment_date' => $line['date'],
                 'reference_no' => 'BANK-RECON-' . $item->bank_reconciliation_id,
                 'total_payment' => $amount,
                 'payment_method' => 'bank_transfer',
                 'status' => 'completed',
-                'supplier_id' => PurchaseInvoice::find($suggestion['invoice_id'])->supplier_id,
+                'supplier_id' => $invoice->supplier_id,
                 'bank_account_id' => $bankAccount->id,
                 'company_id' => $companyId,
                 'created_by_user_id' => $userId,
@@ -213,7 +304,6 @@ class BankReconciliationService
             ]);
 
             // Update invoice
-            $invoice = PurchaseInvoice::find($suggestion['invoice_id']);
             $newPaidAmount = (float) $invoice->paid_amount + $amount;
             $newOutstanding = (float) $invoice->total - $newPaidAmount;
 
@@ -230,106 +320,174 @@ class BankReconciliationService
             }
 
             $invoice->save();
+
+            // Create draft journal entry: Debit AP, Credit Bank
+            if ($bankCoa) {
+                $apAccount = AccountMapping::getAccountMapping('purchase_invoice', 'accounts_payable', $companyId);
+                if ($apAccount) {
+                    $entryNumber = 'BANK-RECON-' . $item->bank_reconciliation_id . '-' . substr(uniqid(), -6);
+                    $journalEntry = JournalEntry::create([
+                        'entry_number' => $entryNumber,
+                        'date' => $line['date'],
+                        'reference_no' => $line['reference_no'] ?: $invoice->invoice_number,
+                        'description' => 'Pembayaran ' . $invoice->invoice_number,
+                        'amount' => $amount,
+                        'total_amount' => $amount,
+                        'status' => 'draft',
+                        'is_posted' => false,
+                        'sub_module' => 'bank_reconciliation',
+                        'reference_type' => PayablePayment::class,
+                        'reference_id' => $payment->id,
+                        'company_id' => $companyId,
+                        'created_by_user_id' => $userId,
+                    ]);
+                    JournalEntryItem::create([
+                        'journal_entry_id' => $journalEntry->id,
+                        'account_id' => $apAccount->id,
+                        'debit' => $amount,
+                        'credit' => 0,
+                        'notes' => 'Utang - ' . $invoice->invoice_number,
+                    ]);
+                    JournalEntryItem::create([
+                        'journal_entry_id' => $journalEntry->id,
+                        'account_id' => $bankCoa->id,
+                        'debit' => 0,
+                        'credit' => $amount,
+                        'notes' => 'Bank - ' . $bankAccount->account_name,
+                    ]);
+                }
+            }
         }
     }
 
     /**
-     * Find a matching invoice for a bank statement line.
-     *
-     * @return array{invoice_id: ?int, invoice_type: ?string, amount: float, status: string}
+     * Find invoice by invoice_number (Sales or Purchase).
      */
-    private function findMatch(array $line, BankAccount $bankAccount, ?int $companyId): array
+    private function findInvoiceByNumber(string $invoiceNo, ?int $companyId): array
     {
-        $amount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
-        if ($amount <= 0) {
-            return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+        // Try SalesInvoice first
+        $query = SalesInvoice::where('invoice_number', $invoiceNo);
+        if ($companyId) {
+            $query->where('company_id', $companyId);
+        }
+        $invoice = $query->first();
+
+        if ($invoice) {
+            if ($invoice->outstanding_amount <= 0) {
+                return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+            }
+            return [
+                'invoice_id' => $invoice->id,
+                'invoice_type' => SalesInvoice::class,
+                'amount' => (float) $invoice->outstanding_amount,
+                'status' => 'matched',
+            ];
         }
 
-        $tolerance = round($amount * 0.02, 2); // 2% tolerance
-        $minAmount = round($amount - $tolerance, 2);
-        $maxAmount = round($amount + $tolerance, 2);
-
-        if ($line['type'] === 'incoming') {
-            return $this->searchSalesInvoices($minAmount, $maxAmount, $amount, $line['date'], $companyId);
+        // Try PurchaseInvoice
+        $query = PurchaseInvoice::where('invoice_number', $invoiceNo);
+        if ($companyId) {
+            $query->where('company_id', $companyId);
         }
+        $invoice = $query->first();
 
-        if ($line['type'] === 'outgoing') {
-            return $this->searchPurchaseInvoices($minAmount, $maxAmount, $amount, $line['date'], $companyId);
+        if ($invoice) {
+            if ($invoice->outstanding_amount <= 0) {
+                return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+            }
+            return [
+                'invoice_id' => $invoice->id,
+                'invoice_type' => PurchaseInvoice::class,
+                'amount' => (float) $invoice->outstanding_amount,
+                'status' => 'matched',
+            ];
         }
 
         return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
     }
 
-    private function searchSalesInvoices(float $min, float $max, float $target, string $date, ?int $companyId): array
+    /**
+     * Create a general journal entry (journal umum) for bank transactions without invoices.
+     */
+    private function createJournalEntry(array $line, BankAccount $bankAccount, string $accountCode, ?int $companyId, int $userId, int $reconciliationId): void
     {
-        $candidates = SalesInvoice::where('outstanding_amount', '>', 0)
-            ->whereBetween('outstanding_amount', [$min, $max])
-            ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-            ->orderByRaw('ABS(outstanding_amount::numeric - ?)', [$target])
-            ->limit(5)
-            ->get();
+        $amount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
+        $isIncoming = $line['type'] === 'incoming';
 
-        if ($candidates->isEmpty()) {
-            return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+        // Find the contra account by code
+        $contraAccount = Account::where('code', $accountCode)
+            ->where('company_id', $companyId)
+            ->where('is_header', false)
+            ->first();
+
+        if (!$contraAccount) {
+            throw new \RuntimeException(__('Account with code ":code" not found.', ['code' => $accountCode]));
         }
 
-        if ($candidates->count() === 1) {
-            $inv = $candidates->first();
-            return [
-                'invoice_id' => $inv->id,
-                'invoice_type' => SalesInvoice::class,
-                'amount' => (float) $inv->outstanding_amount,
-                'status' => 'matched',
-            ];
+        // Get bank COA from bank account relationship
+        $bankCoa = $bankAccount->coaAccount;
+
+        if (!$bankCoa) {
+            throw new \RuntimeException(__('Bank account ":name" is not linked to a COA account. Please set the COA Account on the bank account master.', ['name' => $bankAccount->account_name]));
         }
 
-        // Multiple candidates — suggest best match (closest amount)
-        $inv = $candidates->first();
-        return [
-            'invoice_id' => $inv->id,
-            'invoice_type' => SalesInvoice::class,
-            'amount' => (float) $inv->outstanding_amount,
-            'status' => 'suggested',
-        ];
-    }
+        $entryNumber = 'BANK-RECON-' . $reconciliationId . '-' . substr(uniqid(), -6);
 
-    private function searchPurchaseInvoices(float $min, float $max, float $target, string $date, ?int $companyId): array
-    {
-        $candidates = PurchaseInvoice::where('outstanding_amount', '>', 0)
-            ->whereBetween('outstanding_amount', [$min, $max])
-            ->when($companyId, fn($q) => $q->where('company_id', $companyId))
-            ->orderByRaw('ABS(outstanding_amount::numeric - ?)', [$target])
-            ->limit(5)
-            ->get();
-        if ($candidates->isEmpty()) {
-            return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+        $journalEntry = JournalEntry::create([
+            'entry_number' => $entryNumber,
+            'date' => $line['date'],
+            'reference_no' => $line['reference_no'] ?: null,
+            'description' => $line['description'] ?: 'Bank reconciliation - ' . ($isIncoming ? 'incoming' : 'outgoing'),
+            'amount' => $amount,
+            'total_amount' => $amount,
+            'status' => 'draft',
+            'is_posted' => false,
+            'sub_module' => 'bank_reconciliation',
+            'company_id' => $companyId,
+            'created_by_user_id' => $userId,
+        ]);
+
+        if ($isIncoming) {
+            // Incoming: debit bank, credit contra
+            JournalEntryItem::create([
+                'journal_entry_id' => $journalEntry->id,
+                'account_id' => $bankCoa->id,
+                'debit' => $amount,
+                'credit' => 0,
+                'notes' => $line['notes'] ?? $line['description'] ?? '',
+            ]);
+            JournalEntryItem::create([
+                'journal_entry_id' => $journalEntry->id,
+                'account_id' => $contraAccount->id,
+                'debit' => 0,
+                'credit' => $amount,
+                'notes' => $line['notes'] ?? $line['description'] ?? '',
+            ]);
+        } else {
+            // Outgoing: debit contra, credit bank
+            JournalEntryItem::create([
+                'journal_entry_id' => $journalEntry->id,
+                'account_id' => $contraAccount->id,
+                'debit' => $amount,
+                'credit' => 0,
+                'notes' => $line['notes'] ?? $line['description'] ?? '',
+            ]);
+            JournalEntryItem::create([
+                'journal_entry_id' => $journalEntry->id,
+                'account_id' => $bankCoa->id,
+                'debit' => 0,
+                'credit' => $amount,
+                'notes' => $line['notes'] ?? $line['description'] ?? '',
+            ]);
         }
-
-        if ($candidates->count() === 1) {
-            $inv = $candidates->first();
-            return [
-                'invoice_id' => $inv->id,
-                'invoice_type' => PurchaseInvoice::class,
-                'amount' => (float) $inv->outstanding_amount,
-                'status' => 'matched',
-            ];
-        }
-
-        $inv = $candidates->first();
-        return [
-            'invoice_id' => $inv->id,
-            'invoice_type' => PurchaseInvoice::class,
-            'amount' => (float) $inv->outstanding_amount,
-            'status' => 'suggested',
-        ];
     }
 
     /**
      * Read bank statement Excel.
      *
-     * Template: Date | Description | Debit (Outgoing) | Credit (Incoming)
+     * Template: Date | Description | Reference | Account Code | Invoice No | Debit (Outgoing) | Credit (Incoming)
      *
-     * @return array<int, array{type: string, date: string, description: string, debit: float, credit: float}>
+     * @return array<int, array{type: string, date: string, description: string, reference_no: string, account_code: string, invoice_no: string, debit: float, credit: float}>
      */
     private function readBankStatement(string $filePath): array
     {
@@ -344,20 +502,29 @@ class BankReconciliationService
         $headers = array_map(fn($h) => is_string($h) ? trim($h) : '', $rows[0]);
         $normalized = array_map(fn($h) => strtolower(str_replace(' ', '', $h)), $headers);
 
-        $getCol = function (array $aliases) use ($normalized): int {
+        $getCol = function (array $aliases) use ($normalized): ?int {
             foreach ($aliases as $alias) {
                 $idx = array_search($alias, $normalized, true);
                 if ($idx !== false) {
                     return $idx;
                 }
             }
-            throw new \RuntimeException(__('Required column not found: :col.', ['col' => $aliases[0]]));
+            return null;
         };
 
         $colDate = $getCol(['tanggal', 'date', 'tgl', 'transactiondate']);
         $colDesc = $getCol(['deskripsi', 'description', 'keterangan', 'uraian', 'narration']);
         $colDebit = $getCol(['debit', 'debet', 'outgoing', 'pengeluaran', 'debit(outgoing)', 'debitoutgoing']);
-        $colCredit = $getCol(['credit', 'kredit', 'incoming', 'pemasukan', 'credit(incoming)', 'creditincoming']);
+        $colCredit = $getCol(['kredit', 'credit', 'incoming', 'pemasukan', 'credit(incoming)', 'creditincoming']);
+        $colRef = $getCol(['referensi', 'ref', 'reference', 'noreferensi', 'referenceno', 'nobukti']);
+        $colAccountCode = $getCol(['kode_akun', 'kodeakun', 'accountcode', 'nocoa', 'coa', 'account_code']);
+        $colAccountName = $getCol(['nama_akun', 'namaakun', 'accountname', 'nama_coa']);
+        $colNotes = $getCol(['catatan', 'notes', 'keterangan']);
+        $colInvoiceNo = $getCol(['invoice_no', 'invoiceno', 'noinvoice', 'no_invoice', 'nobonfaktur', 'faktur', 'nofaktur']);
+
+        if ($colDate === null || $colDesc === null || ($colDebit === null && $colCredit === null)) {
+            throw new \RuntimeException(__('Required columns not found. Need at least: Date, Description, and one of Debit/Credit.'));
+        }
 
         $lines = [];
         $errors = [];
@@ -368,8 +535,12 @@ class BankReconciliationService
 
             $date = trim((string) ($row[$colDate] ?? ''));
             $description = trim((string) ($row[$colDesc] ?? ''));
-            $debitRaw = (float) ($row[$colDebit] ?? 0);
-            $creditRaw = (float) ($row[$colCredit] ?? 0);
+            $referenceNo = $colRef !== null ? trim((string) ($row[$colRef] ?? '')) : '';
+            $accountCode = $colAccountCode !== null ? trim((string) ($row[$colAccountCode] ?? '')) : '';
+            $notes = $colNotes !== null ? trim((string) ($row[$colNotes] ?? '')) : '';
+            $invoiceNo = $colInvoiceNo !== null ? trim((string) ($row[$colInvoiceNo] ?? '')) : '';
+            $debitRaw = $colDebit !== null ? (float) ($row[$colDebit] ?? 0) : 0;
+            $creditRaw = $colCredit !== null ? (float) ($row[$colCredit] ?? 0) : 0;
 
             if ($debitRaw == 0 && $creditRaw == 0) {
                 continue;
@@ -394,6 +565,10 @@ class BankReconciliationService
                 'type' => $creditRaw > 0 ? 'incoming' : 'outgoing',
                 'date' => $date,
                 'description' => $description ?: null,
+                'reference_no' => $referenceNo ?: null,
+                'account_code' => $accountCode ?: null,
+                'notes' => $notes ?: null,
+                'invoice_no' => $invoiceNo ?: null,
                 'debit' => round($debitRaw, 2),
                 'credit' => round($creditRaw, 2),
             ];

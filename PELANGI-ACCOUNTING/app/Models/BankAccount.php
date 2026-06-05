@@ -41,6 +41,7 @@ class BankAccount extends Model
     protected $fillable = [
         'account_number',
         'account_name',
+        'coa_account_id',
         'is_active',
         'bank_id',
         'company_id',
@@ -75,6 +76,11 @@ class BankAccount extends Model
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
+    }
+
+    public function coaAccount(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'coa_account_id');
     }
 
     public function company(): BelongsTo

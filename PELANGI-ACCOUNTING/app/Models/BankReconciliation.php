@@ -8,10 +8,35 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 
 class BankReconciliation extends Model
 {
     use HasFactory, SoftDeletes;
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleted(function ($model) {
+            try {
+                $refPrefix = 'BANK-RECON-' . $model->id;
+
+                // Delete related payments
+                \App\Models\ReceivablePayment::where('reference_no', $refPrefix)->delete();
+                \App\Models\PayablePayment::where('reference_no', $refPrefix)->delete();
+
+                // Delete related journal entries (entry_number starts with BANK-RECON-{id})
+                \App\Models\JournalEntry::where('entry_number', 'LIKE', $refPrefix . '%')
+                    ->each(function ($journal) {
+                        $journal->items()->delete();
+                        $journal->delete();
+                    });
+            } catch (\Throwable $e) {
+                Log::error('Error cleaning up bank reconciliation data: ' . $e->getMessage());
+            }
+        });
+    }
 
     /**
      * The attributes that are mass assignable.

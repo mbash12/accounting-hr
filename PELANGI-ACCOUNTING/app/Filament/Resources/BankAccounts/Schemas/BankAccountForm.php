@@ -30,6 +30,21 @@ class BankAccountForm
                         ->label(__('Account Name'))
                         ->required()
                         ->maxLength(200),
+                    Select::make('coa_account_id')
+                        ->label(__('COA Account'))
+                        ->options(function () {
+                            $selectedCompanyId = session('selected_company_id');
+                            $q = \App\Models\Account::where('is_header', false)
+                                ->where('is_active', true);
+                            if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                                $q->where('company_id', $selectedCompanyId);
+                            }
+                            return $q->orderBy('code')->get()
+                                ->mapWithKeys(fn ($a) => [$a->id => $a->code . ' - ' . $a->name]);
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->helperText('Link to Chart of Accounts for journal entries'),
                     Toggle::make('is_active')
                         ->label(__('Active'))
                         ->default(true),

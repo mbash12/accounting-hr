@@ -102,6 +102,8 @@ class JournalEntriesTable
                 ]),
             ])
             ->toolbarActions([
+                \App\Filament\Actions\ImportJournalEntriesAction::make(),
+                \App\Filament\Actions\ExportJournalEntriesAction::make(),
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                     ForceDeleteBulkAction::make(),

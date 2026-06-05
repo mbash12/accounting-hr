@@ -12,37 +12,37 @@ class BankReconciliationTemplateExport implements FromCollection, WithHeadings, 
     {
         return collect([
             [
-                'date' => now()->format('Y-m-d'),
-                'description' => 'Payment from PT ABC - INV/001',
+                'tanggal' => now()->format('Y-m-d'),
+                'referensi' => 'TRF-001',
+                'deskripsi' => 'Pembayaran dari PT ABC',
+                'kode_akun' => '11000200',
+                'nama_akun' => 'Piutang Dagang',
                 'debit' => 0,
-                'credit' => 5000000,
+                'kredit' => 5000000,
+                'catatan' => 'Pembayaran invoice',
+                'invoice_no' => 'INV2026000039',
             ],
             [
-                'date' => now()->format('Y-m-d'),
-                'description' => 'Bank admin fee June',
+                'tanggal' => now()->format('Y-m-d'),
+                'referensi' => 'FEE-001',
+                'deskripsi' => 'Biaya administrasi bank',
+                'kode_akun' => '51000100',
+                'nama_akun' => 'Biaya Bank',
                 'debit' => 25000,
-                'credit' => 0,
+                'kredit' => 0,
+                'catatan' => 'Biaya admin bulanan',
+                'invoice_no' => '',
             ],
         ]);
     }
 
     public function headings(): array
     {
-        return [
-            'Date',
-            'Description',
-            'Debit (Outgoing)',
-            'Credit (Incoming)',
-        ];
+        return ['Tanggal', 'Referensi', 'Deskripsi', 'Kode Akun', 'Nama Akun', 'Debit', 'Kredit', 'Catatan', 'Invoice No'];
     }
 
     public function columnWidths(): array
     {
-        return [
-            'A' => 16,
-            'B' => 45,
-            'C' => 20,
-            'D' => 20,
-        ];
+        return ['A' => 16, 'B' => 20, 'C' => 40, 'D' => 15, 'E' => 25, 'F' => 20, 'G' => 20, 'H' => 30, 'I' => 20];
     }
 }

@@ -43,7 +43,7 @@ class ImportBankReconciliationAction extends Action
                     ->directory('temp/bank-recon'),
             ])
             ->modalHeading(__('Import Bank Statement'))
-            ->modalDescription(__('Upload a bank statement to auto-match against open invoices. Perfect matches are auto-confirmed; ambiguous matches are flagged for review.'))
+            ->modalDescription(__('Upload a bank statement to match against open invoices. Provide Invoice No column to auto-match. Rows without Invoice No create journal entries.'))
             ->modalSubmitActionLabel(__('Upload & Match'))
             ->modalWidth('lg')
             ->extraModalActions([
@@ -83,24 +83,29 @@ class ImportBankReconciliationAction extends Action
                     }
 
                     $service = app(BankReconciliationService::class);
-                    $reconciliation = $service->importFromExcel($filePath, $bankAccountId, $companyId);
+                    $result = $service->importFromExcel($filePath, $bankAccountId, $companyId);
+                    $reconciliation = $result['reconciliation'];
+                    $skipped = $result['skipped'];
 
                     Storage::disk('local')->delete($data['file']);
 
                     $total = $reconciliation->items()->count();
                     $matched = $reconciliation->items()->where('match_status', 'matched')->count();
-                    $suggested = $reconciliation->items()->where('match_status', 'suggested')->count();
                     $unmatched = $reconciliation->items()->where('match_status', 'unmatched')->count();
+
+                    $body = __(':total line(s). :matched invoice matched, :unmatched unmatched.', [
+                        'total' => $total,
+                        'matched' => $matched,
+                        'unmatched' => $unmatched,
+                    ]);
+                    if ($skipped > 0) {
+                        $body .= ' ' . __(':skipped duplicate(s) skipped.', ['skipped' => $skipped]);
+                    }
 
                     Notification::make()
                         ->success()
                         ->title(__('Statement Imported'))
-                        ->body(__(':total line(s). :matched auto-matched, :suggested suggested, :unmatched unmatched.', [
-                            'total' => $total,
-                            'matched' => $matched,
-                            'suggested' => $suggested,
-                            'unmatched' => $unmatched,
-                        ]))
+                        ->body($body)
                         ->send();
 
                     if (method_exists($livewire, 'redirect')) {
