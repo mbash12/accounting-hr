@@ -38,7 +38,7 @@ class Unit extends Model
         });
 
         static::updated(function ($model) {
-            if ($model->wasChanged(['code', 'name', 'description', 'is_active', 'deleted_at'])) {
+            if ($model->wasChanged(['code', 'name', 'description', 'is_active', 'unit_category_id', 'conversion_factor', 'deleted_at'])) {
                 $model->syncToWisma('update');
             }
         });
@@ -72,6 +72,8 @@ class Unit extends Model
         'name',
         'description',
         'is_active',
+        'unit_category_id',
+        'conversion_factor',
         'company_id',
         'created_by_user_id',
     ];
@@ -86,6 +88,8 @@ class Unit extends Model
         return [
             'id' => 'integer',
             'is_active' => 'boolean',
+            'unit_category_id' => 'integer',
+            'conversion_factor' => 'decimal:6',
             'company_id' => 'integer',
             'created_by_user_id' => 'integer',
         ];
@@ -99,6 +103,11 @@ class Unit extends Model
     public function createdByUser(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function unitCategory(): BelongsTo
+    {
+        return $this->belongsTo(UnitCategory::class);
     }
 
     protected function syncToWisma(string $action): void

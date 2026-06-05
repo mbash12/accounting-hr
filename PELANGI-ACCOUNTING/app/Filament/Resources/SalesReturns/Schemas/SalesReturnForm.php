@@ -423,7 +423,7 @@ class SalesReturnForm
                                 if ($productId && $state) {
                                     $product = \App\Models\Product::find($productId);
                                     if ($product) {
-                                        $factor = app(\App\Services\UnitConversionService::class)->getConversionFactor($product, (int) $state);
+                                        $factor = app(\App\Services\UnitConversionService::class)->getConversionFactor((int) $state, $product->unit_id);
                                         $set('conversion_factor', $factor);
                                         $set('base_quantity', $quantity * $factor);
                                     }

@@ -83,22 +83,22 @@ class FixedAssetCategory extends Model
 
     public function salesAccount(): BelongsTo
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(Account::class, 'sales_account_id');
     }
 
     public function assetAccount(): BelongsTo
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(Account::class, 'asset_account_id');
     }
 
     public function accumulatedDepreciationAccount(): BelongsTo
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(Account::class, 'accumulated_depreciation_account_id');
     }
 
     public function depreciationAccount(): BelongsTo
     {
-        return $this->belongsTo(Account::class);
+        return $this->belongsTo(Account::class, 'depreciation_account_id');
     }
 
     public function company(): BelongsTo

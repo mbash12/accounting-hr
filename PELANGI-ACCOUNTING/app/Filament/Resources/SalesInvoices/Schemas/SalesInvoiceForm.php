@@ -657,7 +657,7 @@ class SalesInvoiceForm
                                     $product = \App\Models\Product::find($productId);
                                     if ($product) {
                                         $service = app(\App\Services\UnitConversionService::class);
-                                        $factor = $service->getConversionFactor($product, (int) $state);
+                                        $factor = $service->getConversionFactor((int) $state, $product->unit_id);
                                         $set('conversion_factor', $factor);
                                         $set('base_quantity', $quantity * $factor);
 

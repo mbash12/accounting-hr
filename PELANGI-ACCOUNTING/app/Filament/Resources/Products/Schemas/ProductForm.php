@@ -98,22 +98,6 @@ class ProductForm
                         ->searchable()
                         ->preload()
                         ->required(),
-                    Select::make("unit_id")
-                        ->label(__("Unit"))
-                        ->relationship(
-                            "unit",
-                            "name",
-                            modifyQueryUsing: function ($query) {
-                                $selectedCompanyId = session('selected_company_id');
-                                if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-                                    $query->where('company_id', $selectedCompanyId);
-                                }
-                                return $query;
-                            }
-                        )
-                        ->searchable()
-                        ->preload()
-                        ->required(),
                     Select::make("product_type")
                         ->label(__("Product Type"))
                         ->options([
@@ -174,6 +158,22 @@ class ProductForm
                     Toggle::make("is_active")
                         ->label(__("Active"))
                         ->default(true),
+                    Select::make("unit_id")
+                        ->label(__("Unit"))
+                        ->relationship(
+                            "unit",
+                            "name",
+                            modifyQueryUsing: function ($query) {
+                                $selectedCompanyId = session('selected_company_id');
+                                if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                                    $query->where('company_id', $selectedCompanyId);
+                                }
+                                return $query;
+                            }
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->required(),
                 ])
                 ->columns(2),
 
@@ -195,86 +195,6 @@ class ProductForm
                         ->decimal(false),
                 ])
                 ->columns(2),
-
-            Section::make(__("Unit Conversions"))
-                ->description(__("Define alternate units for this product. Conversion factor = how many base units equal 1 of this unit."))
-                ->schema([
-                    Placeholder::make('base_unit_info')
-                        ->label(__("Base Unit"))
-                        ->content(function ($record) {
-                            $unit = $record?->unit;
-                            return $unit ? $unit->name : __('Not set');
-                        }),
-                    Repeater::make('productUnits')
-                        ->relationship()
-                        ->hiddenLabel()
-                        ->addActionLabel(__('Add Alternate Unit'))
-                        ->table([
-                            TableColumn::make('Unit')->width('25%')->alignment(Alignment::Start),
-                            TableColumn::make('Conversion Factor')->width('25%')->alignment(Alignment::End),
-                            TableColumn::make('Purchase')->width('15%')->alignment(Alignment::Center),
-                            TableColumn::make('Sales')->width('15%')->alignment(Alignment::Center),
-                            TableColumn::make('Info')->width('20%')->alignment(Alignment::Start),
-                        ])
-                        ->schema([
-                            Select::make('unit_id')
-                                ->label(__('Unit'))
-                                ->options(function (callable $get) {
-                                    $selectedCompanyId = session('selected_company_id');
-                                    $q = Unit::query();
-                                    if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-                                        $q->where('company_id', $selectedCompanyId);
-                                    }
-                                    // Exclude the product's base unit from alternate unit options
-                                    $baseUnitId = $get('../../unit_id');
-                                    if ($baseUnitId) {
-                                        $q->where('id', '!=', $baseUnitId);
-                                    }
-                                    return $q->orderBy('name')->pluck('name', 'id')->toArray();
-                                })
-                                ->searchable()
-                                ->preload()
-                                ->required(),
-                            TextInput::make('conversion_factor')
-                                ->label(__('Conversion Factor'))
-                                ->required()
-                                ->numeric()
-                                ->default(1)
-                                ->step(0.000001)
-                                ->minValue(0.000001)
-                                ->extraInputAttributes(['style' => 'text-align:right']),
-                            Toggle::make('is_purchase_unit')
-                                ->label(__('Purchase'))
-                                ->default(true)
-                                ->inline(false),
-                            Toggle::make('is_sales_unit')
-                                ->label(__('Sales'))
-                                ->default(true)
-                                ->inline(false),
-                            Placeholder::make('conversion_info')
-                                ->label(__('Info'))
-                                ->content(function (callable $get) {
-                                    $factor = $get('conversion_factor');
-                                    $unitId = $get('unit_id');
-                                    if (!$factor || !$unitId) {
-                                        return '-';
-                                    }
-                                    $unit = Unit::find($unitId);
-                                    $productName = $get('../../name') ?? 'product';
-                                    $baseUnitId = $get('../../unit_id');
-                                    $baseUnit = $baseUnitId ? Unit::find($baseUnitId) : null;
-                                    $baseName = $baseUnit?->name ?? 'base unit';
-                                    return '1 ' . ($unit?->name ?? 'unit') . ' = ' . rtrim(rtrim(number_format((float) $factor, 6), '0'), '.') . ' ' . $baseName;
-                                }),
-                        ])
-                        ->defaultItems(0)
-                        ->reorderable(false)
-                        ->collapsible()
-                        ->compact()
-                        ->columnSpanFull(),
-                ])
-                ->collapsible()
-                ->collapsed(false),
         ]);
     }
 }
