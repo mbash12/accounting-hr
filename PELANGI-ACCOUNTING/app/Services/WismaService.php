@@ -46,14 +46,15 @@ class WismaService
             
             $this->notifyUser(
                 title: 'Wisma Sync Skipped',
-                body: "Reference No is empty. PO #{$poNo} approved in Pelangi but could not be approved in Wisma.",
+                body: "Reference No is empty. PO #{$poNo} approved locally but not synced to Wisma.",
                 type: 'warning',
                 persistent: true
             );
 
             return [
-                'success' => false,
-                'message' => 'Reference No is empty.'
+                'success' => true,
+                'skipped' => true,
+                'message' => 'Reference No is empty. Approved locally only.'
             ];
         }
 
@@ -135,14 +136,15 @@ class WismaService
 
             $this->notifyUser(
                 title: 'Wisma Sync Skipped',
-                body: "Reference No is empty. PO #{$poNo} rejected in Pelangi but could not be rejected in Wisma.",
+                body: "Reference No is empty. PO #{$poNo} rejected locally but not synced to Wisma.",
                 type: 'warning',
                 persistent: true
             );
 
             return [
-                'success' => false,
-                'message' => 'Reference No is empty.'
+                'success' => true,
+                'skipped' => true,
+                'message' => 'Reference No is empty. Rejected locally only.'
             ];
         }
 

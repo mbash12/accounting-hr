@@ -331,7 +331,6 @@ class PurchaseInvoiceForm
                             }),
                         DatePicker::make('due_date')
                             ->label('Due Date')
-                            ->required()
                             ->default(now()),
                         TextInput::make('reference_no')
                             ->maxLength(255)

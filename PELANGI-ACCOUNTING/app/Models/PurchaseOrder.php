@@ -206,7 +206,8 @@ class PurchaseOrder extends Model
         $wismaService = app(\App\Services\WismaService::class);
         $result = $wismaService->syncApprovedPurchaseOrder($this, $comment);
 
-        if (!($result['success'] ?? false)) {
+        // Block approval if Wisma sync failed (not skipped)
+        if (empty($result['skipped']) && !($result['success'] ?? false)) {
             return $result;
         }
 
@@ -223,7 +224,8 @@ class PurchaseOrder extends Model
         $wismaService = app(\App\Services\WismaService::class);
         $result = $wismaService->syncRejectedPurchaseOrder($this, $comment);
 
-        if (!($result['success'] ?? false)) {
+        // Block rejection if Wisma sync failed (not skipped)
+        if (empty($result['skipped']) && !($result['success'] ?? false)) {
             return $result;
         }
 

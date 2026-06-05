@@ -73,7 +73,7 @@ class EditPurchaseOrder extends EditRecord
                     Textarea::make('comment')
                         ->label('Comment')
                         ->rows(3)
-                        ->placeholder('Optional approval comment for Wisma'),
+                        ->placeholder('Optional approval comment'),
                 ])
                 ->requiresConfirmation()
                 ->modalHeading('Approve Purchase Order')
@@ -82,20 +82,25 @@ class EditPurchaseOrder extends EditRecord
                 ->action(function (PurchaseOrder $record, array $data) {
                     $result = $record->approveWithWisma($data['comment'] ?? null);
 
-                    if (!($result['success'] ?? false)) {
+                    if (empty($result['skipped']) && !($result['success'] ?? false)) {
                         \Filament\Notifications\Notification::make()
                             ->danger()
                             ->title('Purchase Order Failed to Approve')
-                            ->body("Purchase Order {$record->purchase_order_no} gagal diapprove ke Wisma, status lokal tidak diubah.")
+                            ->body("Purchase Order {$record->purchase_order_no} failed to sync to Wisma. Approval blocked.")
                             ->send();
 
                         return;
                     }
 
+                    $body = "Purchase Order {$record->purchase_order_no} has been approved.";
+                    if (!empty($result['skipped'])) {
+                        $body .= " (Local approval only — no Wisma reference)";
+                    }
+
                     \Filament\Notifications\Notification::make()
                         ->success()
                         ->title('Purchase Order Approved')
-                        ->body("Purchase Order {$record->purchase_order_no} has been approved.")
+                        ->body($body)
                         ->send();
                 }),
             Action::make('reject')
@@ -107,7 +112,7 @@ class EditPurchaseOrder extends EditRecord
                     Textarea::make('comment')
                         ->label('Comment')
                         ->rows(3)
-                        ->placeholder('Optional rejection comment for Wisma'),
+                        ->placeholder('Optional rejection comment'),
                 ])
                 ->requiresConfirmation()
                 ->modalHeading('Reject Purchase Order')
@@ -116,20 +121,25 @@ class EditPurchaseOrder extends EditRecord
                 ->action(function (PurchaseOrder $record, array $data) {
                     $result = $record->rejectWithWisma($data['comment'] ?? null);
 
-                    if (!($result['success'] ?? false)) {
+                    if (empty($result['skipped']) && !($result['success'] ?? false)) {
                         \Filament\Notifications\Notification::make()
                             ->danger()
                             ->title('Purchase Order Failed to Reject')
-                            ->body("Purchase Order {$record->purchase_order_no} gagal direject ke Wisma, status lokal tidak diubah.")
+                            ->body("Purchase Order {$record->purchase_order_no} failed to sync to Wisma. Rejection blocked.")
                             ->send();
 
                         return;
                     }
 
+                    $body = "Purchase Order {$record->purchase_order_no} has been rejected.";
+                    if (!empty($result['skipped'])) {
+                        $body .= " (Local rejection only — no Wisma reference)";
+                    }
+
                     \Filament\Notifications\Notification::make()
                         ->danger()
                         ->title('Purchase Order Rejected')
-                        ->body("Purchase Order {$record->purchase_order_no} has been rejected.")
+                        ->body($body)
                         ->send();
                 }),
             DeleteAction::make(),
