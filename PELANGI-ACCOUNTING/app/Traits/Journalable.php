@@ -12,24 +12,30 @@ trait Journalable
      */
     protected static function bootJournalable()
     {
-        // Create/update journal entry when document is saved
+        // Create/update draft journal entry when document is saved
         static::saved(function ($model) {
             try {
                 if (property_exists($model, 'status')) {
-                    // Posting is now handled centrally by PostingCenter page.
-                    // Only handle cleanup: if status changes away from 'posted', delete journal entry.
-                    if ($model->isDirty('status') && $model->getOriginal('status') === 'posted' && $model->status !== 'posted') {
-                        $model->deleteJournalEntry();
+                    // Skip orders - no accounting impact
+                    if (in_array($model->getDocumentType(), ['sales_order', 'purchase_order'])) {
+                        return;
                     }
 
-                    // Safety check: ensure non-posted documents never have journal entries
-                    if ($model->status !== 'posted' && $model->journalEntryExists()) {
-                        $model->deleteJournalEntry();
+                    // Skip posted documents - journal already created or will be posted from Posting Center
+                    if ($model->status === 'posted') {
+                        return;
                     }
-                } else {
-                    // For models without status field, create journal entry as before
+
+                    // For all other statuses (draft, etc.): create/update draft journal entry
                     $journalService = app(JournalService::class);
-
+                    $journalService->createJournalEntryFromDocument(
+                        $model->getDocumentType(),
+                        $model,
+                        $model->getJournalEntryDescription()
+                    );
+                } else {
+                    // For models without status field, create journal entry
+                    $journalService = app(JournalService::class);
                     $journalService->createJournalEntryFromDocument(
                         $model->getDocumentType(),
                         $model,
@@ -37,7 +43,6 @@ trait Journalable
                     );
                 }
             } catch (\Exception $e) {
-                // Log error but don't fail the document save
                 Notification::make()
                     ->danger()
                     ->title('Journal Entry Error')
