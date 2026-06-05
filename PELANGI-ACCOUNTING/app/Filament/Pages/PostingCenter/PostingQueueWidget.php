@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PostingQueueWidget extends TableWidget
 {
@@ -37,10 +38,9 @@ class PostingQueueWidget extends TableWidget
                     ->formatStateUsing(fn ($record) => $record->getTypeLabel())
                     ->badge()
                     ->color(fn ($record) => match ($record->type) {
-                        'journal_entry' => 'info',
                         'cash_disbursement', 'cash_receipt', 'cash_transfer' => 'warning',
-                        'sales_order', 'sales_invoice', 'sales_return' => 'success',
-                        'purchase_order', 'goods_receipt', 'purchase_invoice', 'purchase_return' => 'danger',
+                        'sales_invoice', 'sales_return' => 'success',
+                        'goods_receipt', 'purchase_invoice', 'purchase_return' => 'danger',
                         default => 'gray',
                     })
                     ->sortable(),
@@ -99,14 +99,11 @@ class PostingQueueWidget extends TableWidget
                     ->searchable()
                     ->preload()
                     ->options([
-                        'journal_entry' => __('Journal Entry'),
                         'cash_disbursement' => __('Cash Disbursement'),
                         'cash_receipt' => __('Cash Receipt'),
                         'cash_transfer' => __('Cash Transfer'),
-                        'sales_order' => __('Sales Order'),
                         'sales_invoice' => __('Sales Invoice'),
                         'sales_return' => __('Sales Return'),
-                        'purchase_order' => __('Purchase Order'),
                         'goods_receipt' => __('Goods Receipt'),
                         'purchase_invoice' => __('Purchase Invoice'),
                         'purchase_return' => __('Purchase Return'),
@@ -157,7 +154,6 @@ class PostingQueueWidget extends TableWidget
         try {
             DB::transaction(function () use ($record, $source) {
                 match ($record->type) {
-                    'journal_entry' => $this->postJournalEntry($source),
                     'cash_disbursement', 'cash_receipt', 'cash_transfer' => $this->postCashRecord($source),
                     default => $this->postDocument($source),
                 };
@@ -168,10 +164,21 @@ class PostingQueueWidget extends TableWidget
                 ->success()
                 ->send();
         } catch (\Exception $e) {
+            Log::error("Posting failed for {$record->type} #{$record->document_number}: " . $e->getMessage(), [
+                'exception' => $e,
+                'record_id' => $record->source_id,
+                'record_type' => $record->source_type,
+            ]);
+
             Notification::make()
                 ->title(__('Posting Failed'))
-                ->body($e->getMessage())
+                ->body(__(':type :number failed: :error', [
+                    'type' => $record->getTypeLabel(),
+                    'number' => $record->document_number,
+                    'error' => $e->getMessage(),
+                ]))
                 ->danger()
+                ->persistent()
                 ->send();
         }
     }
@@ -187,13 +194,17 @@ class PostingQueueWidget extends TableWidget
                     $source = $record->getSourceModel();
                     if (!$source) throw new \RuntimeException('Source not found');
                     match ($record->type) {
-                        'journal_entry' => $this->postJournalEntry($source),
                         'cash_disbursement', 'cash_receipt', 'cash_transfer' => $this->postCashRecord($source),
                         default => $this->postDocument($source),
                     };
                 });
                 $success++;
             } catch (\Exception $e) {
+                Log::error("Bulk posting failed for {$record->type} #{$record->document_number}: " . $e->getMessage(), [
+                    'exception' => $e,
+                    'record_id' => $record->source_id,
+                    'record_type' => $record->source_type,
+                ]);
                 $fail++;
             }
         }
@@ -211,17 +222,6 @@ class PostingQueueWidget extends TableWidget
     protected function postAll(): void
     {
         $this->postBulk($this->table->getQuery()->get());
-    }
-
-    protected function postJournalEntry($entry): void
-    {
-        $entry->update([
-            'is_posted' => true,
-            'status' => 'posted',
-            'posted_by_user_id' => Auth::id(),
-            'posted_at' => now(),
-            'updated_by_user_id' => Auth::id(),
-        ]);
     }
 
     protected function postCashRecord($record): void

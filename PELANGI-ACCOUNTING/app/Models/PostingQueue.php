@@ -6,12 +6,9 @@ use App\Filament\Resources\CashDisbursements\CashDisbursementResource;
 use App\Filament\Resources\CashReceipts\CashReceiptResource;
 use App\Filament\Resources\CashTransfers\CashTransferResource;
 use App\Filament\Resources\GoodsReceipts\GoodsReceiptResource;
-use App\Filament\Resources\JournalEntries\JournalEntryResource;
 use App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource;
-use App\Filament\Resources\PurchaseOrders\PurchaseOrderResource;
 use App\Filament\Resources\PurchaseReturns\PurchaseReturnResource;
 use App\Filament\Resources\SalesInvoices\SalesInvoiceResource;
-use App\Filament\Resources\SalesOrders\SalesOrderResource;
 use App\Filament\Resources\SalesReturns\SalesReturnResource;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,14 +23,11 @@ class PostingQueue extends Model
     protected $primaryKey = 'source_id';
 
     protected static array $typeResourceMap = [
-        'journal_entry' => JournalEntryResource::class,
         'cash_disbursement' => CashDisbursementResource::class,
         'cash_receipt' => CashReceiptResource::class,
         'cash_transfer' => CashTransferResource::class,
-        'sales_order' => SalesOrderResource::class,
         'sales_invoice' => SalesInvoiceResource::class,
         'sales_return' => SalesReturnResource::class,
-        'purchase_order' => PurchaseOrderResource::class,
         'goods_receipt' => GoodsReceiptResource::class,
         'purchase_invoice' => PurchaseInvoiceResource::class,
         'purchase_return' => PurchaseReturnResource::class,
@@ -74,7 +68,8 @@ class PostingQueue extends Model
             return null;
         }
 
-        $class = $this->source_type;
+        // PostgreSQL view may store escaped backslashes (App\\Models\\Foo)
+        $class = str_replace('\\\\', '\\', $this->source_type);
         if (!class_exists($class)) {
             return null;
         }
@@ -96,14 +91,11 @@ class PostingQueue extends Model
     public function getTypeLabel(): string
     {
         return match ($this->type) {
-            'journal_entry' => __('Journal Entry'),
             'cash_disbursement' => __('Cash Disbursement'),
             'cash_receipt' => __('Cash Receipt'),
             'cash_transfer' => __('Cash Transfer'),
-            'sales_order' => __('Sales Order'),
             'sales_invoice' => __('Sales Invoice'),
             'sales_return' => __('Sales Return'),
-            'purchase_order' => __('Purchase Order'),
             'goods_receipt' => __('Goods Receipt'),
             'purchase_invoice' => __('Purchase Invoice'),
             'purchase_return' => __('Purchase Return'),
