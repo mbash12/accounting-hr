@@ -12,7 +12,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
-use App\Filament\Actions\RegenerateJournalEntry;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -270,7 +269,6 @@ class SalesOrdersTable
                         ->icon('heroicon-o-eye')
                         ->url(fn ($record) => SalesOrderResource::getUrl('view', ['record' => $record])),
                     EditAction::make(),
-                    RegenerateJournalEntry::make('regenerateJournalEntry'),
                     DeleteAction::make(),
                 ]),
             ])

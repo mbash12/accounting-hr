@@ -5,20 +5,7 @@ namespace App\Filament\Resources\PurchaseOrders\Tables;
 use App\Filament\Actions\ImportPurchaseOrderWithItemsAction;
 use App\Filament\Actions\ExportPurchaseOrderWithItemsAction;
 use App\Filament\Resources\PurchaseOrders\PurchaseOrderResource;
-use App\Filament\Resources\GoodsReceipts\GoodsReceiptResource;
 use App\Models\PurchaseOrder;
-use App\Models\GoodsReceipt;
-use App\Models\GoodsReceiptItem;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use App\Filament\Actions\RegenerateJournalEntry;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -312,8 +299,6 @@ class PurchaseOrdersTable
                         ->icon('heroicon-o-eye')
                         ->url(fn ($record) => PurchaseOrderResource::getUrl('view', ['record' => $record])),
                     EditAction::make(),
-                    RegenerateJournalEntry::make('regenerateJournalEntry')
-                        ->visible(fn ($record) => $record->status === 'posted'),
                     DeleteAction::make(),
                 ])
             ])
