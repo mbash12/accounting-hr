@@ -15,16 +15,12 @@ class BankAccountsTemplateExport implements FromArray, WithHeadings, WithTitle
                 'BCA',
                 '1234567890',
                 'Rekening BCA Utama',
-                'checking',
-                10000000,
                 'yes',
             ],
             [
                 'MANDIRI',
                 '9876543210',
                 'Rekening Mandiri Operasional',
-                'savings',
-                5000000,
                 'yes',
             ],
         ];
@@ -36,8 +32,6 @@ class BankAccountsTemplateExport implements FromArray, WithHeadings, WithTitle
             'bank_code',
             'account_number',
             'account_name',
-            'account_type',
-            'balance',
             'active_status',
         ];
     }

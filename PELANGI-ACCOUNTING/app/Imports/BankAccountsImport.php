@@ -36,8 +36,6 @@ class BankAccountsImport implements ToCollection, WithHeadingRow, WithValidation
             $data = [
                 'bank_id' => $bank->id,
                 'account_name' => (string) ($row['account_name'] ?? ''),
-                'account_type' => (string) ($row['account_type'] ?? 'checking'),
-                'balance' => (float) ($row['balance'] ?? 0),
                 'is_active' => $this->parseBoolean($row['active_status'] ?? 'yes'),
                 'created_by_user_id' => Auth::check() ? Auth::id() : session('current_user_id'),
             ];
@@ -63,8 +61,6 @@ class BankAccountsImport implements ToCollection, WithHeadingRow, WithValidation
             'bank_code' => 'required|string|max:20',
             'account_number' => 'required|string|max:50',
             'account_name' => 'required|string|max:200',
-            'account_type' => 'nullable|string',
-            'balance' => 'nullable|numeric',
             'active_status' => 'nullable|string',
         ];
     }

@@ -24,32 +24,12 @@ class BankAccountForm
                     TextInput::make('account_number')
                         ->label(__('Account Number'))
                         ->required()
+                        ->numeric()
                         ->maxLength(50),
                     TextInput::make('account_name')
                         ->label(__('Account Name'))
                         ->required()
                         ->maxLength(200),
-                    Select::make('account_type')
-                        ->label(__('Account Type'))
-                        ->options([
-                            'checking' => __('Checking'),
-                            'savings' => __('Savings'),
-                            'credit_card' => __('Credit Card'),
-                            'investment' => __('Investment'),
-                        ])
-                        ->default('checking')
-                        ->required(),
-                    Select::make('company_id')
-                        ->label(__('Company'))
-                        ->relationship('company', 'name')
-                        ->searchable()
-                        ->preload()
-                        ->required(),
-                    TextInput::make('balance')
-                        ->label(__('Opening Balance'))
-                        ->numeric()
-                        ->default(0)
-                        ->prefix('Rp'),
                     Toggle::make('is_active')
                         ->label(__('Active'))
                         ->default(true),

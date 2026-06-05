@@ -30,12 +30,6 @@ class BankAccountsTable
                 TextColumn::make('account_name')
                     ->label(__('Account Name'))
                     ->searchable(),
-                TextColumn::make('account_type')
-                    ->label(__('Type'))
-                    ->badge(),
-                TextColumn::make('balance')
-                    ->label(__('Balance'))
-                    ->money('IDR'),
                 TextColumn::make('company.name')
                     ->label(__('Company'))
                     ->toggleable(isToggledHiddenByDefault: true),

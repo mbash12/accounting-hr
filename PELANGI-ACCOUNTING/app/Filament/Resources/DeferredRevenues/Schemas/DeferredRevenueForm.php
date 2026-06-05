@@ -54,12 +54,19 @@ class DeferredRevenueForm
                             })
                             ->searchable()
                             ->preload()
+                            ->live()
+                            ->afterStateUpdated(fn ($state, $set) => $set('sales_invoice_id', null))
                             ->label(__('Customer (Contact)')),
                         Select::make('sales_invoice_id')
-                            ->relationship('salesInvoice', 'invoice_number', modifyQueryUsing: function ($query) {
+                            ->relationship('salesInvoice', 'invoice_number', modifyQueryUsing: function ($query, callable $get) {
                                 $selectedCompanyId = session('selected_company_id');
                                 if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                     $query->where('company_id', $selectedCompanyId);
+                                }
+                                $query->where('status', 'posted');
+                                $customerId = $get('customer_id');
+                                if ($customerId) {
+                                    $query->where('customer_id', $customerId);
                                 }
                                 return $query;
                             })

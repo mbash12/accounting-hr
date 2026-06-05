@@ -41,8 +41,6 @@ class BankAccount extends Model
     protected $fillable = [
         'account_number',
         'account_name',
-        'account_type',
-        'balance',
         'is_active',
         'bank_id',
         'company_id',
@@ -58,14 +56,12 @@ class BankAccount extends Model
     {
         return [
             'id' => 'integer',
-            'balance' => 'decimal:2',
             'is_active' => 'boolean',
             'bank_id' => 'integer',
             'company_id' => 'integer',
             'created_by_user_id' => 'integer',
         ];
     }
-
     protected function getDocumentType(): string
     {
         return 'bank_account';

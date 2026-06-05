@@ -18,7 +18,7 @@ class ImportBankAccountsAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('Bank Account Data File')
-                    ->helperText('Upload Excel file (.xlsx) with columns: bank_code, account_number, account_name, account_type, balance, active_status')
+                    ->helperText('Upload Excel file (.xlsx) with columns: bank_code, account_number, account_name, active_status')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024)
                     ->required()

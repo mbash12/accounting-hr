@@ -16,8 +16,6 @@ class BankAccountsExport implements FromCollection, WithHeadings, WithMapping
             'bank_accounts.bank_id',
             'bank_accounts.account_number',
             'bank_accounts.account_name',
-            'bank_accounts.account_type',
-            'bank_accounts.balance',
             'bank_accounts.is_active',
         ]);
 
@@ -32,8 +30,6 @@ class BankAccountsExport implements FromCollection, WithHeadings, WithMapping
             'bank_code',
             'account_number',
             'account_name',
-            'account_type',
-            'balance',
             'active_status',
         ];
     }
@@ -44,8 +40,6 @@ class BankAccountsExport implements FromCollection, WithHeadings, WithMapping
             $account->bank?->code ?? '',
             $account->account_number,
             $account->account_name,
-            $account->account_type,
-            $account->balance,
             $account->is_active ? 'Yes' : 'No',
         ];
     }
