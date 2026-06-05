@@ -177,16 +177,6 @@ class SalesOrderForm
                             ->label('Description')
                             ->rows(1)
                             ->maxLength(65535),
-                        Select::make('status')
-                            ->label('Status')
-                            ->options([
-                                'draft' => 'Draft',
-                            ])
-                            ->default('draft')
-                            ->required()
-                            ->native(false)
-                            ->disabled(fn ($record) => $record && ($record->deliveryDocuments()->exists() || $record->salesInvoices()->exists()))
-                            ->live(),
                         TextInput::make('reference_no')
                             ->maxLength(255)
                             ->label('Reference No.'),
