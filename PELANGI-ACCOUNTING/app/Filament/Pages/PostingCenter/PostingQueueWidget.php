@@ -2,9 +2,8 @@
 
 namespace App\Filament\Pages\PostingCenter;
 
+use App\Models\JournalEntry;
 use App\Models\PostingQueue;
-use App\Services\CashBankService;
-use App\Services\JournalService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
@@ -38,7 +37,9 @@ class PostingQueueWidget extends TableWidget
                     ->formatStateUsing(fn ($record) => $record->getTypeLabel())
                     ->badge()
                     ->color(fn ($record) => match ($record->type) {
+                        'journal_entry' => 'info',
                         'cash_disbursement', 'cash_receipt', 'cash_transfer' => 'warning',
+                        'receivable_payment', 'payable_payment' => 'info',
                         'sales_invoice', 'sales_return' => 'success',
                         'goods_receipt', 'purchase_invoice', 'purchase_return' => 'danger',
                         default => 'gray',
@@ -99,9 +100,12 @@ class PostingQueueWidget extends TableWidget
                     ->searchable()
                     ->preload()
                     ->options([
+                        'journal_entry' => __('Journal Entry'),
                         'cash_disbursement' => __('Cash Disbursement'),
                         'cash_receipt' => __('Cash Receipt'),
                         'cash_transfer' => __('Cash Transfer'),
+                        'receivable_payment' => __('Receivable Payment'),
+                        'payable_payment' => __('Payable Payment'),
                         'sales_invoice' => __('Sales Invoice'),
                         'sales_return' => __('Sales Return'),
                         'goods_receipt' => __('Goods Receipt'),
@@ -114,8 +118,7 @@ class PostingQueueWidget extends TableWidget
                     ->preload()
                     ->options([
                         'draft' => __('Draft'),
-                        'approved' => __('Approved'),
-                        'rejected' => __('Rejected'),
+                        'posted' => __('Posted'),
                     ]),
             ], layout: FiltersLayout::AboveContent)
             ->headerActions([
@@ -153,10 +156,15 @@ class PostingQueueWidget extends TableWidget
 
         try {
             DB::transaction(function () use ($record, $source) {
-                match ($record->type) {
-                    'cash_disbursement', 'cash_receipt', 'cash_transfer' => $this->postCashRecord($source),
-                    default => $this->postDocument($source),
-                };
+                $source->update([
+                    'is_posted' => true,
+                    'status' => 'posted',
+                    'posted_by_user_id' => Auth::id(),
+                    'posted_at' => now(),
+                    'updated_by_user_id' => Auth::id(),
+                ]);
+
+                $this->updateSourceDocumentStatus($source);
             });
 
             Notification::make()
@@ -193,10 +201,16 @@ class PostingQueueWidget extends TableWidget
                 DB::transaction(function () use ($record) {
                     $source = $record->getSourceModel();
                     if (!$source) throw new \RuntimeException('Source not found');
-                    match ($record->type) {
-                        'cash_disbursement', 'cash_receipt', 'cash_transfer' => $this->postCashRecord($source),
-                        default => $this->postDocument($source),
-                    };
+
+                    $source->update([
+                        'is_posted' => true,
+                        'status' => 'posted',
+                        'posted_by_user_id' => Auth::id(),
+                        'posted_at' => now(),
+                        'updated_by_user_id' => Auth::id(),
+                    ]);
+
+                    $this->updateSourceDocumentStatus($source);
                 });
                 $success++;
             } catch (\Exception $e) {
@@ -224,21 +238,31 @@ class PostingQueueWidget extends TableWidget
         $this->postBulk($this->table->getQuery()->get());
     }
 
-    protected function postCashRecord($record): void
+    protected function updateSourceDocumentStatus(JournalEntry $journalEntry): void
     {
-        $record->update(['status' => 'posted', 'updated_by_user_id' => Auth::id()]);
-        $record->refresh();
-        app(CashBankService::class)->createJournalEntryForRecord($record);
-    }
+        if (!$journalEntry->reference_type || !$journalEntry->reference_id) {
+            return;
+        }
 
-    protected function postDocument($document): void
-    {
-        $document->update(['status' => 'posted', 'updated_by_user_id' => Auth::id()]);
-        $document->refresh();
-        app(JournalService::class)->createJournalEntryFromDocument(
-            $document->getDocumentType(),
-            $document,
-            $document->getJournalEntryDescription()
-        );
+        $sourceClass = $journalEntry->reference_type;
+        if (!class_exists($sourceClass)) {
+            return;
+        }
+
+        $source = $sourceClass::find($journalEntry->reference_id);
+        if (!$source) {
+            return;
+        }
+
+        $postedStatus = match (true) {
+            $source instanceof \App\Models\ReceivablePayment => 'completed',
+            $source instanceof \App\Models\PayablePayment => 'completed',
+            default => 'posted',
+        };
+
+        $source->update([
+            'status' => $postedStatus,
+            'updated_by_user_id' => Auth::id(),
+        ]);
     }
 }
