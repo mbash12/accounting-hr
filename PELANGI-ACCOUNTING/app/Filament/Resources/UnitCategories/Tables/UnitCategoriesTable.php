@@ -16,6 +16,10 @@ class UnitCategoriesTable
     {
         return $table
             ->columns([
+                TextColumn::make('code')
+                    ->label(__('Code'))
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('name')
                     ->label(__('Category Name'))
                     ->searchable()

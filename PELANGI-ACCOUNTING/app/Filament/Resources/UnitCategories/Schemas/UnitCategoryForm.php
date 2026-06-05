@@ -16,6 +16,10 @@ class UnitCategoryForm
             ->components([
                 Section::make(__('UOM Category Information'))
                     ->schema([
+                        TextInput::make('code')
+                            ->required()
+                            ->maxLength(50)
+                            ->label(__('Code')),
                         TextInput::make('name')
                             ->required()
                             ->maxLength(100)

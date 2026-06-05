@@ -43,6 +43,7 @@ class UnitCategory extends Model
     }
 
     protected $fillable = [
+        'code',
         'name',
         'base_unit_id',
         'company_id',

@@ -305,4 +305,231 @@ class MasterDataController extends Controller
             'data'    => $data,
         ]);
     }
+
+    public function syncUom(Request $request)
+    {
+        $items = $request->json('data');
+        if (empty($items) || !is_array($items)) {
+            return response()->json(['code' => 400, 'message' => 'data (array of {code, name}) is required'], 400);
+        }
+
+        $companyId = $request->input('company_id');
+        if (empty($companyId)) {
+            return response()->json(['code' => 400, 'message' => 'company_id is required'], 400);
+        }
+
+        $results = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => []];
+
+        \App\Services\WismaService::withoutUomSync(function () use ($items, $companyId, &$results) {
+            foreach ($items as $item) {
+                try {
+                    $code = $item['code'] ?? null;
+                    $name = $item['name'] ?? null;
+                    $action = $item['action'] ?? null;
+
+                    if (empty($code)) {
+                        $results['errors'][] = 'Missing code';
+                        $results['skipped']++;
+                        continue;
+                    }
+
+                    if ($action === 'delete' || $action === 'deleted') {
+                        $unit = \App\Models\Unit::whereRaw("LOWER(code) = ?", [strtolower($code)])
+                            ->where('company_id', $companyId)
+                            ->first();
+                        if ($unit) {
+                            $unit->forceDelete();
+                            $results['updated']++;
+                        } else {
+                            $results['skipped']++;
+                        }
+                        continue;
+                    }
+
+                    $unit = \App\Models\Unit::whereRaw("LOWER(code) = ?", [strtolower($code)])
+                        ->where('company_id', $companyId)
+                        ->withTrashed()
+                        ->first();
+
+                    if (!$unit) {
+                        $unit = new \App\Models\Unit();
+                        $unit->code = $code;
+                        $unit->company_id = $companyId;
+                        $unit->created_by_user_id = 1;
+                        $isNew = true;
+                    } else {
+                        if ($unit->trashed()) {
+                            $unit->restore();
+                        }
+                        $isNew = false;
+                    }
+
+                    if ($name !== null) $unit->name = $name;
+                    if (isset($item['is_active'])) $unit->is_active = $item['is_active'];
+                    $unit->save();
+
+                    $isNew ? $results['created']++ : $results['updated']++;
+                } catch (\Throwable $e) {
+                    $results['errors'][] = ($item['code'] ?? 'unknown') . ': ' . $e->getMessage();
+                    $results['skipped']++;
+                }
+            }
+        });
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'UOM sync completed',
+            'data' => $results,
+        ]);
+    }
+
+    public function syncUomCategories(Request $request)
+    {
+        $items = $request->json('data');
+        if (empty($items) || !is_array($items)) {
+            return response()->json(['code' => 400, 'message' => 'data (array of {code, name, base_uom_code}) is required'], 400);
+        }
+
+        $companyId = $request->input('company_id');
+        if (empty($companyId)) {
+            return response()->json(['code' => 400, 'message' => 'company_id is required'], 400);
+        }
+
+        $results = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => []];
+
+        \App\Services\WismaService::withoutUomSync(function () use ($items, $companyId, &$results) {
+            foreach ($items as $item) {
+                try {
+                    $code = $item['code'] ?? null;
+                    $name = $item['name'] ?? null;
+                    $baseUomCode = $item['base_uom_code'] ?? null;
+
+                    if (empty($code) || empty($name)) {
+                        $results['errors'][] = 'Missing code or name';
+                        $results['skipped']++;
+                        continue;
+                    }
+
+                    $baseUnitId = null;
+                    if ($baseUomCode) {
+                        $baseUnit = \App\Models\Unit::whereRaw("LOWER(code) = ?", [strtolower($baseUomCode)])
+                            ->where('company_id', $companyId)
+                            ->first();
+                        if ($baseUnit) {
+                            $baseUnitId = $baseUnit->id;
+                        }
+                    }
+
+                    $category = \App\Models\UnitCategory::whereRaw("LOWER(name) = ?", [strtolower($name)])
+                        ->where('company_id', $companyId)
+                        ->withTrashed()
+                        ->first();
+
+                    if (!$category) {
+                        $category = new \App\Models\UnitCategory();
+                        $category->code = $code;
+                        $category->name = $name;
+                        $category->company_id = $companyId;
+                        $category->created_by_user_id = 1;
+                        $isNew = true;
+                    } else {
+                        if ($category->trashed()) {
+                            $category->restore();
+                        }
+                        $category->code = $code;
+                        $isNew = false;
+                    }
+
+                    if ($baseUnitId) $category->base_unit_id = $baseUnitId;
+                    $category->save();
+
+                    $isNew ? $results['created']++ : $results['updated']++;
+                } catch (\Throwable $e) {
+                    $results['errors'][] = ($item['code'] ?? 'unknown') . ': ' . $e->getMessage();
+                    $results['skipped']++;
+                }
+            }
+        });
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'UOM Category sync completed',
+            'data' => $results,
+        ]);
+    }
+
+    public function syncUomConversions(Request $request)
+    {
+        $items = $request->json('data');
+        if (empty($items) || !is_array($items)) {
+            return response()->json(['code' => 400, 'message' => 'data (array of {category_code, uom_code, factor_to_base}) is required'], 400);
+        }
+
+        $companyId = $request->input('company_id');
+        if (empty($companyId)) {
+            return response()->json(['code' => 400, 'message' => 'company_id is required'], 400);
+        }
+
+        $results = ['created' => 0, 'updated' => 0, 'skipped' => 0, 'errors' => []];
+
+        \App\Services\WismaService::withoutUomSync(function () use ($items, $companyId, &$results) {
+            foreach ($items as $item) {
+                try {
+                    $categoryCode = $item['category_code'] ?? null;
+                    $uomCode = $item['uom_code'] ?? null;
+                    $factorToBase = $item['factor_to_base'] ?? null;
+
+                    if (empty($categoryCode) || empty($uomCode)) {
+                        $results['errors'][] = 'Missing category_code or uom_code';
+                        $results['skipped']++;
+                        continue;
+                    }
+
+                    $category = \App\Models\UnitCategory::whereRaw("LOWER(name) = ?", [strtolower($categoryCode)])
+                        ->where('company_id', $companyId)
+                        ->first();
+
+                    if (!$category) {
+                        // Try matching by code field
+                        $category = \App\Models\UnitCategory::whereRaw("LOWER(code) = ?", [strtolower($categoryCode)])
+                            ->where('company_id', $companyId)
+                            ->first();
+                    }
+
+                    if (!$category) {
+                        $results['errors'][] = "Category '{$categoryCode}' not found";
+                        $results['skipped']++;
+                        continue;
+                    }
+
+                    $unit = \App\Models\Unit::whereRaw("LOWER(code) = ?", [strtolower($uomCode)])
+                        ->where('company_id', $companyId)
+                        ->first();
+
+                    if (!$unit) {
+                        $results['errors'][] = "UOM '{$uomCode}' not found";
+                        $results['skipped']++;
+                        continue;
+                    }
+
+                    $unit->unit_category_id = $category->id;
+                    if ($factorToBase !== null) {
+                        $unit->conversion_factor = $factorToBase;
+                    }
+                    $unit->save();
+
+                    $results['updated']++;
+                } catch (\Throwable $e) {
+                    $results['errors'][] = ($item['uom_code'] ?? 'unknown') . ': ' . $e->getMessage();
+                    $results['skipped']++;
+                }
+            }
+        });
+
+        return response()->json([
+            'code' => 200,
+            'message' => 'UOM Conversion sync completed',
+            'data' => $results,
+        ]);
+    }
 }

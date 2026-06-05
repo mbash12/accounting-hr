@@ -211,7 +211,7 @@ class WismaService
         }
     }
 
-    public function withoutUomSync(callable $callback)
+    public static function withoutUomSync(callable $callback)
     {
         $previousState = self::$suppressUomSync;
         self::$suppressUomSync = true;
