@@ -15,11 +15,9 @@ class AccountMapping extends Model
      * Document types that can have account mappings
      */
     const DOCUMENT_TYPES = [
-        'sales_order' => 'Sales Order',
         'delivery_document' => 'Sales Delivery',
         'sales_invoice' => 'Sales Invoice',
         'sales_return' => 'Sales Return',
-        'purchase_order' => 'Purchase Order',
         'goods_receipt' => 'Goods Receipt',
         'purchase_invoice' => 'Purchase Invoice',
         'purchase_return' => 'Purchase Return',
@@ -79,14 +77,12 @@ class AccountMapping extends Model
      */
     const DOCUMENT_MAPPING_TYPES = [
         // ... (rest of mappings)
-        'sales_order' => ['advance_receivable'],
         'delivery_document' => ['cogs', 'inventory'],
         'sales_invoice' => ['accounts_receivable', 'sales', 'discount', 'tax', 'other_charges'],
-        'sales_return' => ['accounts_receivable', 'sales_return'],
-        'purchase_order' => ['advance_payable'],
+        'sales_return' => ['accounts_receivable', 'sales_return', 'tax', 'discount', 'other_charges'],
         'goods_receipt' => ['inventory', 'grni'],
-        'purchase_invoice' => ['accounts_payable', 'purchases', 'tax', 'discount', 'other_charges'],
-        'purchase_return' => ['accounts_payable', 'purchase_return'],
+        'purchase_invoice' => ['accounts_payable', 'purchases', 'tax', 'discount', 'other_charges', 'grni'],
+        'purchase_return' => ['accounts_payable', 'purchase_return', 'tax', 'discount', 'other_charges'],
         'cash_receipt' => ['cash', 'accounts_receivable'],
         'cash_disbursement' => ['cash', 'accounts_payable'],
         'bank_receipt' => ['bank', 'accounts_receivable'],

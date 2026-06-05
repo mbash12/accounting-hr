@@ -19,7 +19,7 @@ class SalesDeliveryResource extends Resource
 {
     protected static ?string $model = DeliveryDocument::class;
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
     public static function getNavigationGroup(): ?string
     {

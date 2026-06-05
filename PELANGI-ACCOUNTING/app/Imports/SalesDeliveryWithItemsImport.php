@@ -79,7 +79,6 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
                     'delivery_data' => [
                         'delivery_number' => $deliveryNumber,
                         'date' => isset($row['date']) ? $this->parseDate($row['date']) : now()->format('Y-m-d'),
-                        'delivery_type' => isset($row['delivery_type']) ? (string) $row['delivery_type'] : 'goods',
                         'reference_no' => isset($row['reference_no']) ? (string) $row['reference_no'] : null,
                         'description' => isset($row['description']) ? (string) $row['description'] : null,
                         'status' => isset($row['status']) ? (string) $row['status'] : 'draft',
@@ -186,8 +185,6 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
         return [
             'delivery_no' => isset($data['delivery_no']) ? (string) $data['delivery_no'] : null,
             'date' => isset($data['date']) ? (string) $data['date'] : null,
-            'delivery_type' => isset($data['delivery_type']) ? (string) $data['delivery_type'] : null,
-            'reference_no' => isset($data['reference_no']) ? (string) $data['reference_no'] : null,
             'description' => isset($data['description']) ? (string) $data['description'] : null,
             'status' => isset($data['status']) ? (string) $data['status'] : null,
             'customer_code' => isset($data['customer_code']) ? (string) $data['customer_code'] : null,
@@ -212,8 +209,6 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
         return [
             'delivery_no' => 'required|string|max:50',
             'date' => 'required',
-            'delivery_type' => 'nullable|in:goods,document|max:20',
-            'reference_no' => 'nullable|string|max:100',
             'description' => 'nullable|string|max:1000',
             'status' => 'nullable|in:draft,posted',
             'customer_code' => 'nullable|string|max:50',
@@ -264,8 +259,6 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
             'delivery_no.required' => 'Delivery Number is required.',
             'delivery_no.max' => 'Delivery Number cannot exceed 50 characters.',
             'date.required' => 'Date is required.',
-            'delivery_type.in' => 'Type must be goods or document.',
-            'reference_no.max' => 'Reference Number cannot exceed 100 characters.',
             'description.max' => 'Description cannot exceed 1000 characters.',
             'customer_code.max' => 'Customer Code cannot exceed 50 characters.',
             'customer_name.max' => 'Customer Name cannot exceed 255 characters.',

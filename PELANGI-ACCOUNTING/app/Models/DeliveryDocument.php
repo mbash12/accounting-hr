@@ -41,7 +41,6 @@ class DeliveryDocument extends Model
 
             $model->customer_id = $model->getOriginal('customer_id');
             $model->sales_order_id = $model->getOriginal('sales_order_id');
-            $model->delivery_type = $model->getOriginal('delivery_type');
             $model->company_id = $model->getOriginal('company_id');
             $model->job_id = $model->getOriginal('job_id');
             $model->is_locked = true;
@@ -105,7 +104,6 @@ class DeliveryDocument extends Model
      */
     protected $fillable = [
         'delivery_number',
-        'delivery_type',
         'date',
         'is_closed',
         'reference_no',

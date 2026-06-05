@@ -27,7 +27,6 @@ class DeliveryDocumentFactory extends Factory
     public function definition(): array
     {
         return [
-            'delivery_type' => fake()->randomElement(["full","partial","return","replacement","sample"]),
             'date' => fake()->date(),
             'is_closed' => fake()->boolean(),
             'reference_no' => fake()->word(),

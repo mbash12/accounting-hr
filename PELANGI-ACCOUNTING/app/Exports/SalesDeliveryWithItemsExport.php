@@ -15,7 +15,7 @@ class SalesDeliveryWithItemsExport implements FromCollection, WithHeadings, With
     {
         $query = DeliveryDocument::with(['customer', 'salesOrder', 'items.product', 'items.unit'])
             ->select([
-                'id', 'delivery_number', 'delivery_type', 'date', 'reference_no', 'description',
+                'id', 'delivery_number', 'date', 'reference_no', 'description',
                 'status', 'customer_id', 'sales_order_id', 'company_id'
             ]);
 
@@ -30,7 +30,6 @@ class SalesDeliveryWithItemsExport implements FromCollection, WithHeadings, With
                     $results->push([
                         'Delivery No.' => $delivery->delivery_number,
                         'Date' => $delivery->date ? $delivery->date->format('Y-m-d') : null,
-                        'Delivery Type' => $delivery->delivery_type,
                         'Reference No.' => $delivery->reference_no,
                         'Description' => $delivery->description,
                         'Status' => $delivery->status,
@@ -49,7 +48,6 @@ class SalesDeliveryWithItemsExport implements FromCollection, WithHeadings, With
                 $results->push([
                     'Delivery No.' => $delivery->delivery_number,
                     'Date' => $delivery->date ? $delivery->date->format('Y-m-d') : null,
-                    'Delivery Type' => $delivery->delivery_type,
                     'Reference No.' => $delivery->reference_no,
                     'Description' => $delivery->description,
                     'Status' => $delivery->status,

@@ -144,11 +144,9 @@ class ManageAccountMappings extends Page implements HasForms
         $allTypes = AccountMapping::DOCUMENT_TYPES;
 
             $allowedTypes = [
-            'sales_order',
             'delivery_document',
             'sales_invoice',
             'sales_return',
-            'purchase_order',
             'goods_receipt',
             'purchase_invoice',
             'purchase_return',
@@ -161,11 +159,9 @@ class ManageAccountMappings extends Page implements HasForms
             $types = array_intersect_key($allTypes, array_flip($allowedTypes));
 
             $translations = [
-            'sales_order' => 'Sales Order',
             'delivery_document' => 'Sales Delivery',
             'sales_invoice' => 'Sales Invoice',
             'sales_return' => 'Sales Return',
-            'purchase_order' => 'Purchase Order',
             'goods_receipt' => 'Goods Receipt',
             'purchase_invoice' => 'Purchase Invoice',
             'purchase_return' => 'Purchase Return',

@@ -223,12 +223,10 @@ class SalesDeliveryForm
                                     if ($salesOrder) {
                                         $set('customer_id', $salesOrder->customer_id);
 
-                                        // Auto-fill items from sales order - show all items regardless of delivery status
-                                        $deliveryType = $get('delivery_type');
+                                        // Auto-fill items from sales order
                                         $items = [];
 
                                         foreach ($salesOrder->items as $item) {
-                                            // Show all items without validation - use original quantity
                                             // Removed delivery type filtering to show all items
                                             $items[] = [
                                                 'sales_order_item_id' => $item->id,
@@ -250,15 +248,6 @@ class SalesDeliveryForm
                                 }
                             })
                             ->getOptionLabelFromRecordUsing(fn ($record) => $record->order_number . ' - ' . $record->customer?->name),
-                        Select::make('delivery_type')
-                            ->label(__('Delivery Type'))
-                            ->options([
-                                'goods' => 'Goods',
-                                'document' => 'Document',
-                            ])
-                            ->disabled(fn ($record) => (bool) ($record?->is_locked))
-                            ->required()
-                            ->reactive(),
                         DatePicker::make('date')
                             ->label(__('Date'))
                             ->required()
@@ -473,21 +462,22 @@ class SalesDeliveryForm
                     ->compact()
                     ->columnSpan('full'),
 
-                // Document Upload Section - Only show when delivery type is document
+
+                // Document Attachments
                 Section::make('Document Attachments')
                     ->schema([
                         FileUpload::make('bast_document')
                             ->label('BAST Document')
                             ->disk('public')
                             ->directory('delivery-documents/bast')
-                            ->maxSize(10240) // 10MB
+                            ->maxSize(10240)
                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                             ->downloadable(),
                         FileUpload::make('tpb_document')
                             ->label('TPB Document')
                             ->disk('public')
                             ->directory('delivery-documents/tpb')
-                            ->maxSize(10240) // 10MB
+                            ->maxSize(10240)
                             ->acceptedFileTypes(['application/pdf', 'image/*'])
                             ->downloadable(),
                         Textarea::make('internal_notes')
@@ -497,8 +487,7 @@ class SalesDeliveryForm
                             ->columnSpanFull(),
                     ])
                     ->columns(2)
-                    ->columnSpanFull()
-                    ->visible(fn (callable $get) => $get('delivery_type') === 'document'),
+                    ->columnSpanFull(),
 
             ]);
     }

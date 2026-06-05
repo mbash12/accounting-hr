@@ -30,6 +30,13 @@ class JournalService
             return null;
         }
 
+        // Orders are commitments — no accounting impact, no journal entry.
+        // Clean up any stale entries that may exist from before this policy was enforced.
+        if (in_array($documentType, ['sales_order', 'purchase_order'])) {
+            $this->deleteJournalEntriesForDocument($documentType, $document->id, $companyId);
+            return null;
+        }
+
         // Get mappings for this document type
         $mappings = AccountMapping::getMappingsForDocument($documentType, $companyId);
 
@@ -136,11 +143,12 @@ class JournalService
         JournalEntry $journalEntry,
         $mappings
     ): void {
-        switch ($documentType) {
-            case 'sales_order':
-                $this->createSalesOrderJournalItems($document, $journalEntry, $mappings);
-                break;
+        // Orders are commitments — no accounting impact, no journal entry
+        if (in_array($documentType, ['sales_order', 'purchase_order'])) {
+            return;
+        }
 
+        switch ($documentType) {
             case 'delivery_document':
                 $this->createSalesDeliveryJournalItems($document, $journalEntry, $mappings);
                 break;
@@ -151,10 +159,6 @@ class JournalService
 
             case 'sales_return':
                 $this->createSalesReturnJournalItems($document, $journalEntry, $mappings);
-                break;
-
-            case 'purchase_order':
-                $this->createPurchaseOrderJournalItems($document, $journalEntry, $mappings);
                 break;
 
             case 'goods_receipt':
@@ -170,28 +174,27 @@ class JournalService
                 break;
         }
 
-        // Update journal entry amount with total debits
+        // Validate and update journal entry balance
         $totalDebit = $journalEntry->items()->sum('debit');
-        $journalEntry->update(['amount' => $totalDebit]);
-    }
+        $totalCredit = $journalEntry->items()->sum('credit');
 
-    /**
-     * Create journal items for Sales Order
-     * Sales Order = No journal entry (commitment only)
-     * Only create if advance payment is received
-     */
-    protected function createSalesOrderJournalItems(
-        $salesOrder,
-        JournalEntry $journalEntry,
-        $mappings
-    ): void {
-        // Sales Order has no accounting impact - it's just a commitment
-        // Journal entry only created if advance payment is received
-        if (isset($salesOrder->advance_amount) && $salesOrder->advance_amount > 0 && $mappings->has('advance_receivable')) {
-            // Debit: Cash/Bank (handled separately in payment)
-            // Credit: Advance Receivable (customer deposit liability)
-            $this->createJournalItem($journalEntry, $mappings->get('advance_receivable'), 'credit', $salesOrder->advance_amount);
+        if ($totalDebit <= 0 && $totalCredit <= 0) {
+            // No items created (e.g. order documents) — delete the empty entry
+            $journalEntry->delete();
+            return;
         }
+
+        if (abs($totalDebit - $totalCredit) > 0.005) {
+            $journalEntry->delete();
+            throw new \RuntimeException(sprintf(
+                'Journal entry #%s does not balance: debit %s, credit %s',
+                $journalEntry->entry_number,
+                $totalDebit,
+                $totalCredit
+            ));
+        }
+
+        $journalEntry->update(['amount' => $totalDebit]);
     }
 
     /**
@@ -258,48 +261,56 @@ class JournalService
 
     /**
      * Create journal items for Sales Return
-     * Sales Return = Reverse revenue (calculated from items)
-     * Dr Sales Return, Cr A/R
+     * Sales Return = Reverse original sale proportionally, including tax and discount
+     * Dr Sales Return, Dr Tax, Dr Other Charges, Cr A/R, Cr Discount
      */
     protected function createSalesReturnJournalItems(
         $return,
         JournalEntry $journalEntry,
         $mappings
     ): void {
-        // Calculate total from items
-        $totalAmount = $this->calculateReturnTotal($return);
-        
-        if ($totalAmount <= 0) {
+        $returnSubtotal = $this->calculateReturnTotal($return);
+        if ($returnSubtotal <= 0) {
             return;
         }
 
-        // Credit: Accounts Receivable (reduce amount due from customer)
-        if ($mappings->has('accounts_receivable')) {
-            $this->createJournalItem($journalEntry, $mappings->get('accounts_receivable'), 'credit', $totalAmount);
+        // Try to get proportional tax/discount from the original invoice
+        $taxAmount = 0;
+        $discountAmount = 0;
+        $otherChargesAmount = 0;
+
+        $originalInvoice = $return->salesInvoice ?? null;
+        if ($originalInvoice && ($originalInvoice->subtotal ?? 0) > 0) {
+            $ratio = $returnSubtotal / $originalInvoice->subtotal;
+            $taxAmount = round(($originalInvoice->tax_amount ?? 0) * $ratio, 2);
+            $discountAmount = round(($originalInvoice->discount ?? 0) * $ratio, 2);
+            $otherChargesAmount = round(($originalInvoice->other_charges ?? 0) * $ratio, 2);
         }
 
-        // Debit: Sales Returns (contra revenue)
+        // Debit: Sales Returns (contra-revenue — reverses original sales credit)
         if ($mappings->has('sales_return')) {
-            $this->createJournalItem($journalEntry, $mappings->get('sales_return'), 'debit', $totalAmount);
+            $this->createJournalItem($journalEntry, $mappings->get('sales_return'), 'debit', $returnSubtotal);
         }
-    }
 
-    /**
-     * Create journal items for Purchase Order
-     * Purchase Order = No journal entry (commitment only)
-     * Only create if advance payment is made
-     */
-    protected function createPurchaseOrderJournalItems(
-        $order,
-        JournalEntry $journalEntry,
-        $mappings
-    ): void {
-        // Purchase Order has no accounting impact - it's just a commitment
-        // Journal entry only created if advance payment is made
-        if (isset($order->advance_amount) && $order->advance_amount > 0 && $mappings->has('advance_payable')) {
-            // Debit: Advance Payable (prepayment to supplier)
-            $this->createJournalItem($journalEntry, $mappings->get('advance_payable'), 'debit', $order->advance_amount);
-            // Credit: Cash/Bank (handled separately in payment)
+        // Debit: Tax Payable (reverses original output VAT credit)
+        if ($taxAmount > 0 && $mappings->has('tax')) {
+            $this->createJournalItem($journalEntry, $mappings->get('tax'), 'debit', $taxAmount);
+        }
+
+        // Debit: Other Charges (reverses original other charges credit)
+        if ($otherChargesAmount > 0 && $mappings->has('other_charges')) {
+            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), 'debit', $otherChargesAmount);
+        }
+
+        // Credit: Discount (reverses original discount debit — contra-revenue reversal)
+        if ($discountAmount > 0 && $mappings->has('discount')) {
+            $this->createJournalItem($journalEntry, $mappings->get('discount'), 'credit', $discountAmount);
+        }
+
+        // Credit: Accounts Receivable (net amount customer no longer owes)
+        $returnTotal = $returnSubtotal - $discountAmount + $taxAmount + $otherChargesAmount;
+        if ($returnTotal > 0 && $mappings->has('accounts_receivable')) {
+            $this->createJournalItem($journalEntry, $mappings->get('accounts_receivable'), 'credit', $returnTotal);
         }
     }
 
@@ -330,18 +341,24 @@ class JournalService
 
     /**
      * Create journal items for Purchase Invoice
-     * Purchase Invoice = Record liability and expense/inventory
-     * Dr Expense/Inventory, Dr Tax, Cr A/P, Cr Discount
+     * Purchase Invoice = Clear GRNI accrual and record tax/discount liability
+     * Dr GRNI (clear accrual), Dr Tax, Dr Other Charges, Cr A/P, Cr Discount
+     * Falls back to Dr Purchases if GRNI mapping is not configured.
      */
     protected function createPurchaseInvoiceJournalItems(
         $invoice,
         JournalEntry $journalEntry,
         $mappings
     ): void {
-        // Debit: Expense or Inventory (subtotal before discount)
+        // Debit: GRNI (clear goods received not invoiced accrual)
+        // Falls back to Purchases/Expenses if GRNI not mapped (direct expense, no prior receipt)
         $grossAmount = $invoice->subtotal ?? 0;
-        if ($grossAmount > 0 && $mappings->has('purchases')) {
-            $this->createJournalItem($journalEntry, $mappings->get('purchases'), 'debit', $grossAmount);
+        if ($grossAmount > 0) {
+            if ($mappings->has('grni')) {
+                $this->createJournalItem($journalEntry, $mappings->get('grni'), 'debit', $grossAmount);
+            } elseif ($mappings->has('purchases')) {
+                $this->createJournalItem($journalEntry, $mappings->get('purchases'), 'debit', $grossAmount);
+            }
         }
 
         // Credit: Discount Received (reduce purchase cost)
@@ -367,29 +384,56 @@ class JournalService
 
     /**
      * Create journal items for Purchase Return
-     * Purchase Return = Reverse purchase (calculated from items)
-     * Dr A/P, Cr Purchase Return
+     * Purchase Return = Reverse original purchase proportionally, including tax and discount
+     * Dr A/P, Dr Discount, Cr Purchase Return, Cr Tax, Cr Other Charges
      */
     protected function createPurchaseReturnJournalItems(
         $return,
         JournalEntry $journalEntry,
         $mappings
     ): void {
-        // Calculate total from items
-        $totalAmount = $this->calculateReturnTotal($return);
-        
-        if ($totalAmount <= 0) {
+        $returnSubtotal = $this->calculateReturnTotal($return);
+        if ($returnSubtotal <= 0) {
             return;
         }
 
-        // Debit: Accounts Payable (reduce amount owed to supplier)
-        if ($mappings->has('accounts_payable')) {
-            $this->createJournalItem($journalEntry, $mappings->get('accounts_payable'), 'debit', $totalAmount);
+        // Try to get proportional tax/discount from the original invoice
+        $taxAmount = 0;
+        $discountAmount = 0;
+        $otherChargesAmount = 0;
+
+        $originalInvoice = $return->purchaseInvoice ?? null;
+        if ($originalInvoice && ($originalInvoice->subtotal ?? 0) > 0) {
+            $ratio = $returnSubtotal / $originalInvoice->subtotal;
+            $taxAmount = round(($originalInvoice->tax_amount ?? 0) * $ratio, 2);
+            $discountAmount = round(($originalInvoice->discount ?? 0) * $ratio, 2);
+            $otherChargesAmount = round(($originalInvoice->other_charges ?? 0) * $ratio, 2);
         }
 
-        // Credit: Purchase Returns
+        // Debit: Accounts Payable (reduce amount owed to supplier)
+        $returnTotal = $returnSubtotal - $discountAmount + $taxAmount + $otherChargesAmount;
+        if ($returnTotal > 0 && $mappings->has('accounts_payable')) {
+            $this->createJournalItem($journalEntry, $mappings->get('accounts_payable'), 'debit', $returnTotal);
+        }
+
+        // Debit: Discount (reverses original purchase discount credit)
+        if ($discountAmount > 0 && $mappings->has('discount')) {
+            $this->createJournalItem($journalEntry, $mappings->get('discount'), 'debit', $discountAmount);
+        }
+
+        // Credit: Purchase Returns (contra-expense — reverses original purchases debit)
         if ($mappings->has('purchase_return')) {
-            $this->createJournalItem($journalEntry, $mappings->get('purchase_return'), 'credit', $totalAmount);
+            $this->createJournalItem($journalEntry, $mappings->get('purchase_return'), 'credit', $returnSubtotal);
+        }
+
+        // Credit: Tax (reverses original input VAT debit)
+        if ($taxAmount > 0 && $mappings->has('tax')) {
+            $this->createJournalItem($journalEntry, $mappings->get('tax'), 'credit', $taxAmount);
+        }
+
+        // Credit: Other Charges (reverses original other charges debit)
+        if ($otherChargesAmount > 0 && $mappings->has('other_charges')) {
+            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), 'credit', $otherChargesAmount);
         }
     }
 
