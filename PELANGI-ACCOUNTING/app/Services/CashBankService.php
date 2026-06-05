@@ -649,21 +649,11 @@ class CashBankService
 
     public function createJournalEntryForRecord($record): void
     {
-        $isPosted = $record->status === 'posted';
-        
         $existingJournalEntry = JournalEntry::where('reference_type', get_class($record))
             ->where('reference_id', $record->id)
             ->first();
-        
-        if (!$isPosted) {
-            if ($existingJournalEntry) {
-                $existingJournalEntry->items()->delete();
-                $existingJournalEntry->delete();
-            }
-            return;
-        }
 
-        $departmentId = $existingJournalEntry->department_id ?? 1; 
+        $departmentId = $existingJournalEntry?->department_id ?? 1;
         $costCenterId = 1;
         if ($existingJournalEntry) {
             $firstItem = $existingJournalEntry->items()->first();
@@ -719,7 +709,7 @@ class CashBankService
             'reference_no' => $receipt->reference_no ?: $receipt->receipt_number,
             'description' => $receipt->description,
             'amount' => $totalAmount,
-            'status' => 'posted',
+            'status' => 'draft',
             'sub_module' => $receipt->sub_module ?? 'pemasukan_kas',
             'reference_type' => CashReceipt::class,
             'reference_id' => $receipt->id,
@@ -766,7 +756,7 @@ class CashBankService
             'reference_no' => $disbursement->reference_no ?: $disbursement->disbursement_number,
             'description' => $disbursement->description,
             'amount' => $totalAmount,
-            'status' => 'posted',
+            'status' => 'draft',
             'sub_module' => $disbursement->sub_module ?? 'pengeluaran',
             'reference_type' => CashDisbursement::class,
             'reference_id' => $disbursement->id,
@@ -809,7 +799,7 @@ class CashBankService
             'reference_no' => $transfer->reference_no ?: $transfer->transfer_number,
             'description' => $transfer->description,
             'amount' => $amount,
-            'status' => 'posted',
+            'status' => 'draft',
             'sub_module' => $transfer->sub_module ?? 'transfer_kas',
             'reference_type' => CashTransfer::class,
             'reference_id' => $transfer->id,
