@@ -92,6 +92,8 @@ class BankAccount extends Model
         return [
             ['table' => 'receivable_payments', 'foreignKey' => 'bank_account_id', 'label' => 'receivable payments'],
             ['table' => 'payable_payments', 'foreignKey' => 'bank_account_id', 'label' => 'payable payments'],
+            ['table' => 'bank_reconciliations', 'foreignKey' => 'bank_account_id', 'label' => 'bank reconciliations'],
+            ['table' => 'check_disbursements', 'foreignKey' => 'bank_account_id', 'label' => 'check disbursements'],
         ];
     }
 }

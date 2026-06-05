@@ -114,7 +114,7 @@ class FixedAssetCategory extends Model
     public function getDependencyChecks(): array
     {
         return [
-            ['table' => 'fixed_assets', 'foreignKey' => 'fixed_asset_category_id', 'label' => 'fixed assets'],
+            ['table' => 'fixed_assets', 'foreignKey' => 'category_id', 'label' => 'fixed assets'],
         ];
     }
 }
