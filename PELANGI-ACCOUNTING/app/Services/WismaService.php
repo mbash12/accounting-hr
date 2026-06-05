@@ -12,6 +12,17 @@ class WismaService
     protected static bool $suppressUomSync = false;
 
     /**
+     * Get API configuration.
+     */
+    protected function config(): array
+    {
+        return [
+            'url' => config('services.wisma.url', env('WISMA_API_URL', 'https://wisma-dev.pelangisentralkreasi.co.id/api')),
+            'token' => config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token')),
+        ];
+    }
+
+    /**
      * Sync approved purchase order to Wisma system
      *
      * @param PurchaseOrder $purchaseOrder
@@ -19,12 +30,11 @@ class WismaService
      */
     public function syncApprovedPurchaseOrder(PurchaseOrder $purchaseOrder): array
     {
-        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://wisma-dev.pelangisentralkreasi.co.id/api'));
-        $apiToken = config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token'));
+        ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
 
         $endpoint = rtrim($apiUrl, '/') . '/external/purchase-requests/approve';
 
-        $purchaseOrder->loadMissing('items.product');
+        $purchaseOrder->loadMissing('items.product', 'items.unit');
 
         $prNo = $purchaseOrder->reference_no;
         $poNo = $purchaseOrder->purchase_order_no;
@@ -111,8 +121,7 @@ class WismaService
 
     public function syncRejectedPurchaseOrder(PurchaseOrder $purchaseOrder, ?string $comment = null): array
     {
-        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://wisma-dev.pelangisentralkreasi.co.id/api'));
-        $apiToken = config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token'));
+        ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
 
         $endpoint = rtrim($apiUrl, '/') . '/external/purchase-requests/reject';
 
@@ -222,7 +231,6 @@ class WismaService
         return [
             'purchase_request_no' => $purchaseOrder->reference_no,
             'po_no' => $purchaseOrder->purchase_order_no,
-            'comment' => $purchaseOrder->description,
             'items' => $purchaseOrder->items
                 ->map(fn ($item) => $this->buildApprovedPurchaseOrderItemPayload($item))
                 ->filter()
@@ -238,17 +246,16 @@ class WismaService
             return null;
         }
 
-        $payload = [
+        $unit = $item->unit ?? null;
+        $conversionFactor = $unit ? (float) ($unit->conversion_factor ?? 1) : 1;
+
+        return [
             'material_code' => $materialCode,
+            'qty_order' => $this->normalizeDecimalValue($item->quantity ?? 0),
+            'uom_code' => $unit ? $unit->code : 'PCS',
+            'factor_to_base' => $conversionFactor,
             'unit_price' => $this->normalizeDecimalValue($item->unit_price ?? 0),
         ];
-
-        $qtyOrder = $this->normalizeDecimalValue($item->quantity ?? 0);
-        if ($qtyOrder !== 0) {
-            $payload['qty_order'] = $qtyOrder;
-        }
-
-        return $payload;
     }
 
     protected function extractMaterialCode(object $item): ?string
@@ -288,33 +295,36 @@ class WismaService
         return round($normalized, 2);
     }
 
+
+    /**
+     * Sync a single UOM to Prima/Wisma.
+     * Called from Unit model events (created, updated, deleted).
+     */
     public function syncUom(Unit $unit, string $action = 'update'): array
     {
-        $apiUrl = config('services.wisma.url', env('WISMA_API_URL', 'https://api-dev.wismaatlet.id/api/'));
-        $apiToken = config('services.wisma.token', env('WISMA_API_TOKEN', 'prima-accounting-secret-token'));
+        ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
 
         $endpoint = rtrim($apiUrl, '/') . '/external/uoms/sync';
-        $action = strtolower($action);
 
-
-        $payload = [
-            'code' => $unit->code,
-            'action' => $action,
-        ];
-
-        if ($action !== 'delete') {
-            $payload['name'] = $unit->name;
-            $payload['description'] = $unit->description;
-            $payload['is_active'] = $unit->trashed() ? 0 : (int) $unit->is_active;
+        if (in_array(strtolower($action), ['delete', 'deleted'])) {
+            return $this->syncUomDeletion($unit, $endpoint, $apiToken);
         }
 
+        // Wrap in data array matching the batch sync format
+        $payload = [
+            'data' => [
+                [
+                    'code' => $unit->code,
+                    'name' => $unit->name,
+                ],
+            ],
+        ];
+
         try {
-            Log::info("Sending UOM sync to Wisma", [
+            Log::info("Syncing UOM to Wisma", [
                 'unit_id' => $unit->id,
                 'code' => $unit->code,
-                'action' => $action,
                 'endpoint' => $endpoint,
-                'payload' => $payload,
             ]);
 
             $response = Http::withHeaders([
@@ -328,27 +338,19 @@ class WismaService
                 Log::info("Successfully synced UOM to Wisma", [
                     'unit_id' => $unit->id,
                     'code' => $unit->code,
-                    'action' => $action,
                 ]);
-
-                return [
-                    'success' => true,
-                    'data' => $responseBody,
-                ];
+                return ['success' => true, 'data' => $responseBody];
             }
 
-            $errorMessage = $responseBody['message'] ?? 'Unknown error';
             Log::error("Failed to sync UOM to Wisma. Status: {$response->status()}", [
                 'unit_id' => $unit->id,
                 'code' => $unit->code,
-                'action' => $action,
-                'payload' => $payload,
                 'response' => $responseBody,
             ]);
 
             return [
                 'success' => false,
-                'message' => $errorMessage,
+                'message' => $responseBody['message'] ?? 'Unknown error',
                 'response' => $responseBody,
             ];
         } catch (\Throwable $e) {
@@ -356,14 +358,156 @@ class WismaService
                 'exception' => $e,
                 'unit_id' => $unit->id,
                 'code' => $unit->code,
-                'action' => $action,
-                'payload' => $payload,
             ]);
+
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Handle UOM deletion sync (separate DELETE request or exclude from batch).
+     */
+    protected function syncUomDeletion(Unit $unit, string $endpoint, string $apiToken): array
+    {
+        // Deletion can be sent with an "action": "delete" flag if the API supports it,
+        // or the UOM can simply be omitted in future batch syncs.
+        try {
+            $response = Http::withHeaders([
+                'X-Accounting-Token' => $apiToken,
+                'Accept' => 'application/json',
+            ])->post($endpoint, [
+                'data' => [
+                    ['code' => $unit->code, 'action' => 'delete'],
+                ],
+            ]);
+
+            $responseBody = $response->json();
+            if ($response->successful()) {
+                return ['success' => true, 'data' => $responseBody];
+            }
 
             return [
                 'success' => false,
-                'message' => $e->getMessage(),
+                'message' => $responseBody['message'] ?? 'Unknown error',
             ];
+        } catch (\Throwable $e) {
+            Log::error("Error syncing UOM deletion to Wisma: " . $e->getMessage(), [
+                'exception' => $e,
+                'unit_id' => $unit->id,
+                'code' => $unit->code,
+            ]);
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Batch sync multiple UOMs.
+     * Use this for bulk operations from the UI.
+     */
+    public function syncUomsBatch(array $units): array
+    {
+        ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
+
+        $endpoint = rtrim($apiUrl, '/') . '/external/uoms/sync';
+
+        $payload = [
+            'data' => array_map(fn (Unit $unit) => [
+                'code' => $unit->code,
+                'name' => $unit->name,
+            ], $units),
+        ];
+
+        if (empty($payload['data'])) {
+            return ['success' => false, 'message' => 'No UOMs to sync.'];
+        }
+
+        return $this->post($endpoint, $apiToken, $payload);
+    }
+
+    /**
+     * Sync UOM Conversion Categories.
+     */
+    public function syncUomConversionCategories(array $categories): array
+    {
+        ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
+
+        $endpoint = rtrim($apiUrl, '/') . '/external/uom-conversion-categories/sync';
+
+        $payload = [
+            'data' => array_map(fn (array $cat) => [
+                'code' => $cat['code'],
+                'name' => $cat['name'],
+                'base_uom_code' => $cat['base_uom_code'],
+            ], $categories),
+        ];
+
+        if (empty($payload['data'])) {
+            return ['success' => false, 'message' => 'No categories to sync.'];
+        }
+
+        return $this->post($endpoint, $apiToken, $payload);
+    }
+
+    /**
+     * Sync UOM Conversions.
+     */
+    public function syncUomConversions(array $conversions): array
+    {
+        ['url' => $apiUrl, 'token' => $apiToken] = $this->config();
+
+        $endpoint = rtrim($apiUrl, '/') . '/external/uom-conversions/sync';
+
+        $payload = [
+            'data' => array_map(fn (array $conv) => [
+                'category_code' => $conv['category_code'],
+                'uom_code' => $conv['uom_code'],
+                'factor_to_base' => $conv['factor_to_base'],
+            ], $conversions),
+        ];
+
+        if (empty($payload['data'])) {
+            return ['success' => false, 'message' => 'No conversions to sync.'];
+        }
+
+        return $this->post($endpoint, $apiToken, $payload);
+    }
+
+    /**
+     * Shared POST helper.
+     */
+    protected function post(string $endpoint, string $apiToken, array $payload): array
+    {
+        try {
+            Log::info("Sending sync to Wisma/Prima", ['endpoint' => $endpoint, 'count' => count($payload['data'] ?? [])]);
+
+            $response = Http::withHeaders([
+                'X-Accounting-Token' => $apiToken,
+                'Accept' => 'application/json',
+            ])->post($endpoint, $payload);
+
+            $responseBody = $response->json();
+
+            if ($response->successful()) {
+                $this->notifyUser(
+                    title: 'Synced to Prima',
+                    body: $responseBody['message'] ?? 'Sync successful.',
+                    type: 'success'
+                );
+                return ['success' => true, 'data' => $responseBody];
+            }
+
+            $errorMessage = $responseBody['message'] ?? 'Unknown error';
+            $this->notifyUser(
+                title: 'Prima Sync Failed',
+                body: "{$errorMessage} (HTTP {$response->status()})",
+                type: 'danger',
+                persistent: true
+            );
+
+            return ['success' => false, 'message' => $errorMessage, 'response' => $responseBody];
+        } catch (\Throwable $e) {
+            Log::error("Error syncing to Wisma/Prima: " . $e->getMessage(), ['exception' => $e]);
+            return ['success' => false, 'message' => $e->getMessage()];
         }
     }
 
