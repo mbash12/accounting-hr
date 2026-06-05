@@ -62,25 +62,7 @@ class SalesOrdersTable
                     ->money("IDR")
                     ->sortable()
                     ->label("Total"),
-                TextColumn::make("status")
-                    ->label("Status")
-                    ->searchable()
-                    ->badge()
-                    ->toggleable(isToggledHiddenByDefault: false)
-                    ->formatStateUsing(
-                        fn(string $state): string => match ($state) {
-                            "draft" => "Draft",
-                            "posted" => "Posted",
-                            default => $state,
-                        },
-                    )
-                    ->color(
-                        fn(string $state): string => match ($state) {
-                            "draft" => "gray",
-                            "posted" => "success",
-                            default => "gray",
-                        },
-                    ),
+
                 TextColumn::make("createdByUser.name")
                     ->label("Created By")
                     ->searchable()
@@ -198,7 +180,7 @@ class SalesOrdersTable
                         ->color('success')
                         ->visible(function (SalesOrder $record): bool {
                             $meta = $record->invoice_meta ?: $record->computeInvoiceMeta();
-                            return (float) ($meta['remaining'] ?? 0) > 0 && $record->status === 'posted';
+                            return (float) ($meta['remaining'] ?? 0) > 0;
                         })
                         ->requiresConfirmation()
                         ->modalHeading('Create Invoice')
@@ -288,8 +270,7 @@ class SalesOrdersTable
                         ->icon('heroicon-o-eye')
                         ->url(fn ($record) => SalesOrderResource::getUrl('view', ['record' => $record])),
                     EditAction::make(),
-                    RegenerateJournalEntry::make('regenerateJournalEntry')
-                        ->visible(fn ($record) => $record->status !== 'draft'),
+                    RegenerateJournalEntry::make('regenerateJournalEntry'),
                     DeleteAction::make(),
                 ]),
             ])
@@ -297,23 +278,6 @@ class SalesOrdersTable
                 \App\Filament\Actions\ImportSalesOrderWithItemsAction::make(),
                 \App\Filament\Actions\ExportSalesOrderWithItemsAction::make(),
                 BulkActionGroup::make([
-                    \Filament\Actions\BulkAction::make('changeStatus')
-                        ->label('Change Status')
-                        ->icon('heroicon-o-pencil-square')
-                        ->color('primary')
-                        ->form([
-                            \Filament\Forms\Components\Select::make('status')
-                                ->label('Status')
-                                ->options([
-                                    'draft' => 'Draft',
-                                    'posted' => 'Posted',
-                                ])
-                                ->required(),
-                        ])
-                        ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
-                            $records->each(fn ($record) => $record->update(['status' => $data['status']]));
-                        })
-                        ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),
                 ]),
             ]);
