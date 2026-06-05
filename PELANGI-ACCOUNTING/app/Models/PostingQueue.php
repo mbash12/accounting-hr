@@ -2,14 +2,7 @@
 
 namespace App\Models;
 
-use App\Filament\Resources\CashDisbursements\CashDisbursementResource;
-use App\Filament\Resources\CashReceipts\CashReceiptResource;
-use App\Filament\Resources\CashTransfers\CashTransferResource;
-use App\Filament\Resources\GoodsReceipts\GoodsReceiptResource;
-use App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource;
-use App\Filament\Resources\PurchaseReturns\PurchaseReturnResource;
-use App\Filament\Resources\SalesInvoices\SalesInvoiceResource;
-use App\Filament\Resources\SalesReturns\SalesReturnResource;
+use App\Filament\Resources\JournalEntries\JournalEntryResource;
 use Illuminate\Database\Eloquent\Model;
 
 class PostingQueue extends Model
@@ -23,14 +16,17 @@ class PostingQueue extends Model
     protected $primaryKey = 'source_id';
 
     protected static array $typeResourceMap = [
-        'cash_disbursement' => CashDisbursementResource::class,
-        'cash_receipt' => CashReceiptResource::class,
-        'cash_transfer' => CashTransferResource::class,
-        'sales_invoice' => SalesInvoiceResource::class,
-        'sales_return' => SalesReturnResource::class,
-        'goods_receipt' => GoodsReceiptResource::class,
-        'purchase_invoice' => PurchaseInvoiceResource::class,
-        'purchase_return' => PurchaseReturnResource::class,
+        'journal_entry' => JournalEntryResource::class,
+        'cash_disbursement' => JournalEntryResource::class,
+        'cash_receipt' => JournalEntryResource::class,
+        'cash_transfer' => JournalEntryResource::class,
+        'receivable_payment' => JournalEntryResource::class,
+        'payable_payment' => JournalEntryResource::class,
+        'sales_invoice' => JournalEntryResource::class,
+        'sales_return' => JournalEntryResource::class,
+        'goods_receipt' => JournalEntryResource::class,
+        'purchase_invoice' => JournalEntryResource::class,
+        'purchase_return' => JournalEntryResource::class,
     ];
 
     // Composite key: model doesn't have a real PK — prevent default sort on it
@@ -79,21 +75,18 @@ class PostingQueue extends Model
 
     public function getResourceUrl(): ?string
     {
-        $resourceClass = static::$typeResourceMap[$this->type] ?? null;
-
-        if (!$resourceClass) {
-            return null;
-        }
-
-        return $resourceClass::getUrl('edit', ['record' => $this->source_id]);
+        return JournalEntryResource::getUrl('edit', ['record' => $this->source_id]);
     }
 
     public function getTypeLabel(): string
     {
         return match ($this->type) {
+            'journal_entry' => __('Journal Entry'),
             'cash_disbursement' => __('Cash Disbursement'),
             'cash_receipt' => __('Cash Receipt'),
             'cash_transfer' => __('Cash Transfer'),
+            'receivable_payment' => __('Receivable Payment'),
+            'payable_payment' => __('Payable Payment'),
             'sales_invoice' => __('Sales Invoice'),
             'sales_return' => __('Sales Return'),
             'goods_receipt' => __('Goods Receipt'),
