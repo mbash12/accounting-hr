@@ -226,7 +226,8 @@ class EditReceivablePayment extends EditRecord
                 }
             }
 
-            if ($this->record && $this->record->status === 'completed') {
+            // Keep journal entry in sync — draft payments need a journal entry for Posting Center
+            if ($this->record && $this->record->status === 'draft') {
                 try {
                     $service = app(ReceivablePayableService::class);
                     $service->createJournalEntryForReceivablePayment($this->record);
@@ -235,13 +236,6 @@ class EditReceivablePayment extends EditRecord
                         'payment_id' => $this->record->id,
                         'trace' => $e->getTraceAsString(),
                     ]);
-                }
-            } else {
-                try {
-                    $service = app(ReceivablePayableService::class);
-                    $service->deleteJournalEntryForReceivablePayment($this->record);
-                } catch (\Exception $e) {
-                    \Log::error('Error deleting journal entry for receivable payment: ' . $e->getMessage());
                 }
             }
         }

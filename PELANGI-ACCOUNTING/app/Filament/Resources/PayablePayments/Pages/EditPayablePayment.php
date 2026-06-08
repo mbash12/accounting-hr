@@ -227,7 +227,8 @@ class EditPayablePayment extends EditRecord
                 }
             }
 
-            if ($this->record && $this->record->status === 'completed') {
+            // Keep journal entry in sync for both draft and completed payments
+            if ($this->record && in_array($this->record->status, ['draft', 'completed'])) {
                 try {
                     $service = app(ReceivablePayableService::class);
                     $service->createJournalEntryForPayablePayment($this->record);

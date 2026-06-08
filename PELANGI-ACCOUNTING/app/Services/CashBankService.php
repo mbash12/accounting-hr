@@ -202,38 +202,38 @@ class CashBankService
                 'updated_by_user_id' => Auth::id(),
             ]);
 
-            // Only create journal entry if status is posted
-            if ($isPosted) {
-                $this->createJournalEntryWithItems([
-                    'date' => $data['date'],
-                    'reference_no' => $data['reference_no'] ?? $disbursementNumber ?? null,
-                    'description' => $data['description'] ?? null,
-                    'amount' => $totalAmount,
-                    'status' => 'posted',
-                    'sub_module' => 'pengeluaran',
-                    'reference_type' => CashDisbursement::class,
-                    'reference_id' => $disbursement->id,
-                    'cash_bank_transaction_id' => $cashBankTx->id,
-                    'company_id' => $data['company_id'] ?? $glAccount->company_id ?? null,
-                    'department_id' => $data['department_id'] ?? throw new InvalidArgumentException('department_id is required'),
-                    'cost_center_id' => $data['cost_center_id'] ?? throw new InvalidArgumentException('cost_center_id is required'),
-                ], [
-                ...collect($items)->map(fn($item) => [
-                    'account_id' => $item['account_id'] ?? null,
-                    'debit' => $item['amount'] ?? $item['total'] ?? 0,
-                    'credit' => 0,
-                    'notes' => $item['description'] ?? 'Expense/Asset',
-                    'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
-                ])->all(),
-                [
-                    'account_id' => $glAccountId,
-                    'debit' => 0,
-                    'credit' => $totalAmount,
-                    'notes' => 'Cash/Bank',
-                    'cost_center_id' => $data['cost_center_id'] ?? null,
-                ],
-                ]);
-            }
+
+            // Create journal entry — draft for posting center, posted for immediate finalization
+            $jeStatus = $isPosted ? 'posted' : 'draft';
+            $this->createJournalEntryWithItems([
+                'date' => $data['date'],
+                'reference_no' => $data['reference_no'] ?? $disbursementNumber ?? null,
+                'description' => $data['description'] ?? null,
+                'amount' => $totalAmount,
+                'status' => $jeStatus,
+                'sub_module' => 'cash_disbursement',
+                'reference_type' => CashDisbursement::class,
+                'reference_id' => $disbursement->id,
+                'cash_bank_transaction_id' => $cashBankTx->id,
+                'company_id' => $data['company_id'] ?? $glAccount->company_id ?? null,
+                'department_id' => $data['department_id'] ?? throw new InvalidArgumentException('department_id is required'),
+                'cost_center_id' => $data['cost_center_id'] ?? throw new InvalidArgumentException('cost_center_id is required'),
+            ], [
+            ...collect($items)->map(fn($item) => [
+                'account_id' => $item['account_id'] ?? null,
+                'debit' => $item['amount'] ?? $item['total'] ?? 0,
+                'credit' => 0,
+                'notes' => $item['description'] ?? 'Expense/Asset',
+                'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
+            ])->all(),
+            [
+                'account_id' => $glAccountId,
+                'debit' => 0,
+                'credit' => $totalAmount,
+                'notes' => 'Cash/Bank',
+                'cost_center_id' => $data['cost_center_id'] ?? null,
+            ],
+            ]);
 
             collect($items)->each(function ($item) use ($disbursement) {
                 CashDisbursementItem::create([
@@ -328,38 +328,38 @@ class CashBankService
                 'updated_by_user_id' => Auth::id(),
             ]);
 
-            // Only create journal entry if status is posted
-            if ($isPosted) {
-                $this->createJournalEntryWithItems([
-                    'date' => $data['date'],
-                    'reference_no' => $data['reference_no'] ?? $receiptNumber ?? null,
-                    'description' => $data['description'] ?? null,
-                    'amount' => $totalAmount,
-                    'status' => 'posted',
-                    'sub_module' => 'pemasukan_kas',
-                    'reference_type' => CashReceipt::class,
-                    'reference_id' => $receipt->id,
-                    'cash_bank_transaction_id' => $cashBankTx->id,
-                    'company_id' => $data['company_id'] ?? $glAccount->company_id ?? null,
-                    'department_id' => $data['department_id'] ?? throw new InvalidArgumentException('department_id is required'),
-                    'cost_center_id' => $data['cost_center_id'] ?? throw new InvalidArgumentException('cost_center_id is required'),
-                ], [
-                [
-                    'account_id' => $glAccountId,
-                    'debit' => $totalAmount,
-                    'credit' => 0,
-                    'notes' => 'Cash/Bank',
-                    'cost_center_id' => $data['cost_center_id'] ?? null,
-                ],
-                ...collect($items)->map(fn($item) => [
-                    'account_id' => $item['account_id'] ?? null,
-                    'debit' => 0,
-                    'credit' => $item['amount'] ?? $item['total'] ?? 0,
-                    'notes' => $item['description'] ?? 'Contra Account',
-                    'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
-                ])->all(),
-                ]);
-            }
+
+            // Create journal entry — draft for posting center, posted for immediate finalization
+            $jeStatus = $isPosted ? 'posted' : 'draft';
+            $this->createJournalEntryWithItems([
+                'date' => $data['date'],
+                'reference_no' => $data['reference_no'] ?? $receiptNumber ?? null,
+                'description' => $data['description'] ?? null,
+                'amount' => $totalAmount,
+                'status' => $jeStatus,
+                'sub_module' => 'cash_receipt',
+                'reference_type' => CashReceipt::class,
+                'reference_id' => $receipt->id,
+                'cash_bank_transaction_id' => $cashBankTx->id,
+                'company_id' => $data['company_id'] ?? $glAccount->company_id ?? null,
+                'department_id' => $data['department_id'] ?? throw new InvalidArgumentException('department_id is required'),
+                'cost_center_id' => $data['cost_center_id'] ?? throw new InvalidArgumentException('cost_center_id is required'),
+            ], [
+            [
+                'account_id' => $glAccountId,
+                'debit' => $totalAmount,
+                'credit' => 0,
+                'notes' => 'Cash/Bank',
+                'cost_center_id' => $data['cost_center_id'] ?? null,
+            ],
+            ...collect($items)->map(fn($item) => [
+                'account_id' => $item['account_id'] ?? null,
+                'debit' => 0,
+                'credit' => $item['amount'] ?? $item['total'] ?? 0,
+                'notes' => $item['description'] ?? 'Contra Account',
+                'cost_center_id' => $item['cost_center_id'] ?? ($data['cost_center_id'] ?? null),
+            ])->all(),
+            ]);
 
             collect($items)->each(function ($item) use ($receipt) {
                 CashReceiptItem::create([
@@ -452,37 +452,38 @@ class CashBankService
                 'created_by_user_id' => Auth::id(),
             ]);
 
-            if ($isPosted) {
-                $this->createJournalEntryWithItems([
-                    'date' => $data['date'],
-                    'reference_no' => $referenceNo ?? $transferNumber ?? null,
-                    'description' => $data['description'] ?? null,
-                    'amount' => $data['amount'],
-                    'status' => 'posted',
-                    'sub_module' => 'transfer_kas',
-                    'reference_type' => CashTransfer::class,
-                    'reference_id' => $transfer->id,
-                    'cash_bank_transaction_id' => $cashBankTx->id,
-                    'company_id' => $data['company_id'] ?? $fromAccount->company_id,
-                    'department_id' => $data['department_id'] ?? throw new InvalidArgumentException('department_id is required'),
-                    'cost_center_id' => $data['cost_center_id'] ?? throw new InvalidArgumentException('cost_center_id is required'),
-                ], [
-                    [
-                        'account_id' => $toAccount->id,
-                        'debit' => $data['amount'],
-                        'credit' => 0,
-                        'notes' => 'Destination Account',
-                        'cost_center_id' => $data['cost_center_id'] ?? null,
-                    ],
-                    [
-                        'account_id' => $fromAccount->id,
-                        'debit' => 0,
-                        'credit' => $data['amount'],
-                        'notes' => 'Source Account',
-                        'cost_center_id' => $data['cost_center_id'] ?? null,
-                    ],
-                ]);
-            }
+
+            // Create journal entry — draft for posting center, posted for immediate finalization
+            $jeStatus = $isPosted ? 'posted' : 'draft';
+            $this->createJournalEntryWithItems([
+                'date' => $data['date'],
+                'reference_no' => $referenceNo ?? $transferNumber ?? null,
+                'description' => $data['description'] ?? null,
+                'amount' => $data['amount'],
+                'status' => $jeStatus,
+                'sub_module' => 'cash_transfer',
+                'reference_type' => CashTransfer::class,
+                'reference_id' => $transfer->id,
+                'cash_bank_transaction_id' => $cashBankTx->id,
+                'company_id' => $data['company_id'] ?? $fromAccount->company_id,
+                'department_id' => $data['department_id'] ?? throw new InvalidArgumentException('department_id is required'),
+                'cost_center_id' => $data['cost_center_id'] ?? throw new InvalidArgumentException('cost_center_id is required'),
+            ], [
+                [
+                    'account_id' => $toAccount->id,
+                    'debit' => $data['amount'],
+                    'credit' => 0,
+                    'notes' => 'Destination Account',
+                    'cost_center_id' => $data['cost_center_id'] ?? null,
+                ],
+                [
+                    'account_id' => $fromAccount->id,
+                    'debit' => 0,
+                    'credit' => $data['amount'],
+                    'notes' => 'Source Account',
+                    'cost_center_id' => $data['cost_center_id'] ?? null,
+                ],
+            ]);
 
             return $transfer;
         });
@@ -710,7 +711,7 @@ class CashBankService
             'description' => $receipt->description,
             'amount' => $totalAmount,
             'status' => 'draft',
-            'sub_module' => $receipt->sub_module ?? 'pemasukan_kas',
+            'sub_module' => 'cash_receipt',
             'reference_type' => CashReceipt::class,
             'reference_id' => $receipt->id,
             'cash_bank_transaction_id' => $receipt->cash_bank_transaction_id,
@@ -757,7 +758,7 @@ class CashBankService
             'description' => $disbursement->description,
             'amount' => $totalAmount,
             'status' => 'draft',
-            'sub_module' => $disbursement->sub_module ?? 'pengeluaran',
+            'sub_module' => 'cash_disbursement',
             'reference_type' => CashDisbursement::class,
             'reference_id' => $disbursement->id,
             'cash_bank_transaction_id' => $disbursement->cash_bank_transaction_id,
@@ -800,7 +801,7 @@ class CashBankService
             'description' => $transfer->description,
             'amount' => $amount,
             'status' => 'draft',
-            'sub_module' => $transfer->sub_module ?? 'transfer_kas',
+            'sub_module' => 'cash_transfer',
             'reference_type' => CashTransfer::class,
             'reference_id' => $transfer->id,
             'cash_bank_transaction_id' => $transfer->cash_bank_transaction_id,

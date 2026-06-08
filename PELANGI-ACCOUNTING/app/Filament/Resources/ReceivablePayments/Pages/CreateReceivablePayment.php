@@ -174,6 +174,17 @@ class CreateReceivablePayment extends CreateRecord
                 }
             }
         }
+
+            // Create journal entry so it appears in Posting Center
+            try {
+                $service = app(ReceivablePayableService::class);
+                $service->createJournalEntryForReceivablePayment($this->record);
+            } catch (\Exception $e) {
+                \Log::error('Error creating journal entry for receivable payment: ' . $e->getMessage(), [
+                    'payment_id' => $this->record->id,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
     }
 
     protected function getRedirectUrl(): string
