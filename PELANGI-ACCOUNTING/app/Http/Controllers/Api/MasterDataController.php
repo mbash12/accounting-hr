@@ -365,6 +365,7 @@ class MasterDataController extends Controller
                     }
 
                     if ($name !== null) $unit->name = $name;
+                    if (isset($item['description'])) $unit->description = $item['description'];
                     if (isset($item['is_active'])) $unit->is_active = $item['is_active'];
                     $unit->save();
 
@@ -403,6 +404,20 @@ class MasterDataController extends Controller
                     $code = $item['code'] ?? null;
                     $name = $item['name'] ?? null;
                     $baseUomCode = $item['base_uom_code'] ?? null;
+                    $action = $item['action'] ?? null;
+
+                    if ($action === 'delete' || $action === 'deleted') {
+                        $category = \App\Models\UnitCategory::whereRaw("LOWER(code) = ?", [strtolower($code)])
+                            ->where('company_id', $companyId)
+                            ->first();
+                        if ($category) {
+                            $category->forceDelete();
+                            $results['updated']++;
+                        } else {
+                            $results['skipped']++;
+                        }
+                        continue;
+                    }
 
                     if (empty($code) || empty($name)) {
                         $results['errors'][] = 'Missing code or name';
@@ -532,4 +547,30 @@ class MasterDataController extends Controller
             'data' => $results,
         ]);
     }
+    public function deleteUomCategory(Request $request, string $code)
+    {
+        $companyId = $request->input('company_id');
+        if (empty($companyId)) {
+            return response()->json(['code' => 400, 'message' => 'company_id is required'], 400);
+        }
+
+        $category = \App\Models\UnitCategory::whereRaw("LOWER(code) = ?", [strtolower($code)])
+            ->where('company_id', $companyId)
+            ->first();
+
+        if (!$category) {
+            return response()->json([
+                'code' => 404,
+                'message' => "UOM Category '{$code}' not found",
+            ], 404);
+        }
+
+        $category->forceDelete();
+
+        return response()->json([
+            'code' => 200,
+            'message' => "UOM Category '{$code}' deleted",
+        ]);
+    }
+
 }

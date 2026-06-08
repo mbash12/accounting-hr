@@ -174,8 +174,8 @@ class GoodsReceiptForm
                                         $query->where('supplier_id', $supplierId);
                                     }
 
-                                    // Only show purchase orders with 'posted' status
-                                    $query->where('status', 'posted');
+                                    // Only show purchase orders with 'approved' status
+                                    $query->where('status', 'approved');
 
                                     // Only exclude POs that already have locked goods receipts when creating a new record
                                     // PO menu creates locked receipts automatically, so this prevents manual creation

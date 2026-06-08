@@ -17,14 +17,17 @@ class UnitCategoryForm
                 Section::make(__('UOM Category Information'))
                     ->schema([
                         TextInput::make('code')
+                            ->disabled()
                             ->required()
                             ->maxLength(50)
                             ->label(__('Code')),
                         TextInput::make('name')
+                            ->disabled()
                             ->required()
                             ->maxLength(100)
                             ->label(__('Category Name')),
                         Select::make('base_unit_id')
+                            ->disabled()
                             ->label(__('Base Unit'))
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');

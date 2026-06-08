@@ -62,16 +62,21 @@ class UnitMeasurementForm
                                         $fail(__('The :attribute has already been taken.'));
                                     }
                                 };
-                            }),
+                            })
+                            ->disabled(),
                         TextInput::make('name')
+                            ->disabled()
                             ->required()
                             ->label(__('Unit Measurement Name')),
                         Textarea::make('description')
+                            ->disabled()
                             ->label(__('Description')),
                         Toggle::make('is_active')
+                            ->disabled()
                             ->required()
                             ->label(__('Active'))->default(true),
                         Select::make('unit_category_id')
+                            ->disabled()
                             ->label(__('UOM Category'))
                             ->options(function () {
                                 $selectedCompanyId = session('selected_company_id');
@@ -96,12 +101,7 @@ class UnitMeasurementForm
                             ->step(0.000001)
                             ->minValue(0.000001)
                             ->live()
-                            ->disabled(function (callable $get, ?Unit $record) {
-                                $categoryId = $get('unit_category_id');
-                                if (!$categoryId || !$record) return false;
-                                $category = UnitCategory::find($categoryId);
-                                return $category && $category->base_unit_id === $record->id;
-                            })
+                            ->disabled()
                             ->hint(function (callable $get, ?Unit $record) {
                                 $categoryId = $get('unit_category_id');
                                 if (!$categoryId || !$record) return __('1 of this unit = X of the category base unit');
