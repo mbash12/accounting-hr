@@ -28,7 +28,6 @@ Route::prefix('master')->middleware([Api::class])->group(function () {
     Route::post('/products', [MasterDataController::class, 'syncProducts']);
     Route::post('/sync-uom', [MasterDataController::class, 'syncUom']);
     Route::post('/sync-uom-categories', [MasterDataController::class, 'syncUomCategories']);
-    Route::delete('/sync-uom-categories/{code}', [MasterDataController::class, 'deleteUomCategory']);
     Route::post('/sync-uom-conversions', [MasterDataController::class, 'syncUomConversions']);
 });
 

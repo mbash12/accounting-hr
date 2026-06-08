@@ -547,30 +547,4 @@ class MasterDataController extends Controller
             'data' => $results,
         ]);
     }
-    public function deleteUomCategory(Request $request, string $code)
-    {
-        $companyId = $request->input('company_id');
-        if (empty($companyId)) {
-            return response()->json(['code' => 400, 'message' => 'company_id is required'], 400);
-        }
-
-        $category = \App\Models\UnitCategory::whereRaw("LOWER(code) = ?", [strtolower($code)])
-            ->where('company_id', $companyId)
-            ->first();
-
-        if (!$category) {
-            return response()->json([
-                'code' => 404,
-                'message' => "UOM Category '{$code}' not found",
-            ], 404);
-        }
-
-        $category->forceDelete();
-
-        return response()->json([
-            'code' => 200,
-            'message' => "UOM Category '{$code}' deleted",
-        ]);
-    }
-
 }
