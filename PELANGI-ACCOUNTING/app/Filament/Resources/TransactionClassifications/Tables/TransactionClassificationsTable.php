@@ -35,7 +35,7 @@ class TransactionClassificationsTable
                         'investing' => __('Investing'),
                         'financing' => __('Financing'),
                         'non_operating' => __('Non Operating'),
-                        default => $state,
+                        default => \Illuminate\Support\Str::headline($state),
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'operating' => 'success',
@@ -54,7 +54,7 @@ class TransactionClassificationsTable
                         'exempt' => __('Exempt'),
                         'zero_rated' => __('Zero Rated'),
                         'out_of_scope' => __('Out of Scope'),
-                        default => $state,
+                        default => \Illuminate\Support\Str::headline($state),
                     } : '-')
                     ->color(fn (?string $state): string => $state ? match ($state) {
                         'taxable' => 'danger',

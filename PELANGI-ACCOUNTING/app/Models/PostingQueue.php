@@ -92,7 +92,7 @@ class PostingQueue extends Model
             'goods_receipt' => __('Goods Receipt'),
             'purchase_invoice' => __('Purchase Invoice'),
             'purchase_return' => __('Purchase Return'),
-            default => $this->type,
+            default => \Illuminate\Support\Str::headline($this->type),
         };
     }
 }

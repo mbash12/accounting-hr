@@ -46,6 +46,20 @@ class CreatePurchaseReturn extends CreateRecord
         }
     }
 
+    protected function afterCreate(): void
+    {
+        if ($this->record) {
+            try {
+                $this->record->createJournalEntry();
+            } catch (\Exception $e) {
+                \Log::error('Error creating journal entry for purchase return: ' . $e->getMessage(), [
+                    'return_id' => $this->record->id,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+        }
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

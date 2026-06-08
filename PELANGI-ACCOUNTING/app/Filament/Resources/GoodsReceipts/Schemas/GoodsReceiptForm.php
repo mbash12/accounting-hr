@@ -389,6 +389,7 @@ class GoodsReceiptForm
                             ->searchable()
                             ->preload()
                             ->label('Unit')
+                            ->required()
                             ->options(function (callable $get) {
                                 $productId = $get('product_id');
                                 if (!$productId) {

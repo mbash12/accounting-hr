@@ -225,8 +225,7 @@ class ReceivablePaymentForm
                             
                             $allInvoiceIds = array_filter(array_merge([$currentInvoiceId], $invoiceIds));
                             
-                            $query = \App\Models\SalesInvoice::where('customer_id', $customerId)
-                                ->whereIn('status', ['posted', 'sent', 'overdue', 'partially_paid', 'paid']);
+                            $query = \App\Models\SalesInvoice::where('customer_id', $customerId);
 
                             if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                 $query->where(function ($q) use ($selectedCompanyId) {

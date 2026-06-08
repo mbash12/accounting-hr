@@ -68,6 +68,7 @@ class PostingQueueWidget extends TableWidget
                 TextColumn::make('status')
                     ->label(__('Status'))
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => \Illuminate\Support\Str::headline($state))
                     ->color(fn (string $state): string => match ($state) {
                         'draft' => 'gray',
                         'approved' => 'warning',

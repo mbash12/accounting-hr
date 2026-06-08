@@ -10,6 +10,7 @@ use App\Services\ReceivablePayableService;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Filament\Notifications\Notification;
 
 class CreateReceivablePayment extends CreateRecord
 {
@@ -184,6 +185,12 @@ class CreateReceivablePayment extends CreateRecord
                     'payment_id' => $this->record->id,
                     'trace' => $e->getTraceAsString(),
                 ]);
+                Notification::make()
+                    ->danger()
+                    ->title(__('Journal Entry Error'))
+                    ->body(__('Payment created but journal entry failed: :message. Configure account mappings to fix.', ['message' => $e->getMessage()]))
+                    ->persistent()
+                    ->send();
             }
     }
 

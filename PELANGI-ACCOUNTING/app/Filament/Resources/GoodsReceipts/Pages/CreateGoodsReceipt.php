@@ -46,6 +46,23 @@ class CreateGoodsReceipt extends CreateRecord
         }
     }
 
+    protected function afterCreate(): void
+    {
+        // Journal entry created during saved event fires before Filament saves
+        // relationship items, resulting in an empty entry that gets deleted.
+        // Re-create it now that items are persisted.
+        if ($this->record) {
+            try {
+                $this->record->createJournalEntry();
+            } catch (\Exception $e) {
+                \Log::error('Error creating journal entry for goods receipt: ' . $e->getMessage(), [
+                    'receipt_id' => $this->record->id,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+        }
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

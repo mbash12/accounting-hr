@@ -72,7 +72,6 @@ class ReceivableListResource extends Resource
             ')
             ->leftJoin('sales_invoices', function ($join) use ($selectedCompanyId) {
                 $join->on('contacts.id', '=', 'sales_invoices.customer_id')
-                    ->whereIn('sales_invoices.status', ['posted', 'sent', 'overdue', 'partially_paid'])
                     ->where(function ($q) {
                         $q->where('sales_invoices.outstanding_amount', '>', 0)
                             ->orWhere('sales_invoices.is_paid', false);

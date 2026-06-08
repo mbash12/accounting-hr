@@ -44,6 +44,7 @@ class CashDisbursementsTable
                 TextColumn::make("status")
                     ->label(__("Status"))
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => \Illuminate\Support\Str::headline($state))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make("created_at")

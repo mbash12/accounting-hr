@@ -46,6 +46,20 @@ class CreateSalesDelivery extends CreateRecord
         }
     }
 
+    protected function afterCreate(): void
+    {
+        if ($this->record) {
+            try {
+                $this->record->createJournalEntry();
+            } catch (\Exception $e) {
+                \Log::error('Error creating journal entry for delivery document: ' . $e->getMessage(), [
+                    'delivery_id' => $this->record->id,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
+        }
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');

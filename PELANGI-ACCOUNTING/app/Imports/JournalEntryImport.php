@@ -69,8 +69,12 @@ class JournalEntryImport implements ToCollection, WithHeadingRow, WithValidation
         $row['no_entry']  = $noEntry;
         $row['tanggal']   = $tanggal;
         $row['kode_akun'] = $kodeAkun;
-        $row['deskripsi'] = self::$lastEntryFields['deskripsi'] ?? (string) ($row['deskripsi'] ?? $row['description'] ?? '');
-        $row['referensi'] = self::$lastEntryFields['referensi'] ?? (string) ($row['referensi'] ?? $row['reference_no'] ?? '');
+        $row['deskripsi'] = self::$lastEntryFields !== null
+            ? (self::$lastEntryFields['deskripsi'] ?? (string) ($row['deskripsi'] ?? $row['description'] ?? ''))
+            : (string) ($row['deskripsi'] ?? $row['description'] ?? '');
+        $row['referensi'] = self::$lastEntryFields !== null
+            ? (self::$lastEntryFields['referensi'] ?? (string) ($row['referensi'] ?? $row['reference_no'] ?? ''))
+            : (string) ($row['referensi'] ?? $row['reference_no'] ?? '');
         $row['catatan']   = (string) ($row['catatan'] ?? $row['notes'] ?? '');
         $row['debit']     = $debit;
         $row['kredit']    = $kredit;

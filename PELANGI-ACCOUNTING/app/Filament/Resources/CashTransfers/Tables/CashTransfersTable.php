@@ -45,6 +45,7 @@ class CashTransfersTable
                     ->label(__("Amount")),
                 TextColumn::make("status")
                     ->badge()
+                    ->formatStateUsing(fn (string $state): string => \Illuminate\Support\Str::headline($state))
                     ->color(
                         fn(string $state): string => match ($state) {
                             "draft" => "gray",

@@ -110,6 +110,7 @@ class ReceivablePayment extends Model
         'company_id',
         'created_by_user_id',
         'updated_by_user_id',
+        'is_incoming_giro',
         'other_costs',
         'other_costs_account_id',
     ];

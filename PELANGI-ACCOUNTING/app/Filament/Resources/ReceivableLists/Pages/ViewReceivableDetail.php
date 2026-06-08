@@ -78,7 +78,6 @@ class ViewReceivableDetail extends ViewRecord implements HasTable
             ->query(
                 \App\Models\SalesInvoice::query()
                     ->where('customer_id', $customerId)
-                    ->whereIn('status', ['posted', 'sent', 'overdue', 'partially_paid'])
                     ->where(function ($q) {
                         $q->where('outstanding_amount', '>', 0)
                             ->orWhere('is_paid', false);

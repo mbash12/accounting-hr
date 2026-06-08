@@ -178,10 +178,6 @@ class PurchaseReturnForm
                                         $query->where('supplier_id', $supplierId);
                                     }
 
-                                    // Only include goods receipts with 'posted' status
-                                    $query->where('status', 'posted');
-
-
                                     // Only exclude goods receipts that already have locked purchase returns when creating a new record
                                     // Goods receipt menu creates locked returns automatically, so this prevents manual creation
                                     // if any return was created from goods receipt menu
@@ -309,7 +305,7 @@ class PurchaseReturnForm
                                     if ($product->unit_id) {
                                         $set('unit_id', $product->unit_id);
                                         $set('conversion_factor', 1);
-                                        $set('base_quantity', \App\Filament\Forms\Components\RoundedIntegerMoneyInput::parseToFloat($get('quantity') ?? 0));
+                                        $set('base_quantity', \App\Filament\Forms\Components\NumberInput::parseToFloat($get('quantity') ?? 0));
                                     }
                                 }
                             })
@@ -406,7 +402,7 @@ class PurchaseReturnForm
                             ->live()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                 $productId = $get('product_id');
-                                $quantity = \App\Filament\Forms\Components\RoundedIntegerMoneyInput::parseToFloat($get('quantity') ?? 0);
+                                $quantity = \App\Filament\Forms\Components\NumberInput::parseToFloat($get('quantity') ?? 0);
                                 if ($productId && $state) {
                                     $product = \App\Models\Product::find($productId);
                                     if ($product) {

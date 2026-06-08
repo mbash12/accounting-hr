@@ -211,8 +211,7 @@ class PayablePaymentForm
                             
                             $currentInvoiceId = $get('purchase_invoice_id');
                             
-                            $query = \App\Models\PurchaseInvoice::where('supplier_id', $supplierId)
-                                ->whereIn('status', ['posted', 'received', 'approved', 'partially_paid', 'paid']);
+                            $query = \App\Models\PurchaseInvoice::where('supplier_id', $supplierId);
 
                             if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                 $query->where(function ($q) use ($selectedCompanyId) {

@@ -44,9 +44,11 @@
     @endif
 
     <style>
+        /* Corporate Design System */
         :root {
             --primary-color: #2c3e50;
             --secondary-color: #7f8c8d;
+            --accent-color: #3498db;
             --border-color: #e0e0e0;
             --bg-light: #f9f9f9;
             --font-main: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
@@ -54,6 +56,7 @@
 
         .document-wrapper {
             max-width: 210mm;
+            /* A4 width */
             margin: 0 auto;
             font-family: var(--font-main);
             color: #333;
@@ -61,6 +64,7 @@
             box-sizing: border-box;
         }
 
+        /* Screen Preview enhancements */
         @media screen {
             .document-wrapper {
                 margin: 20px auto;
@@ -73,9 +77,16 @@
             padding: 10mm;
             position: relative;
             min-height: 297mm;
+            /* A4 height */
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        /* Typography Balanced */
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             margin: 0;
             font-weight: 700;
             color: var(--primary-color);
@@ -86,13 +97,35 @@
             font-size: 10pt;
         }
 
-        .text-sm { font-size: 9pt; }
-        .text-xs { font-size: 8pt; }
-        .text-bold { font-weight: 700; }
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .text-muted { color: var(--secondary-color); }
+        .text-sm {
+            font-size: 9pt;
+        }
 
+        .text-xs {
+            font-size: 8pt;
+        }
+
+        .text-bold {
+            font-weight: 700;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .text-muted {
+            color: var(--secondary-color);
+        }
+
+        /* Header Layout */
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -154,6 +187,7 @@
             font-weight: 600;
         }
 
+        /* Address Section */
         .address-section {
             display: flex;
             justify-content: space-between;
@@ -161,7 +195,9 @@
             gap: 30px;
         }
 
-        .address-box { flex: 1; }
+        .address-box {
+            flex: 1;
+        }
 
         .address-title {
             font-size: 9pt;
@@ -180,6 +216,7 @@
             margin-bottom: 4px;
         }
 
+        /* Items Table */
         .items-table-container {
             margin-bottom: 25px;
         }
@@ -207,12 +244,31 @@
             vertical-align: top;
         }
 
-        .col-idx { width: 5%; text-align: center; }
-        .col-desc { width: 50%; }
-        .col-qty { width: 10%; text-align: right; }
-        .col-price { width: 15%; text-align: right; }
-        .col-total { width: 15%; text-align: right; }
+        .col-idx {
+            width: 5%;
+            text-align: center;
+        }
 
+        .col-desc {
+            width: 55%;
+        }
+
+        .col-qty {
+            width: 10%;
+            text-align: right;
+        }
+
+        .col-price {
+            width: 15%;
+            text-align: right;
+        }
+
+        .col-total {
+            width: 15%;
+            text-align: right;
+        }
+
+        /* Financial Summary */
         .summary-section {
             display: flex;
             justify-content: flex-end;
@@ -246,8 +302,10 @@
             font-weight: 700;
             font-size: 12pt;
             color: var(--primary-color);
+            margin-top: 5px;
         }
 
+        /* Footer / Notes */
         .footer-section {
             margin-top: 30px;
             border-top: 1px solid var(--border-color);
@@ -274,6 +332,48 @@
             margin-top: 30px;
         }
 
+        .status-stamp {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid;
+            margin-top: 5px;
+        }
+
+        .stamp-approved {
+            color: #27ae60;
+            border-color: #27ae60;
+            background: #eafaf1;
+        }
+
+        .stamp-pending {
+            color: #e67e22;
+            border-color: #e67e22;
+            background: #fdf2e9;
+        }
+
+        .stamp-rejected {
+            color: #c0392b;
+            border-color: #c0392b;
+            background: #f9e79f;
+        }
+
+        .stamp-closed {
+            color: #333;
+            border-color: #333;
+            background: #e0e0e0;
+        }
+
+        .stamp-draft {
+            color: #7f8c8d;
+            border-color: #7f8c8d;
+            background: #f2f3f4;
+        }
+
+        /* Print Media Overrides */
         @media print {
             .document-page {
                 box-shadow: none;
@@ -352,7 +452,12 @@
                     <p class="text-muted">No supplier selected</p>
                     @endif
                 </div>
-                <div class="address-box"></div>
+                <div class="address-box">
+                    <div class="address-title">Invoice Details</div>
+                    @if($record->description)
+                    <p><span class="text-muted">Notes:</span> <strong>{{ $record->description }}</strong></p>
+                    @endif
+                </div>
             </div>
 
             <!-- ITEMS -->
@@ -428,17 +533,32 @@
             <!-- FOOTER -->
             <div class="footer-section">
                 <div class="notes-area">
+                    <h4 style="font-size: 9pt; margin-bottom: 5px;">Terms & Conditions</h4>
+                    <p class="text-sm text-muted">
+                        This is a purchase invoice. Payment is due according to the terms specified above.
+                        <br>
+                        Please reference the invoice number in all correspondence regarding this invoice.
+                    </p>
                     @if($record->description)
-                    <div style="font-style: italic;" class="text-sm">
+                    <div style="margin-top: 10px; font-style: italic;" class="text-sm">
                         Notes: {{ $record->description }}
                     </div>
                     @endif
                 </div>
 
                 <div class="signature-area">
-                    <div style="margin-bottom: 40px;">Authorized By</div>
+                    <div style="margin-bottom: 40px;">
+                        @if($record->status === 'approved' || $record->status === 'posted')
+                            Approved By
+                        @else
+                            Authorized By
+                        @endif
+                    </div>
                     <div class="signature-line"></div>
-                    <div class="text-sm text-bold">{{ $record->company->name ?? '' }}</div>
+                    <div class="text-sm text-bold">{{ $record->company->name ?? 'Management' }}</div>
+                    @if($record->status === 'approved' || $record->status === 'posted')
+                        <div class="status-stamp stamp-approved" style="margin-top: 8px;">Approved</div>
+                    @endif
                 </div>
             </div>
 

@@ -68,7 +68,7 @@
                     >
                         <option value="">All Types</option>
                         @foreach($this->getAccountTypes() as $type)
-                            <option value="{{ $type }}">{{ ucfirst($type) }}</option>
+                            <option value="{{ $type }}">{{ ucwords(str_replace('_', ' ', $type)) }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -107,7 +107,7 @@
                                             {{ $row['account_name'] }}
                                         </td>
                                         <td style="padding: 0.5rem 1rem; font-size: 0.75rem; color: #6b7280;">
-                                            {{ ucfirst($row['account_type'] ?? '-') }}
+                                            {{ ucwords(str_replace('_', ' ', $row['account_type'] ?? '-')) }}
                                         </td>
                                         <td style="padding: 0.5rem 1rem; text-align: right;">
                                             <input

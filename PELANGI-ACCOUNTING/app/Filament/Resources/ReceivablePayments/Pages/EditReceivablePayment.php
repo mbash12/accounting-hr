@@ -11,6 +11,7 @@ use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Filament\Notifications\Notification;
 
 class EditReceivablePayment extends EditRecord
 {
@@ -236,6 +237,12 @@ class EditReceivablePayment extends EditRecord
                         'payment_id' => $this->record->id,
                         'trace' => $e->getTraceAsString(),
                     ]);
+                    Notification::make()
+                        ->danger()
+                        ->title(__('Journal Entry Error'))
+                        ->body(__('Payment saved but journal entry update failed: :message', ['message' => $e->getMessage()]))
+                        ->persistent()
+                        ->send();
                 }
             }
         }

@@ -63,7 +63,6 @@ class DeferredRevenueForm
                                 if ($selectedCompanyId && $selectedCompanyId !== 'all') {
                                     $query->where('company_id', $selectedCompanyId);
                                 }
-                                $query->where('status', 'posted');
                                 $customerId = $get('customer_id');
                                 if ($customerId) {
                                     $query->where('customer_id', $customerId);
