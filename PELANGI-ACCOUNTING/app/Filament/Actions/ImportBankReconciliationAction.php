@@ -35,7 +35,7 @@ class ImportBankReconciliationAction extends Action
 
                 FileUpload::make('file')
                     ->label(__('Bank Statement File'))
-                    ->helperText(__('Upload bank statement (.xlsx). Columns: Date, Description, Debit, Credit.'))
+                    ->helperText(__('Upload bank statement (.xlsx). Columns: Date, Description, Reference, Account Code, Invoice No, Debit, Credit.'))
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(2048)
                     ->required()
@@ -43,7 +43,7 @@ class ImportBankReconciliationAction extends Action
                     ->directory('temp/bank-recon'),
             ])
             ->modalHeading(__('Import Bank Statement'))
-            ->modalDescription(__('Upload a bank statement to match against open invoices. Provide Invoice No column to auto-match. Rows without Invoice No create journal entries.'))
+            ->modalDescription(__('Upload a bank statement to match against existing journal entries. Provide Account Code column for auto-matching by account + amount. Unmatched rows can be imported as journal entries.'))
             ->modalSubmitActionLabel(__('Upload & Match'))
             ->modalWidth('lg')
             ->extraModalActions([
@@ -85,7 +85,6 @@ class ImportBankReconciliationAction extends Action
                     $service = app(BankReconciliationService::class);
                     $result = $service->importFromExcel($filePath, $bankAccountId, $companyId);
                     $reconciliation = $result['reconciliation'];
-                    $skipped = $result['skipped'];
 
                     Storage::disk('local')->delete($data['file']);
 
@@ -93,14 +92,11 @@ class ImportBankReconciliationAction extends Action
                     $matched = $reconciliation->items()->where('match_status', 'matched')->count();
                     $unmatched = $reconciliation->items()->where('match_status', 'unmatched')->count();
 
-                    $body = __(':total line(s). :matched invoice matched, :unmatched unmatched.', [
+                    $body = __(':total line(s). :matched already journaled, :unmatched to import.', [
                         'total' => $total,
                         'matched' => $matched,
                         'unmatched' => $unmatched,
                     ]);
-                    if ($skipped > 0) {
-                        $body .= ' ' . __(':skipped duplicate(s) skipped.', ['skipped' => $skipped]);
-                    }
 
                     Notification::make()
                         ->success()

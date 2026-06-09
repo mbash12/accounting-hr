@@ -27,6 +27,7 @@ class BankReconciliationItem extends Model
         'debit',
         'credit',
         'description',
+        'imported_at',
     ];
 
     protected function casts(): array
@@ -41,6 +42,7 @@ class BankReconciliationItem extends Model
             'credit' => 'decimal:2',
             'suggested_invoice_id' => 'integer',
             'suggested_invoice_amount' => 'decimal:2',
+            'imported_at' => 'datetime',
         ];
     }
 
