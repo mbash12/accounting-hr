@@ -136,7 +136,8 @@ class BankReconciliationService
 
         if ($referenceNo) {
             $query->whereHas('journalEntry', function ($q) use ($referenceNo) {
-                $q->where('reference_no', $referenceNo);
+                $q->where('reference_no', $referenceNo)
+                  ->orWhere('entry_number', $referenceNo);
             });
         }
 
