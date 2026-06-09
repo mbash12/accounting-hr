@@ -117,15 +117,11 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
 
                 TextColumn::make('bank_debit')
                     ->label(__('Debit'))
-                    ->money('IDR')
-                    ->state(fn (BankReconciliationItem $record): float => (float) $record->bank_debit)
-                    ->visible(fn ($record): bool => (float) ($record?->bank_debit ?? 0) > 0),
+                    ->money('IDR'),
 
                 TextColumn::make('bank_credit')
                     ->label(__('Credit'))
-                    ->money('IDR')
-                    ->state(fn (BankReconciliationItem $record): float => (float) $record->bank_credit)
-                    ->visible(fn ($record): bool => (float) ($record?->bank_credit ?? 0) > 0),
+                    ->money('IDR'),
 
                 TextColumn::make('match_status')
                     ->label(__('Status'))
