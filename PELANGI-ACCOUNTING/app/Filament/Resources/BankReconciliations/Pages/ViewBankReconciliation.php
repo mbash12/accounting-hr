@@ -147,7 +147,7 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                 ->label(__('Save & Import Journals'))
                 ->icon('heroicon-o-check-circle')
                 ->color('primary')
-                ->visible(fn () => $this->getRecord()->items()->where('match_status', 'unmatched')->whereNull('imported_at')->exists())
+                ->visible(fn () => $this->getRecord()->status === 'in_progress')
                 ->requiresConfirmation()
                 ->modalHeading(__('Save & Import Journals'))
                 ->modalDescription(__('Create journal entries for unmatched items with account code?'))
