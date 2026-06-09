@@ -32,6 +32,9 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
 
     public function infolist(Schema $schema): Schema
     {
+        $record = $this->getRecord();
+        $recalculate = fn () => app(BankReconciliationService::class)->getCalculatedAmounts($record);
+
         return $schema
             ->components([
                 Section::make(__('Reconciliation Summary'))
@@ -60,14 +63,18 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('statement_balance')
-                                    ->label(__('Statement Balance'))
-                                    ->money('IDR'),
+                                    ->label(__('Bank Statement Total'))
+                                    ->money('IDR')
+                                    ->state(fn () => $recalculate()['statement_total']),
                                 TextEntry::make('book_balance')
-                                    ->label(__('Book Balance'))
-                                    ->money('IDR'),
+                                    ->label(__('Matched Amount'))
+                                    ->money('IDR')
+                                    ->state(fn () => $recalculate()['matched_amount']),
                                 TextEntry::make('difference')
-                                    ->label(__('Difference'))
-                                    ->money('IDR'),
+                                    ->label(__('Unmatched Amount'))
+                                    ->money('IDR')
+                                    ->state(fn () => $recalculate()['unmatched_amount'])
+                                    ->color(fn () => $recalculate()['unmatched_amount'] > 0 ? 'danger' : 'success'),
                             ]),
                     ]),
             ]);
@@ -130,13 +137,15 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'matched' => __('Matched'),
+                        'partially_matched' => __('Partially Matched'),
                         'suggested' => __('Suggested'),
                         'unmatched' => __('Unmatched'),
                         default => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
                         'matched' => 'success',
-                        'suggested' => 'warning',
+                        'partially_matched' => 'warning',
+                        'suggested' => 'info',
                         'unmatched' => 'danger',
                         default => 'gray',
                     }),
@@ -215,13 +224,12 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                         } else {
                             $this->pendingMatches[$record->id] = $state;
                         }
-
-                        $this->resetTable();
+                        // Don't resetTable() here - let Livewire handle the update
                     }),
             ])
             ->recordActions([
                 Action::make('confirm')
-                    ->label(__('Confirm'))
+                    ->label(__('Mark as Matched'))
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->size('sm')
@@ -233,26 +241,26 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                         return $record->match_status === 'suggested';
                     })
                     ->requiresConfirmation()
-                    ->modalHeading(__('Confirm Suggested Match'))
+                    ->modalHeading(__('Mark as Matched'))
                     ->modalDescription(function (BankReconciliationItem $record) {
                         $label = $this->formatInvoiceLabel($record);
 
-                        return __('Confirm matching to invoice :invoice?', ['invoice' => $label['label']]);
+                        return __('Mark as matched to invoice :invoice? Payment will be created on Save Matches.', ['invoice' => $label['label']]);
                     })
                     ->action(function (BankReconciliationItem $record) {
                         try {
-                            app(BankReconciliationService::class)->confirmMatch($record);
+                            $record->update(['match_status' => 'matched']);
                             $this->checkReconciliationComplete();
                             $this->resetTable();
 
                             Notification::make()
                                 ->success()
-                                ->title(__('Match confirmed. Payment created.'))
+                                ->title(__('Marked as matched. Payment will be created on Save Matches.'))
                                 ->send();
                         } catch (\Exception $e) {
                             Notification::make()
                                 ->danger()
-                                ->title(__('Confirmation failed'))
+                                ->title(__('Failed'))
                                 ->body($e->getMessage())
                                 ->send();
                         }
@@ -268,22 +276,18 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                 ->label(__('Save Matches'))
                 ->icon('heroicon-o-check-circle')
                 ->color('primary')
-                ->visible(fn () => filled($this->pendingMatches))
+                ->visible(fn () => filled($this->pendingMatches) || $this->getRecord()->items()->whereIn('match_status', ['matched', 'partially_matched', 'unmatched'])->whereNotNull('account_code')->exists())
                 ->requiresConfirmation()
-                ->modalHeading(__('Save Matches'))
-                ->modalDescription(__('Apply all selected invoice matches?'))
+                ->modalHeading(__('Save Matches & Process'))
+                ->modalDescription(__('Create payments for matched invoices and journal entries for unmatched items with account code?'))
                 ->action(function () {
-                    $service = app(BankReconciliationService::class);
-                    $applied = 0;
-                    $failed = [];
+                    // First apply any pending invoice selections
+                    if (filled($this->pendingMatches)) {
+                        $service = app(BankReconciliationService::class);
+                        foreach ($this->pendingMatches as $itemId => $pending) {
+                            $record = BankReconciliationItem::find($itemId);
+                            if (! $record) continue;
 
-                    foreach ($this->pendingMatches as $itemId => $pending) {
-                        $record = BankReconciliationItem::find($itemId);
-                        if (! $record) {
-                            continue;
-                        }
-
-                        try {
                             if (blank($pending)) {
                                 if ($record->match_status === 'suggested') {
                                     $service->unmatch($record);
@@ -293,48 +297,47 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
 
                             [$type, $id] = explode(':', $pending);
                             $invoiceType = $type === 'sales' ? SalesInvoice::class : PurchaseInvoice::class;
-
                             $service->forceMatch($record, (int) $id, $invoiceType);
-                            $applied++;
-                        } catch (\Exception $e) {
-                            $failed[] = $record->bank_description . ': ' . $e->getMessage();
                         }
+                        $this->pendingMatches = [];
                     }
 
-                    $this->pendingMatches = [];
-                    $this->checkReconciliationComplete();
+                    // Then process all matches (create payments + journal entries)
+                    $service = app(BankReconciliationService::class);
+                    $result = $service->processMatches($this->getRecord());
+                    $this->getRecord()->refresh();
                     $this->resetTable();
 
-                    if (count($failed)) {
+                    if (count($result['errors'])) {
                         Notification::make()
                             ->warning()
-                            ->title(__(':count applied, :failed failed.', [
-                                'count' => $applied,
-                                'failed' => count($failed),
+                            ->title(__(':count processed, :failed failed.', [
+                                'count' => $result['processed'],
+                                'failed' => count($result['errors']),
                             ]))
-                            ->body(implode("\n", $failed))
+                            ->body(implode("\n", $result['errors']))
                             ->send();
                     } else {
                         Notification::make()
                             ->success()
-                            ->title(__(':count match(es) saved.', ['count' => $applied]))
+                            ->title(__(':count item(s) processed.', ['count' => $result['processed']]))
                             ->send();
                     }
                 }),
 
             Action::make('confirm_all_suggested')
-                ->label(__('Confirm All Suggested'))
+                ->label(__('Mark All Suggested as Matched'))
                 ->icon('heroicon-o-check')
                 ->color('success')
                 ->visible(fn () => $this->getRecord()->items()->where('match_status', 'suggested')->exists())
                 ->requiresConfirmation()
+                ->modalDescription(__('Mark all suggested matches as matched? Payments will be created when you click Save Matches.'))
                 ->action(function () {
-                    $service = app(BankReconciliationService::class);
                     $confirmed = 0;
 
                     foreach ($this->getRecord()->items()->where('match_status', 'suggested')->get() as $item) {
                         try {
-                            $service->confirmMatch($item);
+                            $item->update(['match_status' => 'matched']);
                             $confirmed++;
                         } catch (\Exception $e) {
                             // skip
@@ -346,7 +349,7 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
 
                     Notification::make()
                         ->success()
-                        ->title(__(':count confirmation(s) processed.', ['count' => $confirmed]))
+                        ->title(__(':count item(s) marked as matched.', ['count' => $confirmed]))
                         ->send();
                 }),
         ];
@@ -354,6 +357,10 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
 
     protected function checkReconciliationComplete(): void
     {
+        $service = app(BankReconciliationService::class);
+        $service->recalculateDifference($this->getRecord());
+        $this->getRecord()->refresh();
+
         $remaining = $this->getRecord()->items()
             ->whereIn('match_status', ['suggested', 'unmatched'])
             ->count();
@@ -367,6 +374,9 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
         } elseif ($this->getRecord()->status === 'pending') {
             $this->getRecord()->update(['status' => 'in_progress']);
         }
+
+        // Refresh the infolist to show updated calculated amounts
+        $this->resetTable();
     }
 
     /**

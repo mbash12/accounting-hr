@@ -52,13 +52,18 @@ class BankReconciliationResource extends Resource
 
                 Tables\Columns\TextColumn::make('items_summary')
                     ->label(__('Matched'))
-                    ->state(fn($record) => $record->items()->where('match_status', 'matched')->count()
-                        . ' / '
-                        . $record->items()->count()),
+                    ->state(function ($record) {
+                        $matchedCount = $record->items()->where('match_status', 'matched')->count();
+                        $totalCount = $record->items()->count();
+                        return "{$matchedCount} / {$totalCount}";
+                    }),
 
                 Tables\Columns\TextColumn::make('difference')
-                    ->label(__('Difference'))
+                    ->label(__('Unmatched Amount'))
                     ->money('IDR')
+                    ->state(function ($record) {
+                        return app(\App\Services\BankReconciliationService::class)->getCalculatedAmounts($record)['unmatched_amount'];
+                    })
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('status')

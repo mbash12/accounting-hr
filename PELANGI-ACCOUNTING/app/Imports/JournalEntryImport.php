@@ -35,8 +35,8 @@ class JournalEntryImport implements ToCollection, WithHeadingRow, WithValidation
         $noEntry   = (string) ($row['no_entry'] ?? $row['no'] ?? '');
         $tanggal   = (string) ($row['tanggal'] ?? $row['date'] ?? '');
         $kodeAkun  = (string) ($row['kode_akun'] ?? $row['no_coa'] ?? $row['account_code'] ?? '');
-        $debit     = (float) ($row['debit'] ?? 0);
-        $kredit    = (float) ($row['kredit'] ?? $row['credit'] ?? 0);
+        $debit     = $this->parseAmount($row['debit'] ?? 0);
+        $kredit    = $this->parseAmount($row['kredit'] ?? $row['credit'] ?? 0);
 
         // A row with no account code and no amounts is a phantom/empty Excel row.
         $hasLineData = $kodeAkun !== '' || $debit > 0 || $kredit > 0;
@@ -195,5 +195,48 @@ class JournalEntryImport implements ToCollection, WithHeadingRow, WithValidation
         }
 
         return $value;
+    }
+
+    protected function parseAmount(mixed $value): float
+    {
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+        $str = trim((string) $value);
+        if ($str === '') {
+            return 0.0;
+        }
+        $dotCount = substr_count($str, '.');
+        $commaCount = substr_count($str, ',');
+
+        if ($dotCount > 1) {
+            $str = str_replace('.', '', $str);
+            $str = str_replace(',', '.', $str);
+        } elseif ($commaCount > 1) {
+            $str = str_replace(',', '', $str);
+        } elseif ($dotCount === 1 && $commaCount === 1) {
+            $lastComma = strrpos($str, ',');
+            $lastDot = strrpos($str, '.');
+            if ($lastComma > $lastDot) {
+                $str = str_replace('.', '', $str);
+                $str = str_replace(',', '.', $str);
+            } else {
+                $str = str_replace(',', '', $str);
+            }
+        } elseif ($dotCount === 1 && $commaCount === 0) {
+            $parts = explode('.', $str);
+            if (strlen($parts[1]) === 3) {
+                $str = str_replace('.', '', $str);
+            }
+        } elseif ($commaCount === 1 && $dotCount === 0) {
+            $parts = explode(',', $str);
+            if (strlen($parts[1]) === 3) {
+                $str = str_replace(',', '', $str);
+            } else {
+                $str = str_replace(',', '.', $str);
+            }
+        }
+
+        return (float) str_replace(' ', '', $str);
     }
 }

@@ -38,16 +38,17 @@ class BankReconciliationService
         return DB::transaction(function () use ($bankLines, $bankAccount, $companyId) {
             $totalDebit = collect($bankLines)->sum('debit');
             $totalCredit = collect($bankLines)->sum('credit');
+            $statementBalance = round($totalCredit - $totalDebit, 2);
             $userId = Auth::id();
 
             $reconciliation = BankReconciliation::create([
                 'statement_date' => now()->format('Y-m-d'),
-                'statement_balance' => (string) $totalCredit,
-                'book_balance' => (string) $totalDebit,
+                'statement_balance' => (string) $statementBalance,
+                'book_balance' => '0',
                 'reconciliation_date' => now()->format('Y-m-d'),
                 'status' => 'in_progress',
                 'reconciled_at' => null,
-                'difference' => (string) abs(round($totalDebit - $totalCredit, 2)),
+                'difference' => '0',
                 'bank_account_id' => $bankAccount->id,
                 'reconciled_by_user_id' => null,
                 'company_id' => $companyId ?? $bankAccount->company_id,
@@ -85,11 +86,12 @@ class BankReconciliationService
 
                 // Determine action: invoice payment or journal
                 $invoiceNo = $line['invoice_no'] ?? null;
+                $bankAmount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
                 $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
 
                 if ($invoiceNo) {
-                    // Find invoice by invoice_number
-                    $suggestion = $this->findInvoiceByNumber($invoiceNo, $companyId);
+                    // Find invoice by invoice_number and compare amounts
+                    $suggestion = $this->findInvoiceByNumber($invoiceNo, $companyId, $bankAmount);
                 } else {
                     $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
                 }
@@ -109,24 +111,37 @@ class BankReconciliationService
                     'suggested_invoice_id' => $suggestion['invoice_id'],
                     'suggested_invoice_type' => $suggestion['invoice_type'],
                     'suggested_invoice_amount' => $suggestion['amount'],
-                    'match_status' => $suggestion['status'],
+                    // Always 'suggested' if invoice found (regardless of amount match), so user can review
+                    'match_status' => $suggestion['invoice_id'] ? 'suggested' : $suggestion['status'],
                 ]);
 
-                if ($suggestion['status'] === 'matched' && $suggestion['invoice_id']) {
-                    // Invoice payment — create payment
-                    $matched++;
-                    $this->createPayment($item, $line, $bankAccount, $suggestion, $companyId, $userId);
-                } elseif (!$invoiceNo && !$suggestion['invoice_id']) {
-                    // No invoice number and no auto-match — create journal entry
-                    $accountCode = $line['account_code'] ?? null;
-                    if ($accountCode) {
-                        $this->createJournalEntry($line, $bankAccount, $accountCode, $companyId, $userId, $reconciliation->id);
-                        $journals++;
-                    } else {
-                        $unmatched++;
-                    }
+                // Just count statuses for summary
+                if ($suggestion['invoice_id']) {
+                    $matched++; // counted as suggested match
+                } elseif ($suggestion['status'] === 'partially_matched') {
+                    $unmatched++;
+                } elseif ($suggestion['status'] === 'unmatched') {
+                    $unmatched++;
                 } else {
                     $unmatched++;
+                }
+            }
+
+            // Calculate unmatched amount (items that couldn't be auto-matched or manually matched)
+            $unmatchedAmount = 0;
+            foreach ($bankLines as $line) {
+                $amount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
+                $invNo = $line['invoice_no'] ?? null;
+                $bankAmount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
+                $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+
+                if ($invNo) {
+                    $suggestion = $this->findInvoiceByNumber($invNo, $companyId, $bankAmount);
+                }
+
+                // If no invoice match, invoice already paid, or amount mismatch (partially_matched), it's unmatched
+                if ($suggestion['status'] !== 'matched' || !$suggestion['invoice_id']) {
+                    $unmatchedAmount += $amount;
                 }
             }
 
@@ -138,10 +153,10 @@ class BankReconciliationService
             }
 
             $reconciliation->update([
-                'difference' => (string) abs(round($totalDebit - $totalCredit, 2)),
-                'status' => $unmatched === 0 ? 'completed' : 'in_progress',
-                'reconciled_at' => $unmatched === 0 ? now() : null,
-                'reconciled_by_user_id' => $unmatched === 0 ? $userId : null,
+                'difference' => (string) round($unmatchedAmount, 2),
+                'status' => 'in_progress', // Always in_progress after import; completed after Save Matches
+                'reconciled_at' => null,
+                'reconciled_by_user_id' => null,
             ]);
 
             return ['reconciliation' => $reconciliation, 'skipped' => $skipped];
@@ -153,8 +168,8 @@ class BankReconciliationService
      */
     public function confirmMatch(BankReconciliationItem $item): void
     {
-        if ($item->match_status !== 'suggested') {
-            throw new \RuntimeException(__('Only suggested items can be confirmed.'));
+        if (! in_array($item->match_status, ['suggested', 'partially_matched'])) {
+            throw new \RuntimeException(__('Only suggested or partially matched items can be confirmed.'));
         }
 
         $bankAccount = $item->bankReconciliation->bankAccount ?? BankAccount::findOrFail($item->bankReconciliation->bank_account_id);
@@ -362,8 +377,9 @@ class BankReconciliationService
 
     /**
      * Find invoice by invoice_number (Sales or Purchase).
+     * Compares bank amount with invoice outstanding amount to determine match status.
      */
-    private function findInvoiceByNumber(string $invoiceNo, ?int $companyId): array
+    private function findInvoiceByNumber(string $invoiceNo, ?int $companyId, float $bankAmount = 0): array
     {
         // Try SalesInvoice first
         $query = SalesInvoice::where('invoice_number', $invoiceNo);
@@ -376,11 +392,13 @@ class BankReconciliationService
             if ($invoice->outstanding_amount <= 0) {
                 return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
             }
+            $invoiceAmount = (float) $invoice->outstanding_amount;
+            $status = $this->compareAmounts($bankAmount, $invoiceAmount);
             return [
                 'invoice_id' => $invoice->id,
                 'invoice_type' => SalesInvoice::class,
-                'amount' => (float) $invoice->outstanding_amount,
-                'status' => 'matched',
+                'amount' => $invoiceAmount,
+                'status' => $status,
             ];
         }
 
@@ -395,15 +413,36 @@ class BankReconciliationService
             if ($invoice->outstanding_amount <= 0) {
                 return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
             }
+            $invoiceAmount = (float) $invoice->outstanding_amount;
+            $status = $this->compareAmounts($bankAmount, $invoiceAmount);
             return [
                 'invoice_id' => $invoice->id,
                 'invoice_type' => PurchaseInvoice::class,
-                'amount' => (float) $invoice->outstanding_amount,
-                'status' => 'matched',
+                'amount' => $invoiceAmount,
+                'status' => $status,
             ];
         }
 
         return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+    }
+
+    /**
+     * Compare bank amount with invoice amount.
+     * Returns 'matched' if equal, 'partially_matched' if different, 'unmatched' if no invoice.
+     */
+    private function compareAmounts(float $bankAmount, float $invoiceAmount): string
+    {
+        if ($bankAmount <= 0 || $invoiceAmount <= 0) {
+            return 'unmatched';
+        }
+
+        // Use epsilon of 1.00 (1 IDR) to handle rounding differences in bank statements
+        $epsilon = 1.00;
+        if (abs($bankAmount - $invoiceAmount) < $epsilon) {
+            return 'matched';
+        }
+
+        return 'partially_matched';
     }
 
     /**
@@ -539,8 +578,8 @@ class BankReconciliationService
             $accountCode = $colAccountCode !== null ? trim((string) ($row[$colAccountCode] ?? '')) : '';
             $notes = $colNotes !== null ? trim((string) ($row[$colNotes] ?? '')) : '';
             $invoiceNo = $colInvoiceNo !== null ? trim((string) ($row[$colInvoiceNo] ?? '')) : '';
-            $debitRaw = $colDebit !== null ? (float) ($row[$colDebit] ?? 0) : 0;
-            $creditRaw = $colCredit !== null ? (float) ($row[$colCredit] ?? 0) : 0;
+            $debitRaw = $colDebit !== null ? $this->parseAmount($row[$colDebit] ?? 0) : 0;
+            $creditRaw = $colCredit !== null ? $this->parseAmount($row[$colCredit] ?? 0) : 0;
 
             if ($debitRaw == 0 && $creditRaw == 0) {
                 continue;
@@ -583,65 +622,215 @@ class BankReconciliationService
 
     /**
      * Manually match an unmatched/reverted item to a specific invoice.
+     * Only updates the match status; payment is created in processMatches().
      */
     public function forceMatch(BankReconciliationItem $item, int $invoiceId, string $invoiceType): void
     {
         $invoice = $invoiceType::findOrFail($invoiceId);
 
-        DB::transaction(function () use ($item, $invoice, $invoiceType) {
-            $bankAccount = $item->bankReconciliation->bankAccount ?? BankAccount::findOrFail($item->bankReconciliation->bank_account_id);
+        $amount = $invoiceType === SalesInvoice::class
+            ? (float) $invoice->outstanding_amount
+            : (float) $invoice->outstanding_amount;
 
-            $line = [
-                'type' => $item->type,
-                'date' => $item->bank_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
-                'description' => $item->bank_description,
-                'debit' => (float) $item->bank_debit,
-                'credit' => (float) $item->bank_credit,
-            ];
-
-            $amount = $invoiceType === SalesInvoice::class
-                ? (float) $invoice->outstanding_amount
-                : (float) $invoice->outstanding_amount;
-
-            $suggestion = [
-                'invoice_id' => $invoice->id,
-                'invoice_type' => $invoiceType,
-                'amount' => $amount,
-                'status' => 'matched',
-            ];
-
-            $this->createPayment(
-                $item,
-                $line,
-                $bankAccount,
-                $suggestion,
-                $item->bankReconciliation->company_id,
-                Auth::id()
-            );
-
-            $item->update([
-                'match_status' => 'matched',
-                'suggested_invoice_id' => $invoice->id,
-                'suggested_invoice_type' => $invoiceType,
-                'suggested_invoice_amount' => $amount,
-            ]);
-        });
+        $item->update([
+            'match_status' => 'matched',
+            'suggested_invoice_id' => $invoice->id,
+            'suggested_invoice_type' => $invoiceType,
+            'suggested_invoice_amount' => $amount,
+        ]);
     }
 
     /**
      * Unmatch a matched or suggested item, reverting it to unmatched.
+     * Note: If payment was already created (via Save Matches), delete the payment first.
      */
     public function unmatch(BankReconciliationItem $item): void
     {
-        if ($item->match_status === 'matched') {
-            throw new \RuntimeException(__('Matched items with payments cannot be unmatched. Please delete the payment first.'));
-        }
-
         $item->update([
             'match_status' => 'unmatched',
             'suggested_invoice_id' => null,
             'suggested_invoice_type' => null,
             'suggested_invoice_amount' => null,
         ]);
+    }
+
+    /**
+     * Recalculate the difference based on current match status of items.
+     * Difference = sum of amounts for items with match_status != 'matched'
+     */
+    public function recalculateDifference(BankReconciliation $reconciliation): void
+    {
+        $amounts = $this->getCalculatedAmounts($reconciliation);
+        $reconciliation->update([
+            'difference' => (string) round($amounts['unmatched_amount'], 2),
+        ]);
+    }
+
+    /**
+     * Get calculated amounts for live display.
+     * Returns: statement_total, matched_amount, unmatched_amount
+     * For partially_matched: matched = invoice amount, unmatched = difference
+     * For suggested/unmatched: full amount counts as unmatched
+     */
+    public function getCalculatedAmounts(BankReconciliation $reconciliation): array
+    {
+        $items = $reconciliation->items;
+
+        $statementTotal = $items->sum(function ($item) {
+            return $item->bank_debit > 0 ? (float) $item->bank_debit : (float) $item->bank_credit;
+        });
+
+        $matchedAmount = 0;
+        $unmatchedAmount = 0;
+
+        foreach ($items as $item) {
+            $bankAmount = $item->bank_debit > 0 ? (float) $item->bank_debit : (float) $item->bank_credit;
+            $invoiceAmount = (float) $item->suggested_invoice_amount;
+
+            switch ($item->match_status) {
+                case 'matched':
+                    $matchedAmount += $bankAmount;
+                    break;
+                case 'partially_matched':
+                    // Matched portion = invoice amount (or bank amount - difference)
+                    $matchedAmount += $invoiceAmount;
+                    // Unmatched = difference
+                    $unmatchedAmount += abs($bankAmount - $invoiceAmount);
+                    break;
+                case 'suggested':
+                case 'unmatched':
+                default:
+                    // Full amount unmatched
+                    $unmatchedAmount += $bankAmount;
+                    break;
+            }
+        }
+
+        return [
+            'statement_total' => round($statementTotal, 2),
+            'matched_amount' => round($matchedAmount, 2),
+            'unmatched_amount' => round($unmatchedAmount, 2),
+        ];
+    }
+
+    /**
+     * Process all matches: create payments for matched/partially_matched items,
+     * create journal entries for unmatched items with account_code.
+     * Call this when user clicks "Save Matches".
+     */
+    public function processMatches(BankReconciliation $reconciliation): array
+    {
+        $items = $reconciliation->items()->whereIn('match_status', ['matched', 'partially_matched', 'unmatched'])->get();
+        $processed = 0;
+        $errors = [];
+
+        foreach ($items as $item) {
+            try {
+                $bankAccount = $reconciliation->bankAccount;
+                $line = [
+                    'type' => $item->type,
+                    'date' => $item->bank_date?->format('Y-m-d') ?? now()->format('Y-m-d'),
+                    'description' => $item->bank_description,
+                    'debit' => (float) $item->bank_debit,
+                    'credit' => (float) $item->bank_credit,
+                ];
+
+                if (in_array($item->match_status, ['matched', 'partially_matched']) && $item->suggested_invoice_id) {
+                    // Create payment for matched/partially_matched items
+                    $suggestion = [
+                        'invoice_id' => $item->suggested_invoice_id,
+                        'invoice_type' => $item->suggested_invoice_type,
+                        'amount' => (float) $item->suggested_invoice_amount,
+                        'status' => 'matched',
+                    ];
+
+                    DB::transaction(function () use ($item, $line, $bankAccount, $suggestion, $reconciliation) {
+                        $this->createPayment(
+                            $item,
+                            $line,
+                            $bankAccount,
+                            $suggestion,
+                            $reconciliation->company_id,
+                            Auth::id()
+                        );
+                        $item->update(['match_status' => 'matched']);
+                    });
+                } elseif ($item->match_status === 'unmatched' && $item->account_code) {
+                    // Create journal entry for unmatched items with account_code
+                    DB::transaction(function () use ($item, $line, $bankAccount, $reconciliation) {
+                        $this->createJournalEntry(
+                            $line,
+                            $bankAccount,
+                            $item->account_code,
+                            $reconciliation->company_id,
+                            Auth::id(),
+                            $reconciliation->id
+                        );
+                        $item->update(['match_status' => 'matched']); // Mark as processed
+                    });
+                }
+                $processed++;
+            } catch (\Exception $e) {
+                $errors[] = $item->bank_description . ': ' . $e->getMessage();
+            }
+        }
+
+        // Recalculate difference after processing
+        $this->recalculateDifference($reconciliation);
+
+        // Check if all items are matched
+        $remaining = $reconciliation->items()->where('match_status', '!=', 'matched')->count();
+        if ($remaining === 0) {
+            $reconciliation->update([
+                'status' => 'completed',
+                'reconciled_at' => now(),
+                'reconciled_by_user_id' => Auth::id(),
+            ]);
+        }
+
+        return ['processed' => $processed, 'errors' => $errors];
+    }
+
+    protected function parseAmount(mixed $value): float
+    {
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+        $str = trim((string) $value);
+        if ($str === '') {
+            return 0.0;
+        }
+        $dotCount = substr_count($str, '.');
+        $commaCount = substr_count($str, ',');
+
+        if ($dotCount > 1) {
+            $str = str_replace('.', '', $str);
+            $str = str_replace(',', '.', $str);
+        } elseif ($commaCount > 1) {
+            $str = str_replace(',', '', $str);
+        } elseif ($dotCount === 1 && $commaCount === 1) {
+            $lastComma = strrpos($str, ',');
+            $lastDot = strrpos($str, '.');
+            if ($lastComma > $lastDot) {
+                $str = str_replace('.', '', $str);
+                $str = str_replace(',', '.', $str);
+            } else {
+                $str = str_replace(',', '', $str);
+            }
+        } elseif ($dotCount === 1 && $commaCount === 0) {
+            $parts = explode('.', $str);
+            if (strlen($parts[1]) === 3) {
+                $str = str_replace('.', '', $str);
+            }
+        } elseif ($commaCount === 1 && $dotCount === 0) {
+            $parts = explode(',', $str);
+            if (strlen($parts[1]) === 3) {
+                $str = str_replace(',', '', $str);
+            } else {
+                $str = str_replace(',', '.', $str);
+            }
+        }
+
+        return (float) str_replace(' ', '', $str);
     }
 }
