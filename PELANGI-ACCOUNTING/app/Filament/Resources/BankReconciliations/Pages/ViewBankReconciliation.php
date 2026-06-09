@@ -115,10 +115,6 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     ->label(__('Account Code'))
                     ->toggleable(),
 
-                TextColumn::make('invoice_no')
-                    ->label(__('Invoice No'))
-                    ->toggleable(),
-
                 TextColumn::make('amount')
                     ->label(__('Amount'))
                     ->money('IDR')

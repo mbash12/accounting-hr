@@ -19,7 +19,6 @@ class BankReconciliationItem extends Model
         'bank_credit',
         'reference_no',
         'account_code',
-        'invoice_no',
         'suggested_invoice_id',
         'suggested_invoice_type',
         'suggested_invoice_amount',

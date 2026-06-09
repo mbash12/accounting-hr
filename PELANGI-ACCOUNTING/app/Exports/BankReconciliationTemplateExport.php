@@ -20,7 +20,6 @@ class BankReconciliationTemplateExport implements FromCollection, WithHeadings, 
                 'debit' => 0,
                 'kredit' => 5000000,
                 'catatan' => 'Pembayaran invoice',
-                'invoice_no' => 'INV2026000039',
             ],
             [
                 'tanggal' => now()->format('Y-m-d'),
@@ -31,18 +30,17 @@ class BankReconciliationTemplateExport implements FromCollection, WithHeadings, 
                 'debit' => 25000,
                 'kredit' => 0,
                 'catatan' => 'Biaya admin bulanan',
-                'invoice_no' => '',
             ],
         ]);
     }
 
     public function headings(): array
     {
-        return ['Tanggal', 'Referensi', 'Deskripsi', 'Kode Akun', 'Nama Akun', 'Debit', 'Kredit', 'Catatan', 'Invoice No'];
+        return ['Tanggal', 'Referensi', 'Deskripsi', 'Kode Akun', 'Nama Akun', 'Debit', 'Kredit', 'Catatan'];
     }
 
     public function columnWidths(): array
     {
-        return ['A' => 16, 'B' => 20, 'C' => 40, 'D' => 15, 'E' => 25, 'F' => 20, 'G' => 20, 'H' => 30, 'I' => 20];
+        return ['A' => 16, 'B' => 20, 'C' => 40, 'D' => 15, 'E' => 25, 'F' => 20, 'G' => 20, 'H' => 30];
     }
 }

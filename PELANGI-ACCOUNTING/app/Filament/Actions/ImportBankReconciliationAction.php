@@ -35,7 +35,7 @@ class ImportBankReconciliationAction extends Action
 
                 FileUpload::make('file')
                     ->label(__('Bank Statement File'))
-                    ->helperText(__('Upload bank statement (.xlsx). Columns: Date, Description, Reference, Account Code, Invoice No, Debit, Credit.'))
+                    ->helperText(__('Upload bank statement (.xlsx). Columns: Date, Description, Reference, Account Code, Debit, Credit.'))
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(2048)
                     ->required()

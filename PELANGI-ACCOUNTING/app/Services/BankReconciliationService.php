@@ -17,7 +17,7 @@ class BankReconciliationService
     /**
      * Import bank statement from Excel, auto-match against existing journal entries.
      *
-     * Template columns: Date | Description | Reference | Account Code | Invoice No | Debit | Credit
+     * Template columns: Date | Description | Reference | Account Code | Debit | Credit
      */
     public function importFromExcel(string $filePath, int $bankAccountId, ?int $companyId): array
     {
@@ -72,7 +72,6 @@ class BankReconciliationService
                     'bank_credit' => $line['credit'],
                     'reference_no' => $line['reference_no'] ?? null,
                     'account_code' => $line['account_code'] ?? null,
-                    'invoice_no' => $line['invoice_no'] ?? null,
                     'debit' => $line['debit'],
                     'credit' => $line['credit'],
                     'match_status' => $matchStatus,
@@ -101,17 +100,11 @@ class BankReconciliationService
         });
     }
 
-    /**
-     * Find existing journal entry that matches the bank line.
-     * Matches by account code + amount, optionally by reference/invoice number.
-     */
     private function findExistingJournal(array $line, ?int $companyId, array $usedJournalEntryIds = []): ?array
     {
         $amount = $line['debit'] > 0 ? $line['debit'] : $line['credit'];
         $accountCode = $line['account_code'] ?? null;
         $referenceNo = $line['reference_no'] ?? null;
-        $invoiceNo = $line['invoice_no'] ?? null;
-        $description = $line['description'] ?? null;
         $isIncoming = $line['type'] === 'incoming';
         $date = $line['date'] ?? null;
 
@@ -129,10 +122,9 @@ class BankReconciliationService
         }
 
         $query = JournalEntryItem::where('account_id', $account->id)
-            ->whereHas('journalEntry', function ($q) use ($companyId, $date, $usedJournalEntryIds, $description) {
+            ->whereHas('journalEntry', function ($q) use ($companyId, $date, $usedJournalEntryIds) {
                 $q->where('company_id', $companyId)
                   ->whereDate('date', $date)
-                  ->when($description, fn ($q) => $q->where('description', $description))
                   ->when($usedJournalEntryIds, fn ($q) => $q->whereNotIn('id', $usedJournalEntryIds));
             });
 
@@ -142,10 +134,9 @@ class BankReconciliationService
             $query->where('debit', $amount);
         }
 
-        $ref = $referenceNo ?? $invoiceNo;
-        if ($ref) {
-            $query->whereHas('journalEntry', function ($q) use ($ref) {
-                $q->where('reference_no', $ref);
+        if ($referenceNo) {
+            $query->whereHas('journalEntry', function ($q) use ($referenceNo) {
+                $q->where('reference_no', $referenceNo);
             });
         }
 
@@ -236,7 +227,7 @@ class BankReconciliationService
     /**
      * Read bank statement Excel.
      *
-     * Template: Date | Description | Reference | Account Code | Invoice No | Debit | Credit
+     * Template: Date | Description | Reference | Account Code | Debit | Credit
      */
     private function readBankStatement(string $filePath): array
     {
@@ -269,8 +260,6 @@ class BankReconciliationService
         $colAccountCode = $getCol(['kode_akun', 'kodeakun', 'accountcode', 'nocoa', 'coa', 'account_code']);
         $colAccountName = $getCol(['nama_akun', 'namaakun', 'accountname', 'nama_coa']);
         $colNotes = $getCol(['catatan', 'notes', 'keterangan']);
-        $colInvoiceNo = $getCol(['invoice_no', 'invoiceno', 'noinvoice', 'no_invoice', 'nobonfaktur', 'faktur', 'nofaktur']);
-
         if ($colDate === null || $colDesc === null || ($colDebit === null && $colCredit === null)) {
             throw new \RuntimeException(__('Required columns not found. Need at least: Date, Description, and one of Debit/Credit.'));
         }
@@ -287,7 +276,6 @@ class BankReconciliationService
             $referenceNo = $colRef !== null ? trim((string) ($row[$colRef] ?? '')) : '';
             $accountCode = $colAccountCode !== null ? trim((string) ($row[$colAccountCode] ?? '')) : '';
             $notes = $colNotes !== null ? trim((string) ($row[$colNotes] ?? '')) : '';
-            $invoiceNo = $colInvoiceNo !== null ? trim((string) ($row[$colInvoiceNo] ?? '')) : '';
             $debitRaw = $colDebit !== null ? $this->parseAmount($row[$colDebit] ?? 0) : 0;
             $creditRaw = $colCredit !== null ? $this->parseAmount($row[$colCredit] ?? 0) : 0;
 
@@ -317,7 +305,6 @@ class BankReconciliationService
                 'reference_no' => $referenceNo ?: null,
                 'account_code' => $accountCode ?: null,
                 'notes' => $notes ?: null,
-                'invoice_no' => $invoiceNo ?: null,
                 'debit' => round($debitRaw, 2),
                 'credit' => round($creditRaw, 2),
             ];
