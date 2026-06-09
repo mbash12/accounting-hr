@@ -91,7 +91,7 @@ class BankReconciliationService
 
                 if ($invoiceNo) {
                     // Find invoice by invoice_number and compare amounts
-                    $suggestion = $this->findInvoiceByNumber($invoiceNo, $companyId, $bankAmount);
+                    $suggestion = $this->findInvoiceByNumber($invoiceNo, $companyId, $bankAmount, $line['type']);
                 } else {
                     $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
                 }
@@ -136,7 +136,7 @@ class BankReconciliationService
                 $suggestion = ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
 
                 if ($invNo) {
-                    $suggestion = $this->findInvoiceByNumber($invNo, $companyId, $bankAmount);
+                    $suggestion = $this->findInvoiceByNumber($invNo, $companyId, $bankAmount, $line['type']);
                 }
 
                 // If no invoice match, invoice already paid, or amount mismatch (partially_matched), it's unmatched
@@ -379,51 +379,61 @@ class BankReconciliationService
      * Find invoice by invoice_number (Sales or Purchase).
      * Compares bank amount with invoice outstanding amount to determine match status.
      */
-    private function findInvoiceByNumber(string $invoiceNo, ?int $companyId, float $bankAmount = 0): array
+    private function findInvoiceByNumber(string $invoiceNo, ?int $companyId, float $bankAmount = 0, string $type = 'outgoing'): array
     {
-        // Try SalesInvoice first
+        if ($type === 'incoming') {
+            // Debit entry → try SalesInvoice first
+            $invoice = $this->findSalesInvoice($invoiceNo, $companyId, $bankAmount);
+            if ($invoice) {
+                return $invoice;
+            }
+            return $this->findPurchaseInvoice($invoiceNo, $companyId, $bankAmount);
+        }
+
+        // Credit entry → try PurchaseInvoice first
+        $invoice = $this->findPurchaseInvoice($invoiceNo, $companyId, $bankAmount);
+        if ($invoice) {
+            return $invoice;
+        }
+        return $this->findSalesInvoice($invoiceNo, $companyId, $bankAmount);
+    }
+
+    private function findSalesInvoice(string $invoiceNo, ?int $companyId, float $bankAmount = 0): ?array
+    {
         $query = SalesInvoice::where('invoice_number', $invoiceNo);
         if ($companyId) {
             $query->where('company_id', $companyId);
         }
         $invoice = $query->first();
-
-        if ($invoice) {
-            if ($invoice->outstanding_amount <= 0) {
-                return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
-            }
-            $invoiceAmount = (float) $invoice->outstanding_amount;
-            $status = $this->compareAmounts($bankAmount, $invoiceAmount);
-            return [
-                'invoice_id' => $invoice->id,
-                'invoice_type' => SalesInvoice::class,
-                'amount' => $invoiceAmount,
-                'status' => $status,
-            ];
+        if (!$invoice || $invoice->outstanding_amount <= 0) {
+            return null;
         }
+        $invoiceAmount = (float) $invoice->outstanding_amount;
+        return [
+            'invoice_id' => $invoice->id,
+            'invoice_type' => SalesInvoice::class,
+            'amount' => $invoiceAmount,
+            'status' => $this->compareAmounts($bankAmount, $invoiceAmount),
+        ];
+    }
 
-        // Try PurchaseInvoice
+    private function findPurchaseInvoice(string $invoiceNo, ?int $companyId, float $bankAmount = 0): ?array
+    {
         $query = PurchaseInvoice::where('invoice_number', $invoiceNo);
         if ($companyId) {
             $query->where('company_id', $companyId);
         }
         $invoice = $query->first();
-
-        if ($invoice) {
-            if ($invoice->outstanding_amount <= 0) {
-                return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
-            }
-            $invoiceAmount = (float) $invoice->outstanding_amount;
-            $status = $this->compareAmounts($bankAmount, $invoiceAmount);
-            return [
-                'invoice_id' => $invoice->id,
-                'invoice_type' => PurchaseInvoice::class,
-                'amount' => $invoiceAmount,
-                'status' => $status,
-            ];
+        if (!$invoice || $invoice->outstanding_amount <= 0) {
+            return null;
         }
-
-        return ['invoice_id' => null, 'invoice_type' => null, 'amount' => 0, 'status' => 'unmatched'];
+        $invoiceAmount = (float) $invoice->outstanding_amount;
+        return [
+            'invoice_id' => $invoice->id,
+            'invoice_type' => PurchaseInvoice::class,
+            'amount' => $invoiceAmount,
+            'status' => $this->compareAmounts($bankAmount, $invoiceAmount),
+        ];
     }
 
     /**
@@ -601,7 +611,7 @@ class BankReconciliationService
             }
 
             $lines[] = [
-                'type' => $creditRaw > 0 ? 'incoming' : 'outgoing',
+                'type' => $debitRaw > 0 ? 'incoming' : 'outgoing',
                 'date' => $date,
                 'description' => $description ?: null,
                 'reference_no' => $referenceNo ?: null,

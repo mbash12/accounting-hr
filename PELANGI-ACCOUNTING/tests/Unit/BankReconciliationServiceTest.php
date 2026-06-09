@@ -45,8 +45,8 @@ test('parses bank statement Excel correctly', function () {
     $lines = $r->invoke(new BankReconciliationService(), $path);
 
     expect($lines)->toHaveCount(2);
-    expect($lines[0])->toMatchArray(['type' => 'incoming', 'debit' => 0.0, 'credit' => 5000000.0]);
-    expect($lines[1])->toMatchArray(['type' => 'outgoing', 'debit' => 25000.0, 'credit' => 0.0]);
+    expect($lines[0])->toMatchArray(['type' => 'outgoing', 'debit' => 0.0, 'credit' => 5000000.0]);
+    expect($lines[1])->toMatchArray(['type' => 'incoming', 'debit' => 25000.0, 'credit' => 0.0]);
 
     unlink($path);
 });
@@ -112,7 +112,7 @@ test('handles various column name formats', function () {
     $lines = $r->invoke(new BankReconciliationService(), $path);
 
     expect($lines)->toHaveCount(1);
-    expect($lines[0]['type'])->toEqual('incoming');
+    expect($lines[0]['type'])->toEqual('outgoing');
 
     unlink($path);
 });
