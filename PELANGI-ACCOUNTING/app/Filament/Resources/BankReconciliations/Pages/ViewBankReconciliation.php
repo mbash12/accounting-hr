@@ -115,10 +115,17 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                     ->label(__('Account Code'))
                     ->toggleable(),
 
-                TextColumn::make('amount')
-                    ->label(__('Amount'))
+                TextColumn::make('bank_debit')
+                    ->label(__('Debit'))
                     ->money('IDR')
-                    ->state(fn (BankReconciliationItem $record): float => (float) ($record->bank_debit > 0 ? $record->bank_debit : $record->bank_credit)),
+                    ->state(fn (BankReconciliationItem $record): float => (float) $record->bank_debit)
+                    ->visible(fn ($record): bool => (float) ($record?->bank_debit ?? 0) > 0),
+
+                TextColumn::make('bank_credit')
+                    ->label(__('Credit'))
+                    ->money('IDR')
+                    ->state(fn (BankReconciliationItem $record): float => (float) $record->bank_credit)
+                    ->visible(fn ($record): bool => (float) ($record?->bank_credit ?? 0) > 0),
 
                 TextColumn::make('match_status')
                     ->label(__('Status'))
@@ -144,7 +151,7 @@ class ViewBankReconciliation extends ViewRecord implements HasTable
                 ->label(__('Save & Import Journals'))
                 ->icon('heroicon-o-check-circle')
                 ->color('primary')
-                ->visible(fn () => $this->getRecord()->items()->where('match_status', 'unmatched')->whereNull('imported_at')->whereNotNull('account_code')->exists())
+                ->visible(fn () => $this->getRecord()->items()->where('match_status', 'unmatched')->whereNull('imported_at')->exists())
                 ->requiresConfirmation()
                 ->modalHeading(__('Save & Import Journals'))
                 ->modalDescription(__('Create journal entries for unmatched items with account code?'))
