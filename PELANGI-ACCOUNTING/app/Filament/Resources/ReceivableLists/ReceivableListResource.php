@@ -5,7 +5,7 @@ namespace App\Filament\Resources\ReceivableLists;
 use App\Filament\Resources\ReceivableLists\Pages\ListReceivableLists;
 use App\Filament\Resources\ReceivableLists\Pages\ViewReceivableDetail;
 use App\Filament\Resources\ReceivableLists\Tables\ReceivableListsTable;
-use App\Models\Contact;
+use App\Models\ReceivableContact;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReceivableListResource extends Resource
 {
-    protected static ?string $model = Contact::class;
+    protected static ?string $model = ReceivableContact::class;
 
     protected static string|\BackedEnum|null $navigationIcon = null;
 
@@ -102,7 +102,7 @@ class ReceivableListResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        $query = Contact::query()
+        $query = parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

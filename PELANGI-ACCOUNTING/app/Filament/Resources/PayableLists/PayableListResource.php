@@ -5,7 +5,7 @@ namespace App\Filament\Resources\PayableLists;
 use App\Filament\Resources\PayableLists\Pages\ListPayableLists;
 use App\Filament\Resources\PayableLists\Pages\ViewPayableDetail;
 use App\Filament\Resources\PayableLists\Tables\PayableListsTable;
-use App\Models\Contact;
+use App\Models\PayableContact;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PayableListResource extends Resource
 {
-    protected static ?string $model = Contact::class;
+    protected static ?string $model = PayableContact::class;
 
     protected static string|\BackedEnum|null $navigationIcon = null;
 
@@ -99,7 +99,7 @@ class PayableListResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        $query = Contact::query()
+        $query = parent::getRecordRouteBindingEloquentQuery()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
