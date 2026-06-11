@@ -207,6 +207,7 @@ class PurchaseReturnForm
                                         $items = [];
                                         foreach ($goodsReceipt->items as $receiptItem) {
                                             $items[] = [
+                                                'goods_receipt_item_id' => $receiptItem->id,
                                                 'product_id' => $receiptItem->product_id,
                                                 'quantity' => $receiptItem->quantity,
                                                 'quantity_display' => number_format($receiptItem->quantity, 0),

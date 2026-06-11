@@ -207,6 +207,7 @@ class GoodsReceiptForm
                                             $items = [];
                                             foreach ($purchaseOrder->items as $poItem) {
                                                 $items[] = [
+                                                    'purchase_order_item_id' => $poItem->id,
                                                     'product_id' => $poItem->product_id,
                                                     'quantity' => $poItem->quantity,
                                                     'quantity_display' => NumberInput::formatRoundedIntegerDisplay($poItem->quantity),
