@@ -356,7 +356,10 @@ class PurchaseOrdersTable
                             $skipped = 0;
                             $records->each(function ($record) use ($targetStatus, $validTransitions, &$updated, &$skipped) {
                                 if (isset($validTransitions[$record->status]) && in_array($targetStatus, $validTransitions[$record->status])) {
-                                    $record->update(['status' => $targetStatus]);
+                                    $record->update([
+                                        'status' => $targetStatus,
+                                        'is_locked' => $targetStatus !== 'draft' ?: $record->is_locked,
+                                    ]);
                                     $updated++;
                                 } else {
                                     $skipped++;

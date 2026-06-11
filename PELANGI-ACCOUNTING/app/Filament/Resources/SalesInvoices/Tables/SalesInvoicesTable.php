@@ -270,7 +270,10 @@ class SalesInvoicesTable
                                 ->required(),
                         ])
                         ->action(function (\Illuminate\Database\Eloquent\Collection $records, array $data): void {
-                            $records->each(fn ($record) => $record->update(['status' => $data['status']]));
+                            $records->each(fn ($record) => $record->update([
+                                'status' => $data['status'],
+                                'is_locked' => $data['status'] !== 'draft' ?: $record->is_locked,
+                            ]));
                         })
                         ->deselectRecordsAfterCompletion(),
                     DeleteBulkAction::make(),

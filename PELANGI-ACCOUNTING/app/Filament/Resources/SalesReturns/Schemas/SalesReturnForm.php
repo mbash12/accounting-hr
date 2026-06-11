@@ -214,6 +214,7 @@ class SalesReturnForm
                                         $items = [];
                                         foreach ($delivery->items as $deliveryItem) {
                                             $items[] = [
+                                                'delivery_document_item_id' => $deliveryItem->id,
                                                 'product_id' => $deliveryItem->product_id,
                                                 'quantity' => $deliveryItem->quantity,
                                                 'quantity_display' => NumberInput::formatRoundedIntegerDisplay($deliveryItem->quantity),

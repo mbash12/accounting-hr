@@ -250,6 +250,7 @@ class SalesInvoiceForm
                                         $items = [];
                                         foreach ($salesOrder->items as $item) {
                                             $items[] = [
+                                                'sales_order_item_id' => $item->id,
                                                 'product_id' => $item->product_id,
                                                 'quantity' => $item->quantity,
                                                 'quantity_display' => NumberInput::formatRoundedIntegerDisplay($item->quantity),
