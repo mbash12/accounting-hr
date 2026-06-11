@@ -99,7 +99,8 @@ class PayableListResource extends Resource
 
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        $query = parent::getRecordRouteBindingEloquentQuery()
+        // Start fresh without the JOIN from getEloquentQuery() to avoid ambiguous "id"
+        $query = static::getModel()::query()
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
