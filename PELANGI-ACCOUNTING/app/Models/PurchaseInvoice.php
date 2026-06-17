@@ -256,7 +256,7 @@ class PurchaseInvoice extends Model
     {
         return [
             ['table' => 'payable_payment_items', 'foreignKey' => 'purchase_invoice_id', 'label' => 'payable payments'],
-            ['table' => 'purchase_return_items', 'foreignKey' => 'purchase_invoice_id', 'label' => 'purchase returns'],
+            ['table' => 'purchase_returns', 'foreignKey' => 'purchase_invoice_id', 'label' => 'purchase returns'],
         ];
     }
 }
