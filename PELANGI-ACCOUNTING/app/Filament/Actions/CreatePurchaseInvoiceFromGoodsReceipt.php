@@ -25,6 +25,8 @@ class CreatePurchaseInvoiceFromGoodsReceipt extends Action
             ->color('success')
             ->visible(function (GoodsReceipt $record): bool {
                 if (!$record->is_locked) return false;
+                // Hide if all items are fully returned
+                if ($record->computeReturnMeta()['remaining'] <= 0) return false;
                 // Guard against duplicate invoices
                 return !$record->purchaseInvoices()->where('is_locked', true)->exists();
             })
