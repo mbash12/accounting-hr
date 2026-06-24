@@ -84,6 +84,54 @@
         .fi-loading-indicator {
             display: none !important;
         }
+
+        @media (max-width: 640px) {
+            .fi-auth-login-root {
+                overflow-y: auto;
+                align-items: center;
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+                background-image: none !important;
+                background-color: #f0f9ff;
+            }
+
+            .fi-auth-login-root .login-card {
+                width: 100% !important;
+                max-width: 400px !important;
+                padding: 1.5rem !important;
+            }
+
+            .fi-auth-login-root .login-logo {
+                height: 5rem !important;
+            }
+
+            .fi-notification {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .fi-auth-login-root {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .fi-auth-login-root .login-card {
+                max-width: 340px !important;
+                padding: 1.25rem !important;
+                border-radius: 0.75rem !important;
+            }
+
+            .fi-auth-login-root .login-logo {
+                height: 4rem !important;
+            }
+
+            .fi-auth-login-root h2 {
+                font-size: 1.25rem !important;
+            }
+        }
     </style>
 
     <!-- Filament's built-in notification system -->
@@ -95,12 +143,12 @@
     </style>
 
     <div class="w-full h-full flex">
-        <div class="w-1/2 flex flex-col items-center justify-center">
+        <div class="w-full sm:w-1/2 flex flex-col items-center justify-center px-6 sm:px-0">
             <div class="fi-auth-grid">
                 <!-- Left Column - Password Reset Form -->
-                <img src="{{ asset('logo.png') }}" alt="Logo" class="h-24 mx-auto mb-6">
+                <img src="{{ asset('logo.png') }}" alt="Logo" class="login-logo h-24 mx-auto mb-6">
 
-                <div class="bg-white p-8 !rounded-3xl shadow-lg w-[450px]">
+                <div class="login-card bg-white p-8 !rounded-3xl shadow-lg w-[450px]">
                     <h2 class="text-2xl font-light mb-6">Reset Password</h2>
                     <p class="text-gray-600 text-sm mb-6">Enter your new password below.</p>
 
