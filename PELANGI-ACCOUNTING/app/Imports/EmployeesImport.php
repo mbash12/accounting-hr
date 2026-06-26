@@ -6,11 +6,12 @@ use App\Models\Department;
 use App\Models\Employee;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 
-class EmployeesImport implements ToCollection, WithHeadingRow, WithValidation
+class EmployeesImport implements ToCollection, WithHeadingRow, WithValidation, SkipsEmptyRows
 {
     public function collection(Collection $rows)
     {
@@ -56,6 +57,20 @@ class EmployeesImport implements ToCollection, WithHeadingRow, WithValidation
 
             if ($employeeIdCode) {
                 $employee = Employee::where('employee_id', $employeeIdCode)
+                    ->where('company_id', $companyId)
+                    ->first();
+
+                if ($employee) {
+                    $employee->update($data);
+                    continue;
+                }
+
+                $data['employee_id'] = $employeeIdCode;
+            }
+
+            $email = isset($row['email']) ? (string) $row['email'] : null;
+            if ($email) {
+                $employee = Employee::where('email', $email)
                     ->where('company_id', $companyId)
                     ->first();
 

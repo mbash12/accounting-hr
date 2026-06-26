@@ -138,6 +138,7 @@ class CodeGeneratorService
             'advance_receipt' => ['model' => \App\Models\AdvanceReceipt::class, 'field' => 'receipt_number'],
             'advance_disbursement' => ['model' => \App\Models\AdvanceDisbursement::class, 'field' => 'disbursement_number'],
             'cash_transfer' => ['model' => \App\Models\CashTransfer::class, 'field' => 'transfer_number'],
+            'employee' => ['model' => \App\Models\Employee::class, 'field' => 'employee_id'],
         ];
 
         if (!isset($modelMap[$documentType])) {
