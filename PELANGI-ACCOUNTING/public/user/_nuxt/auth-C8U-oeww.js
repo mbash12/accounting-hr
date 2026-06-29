@@ -1,0 +1,1 @@
+import{aK as r,aL as s,aM as u,m as o}from"./entry-CcBHKiSz.js";const f=r(async(a,n)=>{let e,t;if(!([e,t]=s(()=>u()),e=await e,t(),e))return o({path:"/auth",query:{redirect:a.fullPath}})});export{f as default};
