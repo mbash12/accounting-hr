@@ -5,9 +5,11 @@
 // export const ASSETURL = 'https://accounting-dev.dotcomsolution.co.id/';
 
 
+// export const APIURL = 'https://accounting.wismaatlet.id/api';
+// export const ASSETURL = 'https://accounting.wismaatlet.id/';
 
-export const APIURL = 'https://accounting.wismaatlet.id/api';
-export const ASSETURL = 'https://accounting.wismaatlet.id/';
+export const APIURL = 'https://accounting-dev.wismaatlet.id/api';
+export const ASSETURL = 'https://accounting-dev.wismaatlet.id/';
 
 // const configuredBase = (import.meta.env.VITE_INTEGRATION_BASE_URL || "").trim().replace(/\/$/, "");
 // const defaultLocalBase =
