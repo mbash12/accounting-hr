@@ -11,15 +11,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/probe-nuxi', function () {
-    \Illuminate\Support\Facades\Log::info('probe.hit');
-    return 'probe-ok';
-});
-
-// Built Nuxt (NUXI) SPA — must be declared before the auth group so the
-// catch-all does not get shadowed. Static assets are still served directly by
-// the web server from public/user/; this route only handles paths the web
-// server could not resolve (SPA deep links, etc.).
+// Built Nuxt (NUXI) SPA — served from public/user/. Static assets in that
+// directory are served directly by the web server; this catch-all only
+// handles deep links the web server could not resolve (SPA history routes).
 Route::get('/user/{any?}', [NuxiAppController::class, 'serve'])
     ->where('any', '.*')
     ->name('nuxi.app');

@@ -26,15 +26,11 @@ class NuxiAppController extends Controller
     {
         $base = public_path(self::APP_DIR);
 
-        \Illuminate\Support\Facades\Log::info('nuxi.serve', ['any' => $any, 'base' => $base, 'is_dir' => is_dir($base)]);
-
         if (! is_dir($base)) {
             abort(404, sprintf('Nuxt app not built. Expected directory: %s', $base));
         }
 
         $relative = trim((string) $any, '/');
-
-        \Illuminate\Support\Facades\Log::info('nuxi.relative', ['relative' => $relative, 'fallback_exists' => is_file($base.DIRECTORY_SEPARATOR.'index.html')]);
 
         // Reject any path-traversal attempts and NUL bytes.
         if ($relative === '' || $this->isSafe($relative)) {
@@ -49,7 +45,6 @@ class NuxiAppController extends Controller
 
         // SPA fallback: let Nuxt's client router handle the URL.
         $fallback = $base.DIRECTORY_SEPARATOR.'index.html';
-        \Illuminate\Support\Facades\Log::info('nuxi.fallback', ['fallback' => $fallback, 'is_file' => is_file($fallback), 'realpath' => realpath($fallback)]);
         if (is_file($fallback)) {
             return $this->fileResponse($fallback);
         }
@@ -104,14 +99,10 @@ class NuxiAppController extends Controller
 
         // For real files on disk, Symfony's BinaryFileResponse streams the
         // content with the right headers (Content-Length, ETag, etc.).
-        \Illuminate\Support\Facades\Log::info('nuxi.fileResponse', ['absolute' => $absolute, 'name' => $name, 'readable' => is_readable($absolute), 'size' => @filesize($absolute)]);
-
         if (is_readable($absolute) && $this->shouldStream($name)) {
             $response = new BinaryFileResponse($absolute, 200, ['Content-Type' => $mime]);
         } else {
-            $content = file_get_contents($absolute);
-            \Illuminate\Support\Facades\Log::info('nuxi.content', ['len' => strlen($content ?? ''), 'mime' => $mime]);
-            $response = new Response((string) $content, 200, ['Content-Type' => $mime]);
+            $response = new Response((string) file_get_contents($absolute), 200, ['Content-Type' => $mime]);
         }
 
         // Service workers must be served from the root scope and never cached
