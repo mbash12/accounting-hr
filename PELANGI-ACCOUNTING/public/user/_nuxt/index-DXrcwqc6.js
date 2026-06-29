@@ -1,0 +1,1 @@
+import{o as a,H as t,m as e,x as n,v as o}from"./entry-C5zc1_lk.js";const _={__name:"index",setup(s){return a(async()=>{t.loggedin?await e("/home"):await e("/auth")}),(r,c)=>(o(),n("div"))}};export{_ as default};

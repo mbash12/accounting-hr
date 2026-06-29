@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nuxt generate",
+    "build:laravel": "rm -rf ../PELANGI-ACCOUNTING/public/user ../PELANGI-ACCOUNTING/public/.output-nuxt .output && nuxt generate",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",

@@ -4,6 +4,12 @@ export default defineNuxtConfig({
     ssr: false,
 
     nitro: {
+        // Static build is emitted directly into Laravel's public folder so it
+        // is served at /user/* without any extra deploy step.
+        output: {
+            dir: "../PELANGI-ACCOUNTING/public/.output-nuxt",
+            publicDir: "../PELANGI-ACCOUNTING/public/user",
+        },
         routeRules: {
             "/**": {
                 headers: {
@@ -14,20 +20,20 @@ export default defineNuxtConfig({
     },
 
     app: {
-        baseURL: "/",
+        baseURL: "/user/",
         buildAssetsDir: "/_nuxt/",
 
         head: {
             title: "Elevate Attendance",
             link: [
-                { rel: "icon", type: "image/x-icon", href: "/icon.png" },
+                { rel: "icon", type: "image/x-icon", href: "/user/icon.png" },
             ],
         },
     },
 
     vite: {
         define: {
-            "process.env.BASE_URL": JSON.stringify("/"),
+            "process.env.BASE_URL": JSON.stringify("/user/"),
         },
         build: {
             assetsDir: "_nuxt",
@@ -87,7 +93,7 @@ export default defineNuxtConfig({
         workbox: {
             globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
             importScripts: ["firebase-messaging-sw.js"],
-            navigateFallback: "/",
+            navigateFallback: "/user/",
             cleanupOutdatedCaches: true,
             runtimeCaching: [
               {
@@ -113,8 +119,8 @@ export default defineNuxtConfig({
             theme_color: "#40B6F4",
             background_color: "#ffffff",
             display: "standalone",
-            scope: "/",
-            start_url: "/",
+            scope: "/user/",
+            start_url: "/user/",
             name: "Elevate Attendance",
             short_name: "Elevate",
             description: "Aplikasi Elevate Attendance",
