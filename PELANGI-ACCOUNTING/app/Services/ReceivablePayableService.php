@@ -467,10 +467,10 @@ class ReceivablePayableService
 
             $receivableAccount = $this->findReceivableAccount($invoice->company_id);
             if (!$receivableAccount) {
-                return; 
+                return;
             }
 
-            $revenueAccount = $this->findRevenueAccount($invoice->company_id);
+            $revenueAccount = AccountMapping::getAccountMapping('sales_invoice', 'sales', $invoice->company_id);
             if (!$revenueAccount) {
                 return;
             }
@@ -578,7 +578,7 @@ class ReceivablePayableService
                 return;
             }
 
-            $expenseAccount = $this->findExpenseAccount($invoice->company_id);
+            $expenseAccount = AccountMapping::getAccountMapping('purchase_invoice', 'purchases', $invoice->company_id);
             if (!$expenseAccount) {
                 return;
             }
@@ -660,49 +660,6 @@ class ReceivablePayableService
         });
     }
 
-    /**
-     * Find Revenue account (code 4%)
-     */
-    private function findRevenueAccount(?int $companyId = null): ?Account
-    {
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '4%')
-                    ->orWhere('name', 'like', '%Revenue%');
-            });
-
-        if ($companyId) {
-            $query->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                    ->orWhereNull('company_id');
-            });
-        }
-
-        return $query->orderBy('code')->first();
-    }
-
-    /**
-     * Find Expense account (code 5%)
-     */
-    private function findExpenseAccount(?int $companyId = null): ?Account
-    {
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '5%')
-                    ->orWhere('name', 'like', '%Expense%');
-            });
-
-        if ($companyId) {
-            $query->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                    ->orWhereNull('company_id');
-            });
-        }
-
-        return $query->orderBy('code')->first();
-    }
 }
 
 
