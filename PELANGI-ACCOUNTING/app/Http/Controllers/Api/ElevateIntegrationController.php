@@ -18,6 +18,24 @@ class ElevateIntegrationController extends Controller
 
     public function processWorkOrder(Request $request): JsonResponse
     {
+        $input = $request->all();
+
+        if (isset($input['items']) && is_array($input['items'])) {
+            foreach ($input['items'] as &$item) {
+                if (isset($item['unit_code']) && is_array($item['unit_code'])) {
+                    $extractedCode = null;
+                    foreach ($item['unit_code'] as $key => $val) {
+                        if (is_array($val) && isset($val['code'])) {
+                            $extractedCode = $val['code'];
+                            break;
+                        }
+                    }
+                    $item['unit_code'] = $extractedCode;
+                }
+            }
+            $request->replace($input);
+        }
+
         try {
             $validated = $request->validate([
                 'work_order_id'          => ['required', 'string'],

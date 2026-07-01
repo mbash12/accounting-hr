@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\BankAccount;
+use App\Models\Account;
 use App\Models\Contact;
 use App\Models\ElevateWorkOrderMapping;
 use App\Models\Product;
@@ -215,13 +215,22 @@ class ElevateIntegrationService
                 );
             }
 
+            $dummyProduct = Product::firstOrCreate(
+                ['code' => 'SVC-WO-JASA', 'company_id' => $companyId],
+                [
+                    'name' => 'Jasa Work Order',
+                    'is_active' => true,
+                    'created_by_user_id' => $this->getSystemUserId(),
+                ]
+            );
+
             $items = [
                 [
-                    'product_code' => null,
+                    'product_code' => $dummyProduct->code,
                     'description'  => 'Jasa Work Order: ' . $workOrderNumber,
                     'quantity'     => 1,
                     'unit_price'   => $billingAmount,
-                    'unit_code'    => null,
+                    'unit_code'    => null, 
                 ],
             ];
 
@@ -261,10 +270,24 @@ class ElevateIntegrationService
             $price    = (float) ($item['unit_price'] ?? 0);
             $lineTotal = $qty * $price;
 
+            if (!$product) {
+                throw new \InvalidArgumentException("Produk dengan kode '{$item['product_code']}' tidak ditemukan atau tidak aktif.");
+            }
+
+            if (!$unit) {
+                $unit = Unit::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)->orWhereNull('company_id');
+                })->first();
+                
+                if (!$unit) {
+                    throw new \InvalidArgumentException("Unit dengan kode '{$item['unit_code']}' tidak ditemukan dan sistem gagal menemukan unit default.");
+                }
+            }
+
             SalesInvoiceItem::create([
                 'sales_invoice_id' => $invoice->id,
-                'product_id'       => $product?->id,
-                'unit_id'          => $unit?->id,
+                'product_id'       => $product->id,
+                'unit_id'          => $unit->id,
                 'description'      => $item['description'] ?? ($product?->name ?? 'Item'),
                 'quantity'         => $qty,
                 'unit_price'       => $price,
@@ -407,36 +430,40 @@ class ElevateIntegrationService
     protected function resolveBankAccountId(?int $bankAccountId, int $companyId): int
     {
         if ($bankAccountId) {
-            $account = BankAccount::where('id', $bankAccountId)
+            $account = Account::where('id', $bankAccountId)
                 ->where(function ($q) use ($companyId) {
                     $q->where('company_id', $companyId)
                       ->orWhereNull('company_id');
                 })
+                ->where('is_cash_bank', true)
                 ->where('is_active', true)
+                ->where('is_header', false)
                 ->first();
 
             if ($account) {
                 return $account->id;
             }
 
-            Log::warning('[Elevate] Provided bank_account_id not found or inactive, falling back', [
+            Log::warning('[Elevate] Provided bank_account_id (COA Account) not found or not cash/bank, falling back', [
                 'bank_account_id' => $bankAccountId,
                 'company_id'      => $companyId,
             ]);
         }
 
-        $fallback = BankAccount::where(function ($q) use ($companyId) {
+        $fallback = Account::where(function ($q) use ($companyId) {
                 $q->where('company_id', $companyId)
                   ->orWhereNull('company_id');
             })
+            ->where('is_cash_bank', true)
             ->where('is_active', true)
-            ->orderBy('id')
+            ->where('is_header', false)
+            ->orderBy('code')
             ->first();
 
         if (!$fallback) {
             throw new \InvalidArgumentException(
-                "No active bank account found for company_id={$companyId}. " .
-                "Please create a bank account or provide 'bank_account_id' in the payload."
+                "No active Cash/Bank COA account found for company_id={$companyId}. " .
+                "Please create a Cash/Bank account or provide a valid 'bank_account_id' in the payload."
             );
         }
 
