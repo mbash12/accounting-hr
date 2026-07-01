@@ -579,9 +579,16 @@ class ManageAccounts extends Page
                 ->required()
                 ->options(function () {
                     // Get only top-level accounts (the 9 main classifications: 1-9)
-                    return Account::query()
+                    $query = Account::query()
                         ->whereNull('parent_id')
-                        ->whereIn('code', ['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+                        ->whereIn('code', ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+
+                    $selectedCompanyId = session('selected_company_id');
+                    if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                        $query->where('company_id', $selectedCompanyId);
+                    }
+
+                    return $query
                         ->orderBy('code')
                         ->get()
                         ->mapWithKeys(fn ($account) => [$account->id => $account->code . ' - ' . $account->name])
@@ -607,8 +614,15 @@ class ManageAccounts extends Page
                         return [];
                     }
                     // Get direct children of the selected classification (subclassifications)
-                    return Account::query()
-                        ->where('parent_id', $classificationId)
+                    $query = Account::query()
+                        ->where('parent_id', $classificationId);
+
+                    $selectedCompanyId = session('selected_company_id');
+                    if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                        $query->where('company_id', $selectedCompanyId);
+                    }
+
+                    return $query
                         ->orderBy('code')
                         ->get()
                         ->mapWithKeys(fn ($account) => [$account->id => $account->code . ' - ' . $account->name])

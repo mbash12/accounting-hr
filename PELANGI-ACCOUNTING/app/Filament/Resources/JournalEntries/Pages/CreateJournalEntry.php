@@ -66,10 +66,27 @@ class CreateJournalEntry extends CreateRecord
             $this->NotificationHalt('Total debit and credit must be balanced.');
         }
 
+        if (empty($data['company_id'])) {
+            $selectedCompanyId = session('selected_company_id');
+            if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                $data['company_id'] = $selectedCompanyId;
+            }
+        }
+
         foreach ($validItems as $index => $item) {
             $item = (array) $item;
             $debit = (float) ($item['debit'] ?? 0);
             $credit = (float) ($item['credit'] ?? 0);
+
+            if (!empty($data['company_id'])) {
+                $accountBelongsToCompany = \App\Models\Account::where('id', $item['account_id'])
+                    ->where('company_id', $data['company_id'])
+                    ->exists();
+
+                if (!$accountBelongsToCompany) {
+                    $this->NotificationHalt('Item ' . ($index + 1) . ' account does not belong to the selected company.');
+                }
+            }
             
             if ($debit <= 0 && $credit <= 0) {
                 $this->NotificationHalt('Item ' . ($index + 1) . ' must have a debit or credit value.');
@@ -88,13 +105,7 @@ class CreateJournalEntry extends CreateRecord
         $data['is_posted'] = false;
         $data['status'] = 'draft';
         $data['created_by_user_id'] = Filament::auth()->id();
-        
-        if (empty($data['company_id'])) {
-            $selectedCompanyId = session('selected_company_id');
-            if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-                $data['company_id'] = $selectedCompanyId;
-            }
-        }
+
         return $data;
     }
 

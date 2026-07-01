@@ -54,8 +54,6 @@ class GeneralLedger extends Page implements HasForms
 
     public function form($form)
     {
-        $companyId = session('selected_company_id');
-
         return $form
             ->schema([
                 \Filament\Forms\Components\Toggle::make('select_all')
@@ -71,7 +69,9 @@ class GeneralLedger extends Page implements HasForms
                 Select::make('account_ids')
                     ->label('Accounts')
                     ->multiple()
-                    ->options(function () use ($companyId) {
+                    ->options(function () {
+                        $companyId = session('selected_company_id');
+
                         if (!$companyId || $companyId === 'all') {
                             return [];
                         }
@@ -163,7 +163,11 @@ class GeneralLedger extends Page implements HasForms
         if ($selectAll) {
             $accounts = Account::where('company_id', $companyId)->where('is_header', false)->orderBy('code')->get();
         } else {
-            $accounts = Account::whereIn('id', $accountIds)->orderBy('code')->get();
+            $accounts = Account::where('company_id', $companyId)
+                ->where('is_header', false)
+                ->whereIn('id', $accountIds)
+                ->orderBy('code')
+                ->get();
         }
 
         if ($accounts->isEmpty()) {

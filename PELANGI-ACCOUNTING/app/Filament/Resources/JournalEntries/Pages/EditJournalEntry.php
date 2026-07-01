@@ -78,11 +78,22 @@ class EditJournalEntry extends EditRecord
         }
 
         $totals = JournalEntryForm::calculateTotalsFromItems($validItems);
+        $companyId = $data['company_id'] ?? $this->record->company_id ?? null;
 
         foreach ($validItems as $index => $item) {
             $item = (array) $item;
             $debit = (float) ($item['debit'] ?? 0);
             $credit = (float) ($item['credit'] ?? 0);
+
+            if (!empty($companyId)) {
+                $accountBelongsToCompany = \App\Models\Account::where('id', $item['account_id'])
+                    ->where('company_id', $companyId)
+                    ->exists();
+
+                if (!$accountBelongsToCompany) {
+                    $this->NotificationHalt('Item ' . ($index + 1) . ' account does not belong to the selected company.');
+                }
+            }
             
             if ($debit <= 0 && $credit <= 0) {
                 $this->NotificationHalt('Item ' . ($index + 1) . ' must have a debit or credit value.');
