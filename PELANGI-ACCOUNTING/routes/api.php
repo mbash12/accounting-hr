@@ -14,6 +14,7 @@ use App\Http\Middleware\EmployeeApiAuth;
 use App\Http\Controllers\Api\FaqController;
 use App\Http\Controllers\Api\BiometricEmployeeController;
 use App\Http\Controllers\Api\BiometricAttendanceController;
+use App\Http\Controllers\Api\ElevateIntegrationController;
 
 Route::prefix('master')->middleware([Api::class])->group(function () {
     Route::get('/coa', [MasterDataController::class, 'coa']);
@@ -75,3 +76,7 @@ Route::prefix('v3')->middleware('api.key')->group(function () {
     Route::post('/clear-usr', [BiometricEmployeeController::class, 'clear']);
 });
 
+
+Route::prefix('integration')->middleware([Api::class])->group(function () {
+    Route::post('/work-orders', [ElevateIntegrationController::class, 'processWorkOrder']);
+});
