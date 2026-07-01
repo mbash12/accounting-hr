@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Account;
+use App\Models\AccountMapping;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryItem;
 use App\Models\SalesInvoice;
@@ -153,12 +154,12 @@ class CreateOutstandingJournalEntries extends Command
     private function createReceivableJournalEntry(SalesInvoice $invoice): void
     {
         DB::transaction(function () use ($invoice) {
-            $receivableAccount = $this->findReceivableAccount($invoice->company_id);
+            $receivableAccount = AccountMapping::getAccountMapping('sales_invoice', 'accounts_receivable', $invoice->company_id);
             if (!$receivableAccount) {
                 throw new \Exception('Accounts Receivable account not found for company ' . $invoice->company_id);
             }
 
-            $revenueAccount = $this->findRevenueAccount($invoice->company_id);
+            $revenueAccount = AccountMapping::getAccountMapping('sales_invoice', 'sales', $invoice->company_id);
             if (!$revenueAccount) {
                 throw new \Exception('Revenue account not found for company ' . $invoice->company_id);
             }
@@ -232,8 +233,8 @@ class CreateOutstandingJournalEntries extends Command
 
             $journalEntry->items()->delete();
 
-            $receivableAccount = $this->findReceivableAccount($invoice->company_id);
-            $revenueAccount = $this->findRevenueAccount($invoice->company_id);
+            $receivableAccount = AccountMapping::getAccountMapping('sales_invoice', 'accounts_receivable', $invoice->company_id);
+            $revenueAccount = AccountMapping::getAccountMapping('sales_invoice', 'sales', $invoice->company_id);
             $costCenterId = \App\Models\CostCenter::first()?->id ?? 1;
 
             JournalEntryItem::create([
@@ -262,12 +263,12 @@ class CreateOutstandingJournalEntries extends Command
     private function createPayableJournalEntry(PurchaseInvoice $invoice): void
     {
         DB::transaction(function () use ($invoice) {
-            $payableAccount = $this->findPayableAccount($invoice->company_id);
+            $payableAccount = AccountMapping::getAccountMapping('purchase_invoice', 'accounts_payable', $invoice->company_id);
             if (!$payableAccount) {
                 throw new \Exception('Accounts Payable account not found for company ' . $invoice->company_id);
             }
 
-            $expenseAccount = $this->findExpenseAccount($invoice->company_id);
+            $expenseAccount = AccountMapping::getAccountMapping('purchase_invoice', 'purchases', $invoice->company_id);
             if (!$expenseAccount) {
                 throw new \Exception('Expense account not found for company ' . $invoice->company_id);
             }
@@ -341,8 +342,8 @@ class CreateOutstandingJournalEntries extends Command
 
             $journalEntry->items()->delete();
 
-            $payableAccount = $this->findPayableAccount($invoice->company_id);
-            $expenseAccount = $this->findExpenseAccount($invoice->company_id);
+            $payableAccount = AccountMapping::getAccountMapping('purchase_invoice', 'accounts_payable', $invoice->company_id);
+            $expenseAccount = AccountMapping::getAccountMapping('purchase_invoice', 'purchases', $invoice->company_id);
             $costCenterId = \App\Models\CostCenter::first()?->id ?? 1;
 
             JournalEntryItem::create([
@@ -364,93 +365,4 @@ class CreateOutstandingJournalEntries extends Command
             ]);
         });
     }
-
-    /**
-     * Find Accounts Receivable account
-     */
-    private function findReceivableAccount(?int $companyId = null): ?Account
-    {
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '11%')
-                    ->orWhere('name', 'like', '%Accounts Receivable%');
-            });
-
-        if ($companyId) {
-            $query->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                    ->orWhereNull('company_id');
-            });
-        }
-
-        return $query->orderBy('code')->first();
-    }
-
-    /**
-     * Find Accounts Payable account
-     */
-    private function findPayableAccount(?int $companyId = null): ?Account
-    {
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '21%')
-                    ->orWhere('name', 'like', '%Accounts Payable%');
-            });
-
-        if ($companyId) {
-            $query->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                    ->orWhereNull('company_id');
-            });
-        }
-
-        return $query->orderBy('code')->first();
-    }
-
-    /**
-     * Find Revenue account (code 4%)
-     */
-    private function findRevenueAccount(?int $companyId = null): ?Account
-    {
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '4%')
-                    ->orWhere('name', 'like', '%Revenue%');
-            });
-
-        if ($companyId) {
-            $query->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                    ->orWhereNull('company_id');
-            });
-        }
-
-        return $query->orderBy('code')->first();
-    }
-
-    /**
-     * Find Expense account (code 5%)
-     */
-    private function findExpenseAccount(?int $companyId = null): ?Account
-    {
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '5%')
-                    ->orWhere('name', 'like', '%Expense%');
-            });
-
-        if ($companyId) {
-            $query->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                    ->orWhereNull('company_id');
-            });
-        }
-
-        return $query->orderBy('code')->first();
-    }
 }
-
