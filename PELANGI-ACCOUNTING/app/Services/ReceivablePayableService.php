@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\JournalEntry;
+use App\Models\AccountMapping;
 use App\Models\JournalEntryItem;
 use App\Models\ReceivablePayment;
 use App\Models\PayablePayment;
@@ -32,7 +33,7 @@ class ReceivablePayableService
 
             $receivableAccount = $this->findReceivableAccount($payment->company_id);
             if (!$receivableAccount) {
-                throw new InvalidArgumentException('Accounts Receivable account not found. Please create an account with code starting with 11% or name containing "Accounts Receivable"');
+                throw new InvalidArgumentException('Accounts Receivable account not found. Please configure the "Accounts Receivable" mapping in General Ledger → Account Mappings for "Receivable Payment".');
             }
 
             $totalPayment = (float) $payment->total_payment;
@@ -219,7 +220,7 @@ class ReceivablePayableService
 
             $payableAccount = $this->findPayableAccount($payment->company_id);
             if (!$payableAccount) {
-                throw new InvalidArgumentException('Accounts Payable account not found. Please create an account with code starting with 21% or name containing "Accounts Payable"');
+                throw new InvalidArgumentException('Accounts Payable account not found. Please configure the "Accounts Payable" mapping in General Ledger → Account Mappings for "Payable Payment".');
             }
 
             $totalPayment = (float) $payment->total_payment;
@@ -388,51 +389,29 @@ class ReceivablePayableService
     }
 
     /**
-     * Find default Accounts Receivable account (code 11%)
+     * Find Accounts Receivable account from mapping configuration
      */
     private function findReceivableAccount(?int $companyId = null): ?Account
     {
         $selectedCompanyId = $companyId ?? session('selected_company_id');
-        
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '11%')
-                    ->orWhere('name', 'like', '%Accounts Receivable%');
-            });
-
-        if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-            $query->where(function ($q) use ($selectedCompanyId) {
-                $q->where('company_id', $selectedCompanyId)
-                    ->orWhereNull('company_id');
-            });
+        if (! $selectedCompanyId || $selectedCompanyId === 'all') {
+            return null;
         }
 
-        return $query->orderBy('code')->first();
+        return AccountMapping::getAccountMapping('receivable_payment', 'accounts_receivable', (int) $selectedCompanyId);
     }
 
     /**
-     * Find default Accounts Payable account (code 21%)
+     * Find Accounts Payable account from mapping configuration
      */
     private function findPayableAccount(?int $companyId = null): ?Account
     {
         $selectedCompanyId = $companyId ?? session('selected_company_id');
-        
-        $query = Account::where('is_header', false)
-            ->where('is_active', true)
-            ->where(function ($q) {
-                $q->where('code', 'like', '21%')
-                    ->orWhere('name', 'like', '%Accounts Payable%');
-            });
-
-        if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-            $query->where(function ($q) use ($selectedCompanyId) {
-                $q->where('company_id', $selectedCompanyId)
-                    ->orWhereNull('company_id');
-            });
+        if (! $selectedCompanyId || $selectedCompanyId === 'all') {
+            return null;
         }
 
-        return $query->orderBy('code')->first();
+        return AccountMapping::getAccountMapping('payable_payment', 'accounts_payable', (int) $selectedCompanyId);
     }
 
     /**

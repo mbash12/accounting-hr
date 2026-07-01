@@ -90,8 +90,8 @@ class AccountMapping extends Model
         'advance_receipt' => ['cash', 'advance_receivable'],
         'advance_disbursement' => ['cash', 'advance_payable'],
         'cash_transfer' => ['cash', 'bank'],
-        'receivable_payment' => ['other_charges', 'discount', 'write_off'],
-        'payable_payment' => ['other_charges', 'discount', 'write_off'],
+        'receivable_payment' => ['accounts_receivable', 'other_charges', 'discount', 'write_off'],
+        'payable_payment' => ['accounts_payable', 'other_charges', 'discount', 'write_off'],
         'payroll' => ['salary_expense', 'thr_expense', 'bpjs_expense', 'salary_payable', 'pph21_payable', 'bpjs_payable'],
         'deferred_revenue' => ['deferred_revenue_liability', 'deferred_revenue_recognition'],
     ];
