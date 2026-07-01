@@ -52,7 +52,7 @@ class ReceivablePayableService
                     'description' => $payment->description ?? __('Receivable Payment :number', ['number' => $payment->payment_number]),
                     'amount' => $totalPayment,
                     'total_amount' => $totalPayment,
-                    'updated_by_user_id' => Auth::id(),
+                    'updated_by_user_id' => Auth::id() ?? 1,
                 ]);
 
                 $existingEntry->items()->delete();
@@ -136,8 +136,8 @@ class ReceivablePayableService
                 'cash_bank_transaction_id' => null,
                 'department_id' => $departmentId,
                 'company_id' => $payment->company_id,
-                'created_by_user_id' => Auth::id(),
-                'updated_by_user_id' => Auth::id(),
+                'created_by_user_id' => Auth::id() ?? 1,
+                'updated_by_user_id' => Auth::id() ?? 1,
             ]);
 
             // Cash/Bank Account - Debit total payment
@@ -239,7 +239,7 @@ class ReceivablePayableService
                     'description' => $payment->description ?? __('Payable Payment :number', ['number' => $payment->payment_number]),
                     'amount' => $totalPayment,
                     'total_amount' => $totalPayment,
-                    'updated_by_user_id' => Auth::id(),
+                    'updated_by_user_id' => Auth::id() ?? 1,
                 ]);
 
                 $existingEntry->items()->delete();
@@ -323,8 +323,8 @@ class ReceivablePayableService
                 'cash_bank_transaction_id' => null,
                 'department_id' => $departmentId,
                 'company_id' => $payment->company_id,
-                'created_by_user_id' => Auth::id(),
-                'updated_by_user_id' => Auth::id(),
+                'created_by_user_id' => Auth::id() ?? 1,
+                'updated_by_user_id' => Auth::id() ?? 1,
             ]);
 
             JournalEntryItem::create([
