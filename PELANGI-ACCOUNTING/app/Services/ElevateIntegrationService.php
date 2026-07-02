@@ -431,6 +431,7 @@ class ElevateIntegrationService
                 'name'               => $productName,
                 'is_active'          => true,
                 'company_id'         => $companyId,
+                'unit_id'            => 26,
                 'created_by_user_id' => $this->getSystemUserId(),
                 'updated_by_user_id' => $this->getSystemUserId(),
             ]);
