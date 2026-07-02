@@ -55,6 +55,7 @@ class ElevateIntegrationController extends Controller
                 'bank_account_id'        => ['nullable', 'integer'],
                 'payment_date'           => ['nullable', 'date'],
                 'invoice_date'           => ['nullable', 'date'],
+                'description'            => ['nullable', 'string', 'max:500'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([

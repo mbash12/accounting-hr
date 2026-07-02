@@ -79,7 +79,8 @@ class ElevateIntegrationService
                         $payload['items'] ?? [],
                         $companyId,
                         $payload['invoice_date'] ?? now()->toDateString(),
-                        isset($payload['billing_amount']) ? (float) $payload['billing_amount'] : null
+                        isset($payload['billing_amount']) ? (float) $payload['billing_amount'] : null,
+                        $payload['description'] ?? null
                     );
 
                     $mapping->update([
@@ -254,7 +255,8 @@ class ElevateIntegrationService
         array  $items,
         int    $companyId,
         string $invoiceDate,
-        ?float $billingAmount = null
+        ?float $billingAmount = null,
+        ?string $woDescription = null
     ): SalesInvoice {
         $existing = SalesInvoice::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
@@ -262,37 +264,7 @@ class ElevateIntegrationService
         if ($existing) {
             return $existing;
         }
-        if (empty($items)) {
-            if (!$billingAmount || $billingAmount <= 0) {
-                throw new \InvalidArgumentException(
-                    'Items kosong: billing_amount harus diisi dan lebih dari 0 untuk Work Order jasa only.'
-                );
-            }
 
-            $dummyProduct = Product::firstOrCreate(
-                ['code' => 'SVC-WO-JASA', 'company_id' => $companyId],
-                [
-                    'name' => 'Jasa Work Order',
-                    'is_active' => true,
-                    'created_by_user_id' => $this->getSystemUserId(),
-                ]
-            );
-
-            $items = [
-                [
-                    'product_code' => $dummyProduct->code,
-                    'description'  => 'Jasa Work Order: ' . $workOrderNumber,
-                    'quantity'     => 1,
-                    'unit_price'   => $billingAmount,
-                    'unit_code'    => 'PCS',
-                ],
-            ];
-
-            Log::info('[Elevate] WO jasa only — single item dibuat dari billing_amount', [
-                'work_order_number' => $workOrderNumber,
-                'billing_amount'    => $billingAmount,
-            ]);
-        }
 
         $totals = $this->calculateInvoiceTotals($items);
 
@@ -319,7 +291,7 @@ class ElevateIntegrationService
         ]);
 
         foreach ($items as $item) {
-            $product   = $this->resolveProduct($item['product_code'] ?? null, $companyId);
+            $product   = $this->resolveProduct($item['product_code'] ?? null, 'Jasa '.$item['description'] ?? 'Item', $companyId);
             $unit      = $this->resolveUnit($item['unit_code'] ?? null, $companyId);
             $qty       = (float) ($item['quantity']   ?? 1);
             $price     = (float) ($item['unit_price'] ?? 0);
@@ -327,7 +299,7 @@ class ElevateIntegrationService
 
             if (!$product) {
                 throw new \InvalidArgumentException(
-                    "Produk dengan kode '{$item['product_code']}' tidak ditemukan atau tidak aktif."
+                    "Kode produk tidak valid pada item."
                 );
             }
 
@@ -435,7 +407,7 @@ class ElevateIntegrationService
         ];
     }
 
-    protected function resolveProduct(?string $productCode, int $companyId): ?Product
+    protected function resolveProduct(?string $productCode, string $productName, int $companyId): ?Product
     {
         if (!$productCode) {
             return null;
@@ -448,9 +420,19 @@ class ElevateIntegrationService
             ->first();
 
         if (!$product) {
-            Log::warning('[Elevate] Product not found by code', [
+            Log::info('[Elevate] Product not found by code, creating new one', [
                 'product_code' => $productCode,
+                'product_name' => $productName,
                 'company_id'   => $companyId,
+            ]);
+
+            $product = Product::create([
+                'code'               => $productCode,
+                'name'               => $productName,
+                'is_active'          => true,
+                'company_id'         => $companyId,
+                'created_by_user_id' => $this->getSystemUserId(),
+                'updated_by_user_id' => $this->getSystemUserId(),
             ]);
         }
 
