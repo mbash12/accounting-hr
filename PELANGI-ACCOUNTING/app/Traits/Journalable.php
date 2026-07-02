@@ -90,11 +90,28 @@ trait Journalable
      */
     public function regenerateJournalEntry(): void
     {
+        // Capture the existing journal entry status before deletion
+        $existingEntry = \App\Models\JournalEntry::where('sub_module', $this->getDocumentType())
+            ->where('reference_type', get_class($this))
+            ->where('reference_id', $this->id)
+            ->first(['status', 'is_posted']);
+
         // Delete existing journal entry
         $this->deleteJournalEntry();
 
         // Create new journal entry
         $this->createJournalEntry();
+
+        // Restore the original status
+        if ($existingEntry) {
+            \App\Models\JournalEntry::where('sub_module', $this->getDocumentType())
+                ->where('reference_type', get_class($this))
+                ->where('reference_id', $this->id)
+                ->update([
+                    'status' => $existingEntry->status,
+                    'is_posted' => $existingEntry->is_posted,
+                ]);
+        }
     }
 
     /**
