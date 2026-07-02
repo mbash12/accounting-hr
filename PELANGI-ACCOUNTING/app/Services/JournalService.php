@@ -95,8 +95,8 @@ class JournalService
             'reference_type' => get_class($document),
             'reference_id' => $document->id,
             'company_id' => $document->company_id,
-            'created_by_user_id' => Auth::id(),
-            'updated_by_user_id' => Auth::id(),
+            'created_by_user_id' => Auth::id() ?? 1,
+            'updated_by_user_id' => Auth::id() ?? 1,
         ]);
 
         // Create journal entry items based on document type
@@ -123,7 +123,7 @@ class JournalService
             'reference_no' => $document->reference_no ?? $journalEntry->reference_no,
             'description' => $description,
             'total_amount' => $document->total_amount ?? 0,
-            'updated_by_user_id' => Auth::id(),
+            'updated_by_user_id' => Auth::id() ?? 1,
         ]);
 
         // Recreate journal entry items
