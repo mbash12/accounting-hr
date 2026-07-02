@@ -190,7 +190,11 @@ class ReceivablePayment extends Model
     {
         $service = app(\App\Services\ReceivablePayableService::class);
 
+        \Illuminate\Support\Facades\DB::transaction(function () use ($service) {
         $service->deleteJournalEntryForReceivablePayment($this);
         $service->createJournalEntryForReceivablePayment($this);
+        });
+
+        $this->load('journalEntry');
     }
 }

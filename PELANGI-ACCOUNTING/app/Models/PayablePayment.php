@@ -195,7 +195,11 @@ class PayablePayment extends Model
     {
         $service = app(\App\Services\ReceivablePayableService::class);
 
+        \Illuminate\Support\Facades\DB::transaction(function () use ($service) {
         $service->deleteJournalEntryForPayablePayment($this);
         $service->createJournalEntryForPayablePayment($this);
+        });
+
+        $this->load('journalEntry');
     }
 }
