@@ -287,7 +287,7 @@ class ElevateIntegrationService
                     'description'  => 'Jasa Work Order: ' . $workOrderNumber,
                     'quantity'     => 1,
                     'unit_price'   => $billingAmount,
-                    'unit_code'    => null,
+                    'unit_code'    => 'PCS',
                 ],
             ];
 
