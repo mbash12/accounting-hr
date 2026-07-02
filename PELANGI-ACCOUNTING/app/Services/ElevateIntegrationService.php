@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Models\Account;
 use App\Models\Contact;
+use App\Models\Department;
 use App\Models\ElevateWorkOrderMapping;
+use App\Models\JournalEntry;
 use App\Models\Product;
 use App\Models\ReceivablePayment;
 use App\Models\ReceivablePaymentItem;
@@ -19,10 +21,10 @@ class ElevateIntegrationService
     public function __construct(
         protected CodeGeneratorService    $codeGenerator,
         protected ReceivablePayableService $receivablePayableService,
+        protected JournalService          $journalService,
     ) {}
 
-
-
+   
     public function processWorkOrder(array $payload): array
     {
         $workOrderId     = (string) $payload['work_order_id'];
@@ -41,7 +43,6 @@ class ElevateIntegrationService
             Log::info('[Elevate] Work Order already completed — returning existing IDs', [
                 'work_order_id' => $workOrderId,
             ]);
-
             return $this->buildResult($mapping, 'already_processed');
         }
 
@@ -59,16 +60,11 @@ class ElevateIntegrationService
             DB::transaction(function () use ($mapping, $payload, $workOrderId, $workOrderNumber, $companyId) {
 
                 if (!$mapping->contact_id) {
-                    $contact = $this->findOrCreateContact(
-                        $payload['customer'],
-                        $companyId
-                    );
-
+                    $contact = $this->findOrCreateContact($payload['customer'], $companyId);
                     $mapping->update([
                         'contact_id' => $contact->id,
                         'status'     => ElevateWorkOrderMapping::STATUS_CONTACT_RESOLVED,
                     ]);
-
                     Log::info('[Elevate] Contact resolved', [
                         'work_order_id' => $workOrderId,
                         'contact_id'    => $contact->id,
@@ -91,7 +87,7 @@ class ElevateIntegrationService
                         'status'           => ElevateWorkOrderMapping::STATUS_INVOICE_CREATED,
                     ]);
 
-                    Log::info('[Elevate] Sales Invoice created', [
+                    Log::info('[Elevate] Sales Invoice created (draft)', [
                         'work_order_id'  => $workOrderId,
                         'invoice_id'     => $invoice->id,
                         'invoice_number' => $invoice->invoice_number,
@@ -99,9 +95,11 @@ class ElevateIntegrationService
                     ]);
                 }
 
-                if (!$mapping->receivable_payment_id) {
-                    $invoice = SalesInvoice::findOrFail($mapping->sales_invoice_id);
+                $invoice = SalesInvoice::findOrFail($mapping->sales_invoice_id);
+                $this->postSalesInvoiceJournal($invoice);
 
+        
+                if (!$mapping->receivable_payment_id) {
                     $bankAccountId = $this->resolveBankAccountId(
                         $payload['bank_account_id'] ?? null,
                         $companyId
@@ -121,13 +119,19 @@ class ElevateIntegrationService
                         'status'                => ElevateWorkOrderMapping::STATUS_PAYMENT_CREATED,
                     ]);
 
-                    Log::info('[Elevate] Receivable Payment created', [
-                        'work_order_id'   => $workOrderId,
-                        'payment_id'      => $payment->id,
-                        'payment_number'  => $payment->payment_number,
-                        'total_payment'   => $payment->total_payment,
+                    Log::info('[Elevate] Receivable Payment created (draft journal)', [
+                        'work_order_id'  => $workOrderId,
+                        'payment_id'     => $payment->id,
+                        'payment_number' => $payment->payment_number,
+                        'total_payment'  => $payment->total_payment,
                     ]);
                 }
+
+                $payment = ReceivablePayment::findOrFail($mapping->receivable_payment_id);
+                $this->postReceivablePaymentJournal($payment);
+
+                $invoice->refresh();
+                $this->receivablePayableService->updateOutstandingJournalEntryForSalesInvoice($invoice);
 
                 $mapping->update([
                     'status'        => ElevateWorkOrderMapping::STATUS_COMPLETED,
@@ -159,6 +163,62 @@ class ElevateIntegrationService
         }
     }
 
+    protected function postSalesInvoiceJournal(SalesInvoice $invoice): void
+    {
+        $journalEntry = JournalEntry::where('reference_type', SalesInvoice::class)
+            ->where('reference_id', $invoice->id)
+            ->where('sub_module', 'sales_invoice')
+            ->first();
+
+        if (!$journalEntry) {
+            Log::warning('[Elevate] No draft journal entry found for Sales Invoice — skipping posting', [
+                'invoice_id' => $invoice->id,
+            ]);
+        } else {
+            $journalEntry->update([
+                'is_posted'          => true,
+                'status'             => 'posted',
+                'posted_by_user_id'  => $this->getSystemUserId(),
+                'posted_at'          => now(),
+                'updated_by_user_id' => $this->getSystemUserId(),
+            ]);
+        }
+
+        $invoice->update([
+            'status'             => 'posted',
+            'updated_by_user_id' => $this->getSystemUserId(),
+        ]);
+    }
+
+    
+    protected function postReceivablePaymentJournal(ReceivablePayment $payment): void
+    {
+        $journalEntry = JournalEntry::where('reference_type', ReceivablePayment::class)
+            ->where('reference_id', $payment->id)
+            ->where('sub_module', 'receivable_payment')
+            ->first();
+
+        if (!$journalEntry) {
+            Log::warning('[Elevate] No draft journal entry found for Receivable Payment — skipping posting', [
+                'payment_id' => $payment->id,
+            ]);
+        } else {
+            $journalEntry->update([
+                'is_posted'          => true,
+                'status'             => 'posted',
+                'posted_by_user_id'  => $this->getSystemUserId(),
+                'posted_at'          => now(),
+                'updated_by_user_id' => $this->getSystemUserId(),
+            ]);
+        }
+
+        $payment->update([
+            'status'             => 'completed',
+            'updated_by_user_id' => $this->getSystemUserId(),
+        ]);
+    }
+
+   
     protected function findOrCreateContact(array $customerData, int $companyId): Contact
     {
         $email = trim($customerData['email'] ?? '');
@@ -177,7 +237,7 @@ class ElevateIntegrationService
             return $contact;
         }
 
-        $contact = Contact::create([
+        return Contact::create([
             'name'               => $name ?: $email,
             'email'              => $email,
             'phone'              => $customerData['phone'] ?? null,
@@ -188,11 +248,9 @@ class ElevateIntegrationService
             'company_id'         => $companyId,
             'created_by_user_id' => $this->getSystemUserId(),
         ]);
-
-        return $contact;
     }
 
-    
+
     protected function createSalesInvoice(
         int    $contactId,
         string $workOrderNumber,
@@ -204,7 +262,6 @@ class ElevateIntegrationService
         $existing = SalesInvoice::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
             ->first();
-
         if ($existing) {
             return $existing;
         }
@@ -230,7 +287,7 @@ class ElevateIntegrationService
                     'description'  => 'Jasa Work Order: ' . $workOrderNumber,
                     'quantity'     => 1,
                     'unit_price'   => $billingAmount,
-                    'unit_code'    => null, 
+                    'unit_code'    => null,
                 ],
             ];
 
@@ -240,65 +297,69 @@ class ElevateIntegrationService
             ]);
         }
 
-        $totals = $this->calculateInvoiceTotals($items, $companyId);
+        $totals = $this->calculateInvoiceTotals($items);
 
         $invoice = SalesInvoice::create([
-            'invoice_number'    => null,         
-            'date'              => $invoiceDate,
-            'reference_no'      => $workOrderNumber,
-            'description'       => 'Work Order: ' . $workOrderNumber,
-            'customer_id'       => $contactId,
-            'company_id'        => $companyId,
-            'subtotal'          => $totals['subtotal'],
-            'discount'          => 0,
-            'tax_amount'        => $totals['tax_amount'],   
-            'other_charges'     => 0,
-            'total_amount'      => $totals['total_amount'],
-            'paid_amount'       => 0,
+            'invoice_number'     => null,          
+            'date'               => $invoiceDate,
+            'due_date'           => $invoiceDate,  
+            'reference_no'       => $workOrderNumber,
+            'description'        => 'Work Order: ' . $workOrderNumber,
+            'customer_id'        => $contactId,
+            'company_id'         => $companyId,
+            'subtotal'           => $totals['subtotal'],
+            'discount'           => 0,
+            'tax_amount'         => $totals['tax_amount'],
+            'other_charges'      => 0,
+            'total_amount'       => $totals['total_amount'],
+            'paid_amount'        => 0,
             'outstanding_amount' => $totals['total_amount'],
-            'is_paid'           => false,
-            'status'            => 'draft',
-            'is_locked'         => false,
+            'is_paid'            => false,
+            'status'             => 'draft',
+            'is_locked'          => false,
             'created_by_user_id' => $this->getSystemUserId(),
             'updated_by_user_id' => $this->getSystemUserId(),
         ]);
 
         foreach ($items as $item) {
-            $product  = $this->resolveProduct($item['product_code'] ?? null, $companyId);
-            $unit     = $this->resolveUnit($item['unit_code'] ?? null, $companyId);
-            $qty      = (float) ($item['quantity']   ?? 1);
-            $price    = (float) ($item['unit_price'] ?? 0);
+            $product   = $this->resolveProduct($item['product_code'] ?? null, $companyId);
+            $unit      = $this->resolveUnit($item['unit_code'] ?? null, $companyId);
+            $qty       = (float) ($item['quantity']   ?? 1);
+            $price     = (float) ($item['unit_price'] ?? 0);
             $lineTotal = $qty * $price;
 
             if (!$product) {
-                throw new \InvalidArgumentException("Produk dengan kode '{$item['product_code']}' tidak ditemukan atau tidak aktif.");
+                throw new \InvalidArgumentException(
+                    "Produk dengan kode '{$item['product_code']}' tidak ditemukan atau tidak aktif."
+                );
             }
 
             if (!$unit) {
                 $unit = Unit::where(function ($q) use ($companyId) {
                     $q->where('company_id', $companyId)->orWhereNull('company_id');
                 })->first();
-                
+
                 if (!$unit) {
-                    throw new \InvalidArgumentException("Unit dengan kode '{$item['unit_code']}' tidak ditemukan dan sistem gagal menemukan unit default.");
+                    throw new \InvalidArgumentException(
+                        "Unit dengan kode '{$item['unit_code']}' tidak ditemukan dan tidak ada unit default."
+                    );
                 }
             }
 
             SalesInvoiceItem::create([
-                'sales_invoice_id' => $invoice->id,
-                'product_id'       => $product->id,
-                'unit_id'          => $unit->id,
-                'description'      => $item['description'] ?? ($product?->name ?? 'Item'),
-                'quantity'         => $qty,
-                'unit_price'       => $price,
-                'total'            => $lineTotal,
-                'tax_id'           => null,   
-                'tax_amount'       => 0,
-                'discount'         => 0,
+                'sales_invoice_id'    => $invoice->id,
+                'product_id'          => $product->id,
+                'unit_id'             => $unit->id,
+                'description'         => $item['description'] ?? $product->name ?? 'Item',
+                'quantity'            => $qty,
+                'unit_price'          => $price,
+                'total'               => $lineTotal,
+                'tax_id'              => null,
+                'tax_amount'          => 0,
+                'discount'            => 0,
                 'discount_percentage' => 0,
             ]);
         }
-
 
         return $invoice;
     }
@@ -314,7 +375,6 @@ class ElevateIntegrationService
         $existing = ReceivablePayment::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
             ->first();
-
         if ($existing) {
             return $existing;
         }
@@ -322,7 +382,7 @@ class ElevateIntegrationService
         $totalAmount = (float) $invoice->total_amount;
 
         $payment = ReceivablePayment::create([
-            'payment_number'     => null,         
+            'payment_number'     => null,          
             'payment_date'       => $paymentDate,
             'reference_no'       => $workOrderNumber,
             'description'        => 'Payment for Work Order: ' . $workOrderNumber,
@@ -330,7 +390,7 @@ class ElevateIntegrationService
             'bank_account_id'    => $bankAccountId,
             'total_payment'      => $totalAmount,
             'payment_method'     => 'bank_transfer',
-            'status'             => 'completed',
+            'status'             => 'draft',      
             'company_id'         => $companyId,
             'created_by_user_id' => $this->getSystemUserId(),
             'updated_by_user_id' => $this->getSystemUserId(),
@@ -340,34 +400,27 @@ class ElevateIntegrationService
             'receivable_payment_id' => $payment->id,
             'sales_invoice_id'      => $invoice->id,
             'date'                  => $paymentDate,
-            'amount'                => $totalAmount,         
-            'paid_amount'           => 0,                   
+            'amount'                => $totalAmount,
+            'paid_amount'           => 0,
             'discount_amount'       => 0,
             'write_off_amount'      => 0,
-            'set_payment'           => $totalAmount,        
+            'set_payment'           => $totalAmount,
         ]);
-
-        $newPaidAmount      = $totalAmount;
-        $newOutstandingAmount = 0;
 
         $invoice->update([
-            'paid_amount'       => $newPaidAmount,
-            'outstanding_amount' => $newOutstandingAmount,
-            'is_paid'           => true,
-            'status'            => 'paid',
+            'paid_amount'        => $totalAmount,
+            'outstanding_amount' => 0,
+            'is_paid'            => true,
+            'status'             => 'paid',
+            'updated_by_user_id' => $this->getSystemUserId(),
         ]);
 
-        $payment->refresh();  // ensure relations are loaded fresh
+        $payment->refresh();
         $this->receivablePayableService->createJournalEntryForReceivablePayment($payment);
-
-        $invoice->refresh();
-        $this->receivablePayableService->updateOutstandingJournalEntryForSalesInvoice($invoice);
 
         return $payment;
     }
-
- 
-    protected function calculateInvoiceTotals(array $items, int $companyId): array
+    protected function calculateInvoiceTotals(array $items): array
     {
         $subtotal  = 0.0;
         $taxAmount = 0.0;
@@ -378,16 +431,13 @@ class ElevateIntegrationService
             $subtotal += $qty * $price;
         }
 
-        $total = $subtotal + $taxAmount;
-
         return [
             'subtotal'     => round($subtotal, 2),
             'tax_amount'   => round($taxAmount, 2),
-            'total_amount' => round($total, 2),
+            'total_amount' => round($subtotal + $taxAmount, 2),
         ];
     }
 
-    
     protected function resolveProduct(?string $productCode, int $companyId): ?Product
     {
         if (!$productCode) {
@@ -396,8 +446,7 @@ class ElevateIntegrationService
 
         $product = Product::where('code', $productCode)
             ->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                  ->orWhereNull('company_id');
+                $q->where('company_id', $companyId)->orWhereNull('company_id');
             })
             ->first();
 
@@ -411,7 +460,6 @@ class ElevateIntegrationService
         return $product;
     }
 
-
     protected function resolveUnit(?string $unitCode, int $companyId): ?Unit
     {
         if (!$unitCode) {
@@ -420,20 +468,17 @@ class ElevateIntegrationService
 
         return Unit::where('code', $unitCode)
             ->where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                  ->orWhereNull('company_id');
+                $q->where('company_id', $companyId)->orWhereNull('company_id');
             })
             ->first();
     }
 
-    
     protected function resolveBankAccountId(?int $bankAccountId, int $companyId): int
     {
         if ($bankAccountId) {
             $account = Account::where('id', $bankAccountId)
                 ->where(function ($q) use ($companyId) {
-                    $q->where('company_id', $companyId)
-                      ->orWhereNull('company_id');
+                    $q->where('company_id', $companyId)->orWhereNull('company_id');
                 })
                 ->where('is_cash_bank', true)
                 ->where('is_active', true)
@@ -443,16 +488,10 @@ class ElevateIntegrationService
             if ($account) {
                 return $account->id;
             }
-
-            Log::warning('[Elevate] Provided bank_account_id (COA Account) not found or not cash/bank, falling back', [
-                'bank_account_id' => $bankAccountId,
-                'company_id'      => $companyId,
-            ]);
         }
 
         $fallback = Account::where(function ($q) use ($companyId) {
-                $q->where('company_id', $companyId)
-                  ->orWhereNull('company_id');
+                $q->where('company_id', $companyId)->orWhereNull('company_id');
             })
             ->where('is_cash_bank', true)
             ->where('is_active', true)
@@ -470,12 +509,10 @@ class ElevateIntegrationService
         return $fallback->id;
     }
 
-    
     protected function getSystemUserId(): int
     {
         return (int) config('elevate.system_user_id', 1);
     }
-
 
     protected function buildResult(ElevateWorkOrderMapping $mapping, string $action): array
     {
