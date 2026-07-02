@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PayablePayments\Tables;
 
 use App\Filament\Resources\PayablePayments\PayablePaymentResource;
+use App\Filament\Actions\RegenerateJournalEntry;
 use App\Filament\Actions\ViewJournalVoucherAction;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -128,6 +129,8 @@ class PayablePaymentsTable
             ->recordActions([
                 ActionGroup::make([
                     ViewJournalVoucherAction::make(),
+                    RegenerateJournalEntry::make('regenerateJournalEntry')
+                        ->visible(fn ($record) => $record->status !== 'pending'),
                     \Filament\Actions\Action::make('print')
                         ->label(__('Print Invoice'))
                         ->icon('heroicon-o-printer')

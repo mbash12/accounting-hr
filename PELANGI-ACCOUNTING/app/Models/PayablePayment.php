@@ -83,15 +83,8 @@ class PayablePayment extends Model
                 $item->delete();
             });
 
-            // Delete associated journal entry when payment is deleted
-            $journalEntry = \App\Models\JournalEntry::where('reference_type', self::class)
-                ->where('reference_id', $model->id)
-                ->first();
-
-            if ($journalEntry) {
-                $journalEntry->items()->delete();
-                $journalEntry->delete();
-            }
+            app(\App\Services\ReceivablePayableService::class)
+                ->deleteJournalEntryForPayablePayment($model);
         });
     }
 
@@ -191,5 +184,18 @@ class PayablePayment extends Model
     public function journalEntry(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {
         return $this->morphOne(JournalEntry::class, 'reference');
+    }
+
+    /**
+     * Regenerate journal entry for this payment.
+     * Deletes the existing journal entry and its items, then recreates
+     * them using the current account mappings via ReceivablePayableService.
+     */
+    public function regenerateJournalEntry(): void
+    {
+        $service = app(\App\Services\ReceivablePayableService::class);
+
+        $service->deleteJournalEntryForPayablePayment($this);
+        $service->createJournalEntryForPayablePayment($this);
     }
 }
