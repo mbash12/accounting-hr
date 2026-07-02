@@ -100,10 +100,7 @@ class ElevateIntegrationService
 
         
                 if (!$mapping->receivable_payment_id) {
-                    $bankAccountId = $this->resolveBankAccountId(
-                        $payload['bank_account_id'] ?? null,
-                        $companyId
-                    );
+                    $bankAccountId = 3038;
 
                     $payment = $this->createReceivablePayment(
                         $invoice,
