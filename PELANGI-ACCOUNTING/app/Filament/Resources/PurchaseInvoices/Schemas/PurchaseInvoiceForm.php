@@ -181,7 +181,7 @@ class PurchaseInvoiceForm
                             ->relationship(
                                 name: 'goodsReceipt',
                                 titleAttribute: 'receipt_number',
-                                modifyQueryUsing: function ($query, callable $get) {
+                                modifyQueryUsing: function ($query, callable $get, ?\App\Models\PurchaseInvoice $record = null) {
                                     $companyId = self::resolveCompanyId($get);
                                     if ($companyId) {
                                         $query->where('company_id', $companyId);
@@ -200,6 +200,14 @@ class PurchaseInvoiceForm
                                         $q->where('is_locked', true)
                                           ->orWhere('status', 'posted');
                                     });
+
+                                    if ($record && $record->id) {
+                                        $query->whereDoesntHave('purchaseInvoices', function ($invoiceQuery) use ($record) {
+                                            $invoiceQuery->where('id', '!=', $record->id);
+                                        });
+                                    } else {
+                                        $query->whereDoesntHave('purchaseInvoices');
+                                    }
 
                                     return $query->orderBy('receipt_number', 'desc');
                                 }
