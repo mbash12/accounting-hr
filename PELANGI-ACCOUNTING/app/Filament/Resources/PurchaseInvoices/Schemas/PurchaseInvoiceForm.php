@@ -195,8 +195,11 @@ class PurchaseInvoiceForm
                                         $query->where('supplier_id', $supplierId);
                                     }
 
-                                    // Only show locked goods receipts
-                                    $query->where('is_locked', true);
+                                    // Only show locked or posted goods receipts
+                                    $query->where(function($q) {
+                                        $q->where('is_locked', true)
+                                          ->orWhere('status', 'posted');
+                                    });
 
                                     return $query->orderBy('receipt_number', 'desc');
                                 }
