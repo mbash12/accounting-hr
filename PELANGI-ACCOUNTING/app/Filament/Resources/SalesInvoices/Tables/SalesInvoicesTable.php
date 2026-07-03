@@ -28,6 +28,11 @@ class SalesInvoicesTable
                     ->label(__("Invoice No."))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make("reference_no")
+                    ->label(__("Reference No"))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make("date")
                     ->label(__("Invoice Date"))
                     ->date()

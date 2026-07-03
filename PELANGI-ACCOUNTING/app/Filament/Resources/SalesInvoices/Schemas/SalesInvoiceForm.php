@@ -367,7 +367,7 @@ class SalesInvoiceForm
                             ->dehydrated(),
                         TextInput::make('reference_no')
                             ->maxLength(255)
-                            ->label('Tax Ref No.'),
+                            ->label('Reference No'),
                         Textarea::make('description')
                             ->rows(1)
                             ->maxLength(65535)
