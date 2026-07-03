@@ -33,6 +33,11 @@ class PurchaseOrdersTable
                     ->copyable()
                     ->weight("bold")
                     ->label(__("Purchase Order No.")),
+                TextColumn::make("reference_no")
+                    ->searchable()
+                    ->copyable()
+                    ->label(__("Reference No"))
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make("date")
                     ->date()
                     ->sortable()

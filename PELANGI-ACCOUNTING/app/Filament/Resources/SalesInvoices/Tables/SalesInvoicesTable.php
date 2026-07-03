@@ -32,6 +32,7 @@ class SalesInvoicesTable
                     ->label(__("Reference No"))
                     ->searchable()
                     ->sortable()
+                    ->copyable()
                     ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make("date")
                     ->label(__("Invoice Date"))
