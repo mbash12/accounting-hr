@@ -24,7 +24,7 @@ class CreatePurchaseInvoiceFromGoodsReceipt extends Action
             ->icon('heroicon-o-document-text')
             ->color('success')
             ->visible(function (GoodsReceipt $record): bool {
-                if (!$record->is_locked) return false;
+                if (!$record->is_locked && $record->status !== 'posted') return false;
                 // Hide if all items are fully returned
                 if ($record->computeReturnMeta()['remaining'] <= 0) return false;
                 // Guard against duplicate invoices
