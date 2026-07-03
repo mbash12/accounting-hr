@@ -193,6 +193,11 @@ class PayablePayment extends Model
      */
     public function regenerateJournalEntry(): void
     {
+        // Capture the existing journal entry status before deletion
+        $existingEntry = \App\Models\JournalEntry::where('reference_type', PayablePayment::class)
+            ->where('reference_id', $this->id)
+            ->first(['status', 'is_posted']);
+
         $service = app(\App\Services\ReceivablePayableService::class);
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($service) {
@@ -201,5 +206,13 @@ class PayablePayment extends Model
         });
 
         $this->load('journalEntry');
+
+        // Restore the original status
+        if ($existingEntry && $this->journalEntry) {
+            $this->journalEntry->update([
+                'status' => $existingEntry->status,
+                'is_posted' => $existingEntry->is_posted,
+            ]);
+        }
     }
 }
