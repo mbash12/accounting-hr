@@ -34,6 +34,12 @@ class BankForm
                         ->required()
                         ->maxLength(200)
                         ->columnSpanFull(),
+                    TextInput::make('country')
+                        ->label(__('Country'))
+                        ->default('Indonesia')
+                        ->readonly()
+                        ->required()
+                        ->maxLength(100),
                     TextInput::make('clearing_code')
                         ->label(__('Clearing Code'))
                         ->maxLength(20),
