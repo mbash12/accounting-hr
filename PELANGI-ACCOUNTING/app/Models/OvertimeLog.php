@@ -28,11 +28,23 @@ class OvertimeLog extends Model
                 }
             }
         });
+
+        // Always recalculate hours from time_start/time_end before saving
+        static::saving(function ($model) {
+            if ($model->time_start && $model->time_end) {
+                $start = \Carbon\Carbon::parse($model->time_start);
+                $end   = \Carbon\Carbon::parse($model->time_end);
+                $mins  = abs($end->diffInMinutes($start));
+                $model->hours = max(0.5, round($mins / 60, 2));
+            }
+        });
     }
 
     protected $fillable = [
         'employee_id',
         'date',
+        'time_start',
+        'time_end',
         'hours',
         'is_holiday',
         'calculated_amount',
@@ -47,6 +59,8 @@ class OvertimeLog extends Model
     {
         return [
             'date' => 'date',
+            'time_start' => 'datetime:H:i',
+            'time_end' => 'datetime:H:i',
             'hours' => 'decimal:2',
             'is_holiday' => 'boolean',
             'calculated_amount' => 'decimal:2',

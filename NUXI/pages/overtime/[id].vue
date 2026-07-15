@@ -57,7 +57,7 @@ const cancel = (update = false) => {
                             timer: 2000,
                         })
                         .then(async () => {
-                            router.push("/home");
+                            router.replace("/overtime/list");
                         });
                 }
             }
@@ -107,8 +107,16 @@ const cancel = (update = false) => {
                             }}</span>
                         </div>
                         <div class="flex justify-between items-center py-4 border-b text-sm font-medium">
-                            <span class="text-gray-500">Jam Lembur</span>
-                            <span class="capitalize">{{ state.data?.hours ?? 0 }} Jam</span>
+                            <span class="text-gray-500">Jam Mulai</span>
+                            <span>{{ state.data?.time_start ?? "-" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-4 border-b text-sm font-medium">
+                            <span class="text-gray-500">Jam Selesai</span>
+                            <span>{{ state.data?.time_end ?? "-" }}</span>
+                        </div>
+                        <div class="flex justify-between items-center py-4 border-b text-sm font-medium">
+                            <span class="text-gray-500">Durasi</span>
+                            <span>{{ state.data?.hours ?? 0 }} Jam</span>
                         </div>
                         <div class="flex justify-between items-center py-4 border-b text-sm font-medium">
                             <span class="text-gray-500">Hari Libur</span>

@@ -9,7 +9,15 @@ class OvertimeLogObserver
 {
     public function updated(OvertimeLog $overtimeLog): void
     {
-        if (!$overtimeLog->isDirty('status') || $overtimeLog->status !== 'approved') {
+        // Recalculate when:
+        // 1. Status changes to 'approved'
+        // 2. hours or is_holiday changes while status is already 'approved'
+        $statusApproved = $overtimeLog->status === 'approved';
+        $justApproved = $overtimeLog->isDirty('status') && $statusApproved;
+        $fieldsChangedWhileApproved = $statusApproved
+            && ($overtimeLog->isDirty('hours') || $overtimeLog->isDirty('is_holiday'));
+
+        if (! $justApproved && ! $fieldsChangedWhileApproved) {
             return;
         }
 

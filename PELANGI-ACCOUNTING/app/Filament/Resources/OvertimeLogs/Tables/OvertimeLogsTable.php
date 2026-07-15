@@ -30,9 +30,19 @@ class OvertimeLogsTable
                     ->label(__('Date'))
                     ->date()
                     ->sortable(),
+                TextColumn::make('time_start')
+                    ->label(__('Start'))
+                    ->time('H:i')
+                    ->sortable(),
+                TextColumn::make('time_end')
+                    ->label(__('End'))
+                    ->time('H:i')
+                    ->sortable(),
                 TextColumn::make('hours')
                     ->label(__('Hours'))
-                    ->sortable(),
+                    ->numeric(2)
+                    ->sortable()
+                    ->suffix(' hrs'),
                 IconColumn::make('is_holiday')
                     ->label(__('Holiday'))
                     ->boolean(),

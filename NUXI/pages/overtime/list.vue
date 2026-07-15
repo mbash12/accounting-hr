@@ -1,14 +1,9 @@
 <script setup>
-import { onMounted, reactive, computed, ref } from "vue";
+import { onMounted, reactive, computed } from "vue";
 import { getOvertimes, loading } from "@/deps/service.js";
 import { Icon } from "@iconify/vue";
-import { onClickOutside } from "@vueuse/core";
 
 const router = useRouter();
-
-const fabOpen = ref(false);
-const fabRef = ref(null);
-onClickOutside(fabRef, () => (fabOpen.value = false));
 
 const state = reactive({
     data: [],
@@ -96,7 +91,8 @@ onMounted(() => {
                     <div class="flex gap-4 text-xs text-gray-500">
                         <div class="flex items-center gap-1">
                             <Icon icon="solar:clock-square-bold-duotone" width="14" height="14" class="text-blue-500" />
-                            <span>{{ item.hours }} Jam</span>
+                            <span v-if="item.time_start && item.time_end">{{ item.time_start }} - {{ item.time_end }} ({{ item.hours }} Jam)</span>
+                            <span v-else>{{ item.hours }} Jam</span>
                         </div>
                         <div class="flex items-center gap-1" v-if="item.is_holiday">
                             <Icon icon="solar:calendar-mark-bold-duotone" width="14" height="14" class="text-red-500" />
@@ -126,32 +122,16 @@ onMounted(() => {
                 </button>
             </div>
         </div>
-        <div class="absolute right-5px bottom-10px z-50" ref="fabRef">
-            <div class="relative flex flex-col items-end gap-2">
-                <Transition>
-                    <div class="flex flex-col items-end gap-2 mr-1" v-if="fabOpen">
-                        <button
-                            class="flex items-center gap-2 bg-white shadow text-[#40B6F4] px-6 py-2.5 text-xs rounded-full font-semibold"
-                            @click="router.push('/overtime')"
-                        >
-                            <Icon icon="solar:clock-circle-bold-duotone" width="1.5rem" height="1.5rem" />
-                            <span>Pengajuan Lembur</span>
-                        </button>
-                    </div>
-                </Transition>
-                <button
-                    class="rounded-full text-[#40B6F4] flex items-center justify-center shadow-lg overflow-hidden bg-white"
-                    @click="fabOpen = !fabOpen"
-                >
-                    <Icon
-                        icon="solar:add-circle-bold"
-                        width="3rem"
-                        height="3rem"
-                        class="transform transition-all duration-300 scale-115"
-                        :class="fabOpen ? 'rotate-45' : 'rotate-0'"
-                    />
-                </button>
-            </div>
-        </div>
+        <button
+            class="absolute right-5px bottom-10px z-50 rounded-full text-[#40B6F4] flex items-center justify-center shadow-lg overflow-hidden bg-white"
+            @click="router.push('/overtime')"
+        >
+            <Icon
+                icon="solar:add-circle-bold"
+                width="3rem"
+                height="3rem"
+                class="scale-115"
+            />
+        </button>
     </main>
 </template>

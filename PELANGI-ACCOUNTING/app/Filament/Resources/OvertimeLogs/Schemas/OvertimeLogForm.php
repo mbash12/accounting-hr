@@ -8,6 +8,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -53,22 +54,47 @@ class OvertimeLogForm
                                 }
                             })
                             ->disabled($disabled),
+                        TimePicker::make('time_start')
+                            ->label(__('Start Time'))
+                            ->seconds(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                $start = $state;
+                                $end = $get('time_end');
+                                if ($start && $end) {
+                                    $mins = abs(\Carbon\Carbon::parse($end)->diffInMinutes(\Carbon\Carbon::parse($start)));
+                                    $set('hours', max(0.5, round($mins / 60, 2)));
+                                }
+                            })
+                            ->disabled($disabled),
+                        TimePicker::make('time_end')
+                            ->label(__('End Time'))
+                            ->seconds(false)
+                            ->live()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                $start = $get('time_start');
+                                $end = $state;
+                                if ($start && $end) {
+                                    $mins = abs(\Carbon\Carbon::parse($end)->diffInMinutes(\Carbon\Carbon::parse($start)));
+                                    $set('hours', max(0.5, round($mins / 60, 2)));
+                                }
+                            })
+                            ->disabled($disabled),
                         TextInput::make('hours')
                             ->label(__('Overtime Hours'))
                             ->numeric()
                             ->required()
                             ->minValue(0.5)
                             ->step(0.5)
-                            ->disabled($disabled),
+                            ->suffix(__('hours'))
+                            ->readonly(),
                         Toggle::make('is_holiday')
                             ->label(__('Holiday'))
                             ->default(false)
-                            ->helperText(__('Auto-detected based on department schedule and company holidays. You can override manually.'))
-                            ->disabled($disabled),
+                            ->helperText(__('Auto-detected based on department schedule and company holidays. You can override manually.')),
                         Textarea::make('reason')
                             ->label(__('Reason'))
-                            ->columnSpanFull()
-                            ->disabled($disabled),
+                            ->columnSpanFull(),
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
@@ -78,7 +104,7 @@ class OvertimeLogForm
                             ])
                             ->default('draft')
                             ->required()
-                            ->disabled($disabled),
+                            ->disabled(),
                         TextInput::make('calculated_amount')
                             ->label(__('Overtime Allowance'))
                             ->numeric()

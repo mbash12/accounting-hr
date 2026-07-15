@@ -29,9 +29,18 @@ const getForm = async () => {
     loading();
     const res = await getSingleOvertime(state.form.id);
     state.form.date = new Date(res.date);
-    const startStr = res.date;
-    state.form.time_start = null;
-    state.form.time_end = null;
+    if (res.time_start) {
+        const [sh, sm] = res.time_start.split(":").map(Number);
+        state.form.time_start = { hours: sh, minutes: sm };
+    } else {
+        state.form.time_start = null;
+    }
+    if (res.time_end) {
+        const [eh, em] = res.time_end.split(":").map(Number);
+        state.form.time_end = { hours: eh, minutes: em };
+    } else {
+        state.form.time_end = null;
+    }
     state.form.reason = res.reason;
     state.is_holiday = res.is_holiday;
     loading(false);
@@ -81,11 +90,16 @@ const handleSubmit = async (e) => {
 
     const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`;
 
+    const pad = (n) => String(n).padStart(2, "0");
+    const timeStart = `${pad(state.form.time_start.hours)}:${pad(state.form.time_start.minutes)}`;
+    const timeEnd = `${pad(state.form.time_end.hours)}:${pad(state.form.time_end.minutes)}`;
+
     const data = {
         date: dateStr,
+        time_start: timeStart,
+        time_end: timeEnd,
         hours,
         reason: state.form.reason ?? null,
-        is_holiday: state.is_holiday,
         status: "submitted",
     };
 
@@ -102,7 +116,7 @@ const handleSubmit = async (e) => {
         showConfirmButton: false,
         timer: 2000,
     }).then(async () => {
-        router.push("/home");
+        router.replace("/overtime/list");
     });
 };
 

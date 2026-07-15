@@ -246,6 +246,8 @@ const mapAccountingOvertimeToApp = (overtime) => {
         id: overtime.id,
         employee_id: overtime.employee_id,
         date: overtime.date,
+        time_start: overtime.time_start ?? null,
+        time_end: overtime.time_end ?? null,
         hours: Number(overtime.hours ?? 0),
         is_holiday: Boolean(overtime.is_holiday),
         calculated_amount: Number(overtime.calculated_amount ?? 0),
@@ -259,6 +261,8 @@ const mapAccountingOvertimeToApp = (overtime) => {
 const mapAppOvertimeToAccounting = (payload) => {
     return {
         date: payload.date,
+        time_start: payload.time_start ?? null,
+        time_end: payload.time_end ?? null,
         hours: Number(payload.hours ?? payload.duration ?? 0),
         is_holiday: Boolean(payload.is_holiday ?? false),
         reason: payload.reason ?? payload.description ?? null,
