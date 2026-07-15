@@ -11,7 +11,7 @@ use Filament\Schemas\Schema;
 
 class PermitForm
 {
-    public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema, bool $disabled = false): Schema
     {
         return $schema
             ->components([
@@ -34,7 +34,8 @@ class PermitForm
                             )
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->disabled($disabled),
                         Select::make('type')
                             ->label(__('Type'))
                             ->options([
@@ -56,7 +57,8 @@ class PermitForm
                                 'sudden' => __('Emergency Leave'),
                                 'others' => __('Permit'),
                             ])
-                            ->required(),
+                            ->required()
+                            ->disabled($disabled),
                         Select::make('status')
                             ->label(__('Status'))
                             ->options([
@@ -65,20 +67,25 @@ class PermitForm
                                 'rejected' => __('Rejected'),
                             ])
                             ->default('pending')
-                            ->required(),
+                            ->required()
+                            ->disabled($disabled),
                         DatePicker::make('start_date')
                             ->label(__('Start Date'))
-                            ->required(),
+                            ->required()
+                            ->disabled($disabled),
                         DatePicker::make('end_date')
                             ->label(__('End Date'))
-                            ->required(),
+                            ->required()
+                            ->disabled($disabled),
                         FileUpload::make('attachment_path')
                             ->label(__('Attachment (Doctor Certificate, etc.)'))
                             ->directory('permits')
-                            ->columnSpan(1),
+                            ->columnSpan(1)
+                            ->disabled($disabled),
                         Textarea::make('reason')
                             ->label(__('Reason'))
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->disabled($disabled),
                     ])
                     ->columns(3)
                     ->columnSpanFull(),

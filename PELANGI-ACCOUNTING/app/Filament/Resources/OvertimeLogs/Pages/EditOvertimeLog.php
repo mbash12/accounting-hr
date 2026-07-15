@@ -23,7 +23,7 @@ class EditOvertimeLog extends EditRecord
     {
         return [
             Action::make('approve')
-                ->label(__('Setujui'))
+                ->label(__('Approve'))
                 ->color('success')
                 ->icon('heroicon-o-check')
                 ->requiresConfirmation()
@@ -40,7 +40,7 @@ class EditOvertimeLog extends EditRecord
                     $this->redirect($this->getResource()::getUrl('index'));
                 }),
             Action::make('reject')
-                ->label(__('Tolak'))
+                ->label(__('Reject'))
                 ->color('danger')
                 ->icon('heroicon-o-x-mark')
                 ->requiresConfirmation()
