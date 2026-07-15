@@ -62,6 +62,16 @@ class OvertimeRuleForm
                             ->decimal(true),
                         Toggle::make('is_default')
                             ->label(__('Default'))
+                            ->helperText(__('Only one default rule per company is allowed. Enabling this will automatically unmark any other default rule.'))
+                            ->hintIcon(
+                                fn ($get) => filled($get('department_id'))
+                                    ? 'heroicon-m-exclamation-triangle'
+                                    : null,
+                                fn ($get) => filled($get('department_id'))
+                                    ? __('This rule is department-specific. It will only be used as fallback for that department. For a global default, leave the Department empty.')
+                                    : null
+                            )
+                            ->hintColor(fn ($get) => filled($get('department_id')) ? 'warning' : null)
                             ->default(false),
                         Toggle::make('is_active')
                             ->label(__('Active'))

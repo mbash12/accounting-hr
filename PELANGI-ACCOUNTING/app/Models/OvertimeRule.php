@@ -16,17 +16,30 @@ class OvertimeRule extends Model
     {
         parent::boot();
 
-        static::creating(function ($model) {
-            if (Auth::check() && !$model->created_by_user_id) {
+        static::saving(function ($model) {
+            // Populate audit fields before enforcing single-default constraint.
+            if (Auth::check() && ! $model->created_by_user_id) {
                 $model->created_by_user_id = Auth::id();
             }
 
-            if (!$model->company_id) {
+            if (! $model->company_id) {
                 $selectedCompanyId = session('selected_company_id');
                 if ($selectedCompanyId) {
                     $model->company_id = $selectedCompanyId;
                 }
             }
+
+            // Ensure only one default rule per company.
+            // Fires on both create and update (via Filament form or import).
+            if (! $model->is_default) {
+                return;
+            }
+
+            static::query()
+                ->where('company_id', $model->company_id)
+                ->where('id', '!=', $model->getKey() ?? 0)
+                ->where('is_default', true)
+                ->update(['is_default' => false]);
         });
     }
 

@@ -272,12 +272,16 @@ class PayrollService
      */
     public function calculateOvertime(Employee $employee, PayrollPeriod $period)
     {
-        // Find rule for department or default
+        // 1) Try a rule bound to the employee's department first
+        // 2) Fall back to any default rule, preferring a global (no-department) default
         $rule = OvertimeRule::where('department_id', $employee->department_id)
             ->where('is_active', true)
-            ->first() ?? OvertimeRule::whereNull('department_id')
-            ->where('is_default', true)
-            ->first();
+            ->first()
+            ?? OvertimeRule::where('is_default', true)
+                ->where('is_active', true)
+                ->orderByRaw('department_id IS NULL DESC')
+                ->orderBy('id')
+                ->first();
 
         if (!$rule) return 0;
 

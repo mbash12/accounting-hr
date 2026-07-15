@@ -25,9 +25,12 @@ class OvertimeLogObserver
 
         $rule = OvertimeRule::where('department_id', $employee->department_id)
             ->where('is_active', true)
-            ->first() ?? OvertimeRule::whereNull('department_id')
-            ->where('is_default', true)
-            ->first();
+            ->first()
+            ?? OvertimeRule::where('is_default', true)
+                ->where('is_active', true)
+                ->orderByRaw('department_id IS NULL DESC')
+                ->orderBy('id')
+                ->first();
 
         if (!$rule) {
             return;
