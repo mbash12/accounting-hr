@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\OvertimeLogs\Schemas;
 
+use App\Models\OvertimeLog;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Select;
@@ -37,10 +38,20 @@ class OvertimeLogForm
                             ->required()
                             ->searchable()
                             ->preload()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                if ($state && $get('date')) {
+                                    $set('is_holiday', OvertimeLog::isHoliday($state, $get('date')));
+                                }
+                            })
                             ->disabled($disabled),
                         DatePicker::make('date')
                             ->label(__('Date'))
                             ->required()
+                            ->afterStateUpdated(function ($state, $set, $get) {
+                                if ($state) {
+                                    $set('is_holiday', OvertimeLog::isHoliday($get('employee_id'), $state));
+                                }
+                            })
                             ->disabled($disabled),
                         TextInput::make('hours')
                             ->label(__('Overtime Hours'))
@@ -52,6 +63,7 @@ class OvertimeLogForm
                         Toggle::make('is_holiday')
                             ->label(__('Holiday'))
                             ->default(false)
+                            ->helperText(__('Auto-detected based on department schedule and company holidays. You can override manually.'))
                             ->disabled($disabled),
                         Textarea::make('reason')
                             ->label(__('Reason'))

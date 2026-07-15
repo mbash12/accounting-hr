@@ -61,7 +61,7 @@ class EmployeeApiOvertimeController extends Controller
             'employee_id' => $employee->id,
             'date' => $validated['date'],
             'hours' => $validated['hours'],
-            'is_holiday' => $validated['is_holiday'] ?? false,
+            'is_holiday' => $validated['is_holiday'] ?? OvertimeLog::isHoliday($employee->id, $validated['date']),
             'reason' => $validated['reason'] ?? null,
             'status' => 'draft',
             'company_id' => $employee->company_id,

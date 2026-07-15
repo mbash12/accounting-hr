@@ -76,4 +76,49 @@ class OvertimeLog extends Model
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
     }
+
+    /**
+     * Determine if a date is a holiday for the given employee.
+     *
+     * Checks:
+     *  1. Company holidays table
+     *  2. Department's working_days (weekend detection)
+     *  3. Default: Saturday/Sunday
+     *
+     * @param int|null $employeeId
+     * @param string|null $date Y-m-d format or Carbon instance
+     * @return bool
+     */
+    public static function isHoliday(?int $employeeId, $date): bool
+    {
+        if (! $employeeId || ! $date) {
+            return false;
+        }
+
+        $employee = Employee::with('department')->find($employeeId);
+        if (! $employee) {
+            return false;
+        }
+
+        $date = \Carbon\Carbon::parse($date);
+
+        // 1. Check company holidays table
+        $isCompanyHoliday = Holiday::where('company_id', $employee->company_id)
+            ->whereDate('date', $date)
+            ->exists();
+
+        if ($isCompanyHoliday) {
+            return true;
+        }
+
+        // 2. Check weekend based on department's working_days
+        if ($employee->department && filled($employee->department->working_days)) {
+            $dayName = $date->format('l'); // e.g., 'Saturday', 'Sunday'
+
+            return ! in_array($dayName, $employee->department->working_days);
+        }
+
+        // Default: Saturday and Sunday are holidays
+        return $date->isWeekend();
+    }
 }
