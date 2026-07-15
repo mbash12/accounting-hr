@@ -231,7 +231,7 @@ class WismaService
     protected function buildApprovedPurchaseOrderPayload(PurchaseOrder $purchaseOrder, ?string $comment = null): array
     {
         $payload = [
-            'purchase_request_no' => $purchaseOrder->reference_no,
+            'purchase_request_no' => trim(explode('&', $purchaseOrder->reference_no ?? '')[0]),
             'po_no' => $purchaseOrder->purchase_order_no,
             'items' => $purchaseOrder->items
                 ->map(fn ($item) => $this->buildApprovedPurchaseOrderItemPayload($item))
