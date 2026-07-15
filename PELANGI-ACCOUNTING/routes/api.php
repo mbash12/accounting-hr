@@ -50,6 +50,7 @@ Route::prefix('employeeapi')->middleware([EmployeeApiAuth::class])->group(functi
     Route::post('/upload', [EmployeeApiUploadController::class, 'store']);
     Route::get('/permits', [EmployeeApiPermitController::class, 'index']);
     Route::post('/permits', [EmployeeApiPermitController::class, 'store']);
+    Route::get('/permits/quota', [EmployeeApiPermitController::class, 'quota']);
     Route::get('/permits/{permit}', [EmployeeApiPermitController::class, 'show']);
     Route::put('/permits/{permit}', [EmployeeApiPermitController::class, 'update']);
     Route::get('/attendances', [EmployeeApiAttendanceController::class, 'index']);

@@ -254,6 +254,18 @@ const handleSubmit = async (e) => {
         // Subtract weekends and holidays from duration
         data.duration = totalDays - wec - hdc;
 
+        // Quota check for annual leave (both 'annual' and legacy 'annual_leave')
+        const subtypeVal = state.form.subtype?.value;
+        if ((subtypeVal === "annual" || subtypeVal === "annual_leave") && data.duration > state.quota) {
+            $swal.fire({
+                icon: "error",
+                title: "Kuota tidak cukup",
+                text: `Sisa cuti Anda: ${state.quota} hari. Diminta: ${data.duration} hari.`,
+            });
+            loading(false);
+            return;
+        }
+
         data.description = state.form.description;
     }
     if (["wfh"].includes(state.form.subtype?.value)) {

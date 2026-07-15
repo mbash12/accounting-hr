@@ -35,6 +35,7 @@ class EmployeeLeaveQuota extends Model
         'year',
         'total_quota',
         'used_quota',
+        'remaining_quota',
         'company_id',
         'created_by_user_id',
     ];
@@ -65,5 +66,24 @@ class EmployeeLeaveQuota extends Model
     public function createdByUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    /**
+     * Get the employee's leave quota for a specific year.
+     * Returns null if no quota record exists.
+     */
+    public static function getForEmployee(int $employeeId, int $year): ?self
+    {
+        return static::where('employee_id', $employeeId)
+            ->where('year', $year)
+            ->first();
+    }
+
+    /**
+     * Get the current year's quota for an employee.
+     */
+    public static function getCurrentForEmployee(int $employeeId): ?self
+    {
+        return static::getForEmployee($employeeId, (int) now()->year);
     }
 }

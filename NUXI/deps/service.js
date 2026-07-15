@@ -295,13 +295,28 @@ export const updateOvertime = async (id, data) => {
 };
 
 export const getLeaveQuota = async (user_id) => {
-    return {
-        id: null,
-        user_id,
-        quota: 12,
-        taken: 0,
-        balance: 12,
-    };
+    try {
+        const result = await api("get_leave_quota");
+        return {
+            id: result?.id ?? null,
+            user_id,
+            year: result?.year ?? new Date().getFullYear(),
+            quota: Number(result?.quota ?? 0),
+            taken: Number(result?.taken ?? 0),
+            balance: Number(result?.balance ?? 0),
+            message: result?.message ?? null,
+        };
+    } catch (error) {
+        return {
+            id: null,
+            user_id,
+            year: new Date().getFullYear(),
+            quota: 0,
+            taken: 0,
+            balance: 0,
+            message: "Could not fetch leave quota.",
+        };
+    }
 };
 export const getNationalHolidays = async () => {
     try {

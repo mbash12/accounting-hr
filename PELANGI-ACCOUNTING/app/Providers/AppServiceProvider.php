@@ -4,8 +4,12 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
+use App\Models\Employee;
 use App\Models\OvertimeLog;
+use App\Models\Permit;
+use App\Observers\EmployeeObserver;
 use App\Observers\OvertimeLogObserver;
+use App\Observers\PermitObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +28,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // Auto-calculate overtime allowance on approval
         OvertimeLog::observe(OvertimeLogObserver::class);
+
+        // Auto-update leave quota when permit is approved/rejected
+        Permit::observe(PermitObserver::class);
+
+        // Auto-create leave quota for new employees
+        Employee::observe(EmployeeObserver::class);
         FilamentView::registerRenderHook(
             'panels::head.end',
             fn (): string => '<style>

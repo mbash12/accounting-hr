@@ -31,6 +31,12 @@ class Kernel extends ConsoleKernel
             ->dailyAt('01:00')
             ->withoutOverlapping()
             ->appendOutputTo(storage_path('logs/deferred-revenue-recognize.log'));
+
+        // Annual leave quota rollover (runs Jan 1 at 00:05)
+        $schedule->command('leave-quota:rollover')
+            ->cron('5 0 1 1 *')
+            ->withoutOverlapping()
+            ->appendOutputTo(storage_path('logs/leave-quota-rollover.log'));
     }
 
     /**

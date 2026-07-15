@@ -69,6 +69,11 @@ export const apilist = {
       auth:true,
       method:'POST'
   },
+  get_leave_quota: {
+      url:"/employeeapi/permits/quota",
+      auth:true,
+      method:'GET'
+  },
   update_form: {
       url:"/employeeapi/permits",
       auth:true,

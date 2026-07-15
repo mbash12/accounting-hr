@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmployeeLeaveQuota;
 use App\Models\Permit;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,6 +48,39 @@ class EmployeeApiPermitController extends Controller
         return response()->json($this->transform($permit));
     }
 
+    /**
+     * Get the current leave quota for the authenticated employee.
+     * GET /employeeapi/permits/quota
+     */
+    public function quota(Request $request): JsonResponse
+    {
+        $employee = $request->attributes->get('employee');
+        $year = (int) $request->query('year', now()->year);
+
+        $quota = \App\Models\EmployeeLeaveQuota::getForEmployee($employee->id, $year);
+
+        if (! $quota) {
+            return response()->json([
+                'id' => null,
+                'user_id' => $employee->id,
+                'year' => $year,
+                'quota' => 0,
+                'taken' => 0,
+                'balance' => 0,
+                'message' => "No leave quota configured for year {$year}.",
+            ]);
+        }
+
+        return response()->json([
+            'id' => $quota->id,
+            'user_id' => $employee->id,
+            'year' => $quota->year,
+            'quota' => $quota->total_quota,
+            'taken' => $quota->used_quota,
+            'balance' => $quota->remaining_quota,
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $employee = $request->attributes->get('employee');
@@ -58,6 +92,28 @@ class EmployeeApiPermitController extends Controller
             'attachment_path' => ['nullable', 'string'],
             'status' => ['nullable', 'in:pending,approved,rejected'],
         ]);
+
+        // Quota validation for annual leave (both 'annual' and legacy 'annual_leave')
+        if (in_array($validated['type'], ['annual', 'annual_leave'], true)) {
+            $year = (int) \Carbon\Carbon::parse($validated['start_date'])->year;
+            $quota = EmployeeLeaveQuota::getForEmployee($employee->id, $year);
+            $duration = (int) \Carbon\Carbon::parse($validated['start_date'])
+                ->diffInDays(\Carbon\Carbon::parse($validated['end_date'])) + 1;
+
+            if (! $quota) {
+                return response()->json([
+                    'message' => "No leave quota configured for year {$year}. Please contact HR.",
+                ], 422);
+            }
+
+            if ($quota->remaining_quota < $duration) {
+                return response()->json([
+                    'message' => "Insufficient leave quota. Available: {$quota->remaining_quota} day(s), requested: {$duration} day(s).",
+                    'available' => $quota->remaining_quota,
+                    'requested' => $duration,
+                ], 422);
+            }
+        }
 
         $permit = Permit::create([
             'employee_id' => $employee->id,
