@@ -36,7 +36,7 @@ class WismaService
 
         $purchaseOrder->loadMissing('items.product', 'items.unit', 'items.unit.unitCategory');
 
-        $prNo = explode('&', $purchaseOrder->reference_no ?? '')[0];        
+        $prNo = trim(explode('&', $purchaseOrder->reference_no ?? '')[0]);        
         $poNo = $purchaseOrder->purchase_order_no;
         $payload = $this->buildApprovedPurchaseOrderPayload($purchaseOrder, $comment);
 
