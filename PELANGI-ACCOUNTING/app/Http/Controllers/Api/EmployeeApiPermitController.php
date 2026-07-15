@@ -61,6 +61,7 @@ class EmployeeApiPermitController extends Controller
 
         $permit = Permit::create([
             'employee_id' => $employee->id,
+            'company_id' => $employee->company_id,
             'type' => $validated['type'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
