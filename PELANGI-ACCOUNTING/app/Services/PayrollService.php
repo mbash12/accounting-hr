@@ -220,51 +220,79 @@ class PayrollService
     }
 
     /**
-     * Calculate BPJS for an employee
+     * Calculate BPJS for an employee.
+     * Returns zeros if the employee has no registered BPJS number.
      */
     public function calculateBPJS(Employee $employee, float $baseSalary)
     {
-        // BPJS Ketenagakerjaan
-        $jkkRate = 0.0024; // 0.24% (default)
-        $jkmRate = 0.003;  // 0.3%
-        
-        $jkkEmployer = $baseSalary * $jkkRate;
-        $jkmEmployer = $baseSalary * $jkmRate;
-        
-        // JHT: 3.7% Employer, 2% Employee
-        $jhtEmployer = $baseSalary * 0.037;
-        $jhtEmployee = $baseSalary * 0.02;
-        
-        // JP (Pension): 2% Employer, 1% Employee (with cap)
-        $jpCap = 10042300; // 2024 Cap
-        $jpBase = min($baseSalary, $jpCap);
-        $jpEmployer = $jpBase * 0.02;
-        $jpEmployee = $jpBase * 0.01;
-        
-        // BPJS Kesehatan: 4% Employer, 1% Employee (with cap)
-        $kesCap = 12000000; // Cap
-        $kesBase = min($baseSalary, $kesCap);
-        $kesEmployer = $kesBase * 0.04;
-        $kesEmployee = $kesBase * 0.01;
-        
-        return [
+        $zero = [
             'ketenagakerjaan' => [
+                'jkk_employer' => 0, 'jkm_employer' => 0,
+                'jht_employer' => 0, 'jht_employee' => 0,
+                'jp_employer'  => 0, 'jp_employee'  => 0,
+                'total_employer' => 0, 'total_employee' => 0,
+            ],
+            'kesehatan' => ['employer' => 0, 'employee' => 0],
+            'total_employer' => 0,
+            'total_employee' => 0,
+        ];
+
+        $hasKetenagakerjaan = filled($employee->bpjs_ketenagakerjaan_number);
+        $hasKesehatan       = filled($employee->bpjs_kesehatan_number);
+
+        if (! $hasKetenagakerjaan && ! $hasKesehatan) {
+            return $zero;
+        }
+
+        $result = $zero;
+
+        // BPJS Ketenagakerjaan (JKK, JKM, JHT, JP)
+        if ($hasKetenagakerjaan) {
+            $jkkRate = 0.0024; // 0.24%
+            $jkmRate = 0.003;  // 0.3%
+
+            $jkkEmployer = $baseSalary * $jkkRate;
+            $jkmEmployer = $baseSalary * $jkmRate;
+
+            // JHT: 3.7% Employer, 2% Employee
+            $jhtEmployer = $baseSalary * 0.037;
+            $jhtEmployee = $baseSalary * 0.02;
+
+            // JP (Pension): 2% Employer, 1% Employee (with cap)
+            $jpCap = 10042300;
+            $jpBase = min($baseSalary, $jpCap);
+            $jpEmployer = $jpBase * 0.02;
+            $jpEmployee = $jpBase * 0.01;
+
+            $result['ketenagakerjaan'] = [
                 'jkk_employer' => $jkkEmployer,
                 'jkm_employer' => $jkmEmployer,
                 'jht_employer' => $jhtEmployer,
                 'jht_employee' => $jhtEmployee,
-                'jp_employer' => $jpEmployer,
-                'jp_employee' => $jpEmployee,
+                'jp_employer'  => $jpEmployer,
+                'jp_employee'  => $jpEmployee,
                 'total_employer' => $jkkEmployer + $jkmEmployer + $jhtEmployer + $jpEmployer,
                 'total_employee' => $jhtEmployee + $jpEmployee,
-            ],
-            'kesehatan' => [
+            ];
+        }
+
+        // BPJS Kesehatan: 4% Employer, 1% Employee (with cap)
+        if ($hasKesehatan) {
+            $kesCap = 12000000;
+            $kesBase = min($baseSalary, $kesCap);
+            $kesEmployer = $kesBase * 0.04;
+            $kesEmployee = $kesBase * 0.01;
+
+            $result['kesehatan'] = [
                 'employer' => $kesEmployer,
                 'employee' => $kesEmployee,
-            ],
-            'total_employer' => $jkkEmployer + $jkmEmployer + $jhtEmployer + $jpEmployer + $kesEmployer,
-            'total_employee' => $jhtEmployee + $jpEmployee + $kesEmployee,
-        ];
+            ];
+        }
+
+        $result['total_employer'] = $result['ketenagakerjaan']['total_employer'] + $result['kesehatan']['employer'];
+        $result['total_employee'] = $result['ketenagakerjaan']['total_employee'] + $result['kesehatan']['employee'];
+
+        return $result;
     }
 
     /**
