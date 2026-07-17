@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions;
 
+use App\Services\AdditionalChargesHelper;
 use App\Models\GoodsReceipt;
 use App\Models\PurchaseInvoice;
 use App\Models\PurchaseInvoiceItem;
@@ -76,10 +77,11 @@ class CreatePurchaseInvoiceFromGoodsReceipt extends Action
 
                 $discountPercentage = $po->discount_percentage ?? 0;
                 $discount = $subtotal * ($discountPercentage / 100);
-                $otherCharges = $po->other_charges ?? 0;
+                $chargeRows = AdditionalChargesHelper::rowsForCopy($po);
+                $otherCharges = AdditionalChargesHelper::sumFromRows($chargeRows->all());
                 $total = $subtotal - $discount + $otherCharges + $totalTax;
 
-                return DB::transaction(function () use ($receipt, $po, $items, $subtotal, $discount, $otherCharges, $totalTax, $total) {
+                return DB::transaction(function () use ($receipt, $po, $items, $subtotal, $discount, $otherCharges, $totalTax, $total, $chargeRows) {
                     $invoice = PurchaseInvoice::create([
                         'date' => now(),
                         'supplier_id' => $receipt->supplier_id,
@@ -97,6 +99,8 @@ class CreatePurchaseInvoiceFromGoodsReceipt extends Action
                         'paid_amount' => 0,
                         'outstanding_amount' => $total,
                     ]);
+
+                    AdditionalChargesHelper::createRows($invoice, $chargeRows);
 
                     foreach ($items as $item) {
                         PurchaseInvoiceItem::create([

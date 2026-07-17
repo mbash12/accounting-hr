@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SalesOrders\Tables;
 
+use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\SalesOrders\SalesOrderResource;
 use App\Models\SalesOrder;
 use Filament\Actions\Action;
@@ -187,7 +188,7 @@ class SalesOrdersTable
                         ->modalSubmitActionLabel('Yes, Create')
                         ->action(function (SalesOrder $record) {
                             $salesOrder = SalesOrder::query()
-                                ->with(['items'])
+                                ->with(['items', 'otherCharges'])
                                 ->findOrFail($record->id);
 
                             $items = [];
@@ -218,11 +219,12 @@ class SalesOrdersTable
                             $ratio = $originalSubtotal > 0 ? $subtotal / $originalSubtotal : 1;
 
                             $discount = $salesOrder->discount * $ratio;
-                            $otherCharges = $salesOrder->other_charges * $ratio;
                             $taxAmount = $salesOrder->tax_amount * $ratio;
+                            $chargeRows = AdditionalChargesHelper::rowsForCopy($salesOrder, $ratio);
+                            $otherCharges = AdditionalChargesHelper::sumFromRows($chargeRows->all());
                             $totalAmount = $subtotal - $discount + $otherCharges + $taxAmount;
 
-                            return DB::transaction(function () use ($salesOrder, $items, $subtotal, $discount, $otherCharges, $taxAmount, $totalAmount) {
+                            return DB::transaction(function () use ($salesOrder, $items, $subtotal, $discount, $otherCharges, $taxAmount, $totalAmount, $chargeRows) {
                                 $invoice = \App\Models\SalesInvoice::create([
                                     'date' => now(),
                                     'customer_id' => $salesOrder->customer_id,
@@ -239,6 +241,8 @@ class SalesOrdersTable
                                     'paid_amount' => 0,
                                     'outstanding_amount' => $totalAmount,
                                 ]);
+
+                                AdditionalChargesHelper::createRows($invoice, $chargeRows);
 
                                 foreach ($items as $item) {
                                     \App\Models\SalesInvoiceItem::create([

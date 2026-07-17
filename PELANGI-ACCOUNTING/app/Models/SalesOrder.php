@@ -126,6 +126,16 @@ class SalesOrder extends Model
         return $this->hasMany(SalesOrderItem::class);
     }
 
+    public function otherCharges(): HasMany
+    {
+        return $this->hasMany(SalesOrderOtherCharge::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function syncOtherChargesTotal(): float
+    {
+        return \App\Services\AdditionalChargesHelper::syncTotal($this);
+    }
+
     public function deliveryDocuments(): HasMany
     {
         return $this->hasMany(DeliveryDocument::class);

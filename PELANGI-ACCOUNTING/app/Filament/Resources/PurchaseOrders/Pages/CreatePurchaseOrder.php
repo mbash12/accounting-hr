@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PurchaseOrders\Pages;
 
 use App\Filament\Forms\Components\NumberInput;
+use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\PurchaseOrders\PurchaseOrderResource;
 use App\Models\PurchaseOrder;
 use App\Models\Tax;
@@ -24,7 +25,10 @@ class CreatePurchaseOrder extends CreateRecord
         }
 
         $discountPercentage = (float) ($data['discount_percentage'] ?? 0);
-        $otherCharges = NumberInput::parseToFloat($data['other_charges'] ?? 0);
+        $otherCharges = AdditionalChargesHelper::resolveAmount(
+            $data['otherCharges'] ?? null,
+            $data['other_charges'] ?? 0,
+        );
         $items = $data['items'] ?? [];
 
         $subtotal = 0.0;
@@ -82,10 +86,11 @@ class CreatePurchaseOrder extends CreateRecord
         if ($this->record instanceof PurchaseOrder) {
             $this->record->refresh();
 
+            $this->record->syncOtherChargesTotal();
             if ($this->record->items()->exists()) {
                 $this->record->recalculateTotalsFromItems();
-                $this->record->saveQuietly();
             }
+            $this->record->saveQuietly();
         }
     }
 }

@@ -191,6 +191,16 @@ class PurchaseInvoice extends Model
         return $this->hasMany(PurchaseInvoiceItem::class);
     }
 
+    public function otherCharges(): HasMany
+    {
+        return $this->hasMany(PurchaseInvoiceOtherCharge::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function syncOtherChargesTotal(): float
+    {
+        return \App\Services\AdditionalChargesHelper::syncTotal($this);
+    }
+
     public function paymentTerm(): BelongsTo
     {
         return $this->belongsTo(PaymentTerm::class);

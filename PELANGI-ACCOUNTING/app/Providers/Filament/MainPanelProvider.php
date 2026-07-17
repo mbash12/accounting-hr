@@ -78,17 +78,121 @@ class MainPanelProvider extends PanelProvider
                             localStorage.removeItem("filament-theme");
                             localStorage.setItem("theme", "light");
 
+                            window.filamentOtherCharges = {
+                                sync: function (block) {
+                                    if (!block) return;
+                                    const open = !block.classList.contains("is-collapsed");
+                                    block.querySelectorAll(".fi-fo-other-charges-toggle").forEach((el) => {
+                                        el.setAttribute("aria-expanded", open ? "true" : "false");
+                                    });
+                                },
+                                expand: function (block) {
+                                    if (!block) return;
+                                    block.classList.remove("is-collapsed");
+                                    this.sync(block);
+                                },
+                                toggle: function (block) {
+                                    if (!block) return;
+                                    block.classList.toggle("is-collapsed");
+                                    this.sync(block);
+                                },
+                                addRow: function (trigger) {
+                                    const block = trigger.closest("[data-other-charges-block]");
+                                    if (block) {
+                                        this.expand(block);
+                                    }
+
+                                    const nativeAdd = block && (
+                                        block.querySelector("[data-other-charges-native-add]") ||
+                                        block.querySelector(".fi-fo-other-charges-repeater .fi-fo-repeater-add button") ||
+                                        block.querySelector(".fi-fo-other-charges-repeater .fi-fo-repeater-add a") ||
+                                        block.querySelector(".fi-fo-other-charges-repeater .fi-fo-repeater-add .fi-link")
+                                    );
+                                    if (nativeAdd) {
+                                        nativeAdd.click();
+                                        return;
+                                    }
+
+                                    let el = trigger;
+                                    let id = null;
+                                    while (el && el !== document.body) {
+                                        if (el.hasAttribute && el.hasAttribute("wire:id")) {
+                                            id = el.getAttribute("wire:id");
+                                            break;
+                                        }
+                                        el = el.parentElement;
+                                    }
+                                    if (!id || !window.Livewire) return;
+                                    const component = window.Livewire.find(id);
+                                    if (!component) return;
+                                    if (typeof component.mountAction === "function") {
+                                        component.mountAction("add", {}, { schemaComponent: "form.otherCharges" });
+                                    } else if (typeof component.call === "function") {
+                                        component.call("mountAction", "add", {}, { schemaComponent: "form.otherCharges" });
+                                    }
+                                },
+                                initAll: function () {
+                                    document.querySelectorAll("[data-other-charges-block]").forEach((block) => {
+                                        const hasItems = block.querySelectorAll(".fi-fo-repeater-item").length > 0;
+                                        if (!block.dataset.otherChargesTouched) {
+                                            block.classList.toggle("is-collapsed", !hasItems);
+                                        }
+                                        this.sync(block);
+                                    });
+                                }
+                            };
+
                             document.addEventListener("DOMContentLoaded", function () {
                                 const userMenu = document.querySelector(".fi-user-menu .fi-link");
                                 if (userMenu && "' . $userName . '") {
                                     userMenu.setAttribute("data-user-name", "' . $userName . '");
                                 }
 
+                                window.filamentOtherCharges.initAll();
+
+                                document.body.addEventListener("click", function (event) {
+                                    const addBtn = event.target.closest("[data-other-charges-add]");
+                                    if (addBtn) {
+                                        event.preventDefault();
+                                        event.stopPropagation();
+                                        const block = addBtn.closest("[data-other-charges-block]");
+                                        if (block) {
+                                            block.dataset.otherChargesTouched = "1";
+                                        }
+                                        window.filamentOtherCharges.addRow(addBtn);
+                                        return;
+                                    }
+
+                                    const toggleRow = event.target.closest(".fi-fo-other-charges-row, .fi-in-entry:has(.fi-fo-other-charges-toggle)");
+                                    if (!toggleRow || event.target.closest("[data-other-charges-add]")) {
+                                        return;
+                                    }
+                                    if (event.target.closest(".fi-fo-other-charges-repeater")) {
+                                        return;
+                                    }
+
+                                    const block = toggleRow.closest("[data-other-charges-block]");
+                                    if (block) {
+                                        block.dataset.otherChargesTouched = "1";
+                                        window.filamentOtherCharges.toggle(block);
+                                    }
+                                });
+
                                 // Continuously enforce light mode
                                 setInterval(() => {
                                     document.documentElement.classList.remove("dark");
                                     document.documentElement.classList.add("light");
                                 }, 100);
+                            });
+
+                            document.addEventListener("livewire:navigated", function () {
+                                window.filamentOtherCharges && window.filamentOtherCharges.initAll();
+                            });
+
+                            document.addEventListener("livewire:init", function () {
+                                Livewire.hook("morph.updated", () => {
+                                    window.filamentOtherCharges && window.filamentOtherCharges.initAll();
+                                });
                             });
 
                             // Also enforce light mode after DOM is loaded

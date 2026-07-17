@@ -251,10 +251,8 @@ class JournalService
             $this->createJournalItem($journalEntry, $mappings->get('tax'), 'credit', $invoice->tax_amount);
         }
 
-        // Credit: Other Charges (additional revenue)
-        if (($invoice->other_charges ?? 0) > 0 && $mappings->has('other_charges')) {
-            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), 'credit', $invoice->other_charges);
-        }
+        // Credit: Other / Additional Charges (per-row COA when available)
+        $this->postOtherCharges($invoice, $journalEntry, $mappings, 'credit');
     }
 
     /**
@@ -276,13 +274,13 @@ class JournalService
         $taxAmount = 0;
         $discountAmount = 0;
         $otherChargesAmount = 0;
+        $ratio = 0;
 
         $originalInvoice = $return->salesInvoice ?? null;
         if ($originalInvoice && ($originalInvoice->subtotal ?? 0) > 0) {
             $ratio = $returnSubtotal / $originalInvoice->subtotal;
             $taxAmount = round(($originalInvoice->tax_amount ?? 0) * $ratio, 2);
             $discountAmount = round(($originalInvoice->discount ?? 0) * $ratio, 2);
-            $otherChargesAmount = round(($originalInvoice->other_charges ?? 0) * $ratio, 2);
         }
 
         // Debit: Sales Returns (contra-revenue — reverses original sales credit)
@@ -295,9 +293,9 @@ class JournalService
             $this->createJournalItem($journalEntry, $mappings->get('tax'), 'debit', $taxAmount);
         }
 
-        // Debit: Other Charges (reverses original other charges credit)
-        if ($otherChargesAmount > 0 && $mappings->has('other_charges')) {
-            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), 'debit', $otherChargesAmount);
+        // Debit: Other / Additional Charges (reverse original charges)
+        if ($originalInvoice) {
+            $otherChargesAmount = $this->postOtherCharges($originalInvoice, $journalEntry, $mappings, 'debit', $ratio);
         }
 
         // Credit: Discount (reverses original discount debit — contra-revenue reversal)
@@ -369,10 +367,8 @@ class JournalService
             $this->createJournalItem($journalEntry, $mappings->get('tax'), 'debit', $invoice->tax_amount);
         }
 
-        // Debit: Other Charges (freight, handling, etc.)
-        if (($invoice->other_charges ?? 0) > 0 && $mappings->has('other_charges')) {
-            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), 'debit', $invoice->other_charges);
-        }
+        // Debit: Other / Additional Charges (per-row COA when available)
+        $this->postOtherCharges($invoice, $journalEntry, $mappings, 'debit');
 
         // Credit: Accounts Payable (total amount owed to supplier)
         if ($mappings->has('accounts_payable') && ($invoice->total_amount ?? 0) > 0) {
@@ -399,13 +395,22 @@ class JournalService
         $taxAmount = 0;
         $discountAmount = 0;
         $otherChargesAmount = 0;
+        $ratio = 0;
 
         $originalInvoice = $return->purchaseInvoice ?? null;
         if ($originalInvoice && ($originalInvoice->subtotal ?? 0) > 0) {
             $ratio = $returnSubtotal / $originalInvoice->subtotal;
             $taxAmount = round(($originalInvoice->tax_amount ?? 0) * $ratio, 2);
             $discountAmount = round(($originalInvoice->discount ?? 0) * $ratio, 2);
-            $otherChargesAmount = round(($originalInvoice->other_charges ?? 0) * $ratio, 2);
+            if (method_exists($originalInvoice, 'otherCharges')) {
+                $originalInvoice->loadMissing('otherCharges');
+                $otherChargesAmount = round(
+                    (float) $originalInvoice->otherCharges->sum('amount') * $ratio,
+                    2
+                );
+            } else {
+                $otherChargesAmount = round(($originalInvoice->other_charges ?? 0) * $ratio, 2);
+            }
         }
 
         // Debit: Accounts Payable (reduce amount owed to supplier)
@@ -429,9 +434,9 @@ class JournalService
             $this->createJournalItem($journalEntry, $mappings->get('tax'), 'credit', $taxAmount);
         }
 
-        // Credit: Other Charges (reverses original other charges debit)
-        if ($otherChargesAmount > 0 && $mappings->has('other_charges')) {
-            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), 'credit', $otherChargesAmount);
+        // Credit: Other / Additional Charges (reverse original charges)
+        if ($originalInvoice) {
+            $this->postOtherCharges($originalInvoice, $journalEntry, $mappings, 'credit', $ratio);
         }
     }
 
@@ -442,7 +447,8 @@ class JournalService
         JournalEntry $journalEntry,
         $account,
         string $type,
-        float $amount
+        float $amount,
+        ?string $notes = null
     ): void {
         if (!$account || $amount <= 0) {
             return;
@@ -453,8 +459,80 @@ class JournalService
             'account_id' => $account->id,
             'debit' => $type === 'debit' ? $amount : 0,
             'credit' => $type === 'credit' ? $amount : 0,
-            'notes' => null,
+            'notes' => $notes,
         ]);
+    }
+
+    /**
+     * Post other/additional charges. Prefer per-row COA when charge rows exist.
+     * Returns the total amount actually posted (after optional ratio).
+     */
+    protected function postOtherCharges(
+        $document,
+        JournalEntry $journalEntry,
+        $mappings,
+        string $type,
+        ?float $ratio = null
+    ): float {
+        $posted = 0.0;
+
+        if ($document && method_exists($document, 'otherCharges')) {
+            $document->loadMissing('otherCharges.account');
+            $rows = $document->otherCharges ?? collect();
+
+            if ($rows->isNotEmpty()) {
+                foreach ($rows as $row) {
+                    $amount = (float) ($row->amount ?? 0);
+                    if ($ratio !== null) {
+                        $amount = round($amount * $ratio, 2);
+                    }
+
+                    if ($amount <= 0) {
+                        continue;
+                    }
+
+                    $account = $row->account;
+                    if (!$account && $mappings->has('other_charges')) {
+                        $account = $mappings->get('other_charges');
+                    }
+
+                    if (!$account) {
+                        $label = $row->name ?? 'Other Charges';
+                        throw new \RuntimeException(
+                            "Cannot post journal: other charge \"{$label}\" has no COA and no other_charges account mapping."
+                        );
+                    }
+
+                    $this->createJournalItem(
+                        $journalEntry,
+                        $account,
+                        $type,
+                        $amount,
+                        $row->name ?? null,
+                    );
+                    $posted += $amount;
+                }
+
+                return round($posted, 2);
+            }
+        }
+
+        $amount = (float) ($document->other_charges ?? 0);
+        if ($ratio !== null) {
+            $amount = round($amount * $ratio, 2);
+        }
+
+        if ($amount > 0) {
+            if (!$mappings->has('other_charges')) {
+                throw new \RuntimeException(
+                    'Cannot post journal: other charges exist but other_charges account mapping is missing.'
+                );
+            }
+            $this->createJournalItem($journalEntry, $mappings->get('other_charges'), $type, $amount);
+            $posted = $amount;
+        }
+
+        return round($posted, 2);
     }
 
     /**

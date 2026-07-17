@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SalesOrders\Pages;
 
 use App\Filament\Forms\Components\NumberInput;
+use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\SalesOrders\SalesOrderResource;
 use App\Models\SalesOrder;
 use App\Models\Tax;
@@ -24,7 +25,10 @@ class CreateSalesOrder extends CreateRecord
         }
 
         $discountPercentage = (float) ($data['discount_percentage'] ?? 0);
-        $otherCharges = NumberInput::parseToFloat($data['other_charges'] ?? 0);
+        $otherCharges = AdditionalChargesHelper::resolveAmount(
+            $data['otherCharges'] ?? null,
+            $data['other_charges'] ?? 0,
+        );
         $items = $data['items'] ?? [];
 
         $subtotal = 0.0;
@@ -77,10 +81,11 @@ class CreateSalesOrder extends CreateRecord
         if ($this->record instanceof SalesOrder) {
             $this->record->refresh();
 
+            $this->record->syncOtherChargesTotal();
             if ($this->record->items()->exists()) {
                 $this->record->recalculateTotalsFromItems();
-                $this->record->saveQuietly();
             }
+            $this->record->saveQuietly();
         }
     }
 }

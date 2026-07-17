@@ -1,10 +1,3 @@
-
-
-.fi-sidebar *:not(.fi-ta-sidebar-trigger):not(.fi-sidebar-trigger):not(.fi-icon-btn):not(.fi-active) {
-    color: #233442;
-}
-
-
 /* Logo styling - Constrain to original header height */
 .fi-brand-logo {
     display: flex !important;
@@ -237,6 +230,15 @@ html.dark *,
     color: rgb(17, 24, 39) !important;
 }
 
+/* Fix global search dropdown icons */
+.fi-global-search-results svg,
+.fi-global-search-results [data-icon],
+.fi-global-search-results i {
+    color: #374151 !important;
+    stroke: #374151 !important;
+    fill: #374151 !important;
+}
+
 /* Account Widget - Show user name next to avatar with white text */
 .fi-user-menu .fi-link {
     display: inline-flex !important;
@@ -281,6 +283,10 @@ html.dark *,
     color: #233442 !important;
 }
 
+.fi-sidebar *:not(.fi-ta-sidebar-trigger):not(.fi-sidebar-trigger) {
+    color: #233442 !important;
+}
+
 .fi-sidebar .fi-sidebar-item {
     color: #233442 !important;
 }
@@ -288,6 +294,7 @@ html.dark *,
 .fi-sidebar .fi-sidebar-item.active {
     color: #233442 !important;
 }
+
 /* Light mode sidebar hover and active states */
 .fi-sidebar .fi-sidebar-item:hover {
     background-color: rgb(243 244 246) !important;
@@ -297,79 +304,10 @@ html.dark *,
     background-color: rgb(254 243 199) !important; /* Amber 100 for light mode */
 }
 
-/* Sidebar item buttons - all states */
-.fi-sidebar-item > .fi-sidebar-item-btn {
-    padding: 0.75rem 1rem !important; /* Increased padding */
-    border-radius: 0.5rem !important; /* Rounded corners */
-}
-
-/* Active sidebar item button with very light 40B6F4 */
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
-    background-color: rgba(64, 182, 244, 0.1) !important; /* Very light 40B6F4 */
-    color: #309DD7 !important; /* Blue text for active menu */
-}
-
-/* Active sidebar item button text and icons */
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn *,
-.fi-sidebar-group.fi-active.fi-collapsible > .fi-sidebar-group-btn * {
-    color: #309DD7 !important;
-}
-
-/* Sidebar group buttons - all states */
-.fi-sidebar-group.fi-collapsible > .fi-sidebar-group-btn {
-    padding: 0.75rem 1rem !important; /* Increased padding */
-    border-radius: 0.5rem !important; /* Rounded corners */
-}
-
-/* Active sidebar item button - background only */
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn,
-.fi-sidebar-group.fi-active.fi-collapsible > .fi-sidebar-group-btn {
-    background-color: rgba(64, 182, 244, 0.1) !important;
-}
-
-/* Active sidebar item label - color and bold only */
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn .fi-sidebar-item-label,
-.fi-sidebar-group.fi-active.fi-collapsible > .fi-sidebar-group-btn .fi-sidebar-item-label {
-    color: #40B6F4 !important;
-    font-weight: 600 !important;
-    background-color: transparent !important;
-}
-
-/* Active sidebar item icons and other elements */
-.fi-sidebar-item.fi-active > .fi-sidebar-item-btn *,
-.fi-sidebar-group.fi-active.fi-collapsible > .fi-sidebar-group-btn * {
-    color: #40B6F4 !important;
-}
-
-/* Reduce row gap in sidebar navigation groups */
-.fi-sidebar-nav-groups {
-    gap: 1rem !important; /* 1rem row gap */
-}
-
-.fi-sidebar-nav{
-    padding-top:0 !important;
-
-}
-
 /* Ensure theme toggle buttons remain visible */
 .fi-sidebar .fi-ta-sidebar-trigger,
 .fi-sidebar .fi-sidebar-trigger {
     color: #233442 !important;
-}
-
-/* Sidebar toggle button color */
-.fi-icon-btn.fi-size-md.fi-sidebar-group-collapse-btn,
-.fi-sidebar .fi-icon-btn.fi-size-md.fi-sidebar-group-collapse-btn,
-.fi-sidebar .fi-icon.fi-size-md {
-    color: #40B6F4 !important;
-}
-
-/* Target SVG inside toggle button */
-.fi-icon-btn.fi-size-md.fi-sidebar-group-collapse-btn svg,
-.fi-sidebar .fi-icon-btn.fi-size-md.fi-sidebar-group-collapse-btn svg,
-.fi-sidebar .fi-icon.fi-size-md svg {
-    color: #40B6F4 !important;
-    fill: #40B6F4 !important;
 }
 
 /* Subtle transitions for smooth theme switching */
@@ -379,131 +317,339 @@ html.dark *,
     transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.fi-ac-btn-action.fi-color-primary{
-    color: #FFFFFF !important;
+/* Custom Login Page Styling */
+.fi-auth-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
 }
 
-/* Custom Topbar Styles */
-.fi-topbar {
+.fi-auth-card::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, #40B6F4 0%, #60a5fa 100%) !important;
+}
+
+/* Login form heading */
+.fi-auth-card h1 {
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    font-size: 1.875rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Login form subheading */
+.fi-auth-card p {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 2rem !important;
+}
+
+/* Form input styling */
+.fi-auth-card .fi-input {
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.fi-auth-card .fi-input:focus {
+    border-color: #40B6F4 !important;
+    box-shadow: 0 0 0 3px rgba(64, 182, 244, 0.1) !important;
+    outline: none !important;
+}
+
+.fi-auth-card .fi-input::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Form labels */
+.fi-auth-card .fi-label {
+    color: #475569 !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    margin-bottom: 0.5rem !important;
+}
+
+/* Checkbox styling */
+.fi-auth-card .fi-checkbox {
+    accent-color: #40B6F4 !important;
+}
+
+.fi-auth-card .fi-checkbox-label {
+    color: #64748b !important;
+    font-size: 0.875rem !important;
+}
+
+/* Submit button styling */
+.fi-auth-card .fi-btn {
+    background: linear-gradient(135deg, #40B6F4 0%, #60a5fa 100%) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease-in-out !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.fi-auth-card .fi-btn:hover {
+    background: linear-gradient(135deg, #38b2f2 0%, #3b82f6 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-auth-card .fi-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Error messages */
+.fi-auth-card .fi-form-error {
+    background-color: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
+    color: #dc2626 !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Success messages */
+.fi-auth-card .fi-form-success {
+    background-color: #f0fdf4 !important;
+    border: 1px solid #bbf7d0 !important;
+    color: #16a34a !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.875rem !important;
+}
+
+/* Links in the auth form */
+.fi-auth-card .fi-link {
+    color: #40B6F4 !important;
+    text-decoration: none !important;
+    font-size: 0.875rem !important;
+    transition: color 0.2s ease-in-out !important;
+}
+
+.fi-auth-card .fi-link:hover {
+    color: #38b2f2 !important;
+    text-decoration: underline !important;
+}
+
+/* Login page background */
+.fi-auth-bg {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    min-height: 100vh !important;
+}
+
+/* Logo on login page */
+.fi-auth-card .fi-brand {
+    margin-bottom: 2rem !important;
+}
+
+.fi-auth-card .fi-brand img {
+    max-height: 48px !important;
+    width: auto !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .fi-auth-card {
+        margin: 1rem !important;
+        border-radius: 12px !important;
+    }
+    
+    .fi-auth-card h1 {
+        font-size: 1.5rem !important;
+    }
+}
+
+/* Other Charges — totals block aligned with Subtotal/Discount */
+.fi-fo-other-charges-block {
+    margin-block: 0 !important;
+}
+
+.fi-fo-other-charges-block > .fi-sc.fi-grid,
+.fi-fo-other-charges-block .fi-sc.fi-sc-has-gap {
+    gap: 0.15rem 1rem !important;
+    row-gap: 0.15rem !important;
+}
+
+.fi-fo-other-charges-block.is-collapsed .fi-fo-other-charges-repeater .fi-fo-repeater-items {
+    display: none !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) {
+    cursor: pointer !important;
+    user-select: none !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.fi-fo-other-charges-block .fi-fo-other-charges-repeater.fi-fo-field {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Keep Filament's native Add out of the field stack; header uses custom Add */
+.fi-fo-other-charges-block .fi-fo-other-charges-repeater .fi-fo-repeater-add {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-label-col {
     display: flex !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    padding: 0 1rem !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
 }
 
-/* Topbar search, notifications, and user menu */
-.fi-topbar input[type="text"] {
-    background-color: rgba(255, 255, 255, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: white !important;
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-label,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-label-ctn,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) dt {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+    margin: 0 !important;
 }
 
-.fi-topbar input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.7) !important;
+.fi-fo-other-charges-add {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.15rem !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
 }
 
-.fi-topbar input[type="text"]:focus {
-    background-color: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.5) !important;
-    outline: none !important;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-content-col {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
 }
 
-/* Notification and user menu buttons in topbar */
-.fi-topbar button {
-    color: white !important;
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-content,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-text,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-text-item,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-content-ctn {
+    display: block !important;
+    width: 100% !important;
+    text-align: right !important;
+    overflow: visible !important;
 }
 
-.fi-topbar button:hover {
-    background-color: rgba(255, 255, 255, 0.15) !important;
+.fi-fo-other-charges-row {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0 !important;
+    position: relative !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: right !important;
 }
 
-/* Dropdown menus from topbar */
-.fi-topbar .relative > div[x-show] {
-    background-color: white !important;
-    color: rgb(17, 24, 39) !important;
+.fi-fo-other-charges-toggle-value {
+    display: inline-block !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    font-variant-numeric: tabular-nums !important;
+    margin-right: 0 !important;
 }
 
-.fi-topbar .relative > div[x-show] * {
-    color: rgb(17, 24, 39) !important;
+.fi-fo-other-charges-chevron {
+    position: absolute !important;
+    right: -1.1rem !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    color: rgb(107 114 128);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+    pointer-events: none;
 }
 
-/* User details in topbar */
-.fi-topbar .text-right p {
-    color: white !important;
+.fi-fo-other-charges-block:not(.is-collapsed) .fi-fo-other-charges-chevron {
+    transform: translateY(-50%) rotate(180deg);
 }
 
-/* Avatar in topbar */
-.fi-topbar .rounded-full {
-    background-color: rgba(255, 255, 255, 0.3) !important;
-    color: white !important;
+.fi-fo-other-charges-repeater .fi-fo-repeater-items {
+    gap: 0.35rem !important;
+    margin-top: 0.15rem !important;
+    margin-bottom: 0 !important;
+    border: none !important;
 }
 
-/* Ensure dropdowns have proper z-index */
-.fi-topbar .relative > div[x-show] {
-    z-index: 50 !important;
+.fi-fo-other-charges-repeater .fi-fo-repeater-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    position: relative !important;
 }
 
-/* Hide the original Filament user menu/avatar */
-.fi-user-menu,
-.fi-topbar .fi-user-menu,
-[data-slot="user-menu"],
-.fi-topbar [data-slot="user-menu"] {
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-header-start-actions,
+.fi-fo-other-charges-repeater [x-sortable-handle] {
     display: none !important;
-    visibility: hidden !important;
 }
 
-/* Style Filament Global Search in topbar */
-.fi-topbar .fi-global-search-field {
-    /* background-color: rgba(255, 255, 255, 0.2) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important; */
-    color: #111827 !important;
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    order: 1 !important;
+    border: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
 }
 
-.fi-topbar .fi-global-search-field::placeholder {
-    color: #6b7280 !important;
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-header {
+    position: static !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    align-self: center !important;
+    order: 2 !important;
 }
 
-.fi-topbar .fi-global-search-field:focus {
-    background-color: white !important;
-    color: #111827 !important;
-    border-color: #d1d5db !important;
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-header-end-actions {
+    margin: 0 !important;
 }
 
-/* Override the general .fi-topbar input color for search field */
-.fi-topbar .fi-global-search input {
-    color: #111827 !important;
-}
-
-.fi-topbar .fi-global-search input::placeholder {
-    color: #6b7280 !important;
-}
-
-.fi-topbar .fi-global-search-field svg {
-    color: #374151 !important;
-}
-
-/* Fix global search field icons - ensure they are visible in the input */
-.fi-topbar .fi-global-search-field .fi-icon {
-    color: #374151 !important;
-    fill: #374151 !important;
-}
-
-/* Global search results dropdown */
-.fi-global-search-results {
-    background-color: white !important;
-    color: #111827 !important;
-}
-
-.fi-global-search-results * {
-    color: #111827 !important;
-}
-
-/* Fix global search dropdown icons */
-.fi-global-search-results svg,
-.fi-global-search-results [data-icon],
-.fi-global-search-results i {
-    color: #374151 !important;
-    stroke: #374151 !important;
-    fill: #374151 !important;
-}

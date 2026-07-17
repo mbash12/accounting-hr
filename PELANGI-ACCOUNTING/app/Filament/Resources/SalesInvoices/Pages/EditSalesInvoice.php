@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SalesInvoices\Pages;
 
 use App\Filament\Forms\Components\NumberInput;
+use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\SalesInvoices\SalesInvoiceResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
@@ -79,7 +80,10 @@ class EditSalesInvoice extends EditRecord
     private function recalculateTotals(array $data, array $items): array
     {
         $discountPercentage = (float) ($data['discount_percentage'] ?? 0);
-        $otherCharges = NumberInput::parseToFloat($data['other_charges'] ?? 0);
+        $otherCharges = AdditionalChargesHelper::resolveAmount(
+            $data['otherCharges'] ?? null,
+            $data['other_charges'] ?? 0,
+        );
         
         $subtotal = 0.0;
         $taxTotal = 0.0;
@@ -139,5 +143,14 @@ class EditSalesInvoice extends EditRecord
             ForceDeleteAction::make(),
             RestoreAction::make(),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        if ($this->record) {
+            $this->record->refresh();
+            $this->record->syncOtherChargesTotal();
+            $this->record->saveQuietly();
+        }
     }
 }

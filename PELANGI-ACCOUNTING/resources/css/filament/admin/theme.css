@@ -470,3 +470,186 @@ html.dark *,
         font-size: 1.5rem !important;
     }
 }
+
+/* Other Charges — totals block aligned with Subtotal/Discount */
+.fi-fo-other-charges-block {
+    margin-block: 0 !important;
+}
+
+.fi-fo-other-charges-block > .fi-sc.fi-grid,
+.fi-fo-other-charges-block .fi-sc.fi-sc-has-gap {
+    gap: 0.15rem 1rem !important;
+    row-gap: 0.15rem !important;
+}
+
+.fi-fo-other-charges-block.is-collapsed .fi-fo-other-charges-repeater .fi-fo-repeater-items {
+    display: none !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) {
+    cursor: pointer !important;
+    user-select: none !important;
+    border: none !important;
+    border-bottom: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.fi-fo-other-charges-block .fi-fo-other-charges-repeater.fi-fo-field {
+    border: none !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Keep Filament's native Add out of the field stack; header uses custom Add */
+.fi-fo-other-charges-block .fi-fo-other-charges-repeater .fi-fo-repeater-add {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-label-col {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-label,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-label-ctn,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) dt {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+    margin: 0 !important;
+}
+
+.fi-fo-other-charges-add {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.15rem !important;
+    min-height: auto !important;
+    padding: 0 !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-content-col {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+}
+
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-content,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-text,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-text-item,
+.fi-fo-other-charges-block .fi-in-entry:has(.fi-fo-other-charges-toggle) .fi-in-entry-content-ctn {
+    display: block !important;
+    width: 100% !important;
+    text-align: right !important;
+    overflow: visible !important;
+}
+
+.fi-fo-other-charges-row {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 0 !important;
+    position: relative !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    padding-right: 0 !important;
+    text-align: right !important;
+}
+
+.fi-fo-other-charges-toggle-value {
+    display: inline-block !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    font-variant-numeric: tabular-nums !important;
+    margin-right: 0 !important;
+}
+
+.fi-fo-other-charges-chevron {
+    position: absolute !important;
+    right: -1.1rem !important;
+    top: 50% !important;
+    transform: translateY(-50%);
+    width: 1rem;
+    height: 1rem;
+    color: rgb(107 114 128);
+    transition: transform 0.15s ease;
+    flex-shrink: 0;
+    pointer-events: none;
+}
+
+.fi-fo-other-charges-block:not(.is-collapsed) .fi-fo-other-charges-chevron {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.fi-fo-other-charges-repeater .fi-fo-repeater-items {
+    gap: 0.35rem !important;
+    margin-top: 0.15rem !important;
+    margin-bottom: 0 !important;
+    border: none !important;
+}
+
+.fi-fo-other-charges-repeater .fi-fo-repeater-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.35rem !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    position: relative !important;
+}
+
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-header-start-actions,
+.fi-fo-other-charges-repeater [x-sortable-handle] {
+    display: none !important;
+}
+
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    order: 1 !important;
+    border: none !important;
+    border-top: none !important;
+    box-shadow: none !important;
+}
+
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-header {
+    position: static !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    align-self: center !important;
+    order: 2 !important;
+}
+
+.fi-fo-other-charges-repeater .fi-fo-repeater-item-header-end-actions {
+    margin: 0 !important;
+}
+

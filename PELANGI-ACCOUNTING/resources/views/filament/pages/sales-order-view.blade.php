@@ -522,7 +522,21 @@
                         <td class="summary-value">{{ number_format($record->tax_amount, 0, ',', '.') }}</td>
                     </tr>
                     @endif
-                    @if($record->other_charges > 0)
+                                        @php
+                        $additionalCharges = method_exists($record, 'otherCharges')
+                            ? $record->otherCharges
+                            : collect();
+                    @endphp
+                    @if($additionalCharges->isNotEmpty())
+                        @foreach($additionalCharges as $charge)
+                            @if(($charge->amount ?? 0) > 0)
+                            <tr>
+                                <td class="summary-label">{{ $charge->name ?: 'Additional Charge' }}</td>
+                                <td class="summary-value">{{ number_format($charge->amount, 0, ',', '.') }}</td>
+                            </tr>
+                            @endif
+                        @endforeach
+                    @elseif($record->other_charges > 0)
                     <tr>
                         <td class="summary-label">Other Charges</td>
                         <td class="summary-value">{{ number_format($record->other_charges, 0, ',', '.') }}</td>

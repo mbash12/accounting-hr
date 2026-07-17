@@ -19,7 +19,9 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
+use App\Filament\Forms\Components\AdditionalChargesSection;
 use App\Filament\Forms\Components\NumberInput;
+use App\Services\AdditionalChargesHelper;
 
 
 class PurchaseInvoiceForm
@@ -58,7 +60,10 @@ class PurchaseInvoiceForm
     {
         $items = $get('items') ?? [];
         $discountPercentage = (float) ($get('discount_percentage') ?? 0);
-        $otherCharges = \App\Filament\Forms\Components\NumberInput::parseToFloat($get('other_charges') ?? 0);
+        $otherCharges = AdditionalChargesHelper::resolveAmount(
+            $get('otherCharges'),
+            $get('other_charges') ?? 0,
+        );
         $subtotal = 0.0;
         $taxTotal = 0.0;
 
@@ -227,15 +232,20 @@ class PurchaseInvoiceForm
 
                                         // Copy reference and totals from PO if available
                                         $po = $goodsReceipt->purchaseOrder;
+                                        $chargeRows = [];
                                         if ($po) {
                                             $set('reference_no', $po->purchase_order_no);
                                             if ($po->discount_percentage) {
                                                 $set('discount_percentage', $po->discount_percentage);
                                             }
-                                            if ($po->other_charges) {
-                                                $set('other_charges', $po->other_charges);
-                                                $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay($po->other_charges));
-                                            }
+                                            $chargeRows = AdditionalChargesHelper::rowsForCopy($po)
+                                                ->map(fn (array $row) => array_merge($row, [
+                                                    'amount_display' => NumberInput::formatRoundedIntegerDisplay($row['amount']),
+                                                ]))
+                                                ->all();
+                                            $otherChargesTotal = AdditionalChargesHelper::sumFromRows($chargeRows);
+                                            $set('otherCharges', $chargeRows);
+                                            $set('other_charges', $otherChargesTotal);
                                         }
 
                                         // Auto-populate items from GR received quantities
@@ -266,11 +276,12 @@ class PurchaseInvoiceForm
 
                                             // Calculate and update all totals
                                             $discountPercentage = $po->discount_percentage ?? 0;
-                                            $otherCharges = $po->other_charges ?? 0;
-                                            $dataForCalculation = function($key) use ($items, $discountPercentage, $otherCharges) {
+                                            $otherCharges = AdditionalChargesHelper::sumFromRows($chargeRows ?? []);
+                                            $dataForCalculation = function($key) use ($items, $discountPercentage, $otherCharges, $chargeRows) {
                                                 if ($key === 'items') return $items;
                                                 if ($key === 'discount_percentage') return $discountPercentage;
                                                 if ($key === 'other_charges') return $otherCharges;
+                                                if ($key === 'otherCharges') return $chargeRows ?? [];
                                                 return null;
                                             };
 
@@ -286,8 +297,8 @@ class PurchaseInvoiceForm
                                     // Clear items if no goods receipt selected
                                     $set('items', []);
                                     $set('purchase_order_id', null);
+                                    $set('otherCharges', []);
                                     $set('other_charges', 0);
-                                    $set('other_charges_display', NumberInput::formatRoundedIntegerDisplay(0));
                                     $set('discount_percentage', 0);
                                     $set('subtotal', 0);
                                     $set('discount', 0);
@@ -644,7 +655,7 @@ class PurchaseInvoiceForm
                                         $c = self::calculateTotals($get);
                                         $set('subtotal', $c['subtotal']);
                                         $set('tax_amount', $c['tax']);
-                                        $set('total_amount', $c['total']);
+                                        $set('total', $c['total']);
                                         $set('outstanding_amount', $c['total'] - NumberInput::parseToFloat($get('paid_amount') ?? 0));
                                     }
                                 }
@@ -683,7 +694,7 @@ class PurchaseInvoiceForm
                         $set('subtotal', $c['subtotal']);
                         $set('discount', $c['discount']);
                         $set('tax_amount', $c['tax']);
-                        $set('total_amount', $c['total']);
+                        $set('total', $c['total']);
                     }),
 
                 Section::make()
@@ -702,24 +713,14 @@ class PurchaseInvoiceForm
                             ->reactive()
                             ->extraAttributes(['style' => 'text-align:right'])
                             ->columnSpan(1),
-                        Placeholder::make('empty_col_2')
-                            ->hiddenLabel()
-                            ->columnSpan(1),
-                        ...RoundedIntegerMoneyInput::schema(
-                            name: 'other_charges',
-                            label: 'Other Charges',
-                            inlineLabel: true,
-                            defaultDecimal: '0.00',
-                            columnSpan: 1,
-                            afterUpdated: function ($decimal, callable $set, callable $get) {
-                                $c = self::calculateTotals($get);
-                                $set('subtotal', $c['subtotal']);
-                                $set('discount', $c['discount']);
-                                $set('tax_amount', $c['tax']);
-                                $set('total', $c['total']);
-                                $set('outstanding_amount', $c['outstanding']);
-                            },
-                        ),
+                        AdditionalChargesSection::make('purchase', function (callable $set, callable $get): void {
+                            $c = self::calculateTotals($get);
+                            $set('subtotal', $c['subtotal']);
+                            $set('discount', $c['discount']);
+                            $set('tax_amount', $c['tax']);
+                            $set('total', $c['total']);
+                            $set('outstanding_amount', $c['outstanding']);
+                        }),
                         Placeholder::make('empty_col_3')
                             ->hiddenLabel()
                             ->columnSpan(1),

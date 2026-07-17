@@ -207,6 +207,16 @@ class SalesInvoice extends Model
         return $this->hasMany(SalesInvoiceItem::class);
     }
 
+    public function otherCharges(): HasMany
+    {
+        return $this->hasMany(SalesInvoiceOtherCharge::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function syncOtherChargesTotal(): float
+    {
+        return \App\Services\AdditionalChargesHelper::syncTotal($this);
+    }
+
     /**
      * Calculate due date based on payment term
      *

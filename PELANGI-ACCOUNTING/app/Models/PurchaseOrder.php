@@ -159,6 +159,16 @@ class PurchaseOrder extends Model
         return $this->hasMany(PurchaseOrderItem::class);
     }
 
+    public function otherCharges(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderOtherCharge::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    public function syncOtherChargesTotal(): float
+    {
+        return \App\Services\AdditionalChargesHelper::syncTotal($this);
+    }
+
     public function recalculateTotalsFromItems(): void
     {
         $items = $this->items()->get(['total', 'tax_id']);
