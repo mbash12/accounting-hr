@@ -660,6 +660,7 @@ class SalesInvoiceForm
                             })
                             ->live()
                             ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                // Unit only records UOM; do not overwrite Unit Price.
                                 $productId = $get('product_id');
                                 $quantity = NumberInput::parseToFloat($get('quantity') ?? 0);
                                 if ($productId && $state) {
@@ -669,22 +670,6 @@ class SalesInvoiceForm
                                         $factor = $service->getConversionFactor((int) $state, $product->unit_id);
                                         $set('conversion_factor', $factor);
                                         $set('base_quantity', $quantity * $factor);
-
-                                        // Update unit price based on conversion factor
-                                        $basePrice = (float) ($product->selling_price ?? 0);
-                                        $newPrice = $basePrice * $factor;
-                                        $set('unit_price', $newPrice);
-                                        $set('unit_price_display', NumberInput::formatRoundedIntegerDisplay($newPrice));
-
-                                        // Recalculate item total and document totals
-                                        $itemTotal = $quantity * $newPrice;
-                                        $set('total', $itemTotal);
-
-                                        $c = self::calculateTotals($get);
-                                        $set('subtotal', $c['subtotal']);
-                                        $set('tax_amount', $c['tax']);
-                                        $set('total_amount', $c['total']);
-                                        $set('outstanding_amount', $c['total'] - NumberInput::parseToFloat($get('paid_amount') ?? 0));
                                     }
                                 }
                             }),
