@@ -129,6 +129,12 @@ class PostingQueueWidget extends TableWidget
 
         try {
             DB::transaction(function () use ($record, $source) {
+                $companyId = $source->company_id ?? $record->company_id ?? null;
+                $date = $source->date ?? $record->date ?? null;
+                if ($companyId && $date) {
+                    app(\App\Services\PeriodClosingService::class)->assertOpen((int) $companyId, $date);
+                }
+
                 $source->update([
                     'is_posted' => true,
                     'status' => 'posted',

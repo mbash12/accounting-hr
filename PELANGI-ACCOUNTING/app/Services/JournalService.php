@@ -30,6 +30,9 @@ class JournalService
             return null;
         }
 
+        $documentDate = $document->date ?? now();
+        app(PeriodClosingService::class)->assertOpen((int) $companyId, $documentDate);
+
         // Orders are commitments — no accounting impact, no journal entry.
         // Clean up any stale entries that may exist from before this policy was enforced.
         if (in_array($documentType, ['sales_order', 'purchase_order'])) {

@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\EnforcesOpenPeriod;
 
 class JournalEntry extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, EnforcesOpenPeriod;
 
     public function reference()
     {

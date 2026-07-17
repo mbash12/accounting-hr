@@ -73,6 +73,14 @@ class CreateJournalEntry extends CreateRecord
             }
         }
 
+        if (!empty($data['company_id']) && !empty($data['date'])) {
+            try {
+                app(\App\Services\PeriodClosingService::class)->assertOpen((int) $data['company_id'], $data['date']);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $this->NotificationHalt(collect($e->errors())->flatten()->first() ?? 'Period is closed.');
+            }
+        }
+
         foreach ($validItems as $index => $item) {
             $item = (array) $item;
             $debit = (float) ($item['debit'] ?? 0);

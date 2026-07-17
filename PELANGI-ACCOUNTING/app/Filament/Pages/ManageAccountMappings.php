@@ -154,6 +154,7 @@ class ManageAccountMappings extends Page implements HasForms
             'payable_payment',
             'payroll',
             'deferred_revenue',
+            'period_closing',
             ];
 
             $types = array_intersect_key($allTypes, array_flip($allowedTypes));
@@ -169,6 +170,7 @@ class ManageAccountMappings extends Page implements HasForms
             'payable_payment' => 'Payable Payment',
             'payroll' => 'Payroll',
             'deferred_revenue' => 'Deferred Revenue',
+            'period_closing' => 'Period Closing / Tutup Buku',
             ];
 
         return array_map(fn($key) => $translations[$key] ?? $types[$key], array_combine(array_keys($types), array_keys($types)));
@@ -211,6 +213,7 @@ class ManageAccountMappings extends Page implements HasForms
             'bpjs_payable' => 'BPJS Payable (Total)',
             'deferred_revenue_liability' => 'Deferred Revenue (Liability)',
             'deferred_revenue_recognition' => 'Deferred Revenue Recognition',
+            'retained_earnings' => 'Retained Earnings / Laba Ditahan',
         ];
 
         return array_map(function ($mappingType) use ($translations) {
@@ -242,6 +245,7 @@ class ManageAccountMappings extends Page implements HasForms
             'deferred_revenue_liability' => 'Customer prepayments (liability)',
             'deferred_revenue_recognition' => 'Revenue recognized from deferred',
             'grni' => 'Goods received not invoiced',
+            'retained_earnings' => 'Equity account for year-end Tutup Buku net income',
         ];
     }
 

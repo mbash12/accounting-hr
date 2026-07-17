@@ -107,6 +107,15 @@ class EditJournalEntry extends EditRecord
         $data['items'] = $validItems;
         $data['amount'] = $totals['total_debit'];
         $data['total_amount'] = $totals['total_debit'];
+
+        $date = $data['date'] ?? $this->record->date ?? null;
+        if (!empty($companyId) && !empty($date)) {
+            try {
+                app(\App\Services\PeriodClosingService::class)->assertOpen((int) $companyId, $date);
+            } catch (\Illuminate\Validation\ValidationException $e) {
+                $this->NotificationHalt(collect($e->errors())->flatten()->first() ?? 'Period is closed.');
+            }
+        }
         
         // Preserve existing posted status - use Posting Center to post
         unset($data['is_posted']);

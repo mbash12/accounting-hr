@@ -277,8 +277,11 @@ class TrialBalance extends Page implements HasForms
             ]);
         }
 
-        // Inject Dynamic Retained Earnings if applicable
-        if (abs($priorYearNetIncome) >= 0.01) {
+        // Inject Dynamic Retained Earnings if applicable (skip when prior year Tutup Buku already posted)
+        $skipDynamicPriorRe = app(\App\Services\PeriodClosingService::class)
+            ->hasPostedClosingBefore((int) $companyId, $startDate);
+
+        if (abs($priorYearNetIncome) >= 0.01 && !$skipDynamicPriorRe) {
             $maxEquityCode = $allAccounts->filter(fn($a) => str_starts_with($a->code, '3'))->max('code');
             $reCode = $maxEquityCode ? $maxEquityCode . '-RE' : '3999';
 

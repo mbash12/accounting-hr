@@ -2,35 +2,38 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 use App\Models\Company;
 use App\Models\PeriodClosing;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class PeriodClosingFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = PeriodClosing::class;
 
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
+        $year = (int) now()->year;
+
         return [
-            'period_type' => fake()->randomElement(["daily","weekly","monthly","quarterly","yearly"]),
-            'start_date' => fake()->date(),
-            'end_date' => fake()->date(),
-            'status' => fake()->randomElement(["pending","in_progress","completed","failed"]),
-            'closed_at' => fake()->dateTime(),
-            'description' => fake()->text(),
-            'closed_by_user_id' => User::factory(),
+            'period_type' => PeriodClosing::TYPE_YEARLY,
+            'start_date' => "{$year}-01-01",
+            'end_date' => "{$year}-12-31",
+            'status' => PeriodClosing::STATUS_OPEN,
+            'closed_at' => null,
+            'description' => null,
+            'closed_by_user_id' => null,
             'company_id' => Company::factory(),
         ];
+    }
+
+    public function closed(): static
+    {
+        return $this->state(fn () => [
+            'status' => PeriodClosing::STATUS_CLOSED,
+            'closed_at' => now(),
+            'closed_by_user_id' => User::factory(),
+            'description' => 'Tutup Buku',
+        ]);
     }
 }

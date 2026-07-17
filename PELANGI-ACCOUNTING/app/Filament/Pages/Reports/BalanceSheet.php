@@ -211,7 +211,10 @@ class BalanceSheet extends Page implements HasForms
         $equityRoot = $accountTree->first(fn($a) => str_starts_with($a->code, '3'));
 
         if ($equityRoot) {
-            if ($priorYearNetIncome != 0) {
+            $skipDynamicPriorRe = app(\App\Services\PeriodClosingService::class)
+                ->hasPostedClosingBefore((int) $companyId, $yearStart);
+
+            if ($priorYearNetIncome != 0 && !$skipDynamicPriorRe) {
                 $reAccount = new Account();
                 $reAccount->name = 'Prior Retained Earnings';
                 $reAccount->code = '';

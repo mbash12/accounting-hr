@@ -33,6 +33,7 @@ class AccountMapping extends Model
         'payable_payment' => 'Payable Payment',
         'payroll' => 'Payroll',
         'deferred_revenue' => 'Deferred Revenue',
+        'period_closing' => 'Period Closing / Tutup Buku',
     ];
 
     /**
@@ -70,6 +71,7 @@ class AccountMapping extends Model
         // Deferred Revenue mappings
         'deferred_revenue_liability' => 'Deferred Revenue (Liability)',
         'deferred_revenue_recognition' => 'Deferred Revenue Recognition (Revenue)',
+        'retained_earnings' => 'Retained Earnings / Laba Ditahan',
     ];
 
     /**
@@ -94,6 +96,7 @@ class AccountMapping extends Model
         'payable_payment' => ['accounts_payable', 'other_charges', 'discount', 'write_off'],
         'payroll' => ['salary_expense', 'thr_expense', 'bpjs_expense', 'salary_payable', 'pph21_payable', 'bpjs_payable'],
         'deferred_revenue' => ['deferred_revenue_liability', 'deferred_revenue_recognition'],
+        'period_closing' => ['retained_earnings'],
     ];
 
     /**
