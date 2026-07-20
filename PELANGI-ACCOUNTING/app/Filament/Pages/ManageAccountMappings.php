@@ -350,25 +350,49 @@ class ManageAccountMappings extends Page implements HasForms
             DB::beginTransaction();
 
             $savedCount = 0;
+            $clearedCount = 0;
 
             foreach ($this->allMappings as $documentType => $mappings) {
                 foreach ($mappings as $mappingType => $data) {
-                    if (empty($data['account_id'])) {
+                    $accountId = $data['account_id'] ?? null;
+                    $isEmpty = $accountId === null || $accountId === '';
+
+                    $existing = AccountMapping::withTrashed()
+                        ->where('company_id', $companyId)
+                        ->where('document_type', $documentType)
+                        ->where('mapping_type', $mappingType)
+                        ->first();
+
+                    if ($isEmpty) {
+                        // Clearing a field must remove the DB row; skipping left the old mapping in place.
+                        if ($existing) {
+                            $existing->forceDelete();
+                            $clearedCount++;
+                        }
+
                         continue;
                     }
 
-                    AccountMapping::updateOrCreate(
-                        [
+                    if ($existing) {
+                        if ($existing->trashed()) {
+                            $existing->restore();
+                        }
+
+                        $existing->update([
+                            'account_id' => $accountId,
+                            'description' => $data['description'] ?? null,
+                            'is_active' => true,
+                        ]);
+                    } else {
+                        AccountMapping::create([
                             'company_id' => $companyId,
                             'document_type' => $documentType,
                             'mapping_type' => $mappingType,
-                        ],
-                        [
-                            'account_id' => $data['account_id'],
+                            'account_id' => $accountId,
                             'description' => $data['description'] ?? null,
                             'is_active' => true,
-                        ]
-                    );
+                        ]);
+                    }
 
                     $savedCount++;
                 }
@@ -376,13 +400,19 @@ class ManageAccountMappings extends Page implements HasForms
 
             DB::commit();
 
+            $this->loadAllMappings();
+            $this->originalMappings = $this->allMappings;
+
+            $parts = ["Successfully saved {$savedCount} account mappings."];
+            if ($clearedCount > 0) {
+                $parts[] = "Cleared {$clearedCount}.";
+            }
+
             Notification::make()
                 ->success()
                 ->title('Success')
-                ->body("Successfully saved {$savedCount} account mappings.")
+                ->body(implode(' ', $parts))
                 ->send();
-
-            $this->originalMappings = $this->allMappings;
 
         } catch (\Exception $e) {
             DB::rollBack();
