@@ -48,10 +48,20 @@ class EditBonusCalculation extends EditRecord
                 ->color('success')
                 ->action(function (PayrollService $service) {
                     try {
-                        $service->postBonusToLedger($this->record);
-                        
+                        $entry = $service->postBonusToLedger($this->record);
+
+                        if ($entry === null) {
+                            Notification::make()
+                                ->title(__('Journal entry skipped'))
+                                ->body(__('Configure Payroll account mappings (Salary Expense, Salary Payable, PPh21) before posting.'))
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
                         $this->refreshFormData(['status']);
-                        
+
                         Notification::make()
                             ->title(__('Bonus posted to journal successfully'))
                             ->success()

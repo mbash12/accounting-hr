@@ -124,7 +124,12 @@ class PayrollService
             $pph21PayableAccount = $mappings['pph21_payable'] ?? null;
 
             if (!$thrExpenseAccount || !$salaryPayableAccount || !$pph21PayableAccount) {
-                throw new \Exception("THR Account Mappings (Expense, Payable, PPh21) not fully configured.");
+                \Illuminate\Support\Facades\Log::warning('THR journal skipped: payroll account mappings incomplete.', [
+                    'thr_id' => $thr->id,
+                    'company_id' => $thr->company_id,
+                ]);
+
+                return null;
             }
 
             $description = "THR Posting - " . $thr->name;
@@ -178,7 +183,12 @@ class PayrollService
             $pph21PayableAccount = $mappings['pph21_payable'] ?? null;
 
             if (!$bonusExpenseAccount || !$salaryPayableAccount || !$pph21PayableAccount) {
-                throw new \Exception("Bonus Account Mappings (Expense, Payable, PPh21) not fully configured.");
+                \Illuminate\Support\Facades\Log::warning('Bonus journal skipped: payroll account mappings incomplete.', [
+                    'bonus_id' => $bonus->id,
+                    'company_id' => $bonus->company_id,
+                ]);
+
+                return null;
             }
 
             $description = "Bonus Posting - " . $bonus->name;
@@ -655,7 +665,12 @@ class PayrollService
             $mappings = AccountMapping::getMappingsForDocument('payroll', $period->company_id);
             
             if ($mappings->isEmpty()) {
-                throw new \Exception("Payroll Account Mappings not configured for this company.");
+                \Illuminate\Support\Facades\Log::warning('Payroll journal skipped: no payroll account mappings configured.', [
+                    'period_id' => $period->id,
+                    'company_id' => $period->company_id,
+                ]);
+
+                return null;
             }
 
             $description = "Payroll Posting - " . $period->name;

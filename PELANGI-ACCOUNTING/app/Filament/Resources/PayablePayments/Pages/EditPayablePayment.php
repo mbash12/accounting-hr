@@ -232,7 +232,14 @@ class EditPayablePayment extends EditRecord
             if ($this->record && in_array($this->record->status, ['draft', 'completed'])) {
                 try {
                     $service = app(ReceivablePayableService::class);
-                    $service->createJournalEntryForPayablePayment($this->record);
+                    $entry = $service->createJournalEntryForPayablePayment($this->record);
+                    if ($entry === null) {
+                        Notification::make()
+                            ->warning()
+                            ->title(__('Journal entry skipped'))
+                            ->body(__('Payment saved successfully, but no journal was created. Configure Accounts Payable mapping for Payable Payment.'))
+                            ->send();
+                    }
                 } catch (\Exception $e) {
                     \Log::error('Error updating journal entry for payable payment: ' . $e->getMessage(), [
                         'payment_id' => $this->record->id,

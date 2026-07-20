@@ -21,11 +21,27 @@ trait Journalable
                 }
 
                 $journalService = app(JournalService::class);
-                $journalService->createJournalEntryFromDocument(
+                $journalService->lastSkipReason = null;
+                $entry = $journalService->createJournalEntryFromDocument(
                     $model->getDocumentType(),
                     $model,
                     $model->getJournalEntryDescription()
                 );
+
+                if ($entry === null && in_array($journalService->lastSkipReason, ['no_mappings', 'incomplete_mappings'], true)) {
+                    $missing = $model->getMissingAccountMappings();
+                    $list = !empty($missing)
+                        ? implode(', ', $missing)
+                        : __('required accounts');
+
+                    Notification::make()
+                        ->warning()
+                        ->title(__('Journal entry skipped'))
+                        ->body(__('Document saved successfully, but no journal was created. Configure Account Mapping: :list', [
+                            'list' => $list,
+                        ]))
+                        ->send();
+                }
             } catch (\Exception $e) {
                 \Log::error('Journal Entry Error: ' . $e->getMessage(), [
                     'model' => get_class($model),

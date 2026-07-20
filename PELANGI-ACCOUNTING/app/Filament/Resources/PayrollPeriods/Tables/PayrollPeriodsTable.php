@@ -91,11 +91,29 @@ class PayrollPeriodsTable
                         ->visible(fn (PayrollPeriod $record): bool => $record->status === 'processed')
                         ->color('success')
                         ->action(function (PayrollPeriod $record, PayrollService $service) {
-                            $service->postToLedger($record);
-                            Notification::make()
-                                ->title(__('Payroll posted to journal successfully'))
-                                ->success()
-                                ->send();
+                            try {
+                                $entry = $service->postToLedger($record);
+                                if ($entry === null) {
+                                    Notification::make()
+                                        ->title(__('Journal entry skipped'))
+                                        ->body(__('Configure Payroll account mappings before posting.'))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
+                                Notification::make()
+                                    ->title(__('Payroll posted to journal successfully'))
+                                    ->success()
+                                    ->send();
+                            } catch (\Exception $e) {
+                                Notification::make()
+                                    ->title(__('Failed to post to journal'))
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->persistent()
+                                    ->send();
+                            }
                         }),
                     Action::make('exportBca')
                         ->label(__('Export BCA Payroll'))

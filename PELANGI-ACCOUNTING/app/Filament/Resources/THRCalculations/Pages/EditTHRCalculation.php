@@ -48,10 +48,20 @@ class EditTHRCalculation extends EditRecord
                 ->color('success')
                 ->action(function (PayrollService $service) {
                     try {
-                        $service->postTHRToLedger($this->record);
-                        
+                        $entry = $service->postTHRToLedger($this->record);
+
+                        if ($entry === null) {
+                            Notification::make()
+                                ->title(__('Journal entry skipped'))
+                                ->body(__('Configure Payroll account mappings (THR/Salary Expense, Salary Payable, PPh21) before posting.'))
+                                ->warning()
+                                ->send();
+
+                            return;
+                        }
+
                         $this->refreshFormData(['status']);
-                        
+
                         Notification::make()
                             ->title(__('THR posted to journal successfully'))
                             ->success()

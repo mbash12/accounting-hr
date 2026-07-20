@@ -82,7 +82,16 @@ class BonusCalculationsTable
                         ->color('success')
                         ->action(function (BonusCalculation $record, PayrollService $service) {
                             try {
-                                $service->postBonusToLedger($record);
+                                $entry = $service->postBonusToLedger($record);
+                                if ($entry === null) {
+                                    Notification::make()
+                                        ->title(__('Journal entry skipped'))
+                                        ->body(__('Configure Payroll account mappings (Salary Expense, Salary Payable, PPh21) before posting.'))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
                                 Notification::make()
                                     ->title(__('Bonus posted to journal successfully'))
                                     ->success()

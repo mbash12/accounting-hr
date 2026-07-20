@@ -178,7 +178,14 @@ class CreatePayablePayment extends CreateRecord
             // Create journal entry so it appears in Posting Center
             try {
                 $service = app(ReceivablePayableService::class);
-                $service->createJournalEntryForPayablePayment($this->record);
+                $entry = $service->createJournalEntryForPayablePayment($this->record);
+                if ($entry === null) {
+                    Notification::make()
+                        ->warning()
+                        ->title(__('Journal entry skipped'))
+                        ->body(__('Payment saved successfully, but no journal was created. Configure Accounts Payable mapping for Payable Payment.'))
+                        ->send();
+                }
             } catch (\Exception $e) {
                 \Log::error('Error creating journal entry for payable payment: ' . $e->getMessage(), [
                     'payment_id' => $this->record->id,
@@ -187,7 +194,7 @@ class CreatePayablePayment extends CreateRecord
                 Notification::make()
                     ->danger()
                     ->title(__('Journal Entry Error'))
-                    ->body(__('Payment created but journal entry failed: :message. Configure account mappings to fix.', ['message' => $e->getMessage()]))
+                    ->body(__('Payment created but journal entry failed: :message.', ['message' => $e->getMessage()]))
                     ->persistent()
                     ->send();
             }

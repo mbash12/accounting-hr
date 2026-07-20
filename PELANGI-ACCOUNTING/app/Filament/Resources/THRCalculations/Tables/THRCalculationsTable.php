@@ -83,7 +83,16 @@ class THRCalculationsTable
                         ->color('success')
                         ->action(function (THRCalculation $record, PayrollService $service) {
                             try {
-                                $service->postTHRToLedger($record);
+                                $entry = $service->postTHRToLedger($record);
+                                if ($entry === null) {
+                                    Notification::make()
+                                        ->title(__('Journal entry skipped'))
+                                        ->body(__('Configure Payroll account mappings (THR/Salary Expense, Salary Payable, PPh21) before posting.'))
+                                        ->warning()
+                                        ->send();
+
+                                    return;
+                                }
                                 Notification::make()
                                     ->title(__('THR posted to journal successfully'))
                                     ->success()

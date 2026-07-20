@@ -12,6 +12,12 @@ use Illuminate\Support\Facades\Auth;
 class JournalService
 {
     /**
+     * Why the last createJournalEntryFromDocument() call returned null.
+     * null | 'no_mappings' | 'incomplete_mappings' | 'empty' | 'orders'
+     */
+    public ?string $lastSkipReason = null;
+
+    /**
      * Create or update a journal entry from a document based on account mappings
      *
      * @param string $documentType - The type of document (sales_order, sales_invoice, etc.)
@@ -24,6 +30,7 @@ class JournalService
         $document,
         string $description
     ): ?JournalEntry {
+        $this->lastSkipReason = null;
         $companyId = $document->company_id;
 
         if (!$companyId) {
@@ -37,6 +44,8 @@ class JournalService
         // Clean up any stale entries that may exist from before this policy was enforced.
         if (in_array($documentType, ['sales_order', 'purchase_order'])) {
             $this->deleteJournalEntriesForDocument($documentType, $document->id, $companyId);
+            $this->lastSkipReason = 'orders';
+
             return null;
         }
 
@@ -44,7 +53,14 @@ class JournalService
         $mappings = AccountMapping::getMappingsForDocument($documentType, $companyId);
 
         if ($mappings->isEmpty()) {
-            // No mappings configured - return null silently without creating journal
+            // No mappings configured — document stays saved; caller may warn.
+            $this->lastSkipReason = 'no_mappings';
+            \Illuminate\Support\Facades\Log::warning('Journal skipped: no account mappings configured.', [
+                'document_type' => $documentType,
+                'document_id' => $document->id ?? null,
+                'company_id' => $companyId,
+            ]);
+
             return null;
         }
 
@@ -83,7 +99,7 @@ class JournalService
         $document,
         string $description,
         $mappings
-    ): JournalEntry {
+    ): ?JournalEntry {
         // Create journal entry
         $journalEntry = JournalEntry::create([
             'entry_number' => $this->generateEntryNumber(),
@@ -102,8 +118,9 @@ class JournalService
             'updated_by_user_id' => Auth::id() ?? 1,
         ]);
 
-        // Create journal entry items based on document type
-        $this->createJournalItems($documentType, $document, $journalEntry, $mappings);
+        if (!$this->createJournalItems($documentType, $document, $journalEntry, $mappings)) {
+            return null;
+        }
 
         return $journalEntry;
     }
@@ -116,7 +133,7 @@ class JournalService
         $document,
         string $description,
         $mappings
-    ): JournalEntry {
+    ): ?JournalEntry {
         // Delete old journal entry items
         $journalEntry->items()->delete();
 
@@ -129,24 +146,29 @@ class JournalService
             'updated_by_user_id' => Auth::id() ?? 1,
         ]);
 
-        // Recreate journal entry items
-        $this->createJournalItems($journalEntry->sub_module, $document, $journalEntry, $mappings);
+        if (!$this->createJournalItems($journalEntry->sub_module, $document, $journalEntry, $mappings)) {
+            return null;
+        }
 
         return $journalEntry;
     }
 
     /**
-     * Create journal entry items based on document type
+     * Create journal entry items based on document type.
+     * Returns false when the draft entry was discarded (empty or incomplete mappings).
      */
     protected function createJournalItems(
         string $documentType,
         $document,
         JournalEntry $journalEntry,
         $mappings
-    ): void {
+    ): bool {
         // Orders are commitments — no accounting impact, no journal entry
         if (in_array($documentType, ['sales_order', 'purchase_order'])) {
-            return;
+            $journalEntry->delete();
+            $this->lastSkipReason = 'orders';
+
+            return false;
         }
 
         switch ($documentType) {
@@ -182,20 +204,29 @@ class JournalService
         if ($totalDebit <= 0 && $totalCredit <= 0) {
             // No items created (e.g. order documents) — delete the empty entry
             $journalEntry->delete();
-            return;
+            $this->lastSkipReason = 'empty';
+
+            return false;
         }
 
         if (abs($totalDebit - $totalCredit) > 0.005) {
+            // Incomplete mappings usually leave Dr/Cr unmatched — discard JE, do not error the document.
             $journalEntry->delete();
-            throw new \RuntimeException(sprintf(
-                'Journal entry #%s does not balance: debit %s, credit %s',
-                $journalEntry->entry_number,
-                $totalDebit,
-                $totalCredit
-            ));
+            $this->lastSkipReason = 'incomplete_mappings';
+            \Illuminate\Support\Facades\Log::warning('Journal skipped: entry does not balance (likely missing account mappings).', [
+                'document_type' => $documentType,
+                'document_id' => $document->id ?? null,
+                'entry_number' => $journalEntry->entry_number,
+                'debit' => $totalDebit,
+                'credit' => $totalCredit,
+            ]);
+
+            return false;
         }
 
         $journalEntry->update(['amount' => $totalDebit]);
+
+        return true;
     }
 
     /**
@@ -539,9 +570,11 @@ class JournalService
 
                     if (!$account) {
                         $label = $row->name ?? 'Other Charges';
-                        throw new \RuntimeException(
-                            "Cannot post journal: other charge \"{$label}\" has no COA and no other_charges account mapping."
-                        );
+                        \Illuminate\Support\Facades\Log::warning('Other charge line skipped: no COA and no other_charges mapping.', [
+                            'label' => $label,
+                            'document_id' => $document->id ?? null,
+                        ]);
+                        continue;
                     }
 
                     $this->createJournalItem(
@@ -565,9 +598,12 @@ class JournalService
 
         if ($amount > 0) {
             if (!$mappings->has('other_charges')) {
-                throw new \RuntimeException(
-                    'Cannot post journal: other charges exist but other_charges account mapping is missing.'
-                );
+                \Illuminate\Support\Facades\Log::warning('Other charges skipped: other_charges account mapping missing.', [
+                    'document_id' => $document->id ?? null,
+                    'amount' => $amount,
+                ]);
+
+                return 0.0;
             }
             $this->createJournalItem($journalEntry, $mappings->get('other_charges'), $type, $amount);
             $posted = $amount;

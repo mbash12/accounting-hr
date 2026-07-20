@@ -16,7 +16,7 @@ use InvalidArgumentException;
 class ReceivablePayableService
 {
    
-    public function createJournalEntryForReceivablePayment(ReceivablePayment $payment, ?int $departmentId = null, ?int $costCenterId = null): JournalEntry
+    public function createJournalEntryForReceivablePayment(ReceivablePayment $payment, ?int $departmentId = null, ?int $costCenterId = null): ?JournalEntry
     {
         return DB::transaction(function () use ($payment, $departmentId, $costCenterId) {
             $existingEntry = JournalEntry::where('reference_type', ReceivablePayment::class)
@@ -33,7 +33,12 @@ class ReceivablePayableService
 
             $receivableAccount = $this->findReceivableAccount($payment->company_id);
             if (!$receivableAccount) {
-                throw new InvalidArgumentException('Accounts Receivable account not found. Please configure the "Accounts Receivable" mapping in General Ledger → Account Mappings for "Receivable Payment".');
+                \Illuminate\Support\Facades\Log::warning('Receivable payment journal skipped: accounts_receivable mapping missing.', [
+                    'payment_id' => $payment->id,
+                    'company_id' => $payment->company_id,
+                ]);
+
+                return null;
             }
 
             $totalPayment = (float) $payment->total_payment;
@@ -203,7 +208,7 @@ class ReceivablePayableService
     }
 
     
-    public function createJournalEntryForPayablePayment(PayablePayment $payment, ?int $departmentId = null, ?int $costCenterId = null): JournalEntry
+    public function createJournalEntryForPayablePayment(PayablePayment $payment, ?int $departmentId = null, ?int $costCenterId = null): ?JournalEntry
     {
         return DB::transaction(function () use ($payment, $departmentId, $costCenterId) {
             $existingEntry = JournalEntry::where('reference_type', PayablePayment::class)
@@ -220,7 +225,12 @@ class ReceivablePayableService
 
             $payableAccount = $this->findPayableAccount($payment->company_id);
             if (!$payableAccount) {
-                throw new InvalidArgumentException('Accounts Payable account not found. Please configure the "Accounts Payable" mapping in General Ledger → Account Mappings for "Payable Payment".');
+                \Illuminate\Support\Facades\Log::warning('Payable payment journal skipped: accounts_payable mapping missing.', [
+                    'payment_id' => $payment->id,
+                    'company_id' => $payment->company_id,
+                ]);
+
+                return null;
             }
 
             $totalPayment = (float) $payment->total_payment;
