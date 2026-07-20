@@ -81,10 +81,10 @@ class AccountMapping extends Model
         // ... (rest of mappings)
         'delivery_document' => ['cogs', 'inventory'],
         'sales_invoice' => ['accounts_receivable', 'sales', 'discount', 'tax', 'other_charges'],
-        'sales_return' => ['accounts_receivable', 'sales_return', 'tax', 'discount', 'other_charges'],
+        'sales_return' => ['accounts_receivable', 'sales_return', 'tax', 'discount', 'other_charges', 'inventory', 'cogs'],
         'goods_receipt' => ['inventory', 'grni'],
         'purchase_invoice' => ['accounts_payable', 'purchases', 'tax', 'discount', 'other_charges', 'grni'],
-        'purchase_return' => ['accounts_payable', 'purchase_return', 'tax', 'discount', 'other_charges'],
+        'purchase_return' => ['accounts_payable', 'purchase_return', 'tax', 'discount', 'other_charges', 'inventory', 'grni'],
         'cash_receipt' => ['cash', 'accounts_receivable'],
         'cash_disbursement' => ['cash', 'accounts_payable'],
         'bank_receipt' => ['bank', 'accounts_receivable'],

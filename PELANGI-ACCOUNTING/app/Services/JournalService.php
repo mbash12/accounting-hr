@@ -311,6 +311,38 @@ class JournalService
         if ($returnTotal > 0 && $mappings->has('accounts_receivable')) {
             $this->createJournalItem($journalEntry, $mappings->get('accounts_receivable'), 'credit', $returnTotal);
         }
+
+        // Stock reversal (perpetual inventory): Dr Inventory / Cr COGS
+        $this->postSalesReturnInventoryLines($return, $journalEntry, $mappings);
+    }
+
+    /**
+     * Reverse delivery COGS for a sales return when inventory mappings exist.
+     * Dr Inventory, Cr COGS. Skips both lines if either mapping is missing.
+     */
+    protected function postSalesReturnInventoryLines(
+        $return,
+        JournalEntry $journalEntry,
+        $mappings
+    ): void {
+        if (!$mappings->has('inventory') || !$mappings->has('cogs')) {
+            if ($this->calculateCOGS($return) > 0) {
+                \Illuminate\Support\Facades\Log::warning('Sales return stock journal skipped: inventory/cogs mapping missing.', [
+                    'return_id' => $return->id ?? null,
+                    'company_id' => $return->company_id ?? null,
+                ]);
+            }
+
+            return;
+        }
+
+        $costAmount = $this->calculateCOGS($return);
+        if ($costAmount <= 0) {
+            return;
+        }
+
+        $this->createJournalItem($journalEntry, $mappings->get('inventory'), 'debit', $costAmount);
+        $this->createJournalItem($journalEntry, $mappings->get('cogs'), 'credit', $costAmount);
     }
 
     /**
@@ -427,9 +459,15 @@ class JournalService
             $this->createJournalItem($journalEntry, $mappings->get('discount'), 'debit', $discountAmount);
         }
 
-        // Credit: Purchase Returns (contra-expense — reverses original purchases debit)
-        if ($mappings->has('purchase_return')) {
+        // Goods value: Cr Inventory when mapped (perpetual); else Cr Purchase Returns (legacy)
+        if ($mappings->has('inventory')) {
+            $this->createJournalItem($journalEntry, $mappings->get('inventory'), 'credit', $returnSubtotal);
+        } elseif ($mappings->has('purchase_return')) {
             $this->createJournalItem($journalEntry, $mappings->get('purchase_return'), 'credit', $returnSubtotal);
+            \Illuminate\Support\Facades\Log::warning('Purchase return stock journal using purchase_return account: inventory mapping missing.', [
+                'return_id' => $return->id ?? null,
+                'company_id' => $return->company_id ?? null,
+            ]);
         }
 
         // Credit: Tax (reverses original input VAT debit)
