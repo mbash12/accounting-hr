@@ -163,6 +163,17 @@
                         Profile
                     </a>
                 @endif
+                @if(\App\Filament\Pages\ManageDataCleanup::canAccess())
+                    <a href="{{ \App\Filament\Pages\ManageDataCleanup::getUrl() }}"
+                       style="display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; font-size: 0.875rem; color: #374151 !important; text-decoration: none;"
+                       onmouseover="this.style.backgroundColor='#f3f4f6'"
+                       onmouseout="this.style.backgroundColor='transparent'">
+                        <svg style="width: 1rem; height: 1rem; color: #374151 !important;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        {{ __('Data Cleanup') }}
+                    </a>
+                @endif
             </div>
 
             <div style="border-top: 1px solid #e5e7eb; padding: 0.5rem 0;">

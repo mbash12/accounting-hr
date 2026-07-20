@@ -11,6 +11,7 @@ use App\Models\FixedAssetCategoryTemplate;
 use App\Models\OpeningBalance;
 use App\Models\Tax;
 use App\Models\TaxTemplate;
+use App\Services\DataCleanupService;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Checkbox;
@@ -22,6 +23,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use RuntimeException;
 use UnitEnum;
 
 class ManageAccounts extends Page
@@ -161,7 +163,95 @@ class ManageAccounts extends Page
             ImportAccountsAction::make(),
             ExportAccountsAction::make(),
             $this->openingBalanceAction(),
+            $this->clearChartOfAccountsAction(),
         ];
+    }
+
+    public function clearChartOfAccountsAction(): Action
+    {
+        return Action::make('clearChartOfAccounts')
+            ->label(__('Clear COA'))
+            ->icon('heroicon-o-trash')
+            ->color('danger')
+            ->visible(function () {
+                $selectedCompanyId = session('selected_company_id');
+
+                if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                    return Account::where('company_id', $selectedCompanyId)->exists();
+                }
+
+                return false;
+            })
+            ->requiresConfirmation()
+            ->modalHeading(__('Clear Chart of Accounts'))
+            ->modalDescription(__('This deletes all accounts for the selected company, plus account mappings, opening balances, taxes, and fixed asset categories. Blocked if journal entries exist. This cannot be undone.'))
+            ->form(function () {
+                $companyId = session('selected_company_id');
+                $companyName = ($companyId && $companyId !== 'all')
+                    ? \App\Models\Company::query()->whereKey($companyId)->value('name')
+                    : '';
+
+                return [
+                    TextInput::make('company_name')
+                        ->label(__('Type the company name to confirm'))
+                        ->helperText(__('Expected: :name', ['name' => $companyName]))
+                        ->required()
+                        ->rules([
+                            fn () => function (string $attribute, $value, $fail) use ($companyName) {
+                                if ((string) $value !== (string) $companyName) {
+                                    $fail(__('Company name does not match.'));
+                                }
+                            },
+                        ]),
+                    TextInput::make('confirmation')
+                        ->label(__('Type CLEAR to confirm'))
+                        ->required()
+                        ->rules(['in:CLEAR']),
+                ];
+            })
+            ->action(function () {
+                $selectedCompanyId = session('selected_company_id');
+
+                if (!$selectedCompanyId || $selectedCompanyId === 'all') {
+                    Notification::make()
+                        ->danger()
+                        ->title(__('Error'))
+                        ->body(__('Please select a company first'))
+                        ->send();
+
+                    return;
+                }
+
+                try {
+                    $result = app(DataCleanupService::class)->clear(
+                        [DataCleanupService::DATASET_CHART_OF_ACCOUNTS],
+                        (int) $selectedCompanyId,
+                        DataCleanupService::MODE_CASCADE
+                    );
+
+                    Notification::make()
+                        ->success()
+                        ->title(__('Chart of Accounts cleared'))
+                        ->body(__('Removed :count account(s).', [
+                            'count' => $result['deleted'][DataCleanupService::DATASET_CHART_OF_ACCOUNTS] ?? 0,
+                        ]))
+                        ->send();
+
+                    $this->dispatch('$refresh');
+                } catch (RuntimeException $e) {
+                    Notification::make()
+                        ->danger()
+                        ->title(__('Cannot clear COA'))
+                        ->body($e->getMessage())
+                        ->send();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->danger()
+                        ->title(__('Error'))
+                        ->body($e->getMessage())
+                        ->send();
+                }
+            });
     }
     
     protected function getActions(): array

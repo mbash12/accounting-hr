@@ -16,6 +16,7 @@ use App\Filament\Pages\Dashboard;
 use App\Filament\Pages\ManageOpeningBalances;
 use App\Filament\Pages\ManageAccountMappings;
 use App\Filament\Pages\ManagePeriodClosings;
+use App\Filament\Pages\ManageDataCleanup;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -253,6 +254,7 @@ class MainPanelProvider extends PanelProvider
             )
             ->darkMode(false)
             ->profile()
+            ->userMenu(false)
             ->globalSearch(false)
             // ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
             ->navigationGroups([
@@ -286,6 +288,7 @@ class MainPanelProvider extends PanelProvider
                 ManageOpeningBalances::class,
                 ManageAccountMappings::class,
                 ManagePeriodClosings::class,
+                ManageDataCleanup::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
