@@ -98,55 +98,45 @@ class Account extends Model
     }
 
     /**
-     * Minimum digit length among all accounts for a company (classification root length).
-     */
-    public static function minClassificationDigitLength(int $companyId): ?int
-    {
-        $codes = static::query()
-            ->where('company_id', $companyId)
-            ->pluck('code');
-
-        if ($codes->isEmpty()) {
-            return null;
-        }
-
-        return $codes->map(fn ($code) => static::digitLength($code))->min();
-    }
-
-    /**
-     * Whether this account is a classification root for its company
-     * (digit length equals the company minimum).
+     * Whether this account is a classification root (top-level: no parent).
      */
     public function isClassificationRoot(): bool
     {
-        if (!$this->company_id) {
-            return false;
-        }
-
-        $min = static::minClassificationDigitLength((int) $this->company_id);
-
-        return $min !== null && static::digitLength($this->code) === $min;
+        return $this->parent_id === null;
     }
 
     /**
-     * Classification root accounts for a company (shortest digit length).
+     * Walk parent chain to the classification root (account with no parent).
+     */
+    public function classificationRoot(): ?self
+    {
+        $current = $this;
+        $guard = 0;
+
+        while ($current->parent_id !== null && $guard < 50) {
+            $parent = static::query()->find($current->parent_id);
+            if (!$parent) {
+                break;
+            }
+            $current = $parent;
+            $guard++;
+        }
+
+        return $current;
+    }
+
+    /**
+     * Classification root accounts for a company (top-level: parent_id is null).
      *
-     * @return \Illuminate\Support\Collection<int, static>
+     * @return \Illuminate\Database\Eloquent\Collection<int, static>
      */
     public static function classificationRootsForCompany(int $companyId)
     {
-        $min = static::minClassificationDigitLength($companyId);
-
-        if ($min === null) {
-            return collect();
-        }
-
         return static::query()
             ->where('company_id', $companyId)
+            ->whereNull('parent_id')
             ->orderBy('code')
-            ->get()
-            ->filter(fn (self $account) => static::digitLength($account->code) === $min)
-            ->values();
+            ->get();
     }
 
     /**

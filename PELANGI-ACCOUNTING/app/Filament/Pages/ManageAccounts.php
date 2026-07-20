@@ -413,6 +413,30 @@ class ManageAccounts extends Page
                         ->update(['parent_id' => $codeToIdMap[$template->parent_code]]);
                 }
             }
+
+            // No parent = classification root; children point classification_id to root
+            $accounts = Account::query()
+                ->where('company_id', $companyId)
+                ->whereIn('id', array_values($codeToIdMap))
+                ->get()
+                ->keyBy('id');
+
+            foreach ($accounts as $account) {
+                $root = $account;
+                $guard = 0;
+                while ($root->parent_id !== null && $guard < 50) {
+                    $parent = $accounts->get($root->parent_id);
+                    if (!$parent) {
+                        break;
+                    }
+                    $root = $parent;
+                    $guard++;
+                }
+
+                $account->update([
+                    'classification_id' => $root->id === $account->id ? null : $root->id,
+                ]);
+            }
             
             DB::commit();
             
@@ -676,7 +700,7 @@ class ManageAccounts extends Page
                 ->label(__('Classification'))
                 ->required()
                 ->options(function () {
-                    // Classification roots = shortest digit length for the company (dots ignored)
+                    // Classification roots = top-level accounts (parent_id is null)
                     $selectedCompanyId = session('selected_company_id');
                     if (!$selectedCompanyId || $selectedCompanyId === 'all') {
                         return [];

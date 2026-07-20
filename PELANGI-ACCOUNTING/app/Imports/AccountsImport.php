@@ -149,6 +149,31 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                 }
             }
 
+            // Third pass: no parent_code / parent_id = classification (top-level);
+            // children get classification_id of their root ancestor.
+            $accounts = Account::query()
+                ->where('company_id', $companyId)
+                ->whereIn('id', array_values($codeToIdMap))
+                ->get()
+                ->keyBy('id');
+
+            foreach ($accounts as $account) {
+                $root = $account;
+                $guard = 0;
+                while ($root->parent_id !== null && $guard < 50) {
+                    $parent = $accounts->get($root->parent_id) ?? Account::query()->find($root->parent_id);
+                    if (!$parent) {
+                        break;
+                    }
+                    $root = $parent;
+                    $guard++;
+                }
+
+                $account->update([
+                    'classification_id' => $root->id === $account->id ? null : $root->id,
+                ]);
+            }
+
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();

@@ -12,32 +12,17 @@ test('digitLength strips dots and non-digits', function () {
         ->and(Account::digitLength('120000'))->toBe(6);
 });
 
-test('classification roots are accounts with minimum digit length', function () {
-    $accounts = collect([
-        (object) ['id' => 1, 'code' => '10', 'company_id' => 99],
-        (object) ['id' => 2, 'code' => '20', 'company_id' => 99],
-        (object) ['id' => 3, 'code' => '30', 'company_id' => 99],
-        (object) ['id' => 4, 'code' => '10.01', 'company_id' => 99],
-        (object) ['id' => 5, 'code' => '10.01.001', 'company_id' => 99],
-    ]);
+test('classification roots are accounts without a parent', function () {
+    $root = new Account(['code' => '10', 'parent_id' => null]);
+    $child = new Account(['code' => '10.01', 'parent_id' => 1]);
 
-    $min = $accounts->min(fn ($a) => Account::digitLength($a->code));
-    expect($min)->toBe(2);
-
-    $roots = $accounts->filter(fn ($a) => Account::digitLength($a->code) === $min)->pluck('code')->values()->all();
-    expect($roots)->toBe(['10', '20', '30']);
+    expect($root->isClassificationRoot())->toBeTrue()
+        ->and($child->isClassificationRoot())->toBeFalse();
 });
 
-test('classic 1-9 roots still qualify as minimum digit length', function () {
-    $accounts = collect([
-        (object) ['code' => '1'],
-        (object) ['code' => '2'],
-        (object) ['code' => '100000'],
-    ]);
-
-    $min = $accounts->min(fn ($a) => Account::digitLength($a->code));
-    expect($min)->toBe(1);
-
-    $roots = $accounts->filter(fn ($a) => Account::digitLength($a->code) === $min)->pluck('code')->all();
-    expect($roots)->toBe(['1', '2']);
+test('classic and dotted top-level codes both qualify when parent_id is null', function () {
+    foreach (['1', '10', '20', '30'] as $code) {
+        $account = new Account(['code' => $code, 'parent_id' => null]);
+        expect($account->isClassificationRoot())->toBeTrue();
+    }
 });
