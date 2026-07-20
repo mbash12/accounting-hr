@@ -125,7 +125,10 @@ class JournalEntry extends Model
 
     public function items(): HasMany
     {
-        return $this->hasMany(JournalEntryItem::class);
+        // Journal voucher convention: all debit lines first, then credits (stable by id).
+        return $this->hasMany(JournalEntryItem::class)
+            ->orderByRaw('CASE WHEN COALESCE(debit, 0) > 0 THEN 0 ELSE 1 END')
+            ->orderBy('id');
     }
 
     public function accounts(): BelongsToMany
