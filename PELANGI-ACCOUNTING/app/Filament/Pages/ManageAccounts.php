@@ -488,10 +488,14 @@ class ManageAccounts extends Page
                     if ($account) {
                         $data = $account->toArray();
 
-                        // Find the top-level classification (one of 1-9)
+                        // Find the top-level classification (shortest digit-length root)
                         $topParent = $account;
                         while ($topParent->parent_id !== null) {
-                            $topParent = Account::find($topParent->parent_id);
+                            $parent = Account::find($topParent->parent_id);
+                            if (!$parent) {
+                                break;
+                            }
+                            $topParent = $parent;
                         }
                         $data['classification_id'] = $topParent->id;
 
@@ -506,8 +510,8 @@ class ManageAccounts extends Page
                 if ($accountId) {
                     $account = Account::find($accountId);
                     if ($account) {
-                        // Check if this is a top-level account (1-9)
-                        $isTopLevel = in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                        // Classification roots (min digit length) only allow renaming
+                        $isTopLevel = $account->isClassificationRoot();
                         
                         if ($isTopLevel) {
                             // Only allow updating the name for top-level accounts
@@ -606,10 +610,14 @@ class ManageAccounts extends Page
                 if ($accountId) {
                     $account = Account::with('company')->find($accountId);
                     if ($account) {
-                        // Find the top-level classification (one of 1-9)
+                        // Find the top-level classification (shortest digit-length root)
                         $topParent = $account;
                         while ($topParent->parent_id !== null) {
-                            $topParent = Account::find($topParent->parent_id);
+                            $parent = Account::find($topParent->parent_id);
+                            if (!$parent) {
+                                break;
+                            }
+                            $topParent = $parent;
                         }
 
                         return [
@@ -668,31 +676,26 @@ class ManageAccounts extends Page
                 ->label(__('Classification'))
                 ->required()
                 ->options(function () {
-                    // Get only top-level accounts (the 9 main classifications: 1-9)
-                    $query = Account::query()
-                        ->whereNull('parent_id')
-                        ->whereIn('code', ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
-
+                    // Classification roots = shortest digit length for the company (dots ignored)
                     $selectedCompanyId = session('selected_company_id');
-                    if ($selectedCompanyId && $selectedCompanyId !== 'all') {
-                        $query->where('company_id', $selectedCompanyId);
+                    if (!$selectedCompanyId || $selectedCompanyId === 'all') {
+                        return [];
                     }
 
-                    return $query
-                        ->orderBy('code')
-                        ->get()
+                    return Account::classificationRootsForCompany((int) $selectedCompanyId)
                         ->mapWithKeys(fn ($account) => [$account->id => $account->code . ' - ' . $account->name])
                         ->toArray();
                 })
                 ->reactive()
                 ->disabled()
                 ->hidden(function (callable $get) {
-                    // Check if current form data indicates a top-level account
                     $accountId = $get('id');
                     if ($accountId) {
                         $account = Account::find($accountId);
-                        return $account && in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+
+                        return $account && $account->isClassificationRoot();
                     }
+
                     return false;
                 }),
             
@@ -754,7 +757,7 @@ class ManageAccounts extends Page
                     $accountId = $get('id');
                     if ($accountId) {
                         $account = Account::find($accountId);
-                        return $account && in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                        return $account && $account->isClassificationRoot();
                     }
                     return false;
                 }),
@@ -798,7 +801,7 @@ class ManageAccounts extends Page
                     $accountId = $get('id');
                     if ($accountId) {
                         $account = Account::find($accountId);
-                        return $account && in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                        return $account && $account->isClassificationRoot();
                     }
                     return false;
                 }),
@@ -825,7 +828,7 @@ class ManageAccounts extends Page
                     $accountId = $get('id');
                     if ($accountId) {
                         $account = Account::find($accountId);
-                        return $account && in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                        return $account && $account->isClassificationRoot();
                     }
                     return false;
                 }),
@@ -838,7 +841,7 @@ class ManageAccounts extends Page
                     $accountId = $get('id');
                     if ($accountId) {
                         $account = Account::find($accountId);
-                        return $account && in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                        return $account && $account->isClassificationRoot();
                     }
                     return false;
                 }),
@@ -851,7 +854,7 @@ class ManageAccounts extends Page
                     $accountId = $get('id');
                     if ($accountId) {
                         $account = Account::find($accountId);
-                        return $account && in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+                        return $account && $account->isClassificationRoot();
                     }
                     return false;
                 }),

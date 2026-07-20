@@ -89,6 +89,67 @@ class Account extends Model
     }
 
     /**
+     * Count of digit characters in an account code (dots/separators ignored).
+     * Examples: "10" → 2, "10.01" → 4, "1" → 1
+     */
+    public static function digitLength(?string $code): int
+    {
+        return strlen(preg_replace('/\D+/', '', (string) $code) ?? '');
+    }
+
+    /**
+     * Minimum digit length among all accounts for a company (classification root length).
+     */
+    public static function minClassificationDigitLength(int $companyId): ?int
+    {
+        $codes = static::query()
+            ->where('company_id', $companyId)
+            ->pluck('code');
+
+        if ($codes->isEmpty()) {
+            return null;
+        }
+
+        return $codes->map(fn ($code) => static::digitLength($code))->min();
+    }
+
+    /**
+     * Whether this account is a classification root for its company
+     * (digit length equals the company minimum).
+     */
+    public function isClassificationRoot(): bool
+    {
+        if (!$this->company_id) {
+            return false;
+        }
+
+        $min = static::minClassificationDigitLength((int) $this->company_id);
+
+        return $min !== null && static::digitLength($this->code) === $min;
+    }
+
+    /**
+     * Classification root accounts for a company (shortest digit length).
+     *
+     * @return \Illuminate\Support\Collection<int, static>
+     */
+    public static function classificationRootsForCompany(int $companyId)
+    {
+        $min = static::minClassificationDigitLength($companyId);
+
+        if ($min === null) {
+            return collect();
+        }
+
+        return static::query()
+            ->where('company_id', $companyId)
+            ->orderBy('code')
+            ->get()
+            ->filter(fn (self $account) => static::digitLength($account->code) === $min)
+            ->values();
+    }
+
+    /**
      * Scope to get accounts under a specific parent account (including the parent itself)
      */
     public function scopeUnderParent($query, $parentCode)

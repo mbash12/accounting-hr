@@ -1,6 +1,6 @@
 @php
     $indentSize = $level * 24;
-    $canDelete = !in_array($account->code, ['1', '2', '3', '4', '5', '6', '7', '8', '9']);
+    $canDelete = ! $account->isClassificationRoot();
     use Illuminate\Support\Str;
     $uniqueId = 'account-' . $account->id;
 
