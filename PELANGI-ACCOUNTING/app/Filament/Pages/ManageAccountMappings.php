@@ -10,6 +10,8 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use UnitEnum;
@@ -89,6 +91,38 @@ class ManageAccountMappings extends Page implements HasForms
     public function selectDocumentType($type): void
     {
         $this->selectedDocumentType = $type;
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        $documentType = $this->selectedDocumentType;
+        $fields = [];
+
+        if ($documentType) {
+            foreach ($this->getMappingTypes() as $mappingType => $mappingLabel) {
+                $fields[] = Select::make("{$documentType}.{$mappingType}.account_id")
+                    ->label($mappingLabel)
+                    ->placeholder(__('-- Select Account --'))
+                    ->options(fn (): array => $this->getAccounts())
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->live()
+                    ->helperText(fn (): ?string => ($this->getMappingDescriptions()[$mappingType] ?? null))
+                    ->extraFieldWrapperAttributes(fn (): array => [
+                        'class' => $this->hasFieldChanged($documentType, $mappingType)
+                            ? 'account-mapping-field-changed'
+                            : '',
+                    ]);
+            }
+        }
+
+        return $schema
+            ->components([
+                Grid::make(1)
+                    ->schema($fields),
+            ])
+            ->statePath('allMappings');
     }
 
     public function hasChanges($documentType = null): bool
