@@ -12,13 +12,13 @@
         @else
             @if(!$this->hasRetainedEarningsMapping())
                 <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 0.75rem; padding: 1rem; color: #9f1239; font-size: 0.875rem;">
-                    {{ __('Map Retained Earnings under Account Mapping → Period Closing / Tutup Buku before closing the year.') }}
+                    {{ __('Map Retained Earnings under Account Mapping → Period Closing before closing the year.') }}
                 </div>
             @endif
 
             @if($this->canCloseSelectedYear() && ($unposted = $this->getUnpostedCount()) > 0)
                 <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 0.75rem; padding: 1rem; color: #9f1239; font-size: 0.875rem;">
-                    {{ __('Cannot Tutup Buku yet: :count unposted journal(s) in :year. Post them in Posting Center first.', ['count' => $unposted, 'year' => $selectedYear]) }}
+                    {{ __('Cannot close year yet: :count unposted journal(s) in :year. Post them in Posting Center first.', ['count' => $unposted, 'year' => $selectedYear]) }}
                 </div>
             @endif
 
@@ -137,7 +137,7 @@
                             @empty
                                 <tr>
                                     <td colspan="5" style="padding: 1.5rem 1rem; text-align: center; color: #6b7280;">
-                                        {{ __('No tutup buku history yet.') }}
+                                        {{ __('No period closing history yet.') }}
                                     </td>
                                 </tr>
                             @endforelse

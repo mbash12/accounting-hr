@@ -300,6 +300,7 @@ class SalesDeliveriesTable
                     DeleteAction::make(),
                     \App\Filament\Actions\RegenerateJournalEntry::make('regenerateJournalEntry')
                         ->visible(fn ($record) => $record->status !== 'draft'),
+                    \App\Filament\Actions\ViewJournalVoucherAction::make(),
                 ]),
             ])
             ->toolbarActions([

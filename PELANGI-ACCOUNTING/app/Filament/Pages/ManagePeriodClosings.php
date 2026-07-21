@@ -19,13 +19,13 @@ class ManagePeriodClosings extends Page
 {
     use HasPageShield;
 
-    protected static ?string $navigationLabel = 'Tutup Buku';
+    protected static ?string $navigationLabel = 'Period Closing';
 
     protected static string|UnitEnum|null $navigationGroup = 'General Ledger';
 
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $title = 'Tutup Buku';
+    protected static ?string $title = 'Period Closing';
 
     protected string $view = 'filament.pages.manage-period-closings';
 
@@ -38,7 +38,7 @@ class ManagePeriodClosings extends Page
 
     public static function getNavigationLabel(): string
     {
-        return __('Tutup Buku');
+        return __('Period Closing');
     }
 
     public static function getNavigationGroup(): ?string
@@ -48,7 +48,7 @@ class ManagePeriodClosings extends Page
 
     public function getTitle(): string
     {
-        return __('Tutup Buku');
+        return __('Period Closing');
     }
 
     protected function getHeaderActions(): array
@@ -65,17 +65,17 @@ class ManagePeriodClosings extends Page
                 ->color('gray')
                 ->action(fn () => $this->selectedYear++),
             Action::make('close_year')
-                ->label(__('Tutup Buku'))
+                ->label(__('Close Year'))
                 ->icon('heroicon-o-lock-closed')
                 ->color('danger')
                 ->requiresConfirmation()
-                ->modalHeading(fn () => __('Tutup Buku :year', ['year' => $this->selectedYear]))
+                ->modalHeading(fn () => __('Close Year :year', ['year' => $this->selectedYear]))
                 ->modalDescription(fn () => $this->closeModalDescription())
                 ->modalContent(fn () => $this->closeModalPreviewContent())
                 ->form([
                     TextInput::make('description')
                         ->label(__('Description'))
-                        ->default(fn () => __('Tutup Buku :year', ['year' => $this->selectedYear])),
+                        ->default(fn () => __('Year-End Closing :year', ['year' => $this->selectedYear])),
                 ])
                 ->action(function (array $data) {
                     $this->closeYear($data['description'] ?? null);
@@ -85,7 +85,7 @@ class ManagePeriodClosings extends Page
                     || !$this->hasRetainedEarningsMapping()
                     || $this->getUnpostedCount() > 0),
             Action::make('reopen_year')
-                ->label(__('Buka Kembali'))
+                ->label(__('Reopen'))
                 ->icon('heroicon-o-lock-open')
                 ->color('warning')
                 ->requiresConfirmation()
@@ -326,7 +326,7 @@ class ManagePeriodClosings extends Page
 
             Notification::make()
                 ->success()
-                ->title(__('Tutup Buku completed'))
+                ->title(__('Year closed'))
                 ->body($je
                     ? __('Year :year closed. Journal :je', ['year' => $this->selectedYear, 'je' => $je])
                     : __('Year :year locked with no closing journal (no posted P&L balances).', ['year' => $this->selectedYear])

@@ -17,7 +17,7 @@ test('createClosingJournal returns null when there are no lines', function () {
     $method = new ReflectionMethod(PeriodClosingService::class, 'createClosingJournal');
     $method->setAccessible(true);
 
-    $result = $method->invoke($svc, 1, 2026, '2026-12-31', 'Tutup Buku 2026', []);
+    $result = $method->invoke($svc, 1, 2026, '2026-12-31', 'Year-End Closing 2026', []);
 
     expect($result)->toBeNull();
 });

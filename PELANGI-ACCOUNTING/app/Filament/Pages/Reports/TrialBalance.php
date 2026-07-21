@@ -277,7 +277,7 @@ class TrialBalance extends Page implements HasForms
             ]);
         }
 
-        // Inject Dynamic Retained Earnings if applicable (skip when prior year Tutup Buku already posted)
+        // Inject Dynamic Retained Earnings if applicable (skip when prior year period closing already posted)
         $skipDynamicPriorRe = app(\App\Services\PeriodClosingService::class)
             ->hasPostedClosingBefore((int) $companyId, $startDate);
 

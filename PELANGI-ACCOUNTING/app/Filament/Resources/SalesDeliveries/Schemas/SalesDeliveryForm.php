@@ -177,6 +177,7 @@ class SalesDeliveryForm
                         Select::make('sales_order_id')
                             ->label('Sales Order')
                             ->disabled(fn ($record) => (bool) ($record?->is_locked))
+                            ->nullable()
                             ->relationship(
                                 name: 'salesOrder',
                                 titleAttribute: 'order_number',

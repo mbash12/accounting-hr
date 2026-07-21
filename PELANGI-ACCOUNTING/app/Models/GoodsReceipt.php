@@ -225,4 +225,10 @@ class GoodsReceipt extends Model
         return $this->hasMany(\App\Models\JournalEntry::class, 'reference_id')
             ->where('reference_type', GoodsReceipt::class);
     }
+
+    public function journalEntry(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(\App\Models\JournalEntry::class, 'reference_id')
+            ->where('reference_type', self::class);
+    }
 }

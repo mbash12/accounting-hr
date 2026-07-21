@@ -64,7 +64,7 @@ class PeriodClosingService
         if ($this->isClosed($companyId, $date)) {
             $year = Carbon::parse($date)->year;
             throw ValidationException::withMessages([
-                'date' => __("Fiscal year :year is closed (Tutup Buku). Reopen the year to change transactions dated in that period.", [
+                'date' => __("Fiscal year :year is closed. Reopen the year to change transactions dated in that period.", [
                     'year' => $year,
                 ]),
             ]);
@@ -89,7 +89,7 @@ class PeriodClosingService
 
         if (!$account) {
             throw ValidationException::withMessages([
-                'retained_earnings' => __('Map Retained Earnings (Laba Ditahan) under Account Mapping → Period Closing / Tutup Buku before closing the year.'),
+                'retained_earnings' => __('Map Retained Earnings under Account Mapping → Period Closing before closing the year.'),
             ]);
         }
 
@@ -194,7 +194,7 @@ class PeriodClosingService
                 'status' => PeriodClosing::STATUS_CLOSED,
                 'closed_at' => now(),
                 'closed_by_user_id' => Auth::id(),
-                'description' => $description ?? __('Tutup Buku :year', ['year' => $year]),
+                'description' => $description ?? __('Year-End Closing :year', ['year' => $year]),
                 'closing_journal_entry_id' => $journal?->id,
                 'company_id' => $companyId,
                 'reopened_at' => null,
@@ -398,7 +398,7 @@ class PeriodClosingService
             'entry_number' => $this->generateEntryNumber(),
             'date' => $date,
             'reference_no' => 'TB-' . $year,
-            'description' => $description ?? __('Tutup Buku :year', ['year' => $year]),
+            'description' => $description ?? __('Year-End Closing :year', ['year' => $year]),
             'amount' => $totalDebit,
             'total_amount' => $totalDebit,
             'status' => 'posted',

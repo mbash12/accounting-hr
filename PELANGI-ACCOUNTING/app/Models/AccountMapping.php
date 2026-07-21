@@ -33,7 +33,7 @@ class AccountMapping extends Model
         'payable_payment' => 'Payable Payment',
         'payroll' => 'Payroll',
         'deferred_revenue' => 'Deferred Revenue',
-        'period_closing' => 'Period Closing / Tutup Buku',
+        'period_closing' => 'Period Closing',
     ];
 
     /**
@@ -71,7 +71,7 @@ class AccountMapping extends Model
         // Deferred Revenue mappings
         'deferred_revenue_liability' => 'Deferred Revenue (Liability)',
         'deferred_revenue_recognition' => 'Deferred Revenue Recognition (Revenue)',
-        'retained_earnings' => 'Retained Earnings / Laba Ditahan',
+        'retained_earnings' => 'Retained Earnings',
     ];
 
     /**

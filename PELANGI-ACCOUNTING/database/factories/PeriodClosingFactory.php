@@ -33,7 +33,7 @@ class PeriodClosingFactory extends Factory
             'status' => PeriodClosing::STATUS_CLOSED,
             'closed_at' => now(),
             'closed_by_user_id' => User::factory(),
-            'description' => 'Tutup Buku',
+            'description' => 'Year-End Closing',
         ]);
     }
 }
