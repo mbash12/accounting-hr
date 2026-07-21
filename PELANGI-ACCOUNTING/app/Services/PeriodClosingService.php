@@ -96,6 +96,66 @@ class PeriodClosingService
         return $account;
     }
 
+    public function countUnpostedJournals(int $companyId, int $year): int
+    {
+        [$start, $end] = $this->yearBounds($year);
+
+        return JournalEntry::query()
+            ->where('company_id', $companyId)
+            ->where('is_posted', false)
+            ->whereDate('date', '>=', $start->toDateString())
+            ->whereDate('date', '<=', $end->toDateString())
+            ->where(function ($q) {
+                $q->whereNull('sub_module')
+                    ->orWhere('sub_module', '!=', 'period_closing');
+            })
+            ->count();
+    }
+
+    public function assertNoUnpostedJournals(int $companyId, int $year): void
+    {
+        $count = $this->countUnpostedJournals($companyId, $year);
+
+        if ($count > 0) {
+            throw ValidationException::withMessages([
+                'unposted' => __('Cannot close year :year: :count unposted journal(s) remain. Post or reverse them in Posting Center first.', [
+                    'year' => $year,
+                    'count' => $count,
+                ]),
+            ]);
+        }
+    }
+
+    /**
+     * Preview closing journal lines for UI confirmation.
+     *
+     * @return list<array{account_id: int, account_code: string, account_name: string, debit: float, credit: float, notes: ?string}>
+     */
+    public function previewClosingLines(int $companyId, int $year): array
+    {
+        $reAccount = $this->resolveRetainedEarningsAccount($companyId);
+        [$start, $end] = $this->yearBounds($year);
+        $lines = $this->buildClosingLines($companyId, $start, $end, $reAccount);
+
+        $accounts = Account::query()
+            ->whereIn('id', collect($lines)->pluck('account_id')->unique()->filter()->all())
+            ->get()
+            ->keyBy('id');
+
+        return array_map(function (array $line) use ($accounts) {
+            $account = $accounts->get($line['account_id']);
+
+            return [
+                'account_id' => $line['account_id'],
+                'account_code' => $account?->code ?? '',
+                'account_name' => $account?->name ?? '',
+                'debit' => (float) $line['debit'],
+                'credit' => (float) $line['credit'],
+                'notes' => $line['notes'] ?? null,
+            ];
+        }, $lines);
+    }
+
     public function closeYear(int $companyId, int $year, ?string $description = null): PeriodClosing
     {
         if (!Company::query()->whereKey($companyId)->exists()) {
@@ -113,11 +173,12 @@ class PeriodClosingService
             ]);
         }
 
+        $this->assertNoUnpostedJournals($companyId, $year);
+
         $reAccount = $this->resolveRetainedEarningsAccount($companyId);
 
         return DB::transaction(function () use ($companyId, $year, $description, $start, $end, $existing, $reAccount) {
             $lines = $this->buildClosingLines($companyId, $start, $end, $reAccount);
-
             $journal = $this->createClosingJournal(
                 $companyId,
                 $year,
@@ -134,7 +195,7 @@ class PeriodClosingService
                 'closed_at' => now(),
                 'closed_by_user_id' => Auth::id(),
                 'description' => $description ?? __('Tutup Buku :year', ['year' => $year]),
-                'closing_journal_entry_id' => $journal->id,
+                'closing_journal_entry_id' => $journal?->id,
                 'company_id' => $companyId,
                 'reopened_at' => null,
                 'reopened_by_user_id' => null,
@@ -148,10 +209,12 @@ class PeriodClosingService
                 $period = PeriodClosing::create($payload)->load(['closingJournalEntry', 'closedByUser']);
             }
 
-            $journal->update([
-                'reference_type' => PeriodClosing::class,
-                'reference_id' => $period->id,
-            ]);
+            if ($journal) {
+                $journal->update([
+                    'reference_type' => PeriodClosing::class,
+                    'reference_id' => $period->id,
+                ]);
+            }
 
             return $period;
         });
@@ -217,6 +280,7 @@ class PeriodClosingService
             ->whereHas('journalEntry', function ($q) use ($companyId, $start, $end) {
                 $q->where('company_id', $companyId)
                     ->where('is_posted', true)
+                    ->excludePeriodClosing()
                     ->whereDate('date', '>=', $start->toDateString())
                     ->whereDate('date', '<=', $end->toDateString());
             })
@@ -300,11 +364,6 @@ class PeriodClosingService
             ];
         }
 
-        if ($lines === []) {
-            // Still allow close with a zero JE tip to RE for empty years — use a balanced placeholder? Better reject or allow empty close with no JE.
-            // Allow empty year close with no journal lines except a note JE is skipped.
-        }
-
         return $lines;
     }
 
@@ -317,7 +376,12 @@ class PeriodClosingService
         string $date,
         ?string $description,
         array $lines,
-    ): JournalEntry {
+    ): ?JournalEntry {
+        if ($lines === []) {
+            // Empty year / no posted P&L: lock only, do not create a zero-line journal.
+            return null;
+        }
+
         $totalDebit = round(collect($lines)->sum('debit'), 2);
         $totalCredit = round(collect($lines)->sum('credit'), 2);
 
@@ -362,7 +426,6 @@ class PeriodClosingService
             ]);
         }
 
-        // Empty year: still create a posted header with zero amount for audit trail
         return $journal;
     }
 
@@ -371,7 +434,8 @@ class PeriodClosingService
         $prefix = 'JE';
         $date = now()->format('Ymd');
 
-        $lastEntry = JournalEntry::where('entry_number', 'like', $prefix . $date . '%')
+        $lastEntry = JournalEntry::withTrashed()
+            ->where('entry_number', 'like', $prefix . $date . '%')
             ->orderBy('entry_number', 'desc')
             ->first();
 

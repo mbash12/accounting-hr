@@ -139,6 +139,8 @@ class IncomeStatement extends Page implements HasForms
             $q->where('company_id', $companyId);
             $q->whereBetween('date', [$startDate, $endDate]);
             $q->where('is_posted', true);
+            // Closing entries zero P&L; exclude so year-end Income Statement still shows operating results.
+            $q->excludePeriodClosing();
         })
             ->groupBy('account_id')
             ->get()
@@ -226,7 +228,8 @@ class IncomeStatement extends Page implements HasForms
         foreach ($nodes as $node) {
             if ($node->children->isNotEmpty()) {
                 $childTotal = $this->aggregateBalances($node->children);
-                if ($node->is_header) {
+                // Roll child totals into parents that have no own movement (headers and intermediate folders).
+                if ($node->is_header || abs((float) $node->calculated_balance) < 0.01) {
                     $node->calculated_balance = $childTotal;
                 }
             }
@@ -246,9 +249,9 @@ class IncomeStatement extends Page implements HasForms
             }
 
             // Include the node if:
-            // 1. It's a header (even if balance is 0, but has children)
-            // 2. It's not a header and has a non-zero balance
-            if (($node->is_header && $node->children->isNotEmpty()) || (!$node->is_header && $node->calculated_balance != 0)) {
+            // 1. It has remaining children (header or intermediate parent)
+            // 2. It's a leaf with a non-zero balance
+            if ($node->children->isNotEmpty() || (!$node->is_header && $node->calculated_balance != 0)) {
                 $filteredNodes->push($node);
             }
         }

@@ -16,6 +16,12 @@
                 </div>
             @endif
 
+            @if($this->canCloseSelectedYear() && ($unposted = $this->getUnpostedCount()) > 0)
+                <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 0.75rem; padding: 1rem; color: #9f1239; font-size: 0.875rem;">
+                    {{ __('Cannot Tutup Buku yet: :count unposted journal(s) in :year. Post them in Posting Center first.', ['count' => $unposted, 'year' => $selectedYear]) }}
+                </div>
+            @endif
+
             <div style="background: white; border: 1px solid #e5e7eb; border-radius: 0.75rem; padding: 1.5rem; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);">
                 <div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 1rem;">
                     <div>
@@ -54,6 +60,14 @@
                             <div>
                                 <div style="font-weight: 500; color: #6b7280; margin-bottom: 0.15rem;">{{ __('Closing Journal') }}</div>
                                 <div style="color: #111827;">{{ $closing->closingJournalEntry->entry_number }}</div>
+                                <div style="margin-top: 0.25rem; font-size: 0.75rem; color: #6b7280;">
+                                    {{ __('Use “View Closing Journal” above to open the voucher.') }}
+                                </div>
+                            </div>
+                        @elseif($isClosed)
+                            <div>
+                                <div style="font-weight: 500; color: #6b7280; margin-bottom: 0.15rem;">{{ __('Closing Journal') }}</div>
+                                <div style="color: #111827;">{{ __('None (no P&L balances)') }}</div>
                             </div>
                         @endif
                         @if($closing->reopened_at)
@@ -111,7 +125,7 @@
                                         @endif
                                     </td>
                                     <td style="padding: 0.75rem 1rem; color: #4b5563;">
-                                        {{ $row->closingJournalEntry?->entry_number ?? '-' }}
+                                        {{ $row->closingJournalEntry?->entry_number ?? ($row->isClosed() ? __('None') : '-') }}
                                     </td>
                                     <td style="padding: 0.75rem 1rem; color: #4b5563;">
                                         {{ $row->reopened_at?->format('d M Y H:i') ?? '-' }}

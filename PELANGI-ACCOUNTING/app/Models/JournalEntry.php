@@ -118,6 +118,17 @@ class JournalEntry extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Exclude year-end closing journals from operational P&L reports.
+     */
+    public function scopeExcludePeriodClosing($query)
+    {
+        return $query->where(function ($q) {
+            $q->whereNull('sub_module')
+                ->orWhere('sub_module', '!=', 'period_closing');
+        });
+    }
+
     public function updatedByUser(): BelongsTo
     {
         return $this->belongsTo(User::class);
