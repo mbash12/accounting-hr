@@ -67,4 +67,9 @@ class PermitPolicy
         return $authUser->can('Reorder:Permit');
     }
 
+    public function approve(AuthUser $authUser, Permit $permit): bool
+    {
+        return $authUser->can('Approve:Permit');
+    }
+
 }

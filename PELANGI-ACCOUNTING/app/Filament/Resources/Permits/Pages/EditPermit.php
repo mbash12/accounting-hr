@@ -27,7 +27,8 @@ class EditPermit extends EditRecord
                 ->color('success')
                 ->icon('heroicon-o-check')
                 ->requiresConfirmation()
-                ->visible(fn () => $this->record->status === 'pending')
+                ->authorize('approve')
+                ->visible(fn () => $this->record->status === 'pending' && auth()->user()?->can('approve', $this->record))
                 ->action(function () {
                     $this->record->update([
                         'status' => 'approved',
@@ -44,7 +45,8 @@ class EditPermit extends EditRecord
                 ->color('danger')
                 ->icon('heroicon-o-x-mark')
                 ->requiresConfirmation()
-                ->visible(fn () => $this->record->status === 'pending')
+                ->authorize('approve')
+                ->visible(fn () => $this->record->status === 'pending' && auth()->user()?->can('approve', $this->record))
                 ->action(function () {
                     $this->record->update([
                         'status' => 'rejected',

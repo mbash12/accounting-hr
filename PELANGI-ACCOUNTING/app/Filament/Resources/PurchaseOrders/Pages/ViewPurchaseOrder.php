@@ -22,7 +22,8 @@ class ViewPurchaseOrder extends ViewRecord
                 ->label('Approve')
                 ->icon('heroicon-o-check-circle')
                 ->color('warning')
-                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                ->authorize('approve')
+                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft' && auth()->user()?->can('approve', $record))
                 ->form([
                     Textarea::make('comment')
                         ->label('Comment')
@@ -61,7 +62,8 @@ class ViewPurchaseOrder extends ViewRecord
                 ->label('Reject')
                 ->icon('heroicon-o-x-circle')
                 ->color('danger')
-                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft')
+                ->authorize('approve')
+                ->visible(fn (PurchaseOrder $record): bool => $record->status === 'draft' && auth()->user()?->can('approve', $record))
                 ->form([
                     Textarea::make('comment')
                         ->label('Comment')

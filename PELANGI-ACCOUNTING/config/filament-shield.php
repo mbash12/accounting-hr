@@ -170,6 +170,15 @@ return [
                 'update',
                 'delete',
             ],
+            \App\Filament\Resources\PurchaseOrders\PurchaseOrderResource::class => [
+                'approve',
+            ],
+            \App\Filament\Resources\Permits\PermitResource::class => [
+                'approve',
+            ],
+            \App\Filament\Resources\OvertimeLogs\OvertimeLogResource::class => [
+                'approve',
+            ],
         ],
         'exclude' => [
             \BezhanSalleh\FilamentShield\Resources\Roles\RoleResource::class,

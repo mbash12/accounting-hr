@@ -67,4 +67,9 @@ class OvertimeLogPolicy
         return $authUser->can('Reorder:OvertimeLog');
     }
 
+    public function approve(AuthUser $authUser, OvertimeLog $overtimeLog): bool
+    {
+        return $authUser->can('Approve:OvertimeLog');
+    }
+
 }

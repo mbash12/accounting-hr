@@ -67,4 +67,9 @@ class PurchaseOrderPolicy
         return $authUser->can('Reorder:PurchaseOrder');
     }
 
+    public function approve(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('Approve:PurchaseOrder');
+    }
+
 }
