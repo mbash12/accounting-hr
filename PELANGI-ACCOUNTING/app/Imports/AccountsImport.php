@@ -85,6 +85,7 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                         case 'cost_of_goods_sold':
                         case 'other_income':
                         case 'other_expense':
+                        case 'other_income_expense':
                             $accountType = $classificationType;
                             break;
                         default:
@@ -101,14 +102,14 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                     $mainClassificationType = 'asset';
                 } elseif (in_array($classificationType, ['current_liability', 'long_term_liability'])) {
                     $mainClassificationType = 'liability';
-                } elseif (in_array($classificationType, ['cost_of_goods_sold', 'other_expense'])) {
+                } elseif (in_array($classificationType, ['cost_of_goods_sold', 'other_expense', 'other_income_expense'])) {
                     $mainClassificationType = 'expense';
                 } elseif ($classificationType === 'other_income') {
                     $mainClassificationType = 'revenue';
                 }
                 // 'asset', 'liability', 'equity', 'revenue', 'expense' remain as they are
 
-                $data = [
+                $data = Account::normalizeOtherIncomeExpenseAttributes([
                     'name' => $name,
                     'description' => $description,
                     'classification_type' => $mainClassificationType,
@@ -122,7 +123,7 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
                     'current_balance' => 0,
                     'company_id' => $companyId,
                     'created_by_user_id' => Auth::check() ? Auth::id() : session('current_user_id'),
-                ];
+                ]);
 
                 if ($account) {
                     // Update existing account
@@ -142,6 +143,19 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
 
                 if ($parentCode && isset($codeToIdMap[$parentCode])) {
                     $accountId = $codeToIdMap[$code];
+                    $child = Account::query()->find($accountId);
+                    $parent = Account::query()->find($codeToIdMap[$parentCode]);
+
+                    if ($child && $parent) {
+                        $hierarchyError = Account::validateOtherIncomeExpenseHierarchy(
+                            (string) $child->account_type,
+                            $parent
+                        );
+                        if ($hierarchyError) {
+                            throw new \Exception("Account {$code}: {$hierarchyError}");
+                        }
+                    }
+
                     // Update parent relationship within the same company
                     Account::where('id', $accountId)
                         ->where('company_id', $companyId)  // Ensure we only update accounts from the same company
@@ -211,13 +225,13 @@ class AccountsImport implements ToCollection, WithHeadingRow, WithValidation, Sk
             'code' => 'required|string|max:50',
             'name' => 'required|string|max:200',
             'description' => 'nullable|string|max:500',
-            'classification_type' => 'required|string|in:asset,liability,equity,revenue,expense,current_asset,fixed_asset,other_asset,current_liability,long_term_liability,cost_of_goods_sold,other_income,other_expense',
+            'classification_type' => 'required|string|in:asset,liability,equity,revenue,expense,current_asset,fixed_asset,other_asset,current_liability,long_term_liability,cost_of_goods_sold,other_income,other_expense,other_income_expense',
             'is_header' => 'nullable|string',
             'is_cash_bank' => 'nullable|string',
             'is_active' => 'nullable|string',
             'level' => 'required|integer|min:1',
             'parent_code' => 'nullable|string|max:50',
-            'account_type' => 'nullable|string|in:asset,liability,equity,revenue,expense,current_asset,fixed_asset,other_asset,current_liability,long_term_liability,cost_of_goods_sold,other_income,other_expense',
+            'account_type' => 'nullable|string|in:asset,liability,equity,revenue,expense,current_asset,fixed_asset,other_asset,current_liability,long_term_liability,cost_of_goods_sold,other_income,other_expense,other_income_expense',
             'cash_flow' => 'nullable|string|in:operating,investing,financing,undefined',
         ];
     }

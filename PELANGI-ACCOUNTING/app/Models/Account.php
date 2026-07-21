@@ -13,6 +13,8 @@ class Account extends Model
 {
     use HasFactory, SoftDeletes, HasDependencyValidation;
 
+    public const OTHER_INCOME_EXPENSE = 'other_income_expense';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -103,6 +105,45 @@ class Account extends Model
     public function isClassificationRoot(): bool
     {
         return $this->parent_id === null;
+    }
+
+    /**
+     * Force header + classification for other_income_expense; leave other types unchanged.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function normalizeOtherIncomeExpenseAttributes(array $data): array
+    {
+        if (($data['account_type'] ?? null) === self::OTHER_INCOME_EXPENSE) {
+            $data['is_header'] = true;
+            $data['classification_type'] = 'expense';
+        }
+
+        return $data;
+    }
+
+    /**
+     * Validate parent/child rules for other_income_expense headers.
+     * Returns an error message, or null when valid.
+     */
+    public static function validateOtherIncomeExpenseHierarchy(string $accountType, ?self $parent): ?string
+    {
+        if (! $parent) {
+            return null;
+        }
+
+        if ($parent->account_type === self::OTHER_INCOME_EXPENSE) {
+            if ($accountType === self::OTHER_INCOME_EXPENSE) {
+                return __('Other Income/Expense headers cannot be nested.');
+            }
+
+            if (! in_array($accountType, ['other_income', 'other_expense'], true)) {
+                return __('Only Other Income or Other Expense accounts can be placed under an Other Income/Expense header.');
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -563,6 +563,23 @@ class ManageAccounts extends Page
                                 }
                             }
 
+                            $data = Account::normalizeOtherIncomeExpenseAttributes($data);
+                            $parent = isset($data['parent_id'])
+                                ? Account::find($data['parent_id'])
+                                : $account->parent;
+                            $hierarchyError = Account::validateOtherIncomeExpenseHierarchy(
+                                (string) ($data['account_type'] ?? $account->account_type),
+                                $parent
+                            );
+                            if ($hierarchyError) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title(__('Validation Error'))
+                                    ->body($hierarchyError)
+                                    ->send();
+                                return;
+                            }
+
                             $account->update($data);
                         }
 
@@ -661,6 +678,20 @@ class ManageAccounts extends Page
                         $data['parent_id'] = $account->id;
                         $data['level'] = $account->level + 1;
                         $data['company_id'] = $account->company_id;
+                        $data = Account::normalizeOtherIncomeExpenseAttributes($data);
+
+                        $hierarchyError = Account::validateOtherIncomeExpenseHierarchy(
+                            (string) ($data['account_type'] ?? ''),
+                            $account
+                        );
+                        if ($hierarchyError) {
+                            Notification::make()
+                                ->danger()
+                                ->title(__('Validation Error'))
+                                ->body($hierarchyError)
+                                ->send();
+                            return;
+                        }
 
                         // Check if code is unique within the same company when creating
                         if (isset($data['code'])) {
@@ -845,8 +876,16 @@ class ManageAccounts extends Page
                     'cost_of_goods_sold' => __('Cost of Goods Sold'),
                     'other_income' => __('Other Income'),
                     'other_expense' => __('Other Expense'),
+                    'other_income_expense' => __('Other Income/Expense'),
                 ])
                 ->searchable()
+                ->live()
+                ->afterStateUpdated(function ($state, callable $set) {
+                    if ($state === Account::OTHER_INCOME_EXPENSE) {
+                        $set('is_header', true);
+                        $set('classification_type', 'expense');
+                    }
+                })
                 ->hidden(function (callable $get) {
                     // Check if current form data indicates a top-level account
                     $accountId = $get('id');
