@@ -11,9 +11,18 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Account extends Model
 {
-    use HasFactory, SoftDeletes, HasDependencyValidation;
+    use HasDependencyValidation, HasFactory, SoftDeletes;
 
     public const OTHER_INCOME_EXPENSE = 'other_income_expense';
+
+    public const DEBIT_NORMAL_TYPES = [
+        'current_asset', 'fixed_asset', 'other_asset',
+        'expense', 'cost_of_goods_sold', 'other_expense',
+    ];
+
+    public const REVENUE_TYPES = ['revenue', 'other_income'];
+
+    public const EXPENSE_TYPES = ['expense', 'cost_of_goods_sold', 'other_expense'];
 
     /**
      * The attributes that are mass assignable.
@@ -107,6 +116,40 @@ class Account extends Model
         return $this->parent_id === null;
     }
 
+    public function isDebitNormal(): bool
+    {
+        // Accumulated depreciation is a contra asset and therefore credit-normal.
+        if ($this->classification_type === 'accumulated_depreciation') {
+            return false;
+        }
+
+        return in_array($this->account_type, self::DEBIT_NORMAL_TYPES, true);
+    }
+
+    public function isRevenueAccount(): bool
+    {
+        return in_array($this->account_type, self::REVENUE_TYPES, true);
+    }
+
+    public function isExpenseAccount(): bool
+    {
+        return in_array($this->account_type, self::EXPENSE_TYPES, true);
+    }
+
+    public function balanceFromMovements(float $debit, float $credit, float $opening = 0): float
+    {
+        return $this->isDebitNormal()
+            ? $opening + $debit - $credit
+            : $opening + $credit - $debit;
+    }
+
+    public function reportOpeningBalance(bool $hasPostedOpeningJournal): float
+    {
+        // Opening-balance journals are the canonical ledger source. The legacy column
+        // remains a fallback for companies that have not migrated to those journals.
+        return $hasPostedOpeningJournal ? 0.0 : (float) ($this->opening_balance ?? 0);
+    }
+
     /**
      * Force header + classification for other_income_expense; leave other types unchanged.
      *
@@ -156,7 +199,7 @@ class Account extends Model
 
         while ($current->parent_id !== null && $guard < 50) {
             $parent = static::query()->find($current->parent_id);
-            if (!$parent) {
+            if (! $parent) {
                 break;
             }
             $current = $parent;
@@ -187,7 +230,7 @@ class Account extends Model
     {
         $parentAccount = static::where('code', $parentCode)->first();
 
-        if (!$parentAccount) {
+        if (! $parentAccount) {
             return $query->whereRaw('1 = 0'); // Return no results if parent doesn't exist
         }
 
@@ -206,7 +249,7 @@ class Account extends Model
         $processed = [];
         $toProcess = [$parentId];
 
-        while (!empty($toProcess)) {
+        while (! empty($toProcess)) {
             $currentId = array_pop($toProcess);
 
             if (\in_array($currentId, $processed)) {
@@ -219,7 +262,7 @@ class Account extends Model
             $children = static::where('parent_id', $currentId)->pluck('id')->toArray();
 
             foreach ($children as $childId) {
-                if (!\in_array($childId, $ids)) {
+                if (! \in_array($childId, $ids)) {
                     $ids[] = $childId;
                     $toProcess[] = $childId;
                 }

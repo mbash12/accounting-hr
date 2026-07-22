@@ -125,6 +125,15 @@
     $fmt = fn($v) => $v != 0 ? number_format($v, 2, ',', '.') : '-';
     @endphp
 
+    @if(collect($imbalance ?? [])->contains(fn ($difference) => abs($difference) >= 0.01))
+    <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #dc2626; background: #fef2f2; color: #991b1b;">
+        Trial Balance is not balanced. Opening difference:
+        {{ number_format($imbalance['opening'], 2, ',', '.') }}, period difference:
+        {{ number_format($imbalance['period'], 2, ',', '.') }}, ending difference:
+        {{ number_format($imbalance['ending'], 2, ',', '.') }}.
+    </div>
+    @endif
+
     <table>
         <thead>
             <tr>

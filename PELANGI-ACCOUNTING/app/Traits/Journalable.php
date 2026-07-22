@@ -16,7 +16,7 @@ trait Journalable
         static::saved(function ($model) {
             try {
                 // Skip posted documents — journal already created or will be posted from Posting Center
-                if (property_exists($model, 'status') && $model->status === 'posted') {
+                if ($model->getAttribute('status') === 'posted') {
                     return;
                 }
 
@@ -30,7 +30,7 @@ trait Journalable
 
                 if ($entry === null && in_array($journalService->lastSkipReason, ['no_mappings', 'incomplete_mappings'], true)) {
                     $missing = $model->getMissingAccountMappings();
-                    $list = !empty($missing)
+                    $list = ! empty($missing)
                         ? implode(', ', $missing)
                         : __('required accounts');
 
@@ -43,7 +43,7 @@ trait Journalable
                         ->send();
                 }
             } catch (\Exception $e) {
-                \Log::error('Journal Entry Error: ' . $e->getMessage(), [
+                \Log::error('Journal Entry Error: '.$e->getMessage(), [
                     'model' => get_class($model),
                     'model_id' => $model->id ?? null,
                     'trace' => $e->getTraceAsString(),
@@ -51,7 +51,7 @@ trait Journalable
                 Notification::make()
                     ->danger()
                     ->title('Journal Entry Error')
-                    ->body('Failed to create journal entry: ' . $e->getMessage())
+                    ->body('Failed to create journal entry: '.$e->getMessage())
                     ->persistent()
                     ->send();
             }
@@ -65,9 +65,25 @@ trait Journalable
                 Notification::make()
                     ->danger()
                     ->title('Journal Entry Deletion Error')
-                    ->body('Failed to delete journal entry: ' . $e->getMessage())
+                    ->body('Failed to delete journal entry: '.$e->getMessage())
                     ->persistent()
                     ->send();
+            }
+        });
+
+        static::deleting(function ($model) {
+            $hasPostedJournal = \App\Models\JournalEntry::query()
+                ->where('sub_module', $model->getDocumentType())
+                ->where('reference_type', get_class($model))
+                ->where('reference_id', $model->id)
+                ->where('company_id', $model->company_id)
+                ->where('is_posted', true)
+                ->exists();
+
+            if ($hasPostedJournal) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'status' => __('A document with a posted journal cannot be deleted. Reverse it first.'),
+                ]);
             }
         });
     }
@@ -111,6 +127,12 @@ trait Journalable
             ->where('reference_type', get_class($this))
             ->where('reference_id', $this->id)
             ->first(['status', 'is_posted']);
+
+        if ($existingEntry?->is_posted) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'status' => __('A posted journal cannot be regenerated. Reverse it first.'),
+            ]);
+        }
 
         // Delete existing journal entry
         $this->deleteJournalEntry();
@@ -161,7 +183,7 @@ trait Journalable
 
         // Check if all required mappings are configured
         foreach ($documentMappings as $mappingType) {
-            if (!$mappings->has($mappingType)) {
+            if (! $mappings->has($mappingType)) {
                 return false;
             }
         }
@@ -183,7 +205,7 @@ trait Journalable
 
         $missing = [];
         foreach ($documentMappings as $mappingType) {
-            if (!in_array($mappingType, $configuredMappings)) {
+            if (! in_array($mappingType, $configuredMappings)) {
                 $missing[] = $mappingType;
             }
         }
@@ -228,6 +250,6 @@ trait Journalable
             }
         }
 
-        return '#' . $this->id;
+        return '#'.$this->id;
     }
 }

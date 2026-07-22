@@ -128,6 +128,19 @@ class AccountMapping extends Model
         ];
     }
 
+    protected static function booted(): void
+    {
+        static::saving(function (self $mapping) {
+            $accountCompanyId = Account::query()->whereKey($mapping->account_id)->value('company_id');
+
+            if ((int) $accountCompanyId !== (int) $mapping->company_id) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'account_id' => __('The mapped account must belong to the same company.'),
+                ]);
+            }
+        });
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -157,11 +170,11 @@ class AccountMapping extends Model
     public static function getAccountMapping(string $documentType, string $mappingType, ?int $companyId = null): ?Account
     {
         $selectedCompanyId = $companyId ?? session('selected_company_id');
-        
-        if (!$selectedCompanyId || $selectedCompanyId === 'all') {
+
+        if (! $selectedCompanyId || $selectedCompanyId === 'all') {
             return null;
         }
-        
+
         $mapping = self::where('company_id', $selectedCompanyId)
             ->where('document_type', $documentType)
             ->where('mapping_type', $mappingType)

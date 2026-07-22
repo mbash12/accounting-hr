@@ -18,7 +18,7 @@ class PostingQueueWidget extends TableWidget
 {
     protected static ?string $heading = 'Pending Transactions';
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
@@ -122,8 +122,9 @@ class PostingQueueWidget extends TableWidget
     protected function postRecord(PostingQueue $record): void
     {
         $source = $record->getSourceModel();
-        if (!$source) {
+        if (! $source) {
             Notification::make()->title(__('Source record not found.'))->danger()->send();
+
             return;
         }
 
@@ -134,6 +135,8 @@ class PostingQueueWidget extends TableWidget
                 if ($companyId && $date) {
                     app(\App\Services\PeriodClosingService::class)->assertOpen((int) $companyId, $date);
                 }
+
+                $this->assertBalancedJournal($source);
 
                 $source->update([
                     'is_posted' => true,
@@ -151,7 +154,7 @@ class PostingQueueWidget extends TableWidget
                 ->success()
                 ->send();
         } catch (\Exception $e) {
-            Log::error("Posting failed for {$record->type} #{$record->document_number}: " . $e->getMessage(), [
+            Log::error("Posting failed for {$record->type} #{$record->document_number}: ".$e->getMessage(), [
                 'exception' => $e,
                 'record_id' => $record->source_id,
                 'record_type' => $record->source_type,
@@ -179,7 +182,17 @@ class PostingQueueWidget extends TableWidget
             try {
                 DB::transaction(function () use ($record) {
                     $source = $record->getSourceModel();
-                    if (!$source) throw new \RuntimeException('Source not found');
+                    if (! $source) {
+                        throw new \RuntimeException('Source not found');
+                    }
+
+                    $companyId = $source->company_id ?? $record->company_id ?? null;
+                    $date = $source->date ?? $record->date ?? null;
+                    if ($companyId && $date) {
+                        app(\App\Services\PeriodClosingService::class)->assertOpen((int) $companyId, $date);
+                    }
+
+                    $this->assertBalancedJournal($source);
 
                     $source->update([
                         'is_posted' => true,
@@ -193,7 +206,7 @@ class PostingQueueWidget extends TableWidget
                 });
                 $success++;
             } catch (\Exception $e) {
-                Log::error("Bulk posting failed for {$record->type} #{$record->document_number}: " . $e->getMessage(), [
+                Log::error("Bulk posting failed for {$record->type} #{$record->document_number}: ".$e->getMessage(), [
                     'exception' => $e,
                     'record_id' => $record->source_id,
                     'record_type' => $record->source_type,
@@ -203,7 +216,9 @@ class PostingQueueWidget extends TableWidget
         }
 
         $body = __(':success posted.', ['success' => $success]);
-        if ($fail > 0) $body .= ' ' . __(':fail failed.', ['fail' => $fail]);
+        if ($fail > 0) {
+            $body .= ' '.__(':fail failed.', ['fail' => $fail]);
+        }
 
         Notification::make()
             ->title(__('Bulk Posting Complete'))
@@ -217,19 +232,38 @@ class PostingQueueWidget extends TableWidget
         $this->postBulk($this->table->getQuery()->get());
     }
 
+    protected function assertBalancedJournal($source): void
+    {
+        if (! $source instanceof JournalEntry) {
+            return;
+        }
+
+        $debit = round((float) $source->items()->sum('debit'), 2);
+        $credit = round((float) $source->items()->sum('credit'), 2);
+
+        if ($debit <= 0 || abs($debit - $credit) >= 0.01) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'journal' => __('Journal must be balanced before posting (debit :debit, credit :credit).', [
+                    'debit' => $debit,
+                    'credit' => $credit,
+                ]),
+            ]);
+        }
+    }
+
     protected function updateSourceDocumentStatus(JournalEntry $journalEntry): void
     {
-        if (!$journalEntry->reference_type || !$journalEntry->reference_id) {
+        if (! $journalEntry->reference_type || ! $journalEntry->reference_id) {
             return;
         }
 
         $sourceClass = $journalEntry->reference_type;
-        if (!class_exists($sourceClass)) {
+        if (! class_exists($sourceClass)) {
             return;
         }
 
         $source = $sourceClass::find($journalEntry->reference_id);
-        if (!$source) {
+        if (! $source) {
             return;
         }
 

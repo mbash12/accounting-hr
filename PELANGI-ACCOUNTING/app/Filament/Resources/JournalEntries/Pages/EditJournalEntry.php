@@ -5,13 +5,12 @@ namespace App\Filament\Resources\JournalEntries\Pages;
 use App\Filament\Actions\BulkInputJournalItemsAction;
 use App\Filament\Resources\JournalEntries\JournalEntryResource;
 use App\Filament\Resources\JournalEntries\Schemas\JournalEntryForm;
-use App\Filament\Forms\Components\NumberInput;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Forms\Components\TextInput;
+use Filament\Resources\Pages\EditRecord;
 
 class EditJournalEntry extends EditRecord
 {
@@ -23,8 +22,8 @@ class EditJournalEntry extends EditRecord
     {
         return [
             BulkInputJournalItemsAction::make(),
-            DeleteAction::make(),
-            ForceDeleteAction::make(),
+            DeleteAction::make()->visible(fn () => ! $this->record->is_posted),
+            ForceDeleteAction::make()->visible(fn () => ! $this->record->is_posted),
             RestoreAction::make(),
         ];
     }
@@ -53,28 +52,34 @@ class EditJournalEntry extends EditRecord
                 ->visible(function () {
                     $items = $this->data['items'] ?? [];
                     $totals = JournalEntryForm::calculateTotalsFromItems($items);
-                    return abs((float)$totals['balance']) < 0.01 && $totals['total_debit'] > 0;
+
+                    return abs((float) $totals['balance']) < 0.01 && $totals['total_debit'] > 0;
                 }),
         ];
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        if ($this->record->is_posted) {
+            $this->NotificationHalt('A posted journal cannot be edited. Reverse it first.');
+        }
+
         $items = $this->data['items'] ?? [];
-        
+
         // Filter out empty items
         $validItems = array_filter($items, function ($item) {
             $item = (array) $item;
-            $hasAccount = !empty($item['account_id'] ?? null);
+            $hasAccount = ! empty($item['account_id'] ?? null);
             $debit = (float) ($item['debit'] ?? 0);
             $credit = (float) ($item['credit'] ?? 0);
+
             return $hasAccount && ($debit > 0 || $credit > 0);
         });
-        
+
         $validItems = array_values($validItems);
-        
+
         if (count($validItems) < 2) {
-            $this->NotificationHalt('Journal must have at least 2 items with account and debit/credit values. Current valid items: ' . count($validItems));
+            $this->NotificationHalt('Journal must have at least 2 items with account and debit/credit values. Current valid items: '.count($validItems));
         }
 
         $totals = JournalEntryForm::calculateTotalsFromItems($validItems);
@@ -85,22 +90,22 @@ class EditJournalEntry extends EditRecord
             $debit = (float) ($item['debit'] ?? 0);
             $credit = (float) ($item['credit'] ?? 0);
 
-            if (!empty($companyId)) {
+            if (! empty($companyId)) {
                 $accountBelongsToCompany = \App\Models\Account::where('id', $item['account_id'])
                     ->where('company_id', $companyId)
                     ->exists();
 
-                if (!$accountBelongsToCompany) {
-                    $this->NotificationHalt('Item ' . ($index + 1) . ' account does not belong to the selected company.');
+                if (! $accountBelongsToCompany) {
+                    $this->NotificationHalt('Item '.($index + 1).' account does not belong to the selected company.');
                 }
             }
-            
+
             if ($debit <= 0 && $credit <= 0) {
-                $this->NotificationHalt('Item ' . ($index + 1) . ' must have a debit or credit value.');
+                $this->NotificationHalt('Item '.($index + 1).' must have a debit or credit value.');
             }
-            
+
             if ($debit > 0 && $credit > 0) {
-                $this->NotificationHalt('Item ' . ($index + 1) . ' cannot have both debit and credit values.');
+                $this->NotificationHalt('Item '.($index + 1).' cannot have both debit and credit values.');
             }
         }
 
@@ -109,14 +114,14 @@ class EditJournalEntry extends EditRecord
         $data['total_amount'] = $totals['total_debit'];
 
         $date = $data['date'] ?? $this->record->date ?? null;
-        if (!empty($companyId) && !empty($date)) {
+        if (! empty($companyId) && ! empty($date)) {
             try {
                 app(\App\Services\PeriodClosingService::class)->assertOpen((int) $companyId, $date);
             } catch (\Illuminate\Validation\ValidationException $e) {
                 $this->NotificationHalt(collect($e->errors())->flatten()->first() ?? 'Period is closed.');
             }
         }
-        
+
         // Preserve existing posted status - use Posting Center to post
         unset($data['is_posted']);
 
@@ -131,7 +136,7 @@ class EditJournalEntry extends EditRecord
             ->danger()
             ->title($message)
             ->send();
-        
+
         $this->halt();
     }
 }

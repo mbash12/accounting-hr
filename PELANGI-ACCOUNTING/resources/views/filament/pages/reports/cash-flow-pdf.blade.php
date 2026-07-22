@@ -79,6 +79,14 @@
         </div>
     </div>
 
+    @if(abs($cashReconciliationDifference ?? 0) >= 0.01)
+    <div style="margin-bottom: 10px; padding: 8px; border: 1px solid #f59e0b; background: #fffbeb; color: #92400e;">
+        Cash-flow reconciliation differs from the cash ledger by
+        {{ number_format($cashReconciliationDifference, 2, ',', '.') }}.
+        Review account cash-flow classifications.
+    </div>
+    @endif
+
     <table>
         <thead>
             <tr>

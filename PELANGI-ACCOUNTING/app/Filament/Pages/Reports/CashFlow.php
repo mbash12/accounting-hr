@@ -5,20 +5,20 @@ namespace App\Filament\Pages\Reports;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\JournalEntryItem;
-use Filament\Pages\Page;
+use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\DatePicker;
-use Illuminate\Support\Facades\DB;
-use Barryvdh\DomPDF\Facade\Pdf;
-use UnitEnum;
-use BackedEnum;
+use Filament\Pages\Page;
 use Illuminate\Support\Collection;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Support\Facades\DB;
+use UnitEnum;
 
 class CashFlow extends Page implements HasForms
 {
-    use InteractsWithForms, HasPageShield;
+    use HasPageShield, InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
@@ -54,16 +54,16 @@ class CashFlow extends Page implements HasForms
     {
         return $form
             ->schema([
-            DatePicker::make('start_date')
-            ->label('From Date')
-            ->required()
-            ->default(now()->startOfMonth()),
+                DatePicker::make('start_date')
+                    ->label('From Date')
+                    ->required()
+                    ->default(now()->startOfMonth()),
 
-            DatePicker::make('end_date')
-            ->label('To Date')
-            ->required()
-            ->default(now()),
-        ])
+                DatePicker::make('end_date')
+                    ->label('To Date')
+                    ->required()
+                    ->default(now()),
+            ])
             ->columns(2)
             ->statePath('data');
     }
@@ -77,7 +77,7 @@ class CashFlow extends Page implements HasForms
     {
         $reportData = $this->getReportData();
 
-        if (isset($reportData['error']) || !$reportData['company']) {
+        if (isset($reportData['error']) || ! $reportData['company']) {
             return;
         }
 
@@ -85,7 +85,7 @@ class CashFlow extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Cash_Flow_' . now()->format('Ymd') . '.pdf');
+        }, 'Cash_Flow_'.now()->format('Ymd').'.pdf');
     }
 
     public function getReportData(): array
@@ -94,7 +94,7 @@ class CashFlow extends Page implements HasForms
         $endDate = $this->data['end_date'] ?? now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
-        if (!$companyId || $companyId === 'all') {
+        if (! $companyId || $companyId === 'all') {
             return [
                 'error' => 'Please select a specific company.',
                 'company' => null,
@@ -102,7 +102,12 @@ class CashFlow extends Page implements HasForms
         }
 
         $company = Company::find($companyId);
-        $allAccounts = Account::where('company_id', $companyId)->get();
+        $allAccounts = Account::withTrashed()->where('company_id', $companyId)->get();
+        $hasPostedOpeningJournal = \App\Models\JournalEntry::query()
+            ->where('company_id', $companyId)
+            ->where('sub_module', 'opening_balance')
+            ->where('is_posted', true)
+            ->exists();
 
         $movements = JournalEntryItem::select(
             'account_id',
@@ -110,10 +115,14 @@ class CashFlow extends Page implements HasForms
             DB::raw('SUM(credit) as total_credit')
         )
             ->whereHas('journalEntry', function ($q) use ($startDate, $endDate, $companyId) {
-            $q->where('company_id', $companyId);
-            $q->whereBetween('date', [$startDate, $endDate]);
-            $q->where('is_posted', true);
-        })
+                $q->where('company_id', $companyId);
+                $q->whereBetween('date', [$startDate, $endDate]);
+                $q->where('is_posted', true);
+                $q->where(function ($query) {
+                    $query->whereNull('sub_module')
+                        ->orWhere('sub_module', '!=', 'opening_balance');
+                });
+            })
             ->groupBy('account_id')
             ->get()
             ->keyBy('account_id');
@@ -128,16 +137,16 @@ class CashFlow extends Page implements HasForms
 
         $baseTree = $this->buildBaseTree($allAccounts);
 
-        // P&L accounts for net income (exclude depreciation 7xx with cash_flow=undefined — go into add-backs)
-        $plCondition = fn($a) => in_array(substr($a->code, 0, 1), ['4', '5', '6', '8', '9'])
-        || (substr($a->code, 0, 1) === '7' && $a->cash_flow !== 'undefined');
-        $opAssetsCondition = fn($a) => $a->account_type === 'current_asset' && !$a->is_cash_bank;
-        $opLiabilitiesCondition = fn($a) => $a->account_type === 'current_liability';
-        $invCondition = fn($a) => in_array($a->account_type, ['fixed_asset', 'other_asset']);
-        $finCondition = fn($a) => in_array($a->account_type, ['long_term_liability', 'equity']);
+        // Indirect method: profit/loss plus non-cash adjustments and balance-sheet movements.
+        $plCondition = fn ($a) => $a->isRevenueAccount() || $a->isExpenseAccount();
+        $opAssetsCondition = fn ($a) => $a->account_type === 'current_asset' && ! $a->is_cash_bank;
+        $opLiabilitiesCondition = fn ($a) => $a->account_type === 'current_liability';
+        $invCondition = fn ($a) => $a->cash_flow === 'investing'
+            && ! $a->isRevenueAccount() && ! $a->isExpenseAccount();
+        $finCondition = fn ($a) => $a->cash_flow === 'financing'
+            && ! $a->isRevenueAccount() && ! $a->isExpenseAccount();
 
-        // Non-cash adjustments: depreciation/amortisation (code 7xx, cash_flow=undefined)
-        $nonCashCondition = fn($a) => substr($a->code, 0, 1) === '7' && $a->cash_flow === 'undefined';
+        $nonCashCondition = fn ($a) => $a->isExpenseAccount() && $a->cash_flow === 'undefined';
 
         $plTree = $this->cloneAndFilter($baseTree, $plCondition);
         $this->aggregateBalances($plTree);
@@ -173,13 +182,21 @@ class CashFlow extends Page implements HasForms
         )
             ->whereIn('account_id', $cashAccountIds)
             ->whereHas('journalEntry', function ($q) use ($startDate, $companyId) {
-            $q->where('company_id', $companyId);
-            $q->whereDate('date', '<', $startDate);
-            $q->where('is_posted', true);
-        })
+                $q->where('company_id', $companyId);
+                $q->where(function ($query) use ($startDate) {
+                    $query->whereDate('date', '<', $startDate)
+                        ->orWhere(function ($openingQuery) use ($startDate) {
+                            $openingQuery->whereDate('date', $startDate)
+                                ->where('sub_module', 'opening_balance');
+                        });
+                });
+                $q->where('is_posted', true);
+            })
             ->first();
 
-        $beginningCash = $allAccounts->where('is_cash_bank', true)->sum('opening_balance') + ($beginningCashMovements->total_debit ?? 0) - ($beginningCashMovements->total_credit ?? 0);
+        $legacyOpeningCash = $allAccounts->where('is_cash_bank', true)
+            ->sum(fn (Account $account) => $account->reportOpeningBalance($hasPostedOpeningJournal));
+        $beginningCash = $legacyOpeningCash + ($beginningCashMovements->total_debit ?? 0) - ($beginningCashMovements->total_credit ?? 0);
 
         $endingCashMovements = JournalEntryItem::select(
             DB::raw('SUM(debit) as total_debit'),
@@ -187,16 +204,17 @@ class CashFlow extends Page implements HasForms
         )
             ->whereIn('account_id', $cashAccountIds)
             ->whereHas('journalEntry', function ($q) use ($endDate, $companyId) {
-            $q->where('company_id', $companyId);
-            $q->whereDate('date', '<=', $endDate);
-            $q->where('is_posted', true);
-        })
+                $q->where('company_id', $companyId);
+                $q->whereDate('date', '<=', $endDate);
+                $q->where('is_posted', true);
+            })
             ->first();
 
-        $endingCash = $allAccounts->where('is_cash_bank', true)->sum('opening_balance') + ($endingCashMovements->total_debit ?? 0) - ($endingCashMovements->total_credit ?? 0);
+        $endingCash = $legacyOpeningCash + ($endingCashMovements->total_debit ?? 0) - ($endingCashMovements->total_credit ?? 0);
 
         $operatingTotal = $plTotal + $nonCashTotal + $opAssetsTotal + $opLiabTotal;
         $netCashFlow = $operatingTotal + $invTotal + $finTotal;
+        $cashReconciliationDifference = $endingCash - $beginningCash - $netCashFlow;
 
         return [
             'company' => $company,
@@ -217,6 +235,7 @@ class CashFlow extends Page implements HasForms
             'beginningCash' => $beginningCash,
             'endingCash' => $endingCash,
             'netCashFlow' => $netCashFlow,
+            'cashReconciliationDifference' => $cashReconciliationDifference,
             'operatingTotal' => $operatingTotal,
         ];
     }
@@ -227,6 +246,7 @@ class CashFlow extends Page implements HasForms
         $accounts->each(function ($item) use ($grouped) {
             $item->children = $grouped->get($item->id, collect());
         });
+
         return $accounts->whereNull('parent_id')->sortBy('code')->values();
     }
 
@@ -239,10 +259,11 @@ class CashFlow extends Page implements HasForms
                 $cloned->children = $this->cloneAndFilter($node->children, $leafCondition);
             }
 
-            if (($cloned->is_header && $cloned->children->isNotEmpty()) || (!$cloned->is_header && $cloned->calculated_balance != 0 && $leafCondition($cloned))) {
+            if (($cloned->is_header && $cloned->children->isNotEmpty()) || (! $cloned->is_header && $cloned->calculated_balance != 0 && $leafCondition($cloned))) {
                 $filtered->push($cloned);
             }
         }
+
         return $filtered;
     }
 
@@ -258,6 +279,7 @@ class CashFlow extends Page implements HasForms
             }
             $total += $node->calculated_balance;
         }
+
         return $total;
     }
 }

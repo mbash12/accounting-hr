@@ -64,7 +64,7 @@ class PeriodClosingService
         if ($this->isClosed($companyId, $date)) {
             $year = Carbon::parse($date)->year;
             throw ValidationException::withMessages([
-                'date' => __("Fiscal year :year is closed. Reopen the year to change transactions dated in that period.", [
+                'date' => __('Fiscal year :year is closed. Reopen the year to change transactions dated in that period.', [
                     'year' => $year,
                 ]),
             ]);
@@ -87,7 +87,7 @@ class PeriodClosingService
     {
         $account = AccountMapping::getAccountMapping('period_closing', 'retained_earnings', $companyId);
 
-        if (!$account) {
+        if (! $account) {
             throw ValidationException::withMessages([
                 'retained_earnings' => __('Map Retained Earnings under Account Mapping → Period Closing before closing the year.'),
             ]);
@@ -137,7 +137,7 @@ class PeriodClosingService
         [$start, $end] = $this->yearBounds($year);
         $lines = $this->buildClosingLines($companyId, $start, $end, $reAccount);
 
-        $accounts = Account::query()
+        $accounts = Account::withTrashed()
             ->whereIn('id', collect($lines)->pluck('account_id')->unique()->filter()->all())
             ->get()
             ->keyBy('id');
@@ -158,7 +158,7 @@ class PeriodClosingService
 
     public function closeYear(int $companyId, int $year, ?string $description = null): PeriodClosing
     {
-        if (!Company::query()->whereKey($companyId)->exists()) {
+        if (! Company::query()->whereKey($companyId)->exists()) {
             throw ValidationException::withMessages([
                 'company_id' => __('Company not found.'),
             ]);
@@ -228,7 +228,7 @@ class PeriodClosingService
             ]);
         }
 
-        if (!$period->isClosed()) {
+        if (! $period->isClosed()) {
             throw ValidationException::withMessages([
                 'period' => __('This fiscal year is not closed.'),
             ]);
@@ -290,7 +290,7 @@ class PeriodClosingService
 
         $accounts = Account::query()
             ->where('company_id', $companyId)
-            ->whereRaw("LEFT(code, 1) IN ('4', '5', '6', '7', '8', '9')")
+            ->whereIn('account_type', array_merge(Account::REVENUE_TYPES, Account::EXPENSE_TYPES))
             ->orderBy('code')
             ->get();
 
@@ -301,8 +301,7 @@ class PeriodClosingService
             $mov = $movements->get($account->id);
             $debit = (float) ($mov->total_debit ?? 0);
             $credit = (float) ($mov->total_credit ?? 0);
-            $root = substr((string) $account->code, 0, 1);
-            $isDebitNormal = in_array($root, ['5', '6', '7', '9'], true);
+            $isDebitNormal = $account->isDebitNormal();
 
             // Credit-normal (revenue/other income): close by debiting remaining credit balance
             // Debit-normal (expense/COGS): close by crediting remaining debit balance
@@ -368,7 +367,7 @@ class PeriodClosingService
     }
 
     /**
-     * @param list<array{account_id: int, debit: float, credit: float, notes: ?string}> $lines
+     * @param  list<array{account_id: int, debit: float, credit: float, notes: ?string}>  $lines
      */
     protected function createClosingJournal(
         int $companyId,
@@ -397,7 +396,7 @@ class PeriodClosingService
         $journal = JournalEntry::create([
             'entry_number' => $this->generateEntryNumber(),
             'date' => $date,
-            'reference_no' => 'TB-' . $year,
+            'reference_no' => 'TB-'.$year,
             'description' => $description ?? __('Year-End Closing :year', ['year' => $year]),
             'amount' => $totalDebit,
             'total_amount' => $totalDebit,
@@ -435,7 +434,7 @@ class PeriodClosingService
         $date = now()->format('Ymd');
 
         $lastEntry = JournalEntry::withTrashed()
-            ->where('entry_number', 'like', $prefix . $date . '%')
+            ->where('entry_number', 'like', $prefix.$date.'%')
             ->orderBy('entry_number', 'desc')
             ->first();
 
@@ -446,6 +445,6 @@ class PeriodClosingService
             $newNumber = '0001';
         }
 
-        return $prefix . $date . $newNumber;
+        return $prefix.$date.$newNumber;
     }
 }

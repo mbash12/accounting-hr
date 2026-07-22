@@ -5,20 +5,20 @@ namespace App\Filament\Pages\Reports;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\JournalEntryItem;
+use BackedEnum;
 use Barryvdh\DomPDF\Facade\Pdf;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\DB;
-use BackedEnum;
 use UnitEnum;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class GeneralLedger extends Page implements HasForms
 {
-    use InteractsWithForms, HasPageShield;
+    use HasPageShield, InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
@@ -72,9 +72,10 @@ class GeneralLedger extends Page implements HasForms
                     ->options(function () {
                         $companyId = session('selected_company_id');
 
-                        if (!$companyId || $companyId === 'all') {
+                        if (! $companyId || $companyId === 'all') {
                             return [];
                         }
+
                         return Account::where('company_id', $companyId)
                             ->where('is_header', false)
                             ->orderBy('code')
@@ -86,7 +87,7 @@ class GeneralLedger extends Page implements HasForms
                     })
                     ->searchable()
                     ->optionsLimit(1000)
-                    ->required(fn ($get) => !$get('select_all'))
+                    ->required(fn ($get) => ! $get('select_all'))
                     ->disabled(fn ($get) => $get('select_all')),
 
                 DatePicker::make('start_date')
@@ -118,7 +119,7 @@ class GeneralLedger extends Page implements HasForms
     {
         $reportData = $this->getReportData();
 
-        if (isset($reportData['error']) || !$reportData['company']) {
+        if (isset($reportData['error']) || ! $reportData['company']) {
             return;
         }
 
@@ -127,7 +128,7 @@ class GeneralLedger extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'General_Ledger_' . now()->format('Ymd') . '.pdf');
+        }, 'General_Ledger_'.now()->format('Ymd').'.pdf');
     }
 
     public function getReportData(): array
@@ -138,7 +139,7 @@ class GeneralLedger extends Page implements HasForms
         $endDate = $this->data['end_date'] ?? now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
-        if (!$companyId || $companyId === 'all') {
+        if (! $companyId || $companyId === 'all') {
             return [
                 'accounts_data' => collect(),
                 'company' => null,
@@ -148,8 +149,8 @@ class GeneralLedger extends Page implements HasForms
             ];
         }
 
-        if (!$selectAll && empty($accountIds)) {
-             return [
+        if (! $selectAll && empty($accountIds)) {
+            return [
                 'accounts_data' => collect(),
                 'company' => null,
                 'start_date' => $startDate,
@@ -159,11 +160,11 @@ class GeneralLedger extends Page implements HasForms
         }
 
         $company = Company::find($companyId);
-        
+
         if ($selectAll) {
-            $accounts = Account::where('company_id', $companyId)->where('is_header', false)->orderBy('code')->get();
+            $accounts = Account::withTrashed()->where('company_id', $companyId)->where('is_header', false)->orderBy('code')->get();
         } else {
-            $accounts = Account::where('company_id', $companyId)
+            $accounts = Account::withTrashed()->where('company_id', $companyId)
                 ->where('is_header', false)
                 ->whereIn('id', $accountIds)
                 ->orderBy('code')
@@ -171,7 +172,7 @@ class GeneralLedger extends Page implements HasForms
         }
 
         if ($accounts->isEmpty()) {
-             return [
+            return [
                 'accounts_data' => collect(),
                 'company' => null,
                 'start_date' => $startDate,
@@ -182,38 +183,42 @@ class GeneralLedger extends Page implements HasForms
 
         $accountsData = collect();
         $yearStart = \Carbon\Carbon::parse($startDate)->startOfYear()->format('Y-m-d');
+        $hasPostedOpeningJournal = \App\Models\JournalEntry::query()
+            ->where('company_id', $companyId)
+            ->where('sub_module', 'opening_balance')
+            ->where('is_posted', true)
+            ->exists();
 
         foreach ($accounts as $account) {
             $accountId = $account->id;
-            $root = substr($account->code, 0, 1);
-            $isDebitNormal = in_array($root, ['1', '5', '6', '7', '9']);
-            $isNominal = in_array($root, ['4', '5', '6', '7', '8', '9']);
+            $isDebitNormal = $account->isDebitNormal();
+            $isNominal = $account->isRevenueAccount() || $account->isExpenseAccount();
 
-            $baseOpeningBalance = (float)($account->opening_balance ?? 0);
+            $baseOpeningBalance = $account->reportOpeningBalance($hasPostedOpeningJournal);
 
             $priorMovementsQuery = JournalEntryItem::where('account_id', $accountId)
                 ->whereHas('journalEntry', function ($q) use ($companyId, $startDate, $yearStart, $isNominal) {
                     $q->where('company_id', $companyId)
-                      ->where('is_posted', true);
-                      
+                        ->where('is_posted', true);
+
                     if ($isNominal) {
                         $q->whereDate('date', '>=', $yearStart)
-                          ->whereDate('date', '<', $startDate);
+                            ->whereDate('date', '<', $startDate);
                     } else {
                         $q->where(function ($subQ) use ($startDate) {
                             $subQ->whereDate('date', '<', $startDate)
-                                 ->orWhere(function ($obQ) use ($startDate) {
-                                     $obQ->whereDate('date', '=', $startDate)
-                                         ->where('sub_module', 'opening_balance');
-                                 });
+                                ->orWhere(function ($obQ) use ($startDate) {
+                                    $obQ->whereDate('date', '=', $startDate)
+                                        ->where('sub_module', 'opening_balance');
+                                });
                         });
                     }
                 })
                 ->select(DB::raw('SUM(debit) as total_debit, SUM(credit) as total_credit'))
                 ->first();
 
-            $priorDebit = $priorMovementsQuery ? (float)$priorMovementsQuery->total_debit : 0;
-            $priorCredit = $priorMovementsQuery ? (float)$priorMovementsQuery->total_credit : 0;
+            $priorDebit = $priorMovementsQuery ? (float) $priorMovementsQuery->total_debit : 0;
+            $priorCredit = $priorMovementsQuery ? (float) $priorMovementsQuery->total_credit : 0;
 
             if ($isNominal) {
                 $openingBalance = $isDebitNormal ? ($priorDebit - $priorCredit) : ($priorCredit - $priorDebit);
@@ -225,12 +230,12 @@ class GeneralLedger extends Page implements HasForms
                 ->where('account_id', $accountId)
                 ->whereHas('journalEntry', function ($q) use ($companyId, $startDate, $endDate) {
                     $q->where('company_id', $companyId)
-                      ->whereBetween('date', [$startDate, $endDate])
-                      ->where('is_posted', true)
-                      ->where(function ($query) {
-                          $query->whereNull('sub_module')
+                        ->whereBetween('date', [$startDate, $endDate])
+                        ->where('is_posted', true)
+                        ->where(function ($query) {
+                            $query->whereNull('sub_module')
                                 ->orWhere('sub_module', '!=', 'opening_balance');
-                      });
+                        });
                 })
                 ->join('journal_entries', 'journal_entry_items.journal_entry_id', '=', 'journal_entries.id')
                 ->orderBy('journal_entries.date')
@@ -262,7 +267,7 @@ class GeneralLedger extends Page implements HasForms
                     'reconciled' => '-',
                 ]);
             }
-            
+
             $accountsData->push([
                 'account' => $account,
                 'opening_balance' => $openingBalance,

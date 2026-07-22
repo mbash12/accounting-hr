@@ -5,25 +5,20 @@ namespace App\Filament\Pages\Reports;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\JournalEntryItem;
-use Filament\Pages\Page;
+use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Section;
-use Filament\Actions\Action;
-use Illuminate\Support\Facades\DB;
+use Filament\Pages\Page;
 use Illuminate\Support\Collection;
-use Barryvdh\DomPDF\Facade\Pdf;
-
+use Illuminate\Support\Facades\DB;
 use UnitEnum;
-use BackedEnum;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class BalanceSheet extends Page implements HasForms
 {
-    use InteractsWithForms, HasPageShield;
+    use HasPageShield, InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
@@ -58,20 +53,20 @@ class BalanceSheet extends Page implements HasForms
     {
         return $form
             ->schema([
-            DatePicker::make('date')
-            ->label('Date')
-            ->required()
-            ->default(now())
-            ->reactive(false) // Disable reactive behavior
-            ->lazy(false) // Disable lazy loading
-            ->afterStateUpdated(fn($state, $set) => null) // Don't update anything on change
-            ->suffixAction(function () {
-            return \Filament\Actions\Action::make('filter_date')
-                ->icon('heroicon-m-funnel')
-                ->action('filterReport')
-                ->color('primary');
-        }),
-        ])
+                DatePicker::make('date')
+                    ->label('Date')
+                    ->required()
+                    ->default(now())
+                    ->reactive(false) // Disable reactive behavior
+                    ->lazy(false) // Disable lazy loading
+                    ->afterStateUpdated(fn ($state, $set) => null) // Don't update anything on change
+                    ->suffixAction(function () {
+                        return \Filament\Actions\Action::make('filter_date')
+                            ->icon('heroicon-m-funnel')
+                            ->action('filterReport')
+                            ->color('primary');
+                    }),
+            ])
             ->statePath('data');
     }
 
@@ -83,7 +78,7 @@ class BalanceSheet extends Page implements HasForms
     public function filterReport()
     {
         $this->validate();
-    // Force the page to re-render with the new date
+        // Force the page to re-render with the new date
     }
 
     public function downloadPdf()
@@ -98,7 +93,7 @@ class BalanceSheet extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Balance_Sheet_' . now()->format('Y-m-d') . '.pdf');
+        }, 'Balance_Sheet_'.now()->format('Y-m-d').'.pdf');
     }
 
     protected function getViewData(): array
@@ -111,7 +106,7 @@ class BalanceSheet extends Page implements HasForms
         $date = $this->data['date'] ?? now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
-        if (!$companyId || $companyId === 'all') {
+        if (! $companyId || $companyId === 'all') {
             return [
                 'assets' => collect(),
                 'liabilities' => collect(),
@@ -119,15 +114,20 @@ class BalanceSheet extends Page implements HasForms
                 'netIncome' => 0,
                 'company' => null,
                 'date' => $date,
-                'error' => 'Please select a specific company from the global selector to view the report.'
+                'error' => 'Please select a specific company from the global selector to view the report.',
             ];
         }
 
-        $accounts = Account::where('company_id', $companyId)
+        $accounts = Account::withTrashed()->where('company_id', $companyId)
             ->orderBy('code')
             ->get();
 
         $yearStart = \Carbon\Carbon::parse($date)->startOfYear()->format('Y-m-d');
+        $hasPostedOpeningJournal = \App\Models\JournalEntry::query()
+            ->where('company_id', $companyId)
+            ->where('sub_module', 'opening_balance')
+            ->where('is_posted', true)
+            ->exists();
 
         // prior year transactions (to compute Retained Earnings)
         $priorYearMovements = JournalEntryItem::select(
@@ -136,10 +136,10 @@ class BalanceSheet extends Page implements HasForms
             DB::raw('SUM(credit) as total_credit')
         )
             ->whereHas('journalEntry', function ($q) use ($yearStart, $companyId) {
-            $q->where('company_id', $companyId);
-            $q->whereDate('date', '<', $yearStart);
-            $q->where('is_posted', true);
-        })
+                $q->where('company_id', $companyId);
+                $q->whereDate('date', '<', $yearStart);
+                $q->where('is_posted', true);
+            })
             ->groupBy('account_id')
             ->get()
             ->keyBy('account_id');
@@ -151,10 +151,10 @@ class BalanceSheet extends Page implements HasForms
             DB::raw('SUM(credit) as total_credit')
         )
             ->whereHas('journalEntry', function ($q) use ($date, $companyId) {
-            $q->where('company_id', $companyId);
-            $q->whereDate('date', '<=', $date);
-            $q->where('is_posted', true);
-        })
+                $q->where('company_id', $companyId);
+                $q->whereDate('date', '<=', $date);
+                $q->where('is_posted', true);
+            })
             ->groupBy('account_id')
             ->get()
             ->keyBy('account_id');
@@ -164,9 +164,8 @@ class BalanceSheet extends Page implements HasForms
 
         // Calculate balances
         foreach ($accounts as $account) {
-            $root = substr($account->code, 0, 1);
-            $opening = $account->opening_balance ?? 0;
-            $isDebitNormal = in_array($root, ['1', '5', '6', '7', '9']);
+            $opening = $account->reportOpeningBalance($hasPostedOpeningJournal);
+            $isDebitNormal = $account->isDebitNormal();
 
             $mov = $allMovements->get($account->id);
             $debit = $mov ? $mov->total_debit : 0;
@@ -174,17 +173,15 @@ class BalanceSheet extends Page implements HasForms
 
             if ($isDebitNormal) {
                 $account->calculated_balance = $opening + $debit - $credit;
-            }
-            else {
+            } else {
                 $account->calculated_balance = $opening + $credit - $debit;
             }
 
             // Categorize nominal accounts for Net Income calculation
-            if (in_array($root, ['4', '5', '6', '7', '8', '9'])) {
+            if ($account->isRevenueAccount() || $account->isExpenseAccount()) {
                 if ($isDebitNormal) {
                     $allTimeNetIncome -= $account->calculated_balance;
-                }
-                else {
+                } else {
                     $allTimeNetIncome += $account->calculated_balance;
                 }
 
@@ -195,8 +192,7 @@ class BalanceSheet extends Page implements HasForms
 
                 if ($isDebitNormal) {
                     $priorYearNetIncome -= $priorBalance;
-                }
-                else {
+                } else {
                     $priorYearNetIncome += $priorBalance;
                 }
             }
@@ -208,14 +204,14 @@ class BalanceSheet extends Page implements HasForms
         $accountTree = $this->buildTree($accounts);
 
         // Inject Net Income and Retained Earnings into Equity
-        $equityRoot = $accountTree->first(fn($a) => str_starts_with($a->code, '3'));
+        $equityRoot = $accountTree->first(fn ($a) => str_starts_with($a->code, '3'));
 
         if ($equityRoot) {
             $skipDynamicPriorRe = app(\App\Services\PeriodClosingService::class)
                 ->hasPostedClosingBefore((int) $companyId, $yearStart);
 
-            if ($priorYearNetIncome != 0 && !$skipDynamicPriorRe) {
-                $reAccount = new Account();
+            if ($priorYearNetIncome != 0 && ! $skipDynamicPriorRe) {
+                $reAccount = new Account;
                 $reAccount->name = 'Prior Retained Earnings';
                 $reAccount->code = '';
                 $reAccount->is_header = false;
@@ -225,7 +221,7 @@ class BalanceSheet extends Page implements HasForms
                 $equityRoot->children->push($reAccount);
             }
 
-            $netIncomeAccount = new Account();
+            $netIncomeAccount = new Account;
             $netIncomeAccount->name = 'Current Year Earnings';
             $netIncomeAccount->code = '';
             $netIncomeAccount->is_header = false;
@@ -236,16 +232,16 @@ class BalanceSheet extends Page implements HasForms
         }
 
         // 3. Aggregate Balance Sheet Roots
-        $bsRoots = $accountTree->filter(fn($a) => in_array(substr($a->code, 0, 1), ['1', '2', '3']));
+        $bsRoots = $accountTree->filter(fn ($a) => in_array(substr($a->code, 0, 1), ['1', '2', '3']));
         $this->aggregateBalances($bsRoots);
 
         // Filter out accounts with zero balance (except headers that have children)
         $bsRoots = $this->filterZeroBalanceAccounts($bsRoots);
 
         // Filter for Main Sections
-        $assets = $bsRoots->filter(fn($a) => str_starts_with($a->code, '1'));
-        $liabilities = $bsRoots->filter(fn($a) => str_starts_with($a->code, '2'));
-        $equity = $bsRoots->filter(fn($a) => str_starts_with($a->code, '3'));
+        $assets = $bsRoots->filter(fn ($a) => str_starts_with($a->code, '1'));
+        $liabilities = $bsRoots->filter(fn ($a) => str_starts_with($a->code, '2'));
+        $equity = $bsRoots->filter(fn ($a) => str_starts_with($a->code, '3'));
 
         return [
             'assets' => $assets,
@@ -263,6 +259,7 @@ class BalanceSheet extends Page implements HasForms
         $accounts->each(function ($item) use ($grouped) {
             $item->children = $grouped->get($item->id, collect());
         });
+
         return $accounts->whereNull('parent_id');
     }
 
@@ -278,6 +275,7 @@ class BalanceSheet extends Page implements HasForms
             }
             $total += $node->calculated_balance;
         }
+
         return $total;
     }
 
@@ -294,7 +292,7 @@ class BalanceSheet extends Page implements HasForms
             // Include the node if:
             // 1. It's a header (even if balance is 0, but has children)
             // 2. It's not a header and has a non-zero balance
-            if (($node->is_header && $node->children->isNotEmpty()) || (!$node->is_header && $node->calculated_balance != 0)) {
+            if (($node->is_header && $node->children->isNotEmpty()) || (! $node->is_header && $node->calculated_balance != 0)) {
                 $filteredNodes->push($node);
             }
         }

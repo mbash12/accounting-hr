@@ -7,6 +7,7 @@ use App\Models\Company;
 use App\Models\JournalEntryItem;
 use BackedEnum;
 use Barryvdh\DomPDF\Facade\Pdf;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -14,11 +15,10 @@ use Filament\Pages\Page;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class AccountBalances extends Page implements HasForms
 {
-    use InteractsWithForms, HasPageShield;
+    use HasPageShield, InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
@@ -112,10 +112,15 @@ class AccountBalances extends Page implements HasForms
             return collect();
         }
 
-        $query = Account::where('company_id', $companyId);
+        $query = Account::withTrashed()->where('company_id', $companyId);
 
         // First get all accounts without eager loading children to avoid circular references
         $allAccounts = $query->get();
+        $hasPostedOpeningJournal = \App\Models\JournalEntry::query()
+            ->where('company_id', $companyId)
+            ->where('sub_module', 'opening_balance')
+            ->where('is_posted', true)
+            ->exists();
 
         // Eagerly calculate balances for all accounts
         $movements = JournalEntryItem::select(
@@ -137,15 +142,8 @@ class AccountBalances extends Page implements HasForms
             $debit = $movement ? $movement->total_debit : 0;
             $credit = $movement ? $movement->total_credit : 0;
 
-            $root = substr($account->code, 0, 1);
-            $opening = $account->opening_balance ?? 0;
-
-            // Asset & Expenses increase with Debit
-            if (in_array($root, ['1', '5', '6', '7', '9'])) {
-                $account->calculated_balance = $opening + $debit - $credit;
-            } else {
-                $account->calculated_balance = $opening + $credit - $debit;
-            }
+            $opening = $account->reportOpeningBalance($hasPostedOpeningJournal);
+            $account->calculated_balance = $account->balanceFromMovements($debit, $credit, $opening);
         }
 
         // Apply search filter if search term is provided

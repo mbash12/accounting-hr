@@ -6,8 +6,8 @@ use App\Models\AccountMapping;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryItem;
 use App\Models\Tax;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class JournalService
 {
@@ -20,10 +20,9 @@ class JournalService
     /**
      * Create or update a journal entry from a document based on account mappings
      *
-     * @param string $documentType - The type of document (sales_order, sales_invoice, etc.)
-     * @param \Illuminate\Database\Eloquent\Model $document - The document model instance
-     * @param string $description - Description for journal entry
-     * @return JournalEntry|null
+     * @param  string  $documentType  - The type of document (sales_order, sales_invoice, etc.)
+     * @param  \Illuminate\Database\Eloquent\Model  $document  - The document model instance
+     * @param  string  $description  - Description for journal entry
      */
     public function createJournalEntryFromDocument(
         string $documentType,
@@ -33,7 +32,7 @@ class JournalService
         $this->lastSkipReason = null;
         $companyId = $document->company_id;
 
-        if (!$companyId) {
+        if (! $companyId) {
             return null;
         }
 
@@ -75,6 +74,12 @@ class JournalService
                 ->first();
 
             if ($existingEntry) {
+                if ($existingEntry->is_posted) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'status' => __('A posted journal cannot be changed. Reverse it first.'),
+                    ]);
+                }
+
                 // Update existing journal entry
                 $result = $this->updateJournalEntry($existingEntry, $document, $description, $mappings);
             } else {
@@ -83,6 +88,7 @@ class JournalService
             }
 
             DB::commit();
+
             return $result;
 
         } catch (\Exception $e) {
@@ -118,7 +124,7 @@ class JournalService
             'updated_by_user_id' => Auth::id() ?? 1,
         ]);
 
-        if (!$this->createJournalItems($documentType, $document, $journalEntry, $mappings)) {
+        if (! $this->createJournalItems($documentType, $document, $journalEntry, $mappings)) {
             return null;
         }
 
@@ -146,7 +152,7 @@ class JournalService
             'updated_by_user_id' => Auth::id() ?? 1,
         ]);
 
-        if (!$this->createJournalItems($journalEntry->sub_module, $document, $journalEntry, $mappings)) {
+        if (! $this->createJournalItems($journalEntry->sub_module, $document, $journalEntry, $mappings)) {
             return null;
         }
 
@@ -240,7 +246,7 @@ class JournalService
         $mappings
     ): void {
         $cogsAmount = $this->calculateCOGS($delivery);
-        
+
         if ($cogsAmount > 0) {
             // Debit: Cost of Goods Sold
             if ($mappings->has('cogs')) {
@@ -356,7 +362,7 @@ class JournalService
         JournalEntry $journalEntry,
         $mappings
     ): void {
-        if (!$mappings->has('inventory') || !$mappings->has('cogs')) {
+        if (! $mappings->has('inventory') || ! $mappings->has('cogs')) {
             if ($this->calculateCOGS($return) > 0) {
                 \Illuminate\Support\Facades\Log::warning('Sales return stock journal skipped: inventory/cogs mapping missing.', [
                     'return_id' => $return->id ?? null,
@@ -387,7 +393,7 @@ class JournalService
         $mappings
     ): void {
         $inventoryAmount = $this->calculateInventoryValue($receipt);
-        
+
         if ($inventoryAmount > 0) {
             // Debit: Inventory (receive goods into stock)
             if ($mappings->has('inventory')) {
@@ -522,7 +528,7 @@ class JournalService
         float $amount,
         ?string $notes = null
     ): void {
-        if (!$account || $amount <= 0) {
+        if (! $account || $amount <= 0) {
             return;
         }
 
@@ -564,16 +570,17 @@ class JournalService
                     }
 
                     $account = $row->account;
-                    if (!$account && $mappings->has('other_charges')) {
+                    if (! $account && $mappings->has('other_charges')) {
                         $account = $mappings->get('other_charges');
                     }
 
-                    if (!$account) {
+                    if (! $account) {
                         $label = $row->name ?? 'Other Charges';
                         \Illuminate\Support\Facades\Log::warning('Other charge line skipped: no COA and no other_charges mapping.', [
                             'label' => $label,
                             'document_id' => $document->id ?? null,
                         ]);
+
                         continue;
                     }
 
@@ -597,7 +604,7 @@ class JournalService
         }
 
         if ($amount > 0) {
-            if (!$mappings->has('other_charges')) {
+            if (! $mappings->has('other_charges')) {
                 \Illuminate\Support\Facades\Log::warning('Other charges skipped: other_charges account mapping missing.', [
                     'document_id' => $document->id ?? null,
                     'amount' => $amount,
@@ -618,10 +625,10 @@ class JournalService
     protected function calculateCOGS($document): float
     {
         // Load items with product if not already loaded
-        if (!$document->relationLoaded('items')) {
+        if (! $document->relationLoaded('items')) {
             $document->load('items.product');
         }
-        
+
         $items = $document->items ?? collect();
 
         return $items->sum(function ($item) {
@@ -632,6 +639,7 @@ class JournalService
                 $product = $item->product ?? \App\Models\Product::find($item->product_id);
                 $unitCost = $product->cost_price ?? 0;
             }
+
             return (float) $quantity * (float) $unitCost;
         });
     }
@@ -642,10 +650,10 @@ class JournalService
     protected function calculateInventoryValue($document): float
     {
         // Load items with product if not already loaded
-        if (!$document->relationLoaded('items')) {
+        if (! $document->relationLoaded('items')) {
             $document->load('items.product');
         }
-        
+
         $items = $document->items ?? collect();
 
         return $items->sum(function ($item) {
@@ -656,6 +664,7 @@ class JournalService
                 $product = $item->product ?? \App\Models\Product::find($item->product_id);
                 $unitCost = $product->cost_price ?? 0;
             }
+
             return (float) $quantity * (float) $unitCost;
         });
     }
@@ -666,18 +675,18 @@ class JournalService
     protected function calculateReturnTotal($document): float
     {
         // Load items with product if not already loaded
-        if (!$document->relationLoaded('items')) {
+        if (! $document->relationLoaded('items')) {
             $document->load('items.product');
         }
-        
+
         $items = $document->items ?? collect();
 
         return $items->sum(function ($item) {
             $quantity = $item->quantity ?? $item->total_quantity ?? $item->qty ?? 0;
-            
+
             // Try item unit_price first
             $unitPrice = $item->unit_price ?? $item->price ?? 0;
-            
+
             // If no price, try to get from linked delivery/receipt item
             if ($unitPrice <= 0 && $item->delivery_document_item_id) {
                 $deliveryItem = \App\Models\DeliveryDocumentItem::with('salesOrderItem')->find($item->delivery_document_item_id);
@@ -687,13 +696,13 @@ class JournalService
                 $receiptItem = \App\Models\GoodsReceiptItem::find($item->goods_receipt_item_id);
                 $unitPrice = $receiptItem?->unit_cost ?? 0;
             }
-            
+
             // Fallback to product selling_price
             if ($unitPrice <= 0) {
                 $product = $item->product ?? \App\Models\Product::find($item->product_id);
                 $unitPrice = $product->selling_price ?? $product->cost_price ?? 0;
             }
-            
+
             return (float) $quantity * (float) $unitPrice;
         });
     }
@@ -706,7 +715,7 @@ class JournalService
         $prefix = 'JE';
         $date = now()->format('Ymd');
 
-        $lastEntry = JournalEntry::where('entry_number', 'like', $prefix . $date . '%')
+        $lastEntry = JournalEntry::where('entry_number', 'like', $prefix.$date.'%')
             ->orderBy('entry_number', 'desc')
             ->first();
 
@@ -717,7 +726,7 @@ class JournalService
             $newNumber = '0001';
         }
 
-        return $prefix . $date . $newNumber;
+        return $prefix.$date.$newNumber;
     }
 
     /**

@@ -234,6 +234,16 @@
             </p>
         </div>
 
+        @if(collect($reportData['imbalance'] ?? [])->contains(fn ($difference) => abs($difference) >= 0.01))
+        <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; border: 1px solid #dc2626; background: #fef2f2; color: #991b1b; border-radius: 0.375rem;">
+            Trial Balance is not balanced. Opening difference:
+            {{ number_format($reportData['imbalance']['opening'], 2, ',', '.') }}, period difference:
+            {{ number_format($reportData['imbalance']['period'], 2, ',', '.') }}, ending difference:
+            {{ number_format($reportData['imbalance']['ending'], 2, ',', '.') }}.
+            Review historical journal accounts before relying on this report.
+        </div>
+        @endif
+
         {{-- Table --}}
         <table class="tb-table">
             <thead>

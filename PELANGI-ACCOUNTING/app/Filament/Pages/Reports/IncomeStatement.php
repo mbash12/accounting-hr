@@ -5,21 +5,20 @@ namespace App\Filament\Pages\Reports;
 use App\Models\Account;
 use App\Models\Company;
 use App\Models\JournalEntryItem;
-use Filament\Pages\Page;
+use BackedEnum;
+use Barryvdh\DomPDF\Facade\Pdf;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Components\DatePicker;
-use Illuminate\Support\Facades\DB;
+use Filament\Pages\Page;
 use Illuminate\Support\Collection;
-use Barryvdh\DomPDF\Facade\Pdf;
-
+use Illuminate\Support\Facades\DB;
 use UnitEnum;
-use BackedEnum;
-use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 
 class IncomeStatement extends Page implements HasForms
 {
-    use InteractsWithForms, HasPageShield;
+    use HasPageShield, InteractsWithForms;
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
@@ -55,22 +54,22 @@ class IncomeStatement extends Page implements HasForms
     {
         return $form
             ->schema([
-            DatePicker::make('start_date')
-            ->label('From Date')
-            ->required()
-            ->default(now()->startOfMonth()),
+                DatePicker::make('start_date')
+                    ->label('From Date')
+                    ->required()
+                    ->default(now()->startOfMonth()),
 
-            DatePicker::make('end_date')
-            ->label('To Date')
-            ->required()
-            ->default(now())
-            ->suffixAction(function () {
-            return \Filament\Actions\Action::make('filter_date')
-                ->icon('heroicon-m-funnel')
-                ->action('filterReport')
-                ->color('primary');
-        }),
-        ])
+                DatePicker::make('end_date')
+                    ->label('To Date')
+                    ->required()
+                    ->default(now())
+                    ->suffixAction(function () {
+                        return \Filament\Actions\Action::make('filter_date')
+                            ->icon('heroicon-m-funnel')
+                            ->action('filterReport')
+                            ->color('primary');
+                    }),
+            ])
             ->columns(2)
             ->statePath('data');
     }
@@ -83,7 +82,7 @@ class IncomeStatement extends Page implements HasForms
     public function filterReport()
     {
         $this->validate();
-    // Force the page to re-render with the new date
+        // Force the page to re-render with the new date
     }
 
     public function downloadPdf()
@@ -98,7 +97,7 @@ class IncomeStatement extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Income_Statement_' . now()->format('Ymd') . '.pdf');
+        }, 'Income_Statement_'.now()->format('Ymd').'.pdf');
     }
 
     protected function getViewData(): array
@@ -112,7 +111,7 @@ class IncomeStatement extends Page implements HasForms
         $endDate = $this->data['end_date'] ?? now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
-        if (!$companyId || $companyId === 'all') {
+        if (! $companyId || $companyId === 'all') {
             return [
                 'revenues' => collect(),
                 'expenses' => collect(),
@@ -120,12 +119,12 @@ class IncomeStatement extends Page implements HasForms
                 'company' => null,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'error' => 'Please select a specific company from the global selector to view the report.'
+                'error' => 'Please select a specific company from the global selector to view the report.',
             ];
         }
 
-        $accounts = Account::where('company_id', $companyId)
-            ->whereIn(DB::raw('SUBSTR(code, 1, 1)'), ['4', '5', '6', '7', '8', '9'])
+        $accounts = Account::withTrashed()->where('company_id', $companyId)
+            ->whereIn('account_type', array_merge(Account::REVENUE_TYPES, Account::EXPENSE_TYPES, [Account::OTHER_INCOME_EXPENSE]))
             ->orderBy('code')
             ->get();
 
@@ -136,12 +135,12 @@ class IncomeStatement extends Page implements HasForms
             DB::raw('SUM(credit) as total_credit')
         )
             ->whereHas('journalEntry', function ($q) use ($startDate, $endDate, $companyId) {
-            $q->where('company_id', $companyId);
-            $q->whereBetween('date', [$startDate, $endDate]);
-            $q->where('is_posted', true);
-            // Closing entries zero P&L; exclude so year-end Income Statement still shows operating results.
-            $q->excludePeriodClosing();
-        })
+                $q->where('company_id', $companyId);
+                $q->whereBetween('date', [$startDate, $endDate]);
+                $q->where('is_posted', true);
+                // Closing entries zero P&L; exclude so year-end Income Statement still shows operating results.
+                $q->excludePeriodClosing();
+            })
             ->groupBy('account_id')
             ->get()
             ->keyBy('account_id');
@@ -152,17 +151,7 @@ class IncomeStatement extends Page implements HasForms
             $debit = $movement ? $movement->total_debit : 0;
             $credit = $movement ? $movement->total_credit : 0;
 
-            $root = substr($account->code, 0, 1);
-
-            // For Income Statement, we typically do not include opening_balance because it is a period report.
-            if (in_array($root, ['5', '6', '7', '9'])) {
-                // Expenses mostly debit
-                $account->calculated_balance = $debit - $credit;
-            }
-            else {
-                // Revenues mostly credit
-                $account->calculated_balance = $credit - $debit;
-            }
+            $account->calculated_balance = $account->balanceFromMovements($debit, $credit);
         }
 
         // Build Tree
@@ -174,12 +163,16 @@ class IncomeStatement extends Page implements HasForms
         // Filter out zero nodes
         $accountTree = $this->filterZeroBalanceAccounts($accountTree);
 
-        // Split into main sections
-        $operatingRevenues = $accountTree->filter(fn($a) => substr($a->code, 0, 1) === '4');
-        $costOfGoodsSold = $accountTree->filter(fn($a) => substr($a->code, 0, 1) === '5');
-        $operatingExpenses = $accountTree->filter(fn($a) => substr($a->code, 0, 1) === '6');
-        $otherRevenues = $accountTree->filter(fn($a) => substr($a->code, 0, 1) === '8');
-        $otherExpenses = $accountTree->filter(fn($a) => in_array(substr($a->code, 0, 1), ['7', '9']));
+        // Split by accounting type, not by a customizable account-code prefix.
+        $operatingRevenues = $this->cloneAndFilter($accountTree, fn ($a) => $a->account_type === 'revenue');
+        $costOfGoodsSold = $this->cloneAndFilter($accountTree, fn ($a) => $a->account_type === 'cost_of_goods_sold');
+        $operatingExpenses = $this->cloneAndFilter($accountTree, fn ($a) => $a->account_type === 'expense');
+        $otherRevenues = $this->cloneAndFilter($accountTree, fn ($a) => $a->account_type === 'other_income');
+        $otherExpenses = $this->cloneAndFilter($accountTree, fn ($a) => $a->account_type === 'other_expense');
+
+        foreach ([$operatingRevenues, $costOfGoodsSold, $operatingExpenses, $otherRevenues, $otherExpenses] as $section) {
+            $this->aggregateBalances($section);
+        }
 
         $totalOperatingRevenue = $operatingRevenues->sum('calculated_balance');
         $totalCogs = $costOfGoodsSold->sum('calculated_balance');
@@ -219,7 +212,24 @@ class IncomeStatement extends Page implements HasForms
         $accounts->each(function ($item) use ($grouped) {
             $item->children = $grouped->get($item->id, collect());
         });
+
         return $accounts->whereNull('parent_id');
+    }
+
+    private function cloneAndFilter($nodes, callable $leafCondition)
+    {
+        $filtered = collect();
+
+        foreach ($nodes as $node) {
+            $clone = clone $node;
+            $clone->children = $this->cloneAndFilter($node->children ?? collect(), $leafCondition);
+
+            if ($clone->children->isNotEmpty() || (! $clone->is_header && $leafCondition($clone))) {
+                $filtered->push($clone);
+            }
+        }
+
+        return $filtered;
     }
 
     private function aggregateBalances($nodes)
@@ -235,6 +245,7 @@ class IncomeStatement extends Page implements HasForms
             }
             $total += $node->calculated_balance;
         }
+
         return $total;
     }
 
@@ -251,7 +262,7 @@ class IncomeStatement extends Page implements HasForms
             // Include the node if:
             // 1. It has remaining children (header or intermediate parent)
             // 2. It's a leaf with a non-zero balance
-            if ($node->children->isNotEmpty() || (!$node->is_header && $node->calculated_balance != 0)) {
+            if ($node->children->isNotEmpty() || (! $node->is_header && $node->calculated_balance != 0)) {
                 $filteredNodes->push($node);
             }
         }

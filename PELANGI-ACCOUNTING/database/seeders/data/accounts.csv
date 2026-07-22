@@ -41,14 +41,14 @@ code,name,description,classification_type,is_header,is_cash_bank,is_active,level
 220000,Hutang Pembelian Belum Ditagih,Hutang Pembelian Belum Ditagih,current_liability,false,false,true,2,2
 22000100,Hutang Gaji,Hutang Gaji,current_liability,false,false,true,2,2
 220100,PPn Keluaran,PPn Keluaran,current_liability,false,false,true,2,2
-220200,Piutang Lain-lain,Piutang Lain-lain,current_liability,false,false,true,2,2
+220200,Hutang Lain-lain,Hutang Lain-lain,current_liability,false,false,true,2,2
 220300,Hutang PPh Psl 21,Hutang PPh Psl 21,current_liability,false,false,true,2,2
 220400,Hutang PPh 23,Hutang PPh 23,current_liability,false,false,true,2,2
 220500,Hutang PPh Psl 25/29,Hutang PPh Psl 25/29,current_liability,false,false,true,2,2
 220600,Hutang PPh Final Psl 4(2),Hutang PPh Final Psl 4(2),current_liability,false,false,true,2,2
 220700,Hutang PPN,Hutang PPN,current_liability,false,false,true,2,2
-220800,Hutang Lain-lain,Hutang Lain-lain,current_asset,false,false,true,2,2
-230000,Hutang Jangka Panjang,Hutang Jangka Panjang,current_liability,false,false,true,2,2
+220800,Hutang Lain-lain,Hutang Lain-lain,current_liability,false,false,true,2,2
+230000,Hutang Jangka Panjang,Hutang Jangka Panjang,long_term_liability,false,false,true,2,2
 3,Modal,Modal,equity,true,false,true,1,
 300000,Modal,Modal,equity,false,false,true,2,3
 31000100,OPENING BALANCE EQUITY,OPENING BALANCE EQUITY,equity,false,false,true,2,3

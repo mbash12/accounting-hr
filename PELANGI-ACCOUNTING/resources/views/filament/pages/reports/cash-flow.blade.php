@@ -192,6 +192,14 @@
                 to {{ \Carbon\Carbon::parse($reportData['end_date'])->isoFormat('MMMM YYYY') }}</p>
         </div>
 
+        @if(abs($reportData['cashReconciliationDifference'] ?? 0) >= 0.01)
+        <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; border: 1px solid #f59e0b; background: #fffbeb; color: #92400e; border-radius: 0.375rem;">
+            Cash-flow reconciliation differs from the cash ledger by
+            {{ number_format($reportData['cashReconciliationDifference'], 2, ',', '.') }}.
+            Review account cash-flow classifications.
+        </div>
+        @endif
+
         <table class="tb-table">
             <thead>
                 <tr>
