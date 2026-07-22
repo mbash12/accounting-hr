@@ -28,18 +28,23 @@ trait Journalable
                     $model->getJournalEntryDescription()
                 );
 
-                if ($entry === null && in_array($journalService->lastSkipReason, ['no_mappings', 'incomplete_mappings'], true)) {
+                if ($entry === null && in_array($journalService->lastSkipReason, ['no_mappings', 'incomplete_mappings', 'empty'], true)) {
                     $missing = $model->getMissingAccountMappings();
                     $list = ! empty($missing)
                         ? implode(', ', $missing)
                         : __('required accounts');
 
+                    $message = match ($journalService->lastSkipReason) {
+                        'empty' => __('Document saved, but journal was skipped because the total amount is zero. Please check product cost prices and account mappings.'),
+                        default => __('Document saved successfully, but no journal was created. Configure Account Mapping: :list', [
+                            'list' => $list,
+                        ]),
+                    };
+
                     Notification::make()
                         ->warning()
                         ->title(__('Journal entry skipped'))
-                        ->body(__('Document saved successfully, but no journal was created. Configure Account Mapping: :list', [
-                            'list' => $list,
-                        ]))
+                        ->body($message)
                         ->send();
                 }
             } catch (\Exception $e) {

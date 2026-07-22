@@ -247,16 +247,24 @@ class JournalService
     ): void {
         $cogsAmount = $this->calculateCOGS($delivery);
 
-        if ($cogsAmount > 0) {
-            // Debit: Cost of Goods Sold
-            if ($mappings->has('cogs')) {
-                $this->createJournalItem($journalEntry, $mappings->get('cogs'), 'debit', $cogsAmount);
-            }
+        if ($cogsAmount <= 0) {
+            \Illuminate\Support\Facades\Log::warning('Sales delivery journal has zero COGS. Check product cost_price values.', [
+                'delivery_id' => $delivery->id ?? null,
+                'company_id' => $delivery->company_id ?? null,
+                'item_count' => $delivery->items?->count() ?? 0,
+            ]);
 
-            // Credit: Inventory
-            if ($mappings->has('inventory')) {
-                $this->createJournalItem($journalEntry, $mappings->get('inventory'), 'credit', $cogsAmount);
-            }
+            return;
+        }
+
+        // Debit: Cost of Goods Sold
+        if ($mappings->has('cogs')) {
+            $this->createJournalItem($journalEntry, $mappings->get('cogs'), 'debit', $cogsAmount);
+        }
+
+        // Credit: Inventory
+        if ($mappings->has('inventory')) {
+            $this->createJournalItem($journalEntry, $mappings->get('inventory'), 'credit', $cogsAmount);
         }
     }
 
@@ -624,10 +632,8 @@ class JournalService
      */
     protected function calculateCOGS($document): float
     {
-        // Load items with product if not already loaded
-        if (! $document->relationLoaded('items')) {
-            $document->load('items.product');
-        }
+        // Always reload items from DB — relation may be loaded but stale/empty
+        $document->load('items.product');
 
         $items = $document->items ?? collect();
 
@@ -649,10 +655,8 @@ class JournalService
      */
     protected function calculateInventoryValue($document): float
     {
-        // Load items with product if not already loaded
-        if (! $document->relationLoaded('items')) {
-            $document->load('items.product');
-        }
+        // Always reload items from DB — relation may be loaded but stale/empty
+        $document->load('items.product');
 
         $items = $document->items ?? collect();
 
@@ -674,10 +678,8 @@ class JournalService
      */
     protected function calculateReturnTotal($document): float
     {
-        // Load items with product if not already loaded
-        if (! $document->relationLoaded('items')) {
-            $document->load('items.product');
-        }
+        // Always reload items from DB — relation may be loaded but stale/empty
+        $document->load('items.product');
 
         $items = $document->items ?? collect();
 

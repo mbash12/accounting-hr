@@ -174,6 +174,16 @@ class SalesDeliveryWithItemsImport implements ToCollection, WithHeadingRow, With
                 $itemData['delivery_document_id'] = $deliveryDocument->id;
                 DeliveryDocumentItem::create($itemData);
             }
+
+            // Create journal entry after items are saved (so COGS can be calculated)
+            try {
+                $deliveryDocument->createJournalEntry();
+            } catch (\Exception $e) {
+                \Log::error('Error creating journal entry for imported delivery document: ' . $e->getMessage(), [
+                    'delivery_id' => $deliveryDocument->id,
+                    'trace' => $e->getTraceAsString(),
+                ]);
+            }
         }
     }
 
