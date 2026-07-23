@@ -2,7 +2,7 @@
     <main class="bg-white overflow-auto h-screen">
         <div class="flex flex-col py-8 gap-4 items-center h-full px-6 max-w-xl mx-auto w-full">
             <div class="w-full mb-6 flex items-center justify-center">
-                <img src="/accounting-logo.png" alt="Elevate Attendance Logo" class="h-24 object-contain" />
+                <img src="/accounting-logo.png" alt="Elevon Logo" class="h-24 object-contain" />
             </div>
             <div class="flex flex-col gap-5 text-left w-full mb-4 px-2">
                 <span class="font-regular text-26px text-[#404040]">Login</span>
@@ -30,7 +30,7 @@
 
             <span class="mt-4 text-[#40B6F4] cursor-pointer" @click="$router.push('/auth/forgot')">Forgot Password</span>
             <span class="flex-1"></span>
-            <span class="font-light text-14px text-[#919294] pb-10">Copyright © Elevate Attendance</span>
+            <span class="font-light text-14px text-[#919294] pb-10">Copyright © Elevon</span>
         </div>
     </main>
 </template>

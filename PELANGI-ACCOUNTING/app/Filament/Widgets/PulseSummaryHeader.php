@@ -3,9 +3,11 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
 class PulseSummaryHeader extends Widget
 {
+    use HasWidgetShield;
     protected string $view = 'filament.widgets.dashboard-section-header';
     public string $title = 'Business Pulse';
     public string $description = 'Real-time overview of your company health across finance and personnel.';

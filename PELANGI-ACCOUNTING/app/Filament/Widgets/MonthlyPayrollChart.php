@@ -5,13 +5,14 @@ namespace App\Filament\Widgets;
 use App\Models\PayrollPeriod;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Carbon\Carbon;
 
 class MonthlyPayrollChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
+    use HasWidgetShield, InteractsWithPageFilters;
 
     protected ?string $heading = 'Salary Expenditure Trend (12 Months)';
     protected static ?int $sort = 22;

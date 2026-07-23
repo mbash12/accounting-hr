@@ -24,7 +24,7 @@ export default defineNuxtConfig({
         buildAssetsDir: "/_nuxt/",
 
         head: {
-            title: "Elevate Attendance",
+            title: "Elevon",
             link: [
                 { rel: "icon", type: "image/x-icon", href: "/user/icon.png" },
             ],
@@ -115,29 +115,29 @@ export default defineNuxtConfig({
         includeAssets: ["favicon.ico", "apple-touch-icon.png", "mask-icon.svg"],
         filename: "manifest.json",
         manifest: {
-            id: "elevate-attendance",
+            id: "elevon",
             theme_color: "#40B6F4",
             background_color: "#ffffff",
             display: "standalone",
             scope: "/user/",
             start_url: "/user/",
-            name: "Elevate Attendance",
-            short_name: "Elevate",
-            description: "Aplikasi Elevate Attendance",
+            name: "Elevon",
+            short_name: "Elevon",
+            description: "Aplikasi Elevon",
             screenshots: [
                 {
                     src: "screenshot.png",
                     sizes: "1024x1024",
                     type: "image/png",
                     form_factor: "wide",
-                    label: "Elevate Attendance",
+                    label: "Elevon",
                 },
                 {
                     src: "screenshot.png",
                     sizes: "1024x1024",
                     type: "image/png",
                     form_factor: "narrow",
-                    label: "Elevate Attendance",
+                    label: "Elevon",
                 },
             ],
             icons: [

@@ -7,10 +7,11 @@ use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
 class PermitTypeChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
+    use HasWidgetShield, InteractsWithPageFilters;
 
     protected ?string $heading = 'Permit & Leave Distribution';
     protected static ?int $sort = 32;

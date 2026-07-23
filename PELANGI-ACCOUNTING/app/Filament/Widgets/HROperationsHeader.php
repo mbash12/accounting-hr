@@ -3,9 +3,11 @@
 namespace App\Filament\Widgets;
 
 use Filament\Widgets\Widget;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
 class HROperationsHeader extends Widget
 {
+    use HasWidgetShield;
     protected string $view = 'filament.widgets.dashboard-section-header';
     public string $title = 'HR Operations Hub';
     public string $description = 'Operational insights including attendance exceptions, permits, and overtime analysis.';

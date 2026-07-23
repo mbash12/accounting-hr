@@ -54,7 +54,7 @@ const handleSubmit = () => {
             class="flex flex-col py-8 gap-4 items-center h-full px-6 max-w-xl mx-auto w-full"
         >
         <div class="w-full mb-6 flex items-center justify-center">
-          <img src="/accounting-logo.png" alt="Elevate Attendance Logo" class="h-24 object-contain" />
+          <img src="/accounting-logo.png" alt="Elevon Logo" class="h-24 object-contain" />
         </div>
             <div class="flex flex-col gap-5 text-left w-full mb-4 px-2">
                 <span class="font-regualar text-26px text-[#404040]"
@@ -102,7 +102,7 @@ const handleSubmit = () => {
 
             <span class="flex-1"></span>
             <span class="font-light text-14px text-[#919294] pb-10"
-                >Copyright © Elevate Attendance</span
+                >Copyright © Elevon</span
             >
         </div>
     </main>

@@ -5,13 +5,14 @@ namespace App\Filament\Widgets;
 use App\Models\JournalEntryItem;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Carbon\Carbon;
 
 class ExpenseBreakdownChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
+    use HasWidgetShield, InteractsWithPageFilters;
 
     protected ?string $heading = 'Operating Expense Breakdown';
     protected static ?int $sort = 13;

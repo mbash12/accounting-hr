@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ config('app.name', 'Elevate') }}</title>
+        <title>{{ config('app.name', 'Elevon') }}</title>
 
         <!-- Favicon -->
         <link rel="icon" type="image/x-icon" href="{{ asset('fav.png') }}">
@@ -198,7 +198,7 @@
         <div class="container">
             <!-- Logo -->
             <div class="logo">
-                <img src="{{ asset('logo.png') }}" alt="Elevate Logo">
+                <img src="{{ asset('logo.png') }}" alt="Elevon Logo">
             </div>
 
             <div class="cards-grid">
