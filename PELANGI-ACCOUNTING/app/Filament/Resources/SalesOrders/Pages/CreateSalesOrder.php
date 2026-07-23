@@ -7,11 +7,38 @@ use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\SalesOrders\SalesOrderResource;
 use App\Models\SalesOrder;
 use App\Models\Tax;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Validation\ValidationException;
 
 class CreateSalesOrder extends CreateRecord
 {
     protected static string $resource = SalesOrderResource::class;
+
+    public function create(...$args): void
+    {
+        try {
+            parent::create(...$args);
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw $e;
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            throw $e;
+        }
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

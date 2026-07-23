@@ -7,14 +7,39 @@ use App\Models\PayablePayment;
 use App\Models\PayablePaymentItem;
 use App\Services\CodeGeneratorService;
 use App\Services\ReceivablePayableService;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
-use Filament\Notifications\Notification;
 
 class CreatePayablePayment extends CreateRecord
 {
     protected static string $resource = PayablePaymentResource::class;
+
+    public function create(...$args): void
+    {
+        try {
+            parent::create(...$args);
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw $e;
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            throw $e;
+        }
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

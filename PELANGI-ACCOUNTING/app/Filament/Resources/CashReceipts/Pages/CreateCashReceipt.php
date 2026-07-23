@@ -7,6 +7,7 @@ use App\Services\CashBankService;
 use App\Services\CodeGeneratorService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
@@ -14,6 +15,57 @@ use Illuminate\Validation\ValidationException;
 class CreateCashReceipt extends CreateRecord
 {
     protected static string $resource = CashReceiptResource::class;
+
+    public function create(...$args): void
+    {
+        try {
+            parent::create(...$args);
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw $e;
+        } catch (QueryException $e) {
+            $message = $this->resolveErrorMessage($e);
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw ValidationException::withMessages([
+                'receipt_number' => $message,
+            ]);
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            throw $e;
+        }
+    }
+
+    protected function resolveErrorMessage(QueryException $e): string
+    {
+        $sqlState = $e->getSQLState() ?? '';
+        $message = $e->getMessage();
+
+        if (str_contains($message, 'cash_receipts_company_receipt_number_unique') ||
+            str_contains($message, 'cash_receipts_receipt_number_unique') ||
+            $sqlState === '23505') {
+            return __('Receipt number is already used. Please generate a new code or use a different one.');
+        }
+
+        return __('An error occurred while saving. Please try again.');
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

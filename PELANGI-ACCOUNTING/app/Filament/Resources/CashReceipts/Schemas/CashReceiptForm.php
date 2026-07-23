@@ -110,7 +110,15 @@ class CashReceiptForm
                             'receipt_number',
                             ignoreRecord: true,
                             modifyRuleUsing: function ($rule) {
-                                return $rule->whereNull('deleted_at');
+                                $selectedCompanyId = session('selected_company_id');
+                                $rule = $rule->whereNull('deleted_at');
+                                if ($selectedCompanyId && $selectedCompanyId !== 'all') {
+                                    $rule->where(function ($q) use ($selectedCompanyId) {
+                                        $q->where('company_id', $selectedCompanyId)
+                                          ->orWhereNull('company_id');
+                                    });
+                                }
+                                return $rule;
                             },
                         ),
                     Select::make("to_account_id")

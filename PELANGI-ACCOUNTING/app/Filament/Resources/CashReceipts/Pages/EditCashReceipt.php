@@ -9,7 +9,9 @@ use App\Services\CashBankService;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -17,6 +19,57 @@ use Illuminate\Validation\ValidationException;
 class EditCashReceipt extends EditRecord
 {
     protected static string $resource = CashReceiptResource::class;
+
+    public function save(...$args): void
+    {
+        try {
+            parent::save(...$args);
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw $e;
+        } catch (QueryException $e) {
+            $message = $this->resolveErrorMessage($e);
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw ValidationException::withMessages([
+                'receipt_number' => $message,
+            ]);
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            throw $e;
+        }
+    }
+
+    protected function resolveErrorMessage(QueryException $e): string
+    {
+        $sqlState = $e->getSQLState() ?? '';
+        $message = $e->getMessage();
+
+        if (str_contains($message, 'cash_receipts_company_receipt_number_unique') ||
+            str_contains($message, 'cash_receipts_receipt_number_unique') ||
+            $sqlState === '23505') {
+            return __('Receipt number is already used. Please generate a new code or use a different one.');
+        }
+
+        return __('An error occurred while saving. Please try again.');
+    }
 
     protected function getHeaderActions(): array
     {

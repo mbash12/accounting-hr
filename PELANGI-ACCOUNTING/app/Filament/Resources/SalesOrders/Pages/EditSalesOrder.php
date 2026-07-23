@@ -10,12 +10,39 @@ use App\Models\Tax;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\ValidationException;
 
 class EditSalesOrder extends EditRecord
 {
     protected static string $resource = SalesOrderResource::class;
+
+    public function save(...$args): void
+    {
+        try {
+            parent::save(...$args);
+        } catch (ValidationException $e) {
+            $message = collect($e->errors())->flatten()->first() ?? __('Validation failed.');
+
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($message)
+                ->danger()
+                ->send();
+
+            throw $e;
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title(__('Save Failed'))
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+
+            throw $e;
+        }
+    }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
