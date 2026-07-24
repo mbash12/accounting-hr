@@ -143,6 +143,15 @@
             min-width: 250px;
         }
 
+        a.report-drill-link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a.report-drill-link:hover {
+            text-decoration: underline;
+        }
+
         .error-box {
             background-color: white;
             padding: 2rem;
@@ -260,7 +269,13 @@
                 @forelse($rows as $row)
                 <tr>
                     <td>{{ $row['date'] }}</td>
-                    <td>{{ $row['source_no'] }}</td>
+                    <td>
+                        @if(!empty($row['source_url']) && $row['source_url'] !== '#')
+                        <a href="{{ $row['source_url'] }}" class="report-drill-link" title="View source document">{{ $row['source_no'] }}</a>
+                        @else
+                        {{ $row['source_no'] }}
+                        @endif
+                    </td>
                     <td>{{ $row['check_no'] }}</td>
                     <td class="desc-col">{{ $row['description'] }}</td>
                     <td class="num">{{ $fmt($row['debit']) }}</td>

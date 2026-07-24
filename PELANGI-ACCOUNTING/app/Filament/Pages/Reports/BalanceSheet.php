@@ -56,10 +56,11 @@ class BalanceSheet extends Page implements HasForms
                 DatePicker::make('date')
                     ->label('Date')
                     ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->validate())
                     ->default(now())
                     ->reactive(false) // Disable reactive behavior
                     ->lazy(false) // Disable lazy loading
-                    ->afterStateUpdated(fn ($state, $set) => null) // Don't update anything on change
                     ->suffixAction(function () {
                         return \Filament\Actions\Action::make('filter_date')
                             ->icon('heroicon-m-funnel')
@@ -103,7 +104,9 @@ class BalanceSheet extends Page implements HasForms
 
     protected function getRawData(): array
     {
-        $date = $this->data['date'] ?? now()->format('Y-m-d');
+        $date = filled($this->data['date'] ?? null)
+            ? $this->data['date']
+            : now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
         if (! $companyId || $companyId === 'all') {

@@ -124,6 +124,15 @@
             color: #1f2937;
         }
 
+        a.report-drill-link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a.report-drill-link:hover {
+            text-decoration: underline;
+        }
+
         .error-box {
             background-color: white;
             padding: 2rem;
@@ -181,6 +190,7 @@
     @php
     $company = \App\Models\Company::find(session('selected_company_id'));
     $date = $this->data['date'] ?? now()->format('Y-m-d');
+    $drillEndDate = $date;
     @endphp
 
     <div class="report-page">

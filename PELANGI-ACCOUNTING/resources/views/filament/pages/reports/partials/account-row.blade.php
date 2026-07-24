@@ -1,4 +1,15 @@
-@props(['account', 'level' => 0])
+@php
+$drillStart = $drillStartDate ?? $startDate ?? null;
+$drillEnd = $drillEndDate ?? $endDate ?? null;
+$canDrill = ! $account->is_header
+    && filled($account->id)
+    && $drillStart
+    && $drillEnd
+    && $account->calculated_balance != 0;
+$drillUrl = $canDrill
+    ? \App\Support\ReportDrilldown::generalLedgerUrl($account->id, $drillStart, $drillEnd)
+    : null;
+@endphp
 
 @if(!$account->is_header && $account->calculated_balance == 0)
 {{-- Skip rendering leaf nodes with zero balance --}}
@@ -28,12 +39,26 @@
 {{-- Leaf Node --}}
 <tr>
     <td style="padding-left: {{ 0.8 + ($level * 1.5) }}rem; color: #1f2937;">
+        @if($drillUrl)
+        <a href="{{ $drillUrl }}" class="report-drill-link" title="View General Ledger">
+            {{ $account->name }}
+            <span style="font-size: 0.75rem; color: #9ca3af; margin-left: 0.5rem; font-family: monospace;">{{ $account->code
+                }}</span>
+        </a>
+        @else
         {{ $account->name }}
         <span style="font-size: 0.75rem; color: #9ca3af; margin-left: 0.5rem; font-family: monospace;">{{ $account->code
             }}</span>
+        @endif
     </td>
     <td class="num">
+        @if($drillUrl)
+        <a href="{{ $drillUrl }}" class="report-drill-link" title="View General Ledger">
+            {{ number_format($account->calculated_balance, 2, ',', '.') }}
+        </a>
+        @else
         {{ number_format($account->calculated_balance, 2, ',', '.') }}
+        @endif
     </td>
 </tr>
 @endif

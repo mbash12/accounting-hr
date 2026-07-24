@@ -126,6 +126,15 @@
             color: #1f2937;
         }
 
+        a.report-drill-link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a.report-drill-link:hover {
+            text-decoration: underline;
+        }
+
         .error-box {
             background-color: white;
             padding: 2rem;
@@ -180,6 +189,10 @@
         <p>{{ $error }}</p>
     </div>
     @elseif($company)
+    @php
+        $drillStartDate = \Carbon\Carbon::parse($date)->startOfYear()->format('Y-m-d');
+        $drillEndDate = $date;
+    @endphp
     <div class="report-page">
         <!-- Header -->
         <div class="report-header">

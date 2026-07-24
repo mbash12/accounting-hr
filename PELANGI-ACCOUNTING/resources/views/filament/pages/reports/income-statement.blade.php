@@ -126,6 +126,15 @@
             color: #1f2937;
         }
 
+        a.report-drill-link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a.report-drill-link:hover {
+            text-decoration: underline;
+        }
+
         .error-box {
             background-color: white;
             padding: 2rem;
@@ -199,6 +208,8 @@
     $totalOtherRevenue = $reportData['totalOtherRevenue'] ?? 0;
     $totalOtherExpense = $reportData['totalOtherExpense'] ?? 0;
     $netIncome = $reportData['netIncome'];
+    $drillStartDate = $startDate;
+    $drillEndDate = $endDate;
     @endphp
     <div class="report-page">
         <!-- Header -->

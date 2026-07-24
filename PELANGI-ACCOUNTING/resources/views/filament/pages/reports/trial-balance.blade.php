@@ -135,6 +135,15 @@
             color: #1f2937;
         }
 
+        a.report-drill-link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a.report-drill-link:hover {
+            text-decoration: underline;
+        }
+
         /* ── Totals row ──────────────────────────────────────────── */
         .tb-table tfoot td {
             font-weight: bold;
@@ -265,15 +274,51 @@
             </thead>
             <tbody>
                 @forelse($rows as $row)
+                @php
+                    $accountId = $row['account_id'] ?? null;
+                    $periodDrillUrl = $accountId
+                        ? \App\Support\ReportDrilldown::generalLedgerUrl($accountId, $startDate, $endDate)
+                        : null;
+                    $openingDrillUrl = $accountId
+                        ? \App\Support\ReportDrilldown::generalLedgerUrlBefore($accountId, $startDate)
+                        : null;
+                    $endingDrillUrl = $accountId
+                        ? \App\Support\ReportDrilldown::generalLedgerUrlAsOf($accountId, $endDate)
+                        : null;
+                @endphp
                 <tr>
-                    <td>{{ $row['code'] }}</td>
-                    <td class="acc-name">{{ $row['name'] }}</td>
-                    <td class="num">{{ $fmt($row['open_debit']) }}</td>
-                    <td class="num">{{ $fmt($row['open_credit']) }}</td>
-                    <td class="num">{{ $fmt($row['period_debit']) }}</td>
-                    <td class="num">{{ $fmt($row['period_credit']) }}</td>
-                    <td class="num">{{ $fmt($row['end_debit']) }}</td>
-                    <td class="num">{{ $fmt($row['end_credit']) }}</td>
+                    <td>
+                        @if($periodDrillUrl)
+                        <a href="{{ $periodDrillUrl }}" class="report-drill-link" title="View General Ledger for this account">{{ $row['code'] }}</a>
+                        @else
+                        {{ $row['code'] }}
+                        @endif
+                    </td>
+                    <td class="acc-name">
+                        @if($periodDrillUrl)
+                        <a href="{{ $periodDrillUrl }}" class="report-drill-link" title="View General Ledger for this account">{{ $row['name'] }}</a>
+                        @else
+                        {{ $row['name'] }}
+                        @endif
+                    </td>
+                    @foreach([
+                        ['value' => $row['open_debit'], 'url' => $openingDrillUrl, 'title' => 'View opening balance detail'],
+                        ['value' => $row['open_credit'], 'url' => $openingDrillUrl, 'title' => 'View opening balance detail'],
+                        ['value' => $row['period_debit'], 'url' => $periodDrillUrl, 'title' => 'View period movements'],
+                        ['value' => $row['period_credit'], 'url' => $periodDrillUrl, 'title' => 'View period movements'],
+                        ['value' => $row['end_debit'], 'url' => $endingDrillUrl, 'title' => 'View ending balance detail'],
+                        ['value' => $row['end_credit'], 'url' => $endingDrillUrl, 'title' => 'View ending balance detail'],
+                    ] as $drillCell)
+                    <td class="num">
+                        @if($drillCell['url'] && $drillCell['value'] != 0)
+                        <a href="{{ $drillCell['url'] }}" class="report-drill-link" title="{{ $drillCell['title'] }}">
+                            {{ $fmt($drillCell['value']) }}
+                        </a>
+                        @else
+                        {{ $fmt($drillCell['value']) }}
+                        @endif
+                    </td>
+                    @endforeach
                 </tr>
                 @empty
                 <tr>

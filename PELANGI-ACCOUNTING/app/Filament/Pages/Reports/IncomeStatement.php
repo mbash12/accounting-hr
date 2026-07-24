@@ -57,11 +57,15 @@ class IncomeStatement extends Page implements HasForms
                 DatePicker::make('start_date')
                     ->label('From Date')
                     ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->validate())
                     ->default(now()->startOfMonth()),
 
                 DatePicker::make('end_date')
                     ->label('To Date')
                     ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->validate())
                     ->default(now())
                     ->suffixAction(function () {
                         return \Filament\Actions\Action::make('filter_date')
@@ -107,8 +111,12 @@ class IncomeStatement extends Page implements HasForms
 
     protected function getRawData(): array
     {
-        $startDate = $this->data['start_date'] ?? now()->startOfMonth()->format('Y-m-d');
-        $endDate = $this->data['end_date'] ?? now()->format('Y-m-d');
+        $startDate = filled($this->data['start_date'] ?? null)
+            ? $this->data['start_date']
+            : now()->startOfMonth()->format('Y-m-d');
+        $endDate = filled($this->data['end_date'] ?? null)
+            ? $this->data['end_date']
+            : now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
         if (! $companyId || $companyId === 'all') {

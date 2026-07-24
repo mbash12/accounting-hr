@@ -60,10 +60,11 @@ class AccountBalances extends Page implements HasForms
                 DatePicker::make('date')
                     ->label('Date')
                     ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->validate())
                     ->default(now())
                     ->reactive(false)
                     ->lazy(false)
-                    ->afterStateUpdated(fn ($state, $set) => null)
                     ->suffixAction(function () {
                         return \Filament\Actions\Action::make('filter_date')
                             ->icon('heroicon-m-funnel')
@@ -82,7 +83,9 @@ class AccountBalances extends Page implements HasForms
     public function downloadPdf()
     {
         $accounts = $this->getAccounts();
-        $date = $this->data['date'] ?? now()->format('Y-m-d');
+        $date = filled($this->data['date'] ?? null)
+            ? $this->data['date']
+            : now()->format('Y-m-d');
         $companyId = session('selected_company_id');
         $company = Company::find($companyId);
 
@@ -105,7 +108,9 @@ class AccountBalances extends Page implements HasForms
 
     public function getAccounts()
     {
-        $date = $this->data['date'] ?? now()->format('Y-m-d');
+        $date = filled($this->data['date'] ?? null)
+            ? $this->data['date']
+            : now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
         if (! $companyId || $companyId === 'all') {

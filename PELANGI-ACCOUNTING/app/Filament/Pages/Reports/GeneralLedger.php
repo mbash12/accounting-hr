@@ -44,11 +44,19 @@ class GeneralLedger extends Page implements HasForms
 
     public function mount(): void
     {
+        // Accept deep-link parameters so other reports can drill into a
+        // pre-filtered Buku Besar view (e.g. "show me account X for Y-Z").
+        $accountIds = request()->query('account_ids', []);
+        if (! is_array($accountIds)) {
+            $accountIds = filled($accountIds) ? [$accountIds] : [];
+        }
+        $accountIds = array_values(array_filter(array_map('intval', $accountIds)));
+
         $this->form->fill([
             'select_all' => false,
-            'account_ids' => [],
-            'start_date' => now()->startOfMonth()->format('Y-m-d'),
-            'end_date' => now()->format('Y-m-d'),
+            'account_ids' => $accountIds,
+            'start_date' => request()->query('start_date', now()->startOfMonth()->format('Y-m-d')),
+            'end_date' => request()->query('end_date', now()->format('Y-m-d')),
         ]);
     }
 
@@ -93,11 +101,15 @@ class GeneralLedger extends Page implements HasForms
                 DatePicker::make('start_date')
                     ->label('From Date')
                     ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->validate())
                     ->default(now()->startOfMonth()),
 
                 DatePicker::make('end_date')
                     ->label('To Date')
                     ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->validate())
                     ->default(now())
                     ->suffixAction(function () {
                         return \Filament\Actions\Action::make('filter_date')
@@ -134,9 +146,16 @@ class GeneralLedger extends Page implements HasForms
     public function getReportData(): array
     {
         $accountIds = $this->data['account_ids'] ?? [];
-        $selectAll = $this->data['select_all'] ?? false;
-        $startDate = $this->data['start_date'] ?? now()->startOfMonth()->format('Y-m-d');
-        $endDate = $this->data['end_date'] ?? now()->format('Y-m-d');
+        if (! is_array($accountIds)) {
+            $accountIds = filled($accountIds) ? [$accountIds] : [];
+        }
+        $selectAll = (bool) ($this->data['select_all'] ?? false);
+        $startDate = filled($this->data['start_date'] ?? null)
+            ? $this->data['start_date']
+            : now()->startOfMonth()->format('Y-m-d');
+        $endDate = filled($this->data['end_date'] ?? null)
+            ? $this->data['end_date']
+            : now()->format('Y-m-d');
         $companyId = session('selected_company_id');
 
         if (! $companyId || $companyId === 'all') {
@@ -259,6 +278,7 @@ class GeneralLedger extends Page implements HasForms
                 $rows->push([
                     'date' => $item->journalEntry->date->format('d M Y'),
                     'source_no' => $item->journalEntry->entry_number ?? $item->journalEntry->reference_no,
+                    'source_url' => \App\Support\ReportDrilldown::sourceDocumentUrl($item->journalEntry),
                     'check_no' => '',
                     'description' => $item->notes ?? $item->journalEntry->description,
                     'debit' => $debit,

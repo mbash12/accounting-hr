@@ -126,6 +126,15 @@
             color: #1f2937;
         }
 
+        a.report-drill-link {
+            color: #000000;
+            text-decoration: none;
+        }
+
+        a.report-drill-link:hover {
+            text-decoration: underline;
+        }
+
         .error-box {
             background-color: white;
             padding: 2rem;
@@ -184,6 +193,10 @@
         <p>{{ $reportData['error'] ?? 'Please select a specific company.' }}</p>
     </div>
     @else
+    @php
+        $drillStartDate = $reportData['start_date'];
+        $drillEndDate = $reportData['end_date'];
+    @endphp
     <div class="report-page">
         <div class="report-header">
             <h2 class="report-company-name">{{ $reportData['company']->name }}</h2>
