@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Attendance;
 use App\Models\AttendanceClock;
 use App\Models\Employee;
+use App\Models\ShiftSchedule;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -78,7 +79,7 @@ class AttendanceClockService
      * @param  Collection<int, AttendanceClock>  $clocks
      * @return array{check_in: ?Carbon, check_out: ?Carbon, late_minutes: int}
      */
-    public function summarizeClocks(Collection $clocks, ?Employee $employee): array
+    public function summarizeClocks(Collection $clocks, ?Employee $employee, string $date): array
     {
         $sorted = $clocks->sortBy('clocked_at')->values();
 
@@ -95,10 +96,14 @@ class AttendanceClockService
         $checkIn = $first->clocked_at;
         $checkOut = ($last && $last->clocked_at->gt($checkIn)) ? $last->clocked_at : null;
 
+        $expected = $employee
+            ? $this->getExpectedShiftTimes($employee->id, $date)
+            : ['start_time' => null, 'end_time' => null];
+
         return [
             'check_in' => $checkIn,
             'check_out' => $checkOut,
-            'late_minutes' => $this->calculateLateMinutes($checkIn, $employee),
+            'late_minutes' => $this->calculateLateMinutes($checkIn, $expected['start_time']),
         ];
     }
 
@@ -109,7 +114,8 @@ class AttendanceClockService
     {
         $attendance = $attendance->fresh(['employee.department']);
         $attendance->load('clocks');
-        $summary = $this->summarizeClocks($attendance->clocks, $attendance->employee);
+        $date = $attendance->date?->format('Y-m-d') ?? now()->format('Y-m-d');
+        $summary = $this->summarizeClocks($attendance->clocks, $attendance->employee, $date);
 
         if ($summary['check_in'] === null) {
             $attendance->update([
@@ -136,7 +142,11 @@ class AttendanceClockService
         $firstIn = $clocks->firstWhere('type', AttendanceClock::TYPE_IN) ?? $first;
         $lastOut = $clocks->reverse()->firstWhere('type', AttendanceClock::TYPE_OUT) ?? $last;
 
-        $earlyMinutes = $this->calculateEarlyDepartureMinutes($summary['check_out'], $attendance->employee);
+        $expected = $attendance->employee
+            ? $this->getExpectedShiftTimes($attendance->employee->id, $date)
+            : ['start_time' => null, 'end_time' => null];
+
+        $earlyMinutes = $this->calculateEarlyDepartureMinutes($summary['check_out'], $expected['end_time']);
 
         $status = $attendance->status;
         if (! in_array($status, ['permit', 'leave', 'absent'], true)) {
@@ -176,14 +186,43 @@ class AttendanceClockService
             ->map(fn (string $source) => AttendanceClock::sourceOptions()[$source] ?? $source);
     }
 
-    private function calculateLateMinutes(mixed $checkIn, ?Employee $employee): int
+    /**
+     * Resolve expected start/end times for an employee on a given date.
+     * Uses rolling shift schedule first, falls back to department fixed hours.
+     *
+     * @return array{start_time: ?string, end_time: ?string}
+     */
+    private function getExpectedShiftTimes(int $employeeId, string $date): array
     {
-        if (! $checkIn || ! $employee) {
+        $schedule = ShiftSchedule::query()
+            ->with('shiftType')
+            ->where('employee_id', $employeeId)
+            ->whereDate('date', $date)
+            ->first();
+
+        if ($schedule && $schedule->shiftType && ! $schedule->is_off) {
+            return [
+                'start_time' => $schedule->shiftType->start_time,
+                'end_time' => $schedule->shiftType->end_time,
+            ];
+        }
+
+        // Fallback: department default work hours.
+        $employee = Employee::query()->with('department')->find($employeeId);
+
+        return [
+            'start_time' => $employee?->department?->work_start_time,
+            'end_time' => $employee?->department?->work_end_time,
+        ];
+    }
+
+    private function calculateLateMinutes(mixed $checkIn, ?string $startTime): int
+    {
+        if (! $checkIn || ! $startTime) {
             return 0;
         }
 
-        $workStartTime = $employee->department?->work_start_time ?: '08:00:00';
-        $startMinutes = $this->parseDepartmentClockMinutes($workStartTime, 8 * 60);
+        $startMinutes = $this->parseClockMinutes($startTime, 8 * 60);
         $checkInMinutes = $this->extractClockMinutes($checkIn);
 
         if ($checkInMinutes === null) {
@@ -193,14 +232,13 @@ class AttendanceClockService
         return max(0, $checkInMinutes - $startMinutes);
     }
 
-    private function calculateEarlyDepartureMinutes(mixed $checkOut, ?Employee $employee): int
+    private function calculateEarlyDepartureMinutes(mixed $checkOut, ?string $endTime): int
     {
-        if (! $checkOut || ! $employee) {
+        if (! $checkOut || ! $endTime) {
             return 0;
         }
 
-        $workEndTime = $employee->department?->work_end_time ?: '17:00:00';
-        $endMinutes = $this->parseDepartmentClockMinutes($workEndTime, 17 * 60);
+        $endMinutes = $this->parseClockMinutes($endTime, 17 * 60);
         $checkOutMinutes = $this->extractClockMinutes($checkOut);
 
         if ($checkOutMinutes === null) {
@@ -227,20 +265,6 @@ class AttendanceClockService
         }
 
         return $fallbackMinutes;
-    }
-
-    private function parseDepartmentClockMinutes(mixed $value, int $fallbackMinutes): int
-    {
-        $rawMinutes = $this->parseClockMinutes($value, $fallbackMinutes);
-        $rawHour = intdiv($rawMinutes, 60);
-        $fallbackHour = intdiv($fallbackMinutes, 60);
-        $shouldShiftFromUtcClock = $fallbackHour <= 12
-            ? $rawHour < 4
-            : $rawHour < 13;
-
-        return $shouldShiftFromUtcClock
-            ? ($rawMinutes + (7 * 60)) % (24 * 60)
-            : $rawMinutes;
     }
 
     private function extractClockMinutes(mixed $value): ?int

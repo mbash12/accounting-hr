@@ -43,15 +43,20 @@ class DepartmentForm
                     ])
                     ->columns(2),
                 Section::make(__('Work Schedule'))
+                    ->description(__('Work hours are now configured per shift type in the Shift Schedule module. The fields below are kept for backward compatibility but are not used.'))
                     ->schema([
                         TimePicker::make('work_start_time')
                             ->label(__('Start Time'))
                             ->default('08:00:00')
-                            ->required(),
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText(__('Deprecated — use Shift Types instead.')),
                         TimePicker::make('work_end_time')
                             ->label(__('End Time'))
                             ->default('17:00:00')
-                            ->required(),
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText(__('Deprecated — use Shift Types instead.')),
                         CheckboxList::make('working_days')
                             ->label(__('Working Days'))
                             ->options([
@@ -65,10 +70,14 @@ class DepartmentForm
                             ])
                             ->columns(3)
                             ->default(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'])
-                            ->required()
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText(__('Deprecated — use Shift Schedule upload instead.'))
                             ->columnSpanFull(),
                     ])
-                    ->columns(2),
+                    ->columns(2)
+                    ->collapsed()
+                    ->persistCollapsed(),
                 Section::make(__('System'))
                     ->collapsible()
                     ->schema([

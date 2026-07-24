@@ -2,49 +2,40 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Filament\Support\Facades\FilamentView;
 use App\Models\Employee;
 use App\Models\OvertimeLog;
 use App\Models\Permit;
+use App\Models\ShiftType;
 use App\Observers\EmployeeObserver;
 use App\Observers\OvertimeLogObserver;
 use App\Observers\PermitObserver;
+use App\Policies\ShiftTypePolicy;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        // Auto-calculate overtime allowance on approval
+        // Observers
         OvertimeLog::observe(OvertimeLogObserver::class);
-
-        // Auto-update leave quota when permit is approved/rejected
         Permit::observe(PermitObserver::class);
-
-        // Auto-create leave quota for new employees
         Employee::observe(EmployeeObserver::class);
+
+        // Shield-generated policies
+        Gate::policy(ShiftType::class,                ShiftTypePolicy::class);
+
+        // Global CSS reset for Filament panel so our app CSS can take over
         FilamentView::registerRenderHook(
             'panels::head.end',
-            fn (): string => '<style>
-                .fi-main {
-                    max-width: none !important;
-                }
-                .fi-width-7xl {
-                    max-width: none !important;
-                    width: 100% !important;
-                }
-            </style>'
+            fn (): string => '<link rel="stylesheet" href="' . asset('css/app.css') . (file_exists(public_path('css/app.css')) ? '?v=' . filemtime(public_path('css/app.css')) : '') . '">'
+                . '<style>.fi-main { max-width: none !important; }</style>'
         );
     }
 }
