@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PurchaseReturns\Pages;
 
 use App\Filament\Resources\PurchaseReturns\PurchaseReturnResource;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -13,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditPurchaseReturn extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = PurchaseReturnResource::class;
 
     public function save(...$args): void

@@ -4,12 +4,15 @@ namespace App\Filament\Resources\BonusCalculations\Pages;
 
 use App\Filament\Resources\BonusCalculations\BonusCalculationResource;
 use App\Services\PayrollService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBonusCalculation extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = BonusCalculationResource::class;
 
     protected function getHeaderActions(): array

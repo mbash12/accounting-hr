@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SalesReturns\Pages;
 
 use App\Filament\Resources\SalesReturns\SalesReturnResource;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -13,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditSalesReturn extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = SalesReturnResource::class;
 
     public function save(...$args): void

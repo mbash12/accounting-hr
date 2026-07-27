@@ -7,6 +7,7 @@ use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\SalesOrders\SalesOrderResource;
 use App\Models\SalesOrder;
 use App\Models\Tax;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -17,6 +18,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditSalesOrder extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = SalesOrderResource::class;
 
     public function save(...$args): void

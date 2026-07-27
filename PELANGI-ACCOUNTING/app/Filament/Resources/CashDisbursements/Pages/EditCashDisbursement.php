@@ -4,6 +4,7 @@ namespace App\Filament\Resources\CashDisbursements\Pages;
 
 use App\Filament\Resources\CashDisbursements\CashDisbursementResource;
 use App\Models\CashDisbursement;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -12,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditCashDisbursement extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = CashDisbursementResource::class;
 
     protected function getHeaderActions(): array

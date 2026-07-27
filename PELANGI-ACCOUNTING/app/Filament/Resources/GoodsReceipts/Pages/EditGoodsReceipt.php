@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\GoodsReceipts\Pages;
 
 use App\Filament\Resources\GoodsReceipts\GoodsReceiptResource;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -13,6 +14,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditGoodsReceipt extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = GoodsReceiptResource::class;
 
     public function save(...$args): void

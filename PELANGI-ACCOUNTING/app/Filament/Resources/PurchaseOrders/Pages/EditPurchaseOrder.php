@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PurchaseOrders\Pages;
 use App\Filament\Forms\Components\NumberInput;
 use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\PurchaseOrders\PurchaseOrderResource;
+use App\Traits\WarnEditPostedRecord;
 use App\Models\PurchaseOrder;
 use App\Models\Tax;
 use Filament\Actions\Action;
@@ -18,6 +19,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditPurchaseOrder extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = PurchaseOrderResource::class;
 
     public function save(...$args): void

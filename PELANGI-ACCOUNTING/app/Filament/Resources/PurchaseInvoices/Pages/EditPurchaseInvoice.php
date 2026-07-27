@@ -6,6 +6,7 @@ use App\Filament\Forms\Components\NumberInput;
 use App\Services\AdditionalChargesHelper;
 use App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource;
 use App\Models\Tax;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -17,6 +18,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditPurchaseInvoice extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = PurchaseInvoiceResource::class;
 
     public function save(...$args): void

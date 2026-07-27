@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PayablePayments\Pages;
 use App\Filament\Resources\PayablePayments\PayablePaymentResource;
 use App\Models\PayablePaymentItem;
 use App\Services\ReceivablePayableService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -15,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditPayablePayment extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = PayablePaymentResource::class;
 
     public function save(...$args): void

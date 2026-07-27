@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SalesDeliveries\Pages;
 
 use App\Filament\Resources\SalesDeliveries\SalesDeliveryResource;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
@@ -11,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditSalesDelivery extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = SalesDeliveryResource::class;
 
     public function save(...$args): void

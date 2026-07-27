@@ -5,6 +5,7 @@ namespace App\Filament\Resources\ReceivablePayments\Pages;
 use App\Filament\Resources\ReceivablePayments\ReceivablePaymentResource;
 use App\Models\ReceivablePaymentItem;
 use App\Services\ReceivablePayableService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -15,6 +16,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditReceivablePayment extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = ReceivablePaymentResource::class;
 
     public function save(...$args): void

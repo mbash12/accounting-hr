@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CashTransfers\Pages;
 use App\Filament\Resources\CashTransfers\CashTransferResource;
 use App\Models\CashTransfer;
 use App\Services\CashBankService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -14,6 +15,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditCashTransfer extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = CashTransferResource::class;
 
     protected function getHeaderActions(): array

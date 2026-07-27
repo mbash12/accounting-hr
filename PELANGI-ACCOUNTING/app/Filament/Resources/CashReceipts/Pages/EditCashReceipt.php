@@ -6,6 +6,7 @@ use App\Filament\Resources\CashReceipts\CashReceiptResource;
 use App\Models\CashReceipt;
 use App\Models\CashReceiptItem;
 use App\Services\CashBankService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
@@ -18,6 +19,8 @@ use Illuminate\Validation\ValidationException;
 
 class EditCashReceipt extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = CashReceiptResource::class;
 
     public function save(...$args): void

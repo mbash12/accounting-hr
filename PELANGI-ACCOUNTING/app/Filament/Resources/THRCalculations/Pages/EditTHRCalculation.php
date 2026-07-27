@@ -4,12 +4,15 @@ namespace App\Filament\Resources\THRCalculations\Pages;
 
 use App\Filament\Resources\THRCalculations\THRCalculationResource;
 use App\Services\PayrollService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 
 class EditTHRCalculation extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = THRCalculationResource::class;
 
     protected function getHeaderActions(): array

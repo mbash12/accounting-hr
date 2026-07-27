@@ -28,6 +28,17 @@ class EditJournalEntry extends EditRecord
         ];
     }
 
+    protected function beforeSave(): void
+    {
+        // Jika journal sudah posted, unpost terlebih dahulu
+        if ($this->record->is_posted) {
+            $this->record->is_posted = false;
+            $this->record->posted_by_user_id = null;
+            $this->record->posted_at = null;
+            $this->record->save();
+        }
+    }
+
     protected function getFormActions(): array
     {
         return [
@@ -37,7 +48,16 @@ class EditJournalEntry extends EditRecord
                     $this->reason = $data['reason'] ?? null;
                     $this->save();
                 })
-                ->modalHeading(__('Change Reason'))
+                ->modalHeading(function () {
+                    return $this->record->is_posted
+                        ? __('⚠️ Jurnal Sudah Diposting')
+                        : __('Change Reason');
+                })
+                ->modalDescription(function () {
+                    return $this->record->is_posted
+                        ? __('Jurnal ini sudah diposting. Jika Anda melanjutkan edit, status jurnal akan berubah menjadi DRAFT dan posting akan dihapus. Anda perlu memposting ulang setelah selesai edit. Yakin ingin melanjutkan?')
+                        : null;
+                })
                 ->modalWidth('md')
                 ->form([
                     TextInput::make('reason')
@@ -46,7 +66,11 @@ class EditJournalEntry extends EditRecord
                         ->placeholder(__('Reason must be at least 5 characters'))
                         ->minLength(5),
                 ])
-                ->modalSubmitActionLabel(__('Submit'))
+                ->modalSubmitActionLabel(function () {
+                    return $this->record->is_posted
+                        ? __('Unpost & Simpan')
+                        : __('Submit');
+                })
                 ->modalCancelActionLabel(__('Cancel'))
                 ->keyBindings(['mod+s'])
                 ->visible(function () {
@@ -60,10 +84,6 @@ class EditJournalEntry extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if ($this->record->is_posted) {
-            $this->NotificationHalt('A posted journal cannot be edited. Reverse it first.');
-        }
-
         $items = $this->data['items'] ?? [];
 
         // Filter out empty items

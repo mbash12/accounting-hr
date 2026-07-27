@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PayrollPeriods\Pages;
 use App\Filament\Resources\PayrollPeriods\PayrollPeriodResource;
 use App\Models\PayrollPeriod;
 use App\Services\PayrollService;
+use App\Traits\WarnEditPostedRecord;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
@@ -14,6 +15,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditPayrollPeriod extends EditRecord
 {
+    use WarnEditPostedRecord;
+
     protected static string $resource = PayrollPeriodResource::class;
 
     protected function getHeaderActions(): array
