@@ -14,11 +14,11 @@ class ExportAttendancesAction extends Action
         return parent::make($name ?? 'export')
             ->label('Export')
             ->icon('heroicon-o-arrow-down-tray')
-            ->action(function () {
+            ->action(function (\Filament\Actions\Action $action) {
                 try {
                     // Get active table filters from Livewire component
                     $filters = [];
-                    $livewire = $this->getLivewire();
+                    $livewire = $action->getLivewire();
                     if ($livewire && property_exists($livewire, 'tableFilters')) {
                         $filters = $livewire->tableFilters ?? [];
                     }
