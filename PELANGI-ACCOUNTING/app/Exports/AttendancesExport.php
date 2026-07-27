@@ -13,13 +13,15 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
 {
     public function collection(): Collection
     {
-        $query = Attendance::with('employee');
+        $query = Attendance::with(['employee.department', 'company']);
 
         $query = CompanyFilterService::applyCompanyFilter($query);
 
         return $query->orderBy('date', 'desc')->get()->map(function ($attendance) {
             return [
                 'employee_id'              => $attendance->employee?->employee_id,
+                'employee_name'            => $attendance->employee?->name,
+                'department'               => $attendance->employee?->department?->name,
                 'date'                     => $attendance->date?->format('Y-m-d'),
                 'check_in'                 => $attendance->check_in?->format('H:i:s'),
                 'check_out'                => $attendance->check_out?->format('H:i:s'),
@@ -37,6 +39,8 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
     {
         return [
             'Employee ID',
+            'Employee Name',
+            'Department',
             'Date',
             'Check In',
             'Check Out',
