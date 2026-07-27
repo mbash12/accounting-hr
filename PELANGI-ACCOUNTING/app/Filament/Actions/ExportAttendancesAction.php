@@ -16,8 +16,15 @@ class ExportAttendancesAction extends Action
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function () {
                 try {
+                    // Get active table filters from Livewire component
+                    $filters = [];
+                    $livewire = $this->getLivewire();
+                    if ($livewire && property_exists($livewire, 'tableFilters')) {
+                        $filters = $livewire->tableFilters ?? [];
+                    }
+
                     return Excel::download(
-                        new AttendancesExport(),
+                        new AttendancesExport($filters),
                         'attendance-' . date('Y-m-d') . '.xlsx'
                     );
                 } catch (\Exception $e) {

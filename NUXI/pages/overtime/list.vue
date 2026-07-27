@@ -123,7 +123,8 @@ onMounted(() => {
             </div>
         </div>
         <button
-            class="absolute right-5px bottom-10px z-50 rounded-full text-[#40B6F4] flex items-center justify-center shadow-lg overflow-hidden bg-white"
+            class="fixed right-[1rem] bottom-[5rem] z-50 rounded-full text-[#40B6F4] flex items-center justify-center shadow-lg overflow-hidden bg-white"
+            style="bottom: calc(5rem + env(safe-area-inset-bottom));"
             @click="router.push('/overtime')"
         >
             <Icon

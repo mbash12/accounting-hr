@@ -25,6 +25,7 @@ export default defineNuxtConfig({
 
         head: {
             title: "Elevon",
+            viewport: "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover",
             link: [
                 { rel: "icon", type: "image/x-icon", href: "/user/icon.png" },
             ],

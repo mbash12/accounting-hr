@@ -11,11 +11,20 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class AttendancesExport implements FromCollection, WithHeadings, WithTitle
 {
+    protected array $filters;
+
+    public function __construct(array $filters = [])
+    {
+        $this->filters = $filters;
+    }
+
     public function collection(): Collection
     {
         $query = Attendance::with(['employee.department', 'company']);
 
         $query = CompanyFilterService::applyCompanyFilter($query);
+
+        $this->applyFilters($query);
 
         return $query->orderBy('date', 'desc')->get()->map(function ($attendance) {
             return [
@@ -56,5 +65,35 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
     public function title(): string
     {
         return 'Attendance Data';
+    }
+
+    protected function applyFilters($query): void
+    {
+        // Date range filter
+        if (!empty($this->filters['date_range']['from'])) {
+            $query->whereDate('date', '>=', $this->filters['date_range']['from']);
+        }
+        if (!empty($this->filters['date_range']['to'])) {
+            $query->whereDate('date', '<=', $this->filters['date_range']['to']);
+        }
+
+        // Employee filter
+        if (!empty($this->filters['employee_id']['value'])) {
+            $query->where('employee_id', $this->filters['employee_id']['value']);
+        }
+
+        // Department filter
+        if (!empty($this->filters['department_id']['value'])) {
+            $query->whereHas('employee', function ($q) {
+                $q->where('department_id', $this->filters['department_id']['value']);
+            });
+        }
+
+        // Clock source filter
+        if (!empty($this->filters['clock_source']['value'])) {
+            $query->whereHas('clocks', function ($q) {
+                $q->where('source', $this->filters['clock_source']['value']);
+            });
+        }
     }
 }

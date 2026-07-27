@@ -460,8 +460,8 @@ onMounted(async () => {
             </div>
         </div>
         <div
-            class="absolute right-5px fab bottom-10px opacity-100"
-            style="transform-origin: bottom right"
+            class="fixed right-[1rem] fab bottom-[5rem] opacity-100"
+            style="transform-origin: bottom right; bottom: calc(5rem + env(safe-area-inset-bottom));"
         >
             <FAB />
         </div>
