@@ -113,10 +113,13 @@ class ShiftScheduleService
         int $year,
         int $month,
         ?int $companyId = null,
-        ?int $departmentId = null,
-        ?int $shiftTypeId = null,
+        array|int|null $departmentIds = null,
+        array|int|null $shiftTypeIds = null,
     ): array
     {
+        $departmentIds = is_array($departmentIds) ? $departmentIds : ($departmentIds === null ? [] : [$departmentIds]);
+        $shiftTypeIds = is_array($shiftTypeIds) ? $shiftTypeIds : ($shiftTypeIds === null ? [] : [$shiftTypeIds]);
+
         $start  = CarbonImmutable::create($year, $month, 1)->startOfDay();
         $end    = $start->endOfMonth();
         $daysIn = (int) $start->daysInMonth;
@@ -125,10 +128,10 @@ class ShiftScheduleService
             ->with(['employee', 'shiftType'])
             ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
-            ->when($departmentId, function ($q) use ($departmentId) {
-                $q->whereHas('employee', fn ($qq) => $qq->where('department_id', $departmentId));
+            ->when($departmentIds, function ($q) use ($departmentIds) {
+                $q->whereHas('employee', fn ($qq) => $qq->whereIn('department_id', $departmentIds));
             })
-            ->when($shiftTypeId, fn ($q) => $q->where('shift_type_id', $shiftTypeId))
+            ->when($shiftTypeIds, fn ($q) => $q->whereIn('shift_type_id', $shiftTypeIds))
             ->orderBy('employee_id')
             ->orderBy('date')
             ->get();

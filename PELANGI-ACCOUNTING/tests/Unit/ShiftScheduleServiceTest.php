@@ -114,9 +114,14 @@ test('filters the monthly grid by the selected company department and shift type
         ['company_id' => 2, 'employee_id' => 201, 'shift_type_id' => 401, 'date' => '2026-07-01', 'shift_code' => 'A', 'created_at' => now(), 'updated_at' => now()],
     ]);
 
-    $result = app(ShiftScheduleService::class)->buildMonthGrid(2026, 7, 1, 11, 301);
+    $result = app(ShiftScheduleService::class)->buildMonthGrid(2026, 7, 1, [11, 12], [301]);
+
+    expect(collect($result['employees'])->pluck('id')->all())->toBe([101, 102]);
+    expect($result['grid'][101][1]['code'])->toBe('A');
+
+    $result = app(ShiftScheduleService::class)->buildMonthGrid(2026, 7, 1, [11], [301, 302]);
 
     expect(collect($result['employees'])->pluck('id')->all())->toBe([101]);
     expect($result['grid'][101][1]['code'])->toBe('A');
-    expect($result['grid'][101][2] ?? null)->toBeNull();
+    expect($result['grid'][101][2]['code'])->toBe('B');
 });

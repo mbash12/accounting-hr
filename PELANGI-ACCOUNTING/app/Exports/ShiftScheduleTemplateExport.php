@@ -25,10 +25,10 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
     public function __construct(
         public int $year,
         public int $month,
-        public ?int $departmentId = null,
+        public array $departmentIds = [],
         public ?int $companyId = null,
         public bool $prefill = false,
-        public ?int $shiftTypeId = null,
+        public array $shiftTypeIds = [],
         public ?array $employeeIds = null,
     ) {}
 
@@ -57,10 +57,10 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
             ->where('is_active', true)
             ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
             ->when($this->employeeIds !== null, fn ($q) => $q->whereIn('id', $this->employeeIds))
-            ->when($this->departmentId, fn ($q) => $q->where('department_id', $this->departmentId))
-            ->when($this->shiftTypeId, function ($q) use ($firstDate) {
+            ->when($this->departmentIds, fn ($q) => $q->whereIn('department_id', $this->departmentIds))
+            ->when($this->shiftTypeIds, function ($q) use ($firstDate) {
                 $q->whereHas('shiftSchedules', function ($qq) use ($firstDate) {
-                    $qq->where('shift_type_id', $this->shiftTypeId)
+                    $qq->whereIn('shift_type_id', $this->shiftTypeIds)
                         ->whereBetween('date', [$firstDate->toDateString(), $firstDate->endOfMonth()->toDateString()]);
                 });
             })
@@ -72,7 +72,7 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
             ShiftSchedule::query()
                 ->whereBetween('date', [$firstDate->toDateString(), $firstDate->endOfMonth()->toDateString()])
                 ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
-                ->when($this->shiftTypeId, fn ($q) => $q->where('shift_type_id', $this->shiftTypeId))
+                ->when($this->shiftTypeIds, fn ($q) => $q->whereIn('shift_type_id', $this->shiftTypeIds))
                 ->get()
                 ->each(function ($s) use (&$scheduleMap) {
                     $scheduleMap[$s->employee_id][(int) $s->date->format('j')] = $s->shift_code;
@@ -211,10 +211,10 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
             ->where('is_active', true)
             ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
             ->when($this->employeeIds !== null, fn ($q) => $q->whereIn('id', $this->employeeIds))
-            ->when($this->departmentId, fn ($q) => $q->where('department_id', $this->departmentId))
-            ->when($this->shiftTypeId, function ($q) use ($firstDate) {
+            ->when($this->departmentIds, fn ($q) => $q->whereIn('department_id', $this->departmentIds))
+            ->when($this->shiftTypeIds, function ($q) use ($firstDate) {
                 $q->whereHas('shiftSchedules', function ($qq) use ($firstDate) {
-                    $qq->where('shift_type_id', $this->shiftTypeId)
+                    $qq->whereIn('shift_type_id', $this->shiftTypeIds)
                         ->whereBetween('date', [$firstDate->toDateString(), $firstDate->endOfMonth()->toDateString()]);
                 });
             })

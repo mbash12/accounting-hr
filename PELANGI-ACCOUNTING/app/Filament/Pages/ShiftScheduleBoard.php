@@ -10,9 +10,11 @@ use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use BackedEnum;
@@ -47,8 +49,9 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
 
     #[Url]
     public int $month = 0;
-    public ?int $departmentId = null;
-    public ?int $shiftTypeId = null;
+    public ?array $data = [];
+    public array $departmentIds = [];
+    public array $shiftTypeIds = [];
 
     public array $grid = [];
     public array $holidays = [];
@@ -64,6 +67,63 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
     {
         $this->year  = $this->year  ?: now()->year;
         $this->month = $this->month ?: now()->month;
+        $this->form->fill([
+            'month' => $this->month,
+            'year' => $this->year,
+            'departmentIds' => [],
+            'shiftTypeIds' => [],
+        ]);
+        $this->refreshGrid();
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                Select::make('month')
+                    ->label('Bulan')
+                    ->options(collect(range(1, 12))->mapWithKeys(fn (int $month) => [
+                        $month => CarbonImmutable::create(null, $month, 1)->format('F'),
+                    ])->all())
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->applyFormFilters()),
+                Select::make('year')
+                    ->label('Tahun')
+                    ->options(array_combine(
+                        range(now()->year - 2, now()->year + 1),
+                        range(now()->year - 2, now()->year + 1),
+                    ))
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->applyFormFilters()),
+                Select::make('departmentIds')
+                    ->label('Department')
+                    ->options(fn () => $this->departments)
+                    ->multiple()
+                    ->searchable()
+                    ->placeholder('All Departments')
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->applyFormFilters()),
+                Select::make('shiftTypeIds')
+                    ->label('Shift Type')
+                    ->options(fn () => $this->shiftTypes)
+                    ->multiple()
+                    ->searchable()
+                    ->placeholder('All Shift Types')
+                    ->live()
+                    ->afterStateUpdated(fn () => $this->applyFormFilters()),
+            ])
+            ->columns(4)
+            ->statePath('data');
+    }
+
+    public function applyFormFilters(): void
+    {
+        $this->month = (int) ($this->data['month'] ?? $this->month);
+        $this->year = (int) ($this->data['year'] ?? $this->year);
+        $this->departmentIds = array_values(array_map('intval', $this->data['departmentIds'] ?? []));
+        $this->shiftTypeIds = array_values(array_map('intval', $this->data['shiftTypeIds'] ?? []));
         $this->refreshGrid();
     }
 
@@ -80,7 +140,7 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
         }
 
         $data = app(ShiftScheduleService::class)
-            ->buildMonthGrid($this->year, $this->month, $companyId, $this->departmentId, $this->shiftTypeId);
+            ->buildMonthGrid($this->year, $this->month, $companyId, $this->departmentIds, $this->shiftTypeIds);
 
         $this->year         = $data['year'];
         $this->month        = $data['month'];
@@ -112,8 +172,8 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
         if (!$companyId) {
             $this->departments = [];
             $this->shiftTypes = [];
-            $this->departmentId = null;
-            $this->shiftTypeId = null;
+            $this->departmentIds = [];
+            $this->shiftTypeIds = [];
             return;
         }
 
@@ -132,12 +192,18 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
             ->mapWithKeys(fn (ShiftType $type) => [$type->id => $type->code . ' - ' . $type->name])
             ->toArray();
 
-        if ($this->departmentId !== null && !array_key_exists($this->departmentId, $this->departments)) {
-            $this->departmentId = null;
-        }
-        if ($this->shiftTypeId !== null && !array_key_exists($this->shiftTypeId, $this->shiftTypes)) {
-            $this->shiftTypeId = null;
-        }
+        $this->departmentIds = array_values(array_intersect(
+            array_map('intval', $this->departmentIds),
+            array_map('intval', array_keys($this->departments)),
+        ));
+        $this->shiftTypeIds = array_values(array_intersect(
+            array_map('intval', $this->shiftTypeIds),
+            array_map('intval', array_keys($this->shiftTypes)),
+        ));
+        $this->data['month'] = $this->month;
+        $this->data['year'] = $this->year;
+        $this->data['departmentIds'] = $this->departmentIds;
+        $this->data['shiftTypeIds'] = $this->shiftTypeIds;
     }
 
     protected function resetBoardData(): void
@@ -193,16 +259,16 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
         }
 
         $gridData = app(ShiftScheduleService::class)
-            ->buildMonthGrid($this->year, $this->month, $companyId, $this->departmentId, $this->shiftTypeId);
+            ->buildMonthGrid($this->year, $this->month, $companyId, $this->departmentIds, $this->shiftTypeIds);
 
         return Excel::download(
             new ShiftScheduleTemplateExport(
                 year: $this->year,
                 month: $this->month,
-                departmentId: $this->departmentId,
+                departmentIds: $this->departmentIds,
                 companyId: $companyId,
                 prefill: true,
-                shiftTypeId: $this->shiftTypeId,
+                shiftTypeIds: $this->shiftTypeIds,
                 employeeIds: collect($gridData['employees'])->pluck('id')->all(),
             ),
             'shift-schedule-' . CarbonImmutable::create($this->year, $this->month, 1)->format('Y-m') . '.xlsx'
