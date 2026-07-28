@@ -8,10 +8,41 @@
 
         {{-- ====== Top controls ====== --}}
         <div class="shift-board__header">
-            <div class="shift-board__nav">
-                <button type="button" wire:click="previousMonth" class="shift-board__nav-btn" title="Previous month">‹</button>
-                <div class="shift-board__month">{{ $month_name }} {{ $year }}</div>
-                <button type="button" wire:click="nextMonth" class="shift-board__nav-btn" title="Next month">›</button>
+            <div class="shift-board__field shift-board__month-select">
+                <label class="shift-board__label" for="shift-month">Bulan</label>
+                <select id="shift-month" class="shift-board__select" wire:model="month" wire:change="refreshGrid">
+                    @foreach(range(1, 12) as $monthOption)
+                        <option value="{{ $monthOption }}">{{ date('F', mktime(0, 0, 0, $monthOption, 1)) }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="shift-board__field shift-board__month-select">
+                <label class="shift-board__label" for="shift-year">Tahun</label>
+                <select id="shift-year" class="shift-board__select" wire:model="year" wire:change="refreshGrid">
+                    @foreach(range(now()->year - 2, now()->year + 1) as $yearOption)
+                        <option value="{{ $yearOption }}">{{ $yearOption }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="shift-board__field">
+                <label class="shift-board__label" for="shift-department">Department</label>
+                <select id="shift-department" class="shift-board__select" wire:model="departmentId" wire:change="refreshGrid">
+                        <option value="">All</option>
+                        @foreach($departments as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                </select>
+            </div>
+            <div class="shift-board__field">
+                <label class="shift-board__label" for="shift-type">Shift Type</label>
+                <select id="shift-type" class="shift-board__select" wire:model="shiftTypeId" wire:change="refreshGrid">
+                        <option value="">All</option>
+                        @foreach($shiftTypes as $id => $label)
+                            <option value="{{ $id }}">{{ $label }}</option>
+                        @endforeach
+                </select>
             </div>
 
             <div class="shift-board__meta">
@@ -20,6 +51,7 @@
             </div>
 
             <div class="shift-board__actions">
+                {{ $this->exportAction }}
                 {{ $this->uploadAction }}
                 {{ $this->clearScheduleAction }}
             </div>

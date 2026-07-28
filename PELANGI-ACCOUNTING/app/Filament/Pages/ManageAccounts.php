@@ -538,9 +538,10 @@ class ManageAccounts extends Page
                         $isTopLevel = $account->isClassificationRoot();
                         
                         if ($isTopLevel) {
-                            // Only allow updating the name for top-level accounts
+                            // Keep classification roots restricted to label/header status only.
                             $account->update([
-                                'name' => $data['name']
+                                'name' => $data['name'],
+                                'is_header' => (bool) ($data['is_header'] ?? $account->is_header),
                             ]);
                         } else {
                             // Check if code is unique within the same company (excluding current record)
@@ -895,6 +896,11 @@ class ManageAccounts extends Page
                     }
                     return false;
                 }),
+
+            Checkbox::make('is_header')
+                ->label(__('Header Account'))
+                ->helperText(__('Header accounts group child accounts and are not used for journal postings.'))
+                ->default(false),
             
             Checkbox::make('is_cash_bank')
                 ->label(__('Is Cash/Bank Account'))

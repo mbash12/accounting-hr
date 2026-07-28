@@ -109,7 +109,13 @@ class ShiftScheduleService
      *   legend: Collection
      * }
      */
-    public function buildMonthGrid(int $year, int $month, ?int $companyId = null, ?int $departmentId = null): array
+    public function buildMonthGrid(
+        int $year,
+        int $month,
+        ?int $companyId = null,
+        ?int $departmentId = null,
+        ?int $shiftTypeId = null,
+    ): array
     {
         $start  = CarbonImmutable::create($year, $month, 1)->startOfDay();
         $end    = $start->endOfMonth();
@@ -122,6 +128,7 @@ class ShiftScheduleService
             ->when($departmentId, function ($q) use ($departmentId) {
                 $q->whereHas('employee', fn ($qq) => $qq->where('department_id', $departmentId));
             })
+            ->when($shiftTypeId, fn ($q) => $q->where('shift_type_id', $shiftTypeId))
             ->orderBy('employee_id')
             ->orderBy('date')
             ->get();

@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Exports\ShiftScheduleTemplateExport;
+use App\Models\Department;
+use App\Models\ShiftType;
 use App\Services\ShiftScheduleService;
 use Carbon\CarbonImmutable;
 use Filament\Actions\Action;
@@ -13,6 +16,7 @@ use Filament\Pages\Page;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use BackedEnum;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ShiftScheduleBoard extends Page implements HasForms, HasActions
 {
@@ -43,11 +47,15 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
 
     #[Url]
     public int $month = 0;
+    public ?int $departmentId = null;
+    public ?int $shiftTypeId = null;
 
     public array $grid = [];
     public array $holidays = [];
     public array $legend = [];
     public array $employees = [];
+    public array $departments = [];
+    public array $shiftTypes = [];
     public int $days_in_month = 0;
     public int $first_dow = 1;
     public string $month_name = '';
@@ -60,10 +68,19 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
     }
 
     #[On('shift-schedule-uploaded')]
+    #[On('company-changed')]
     public function refreshGrid(): void
     {
+        $companyId = $this->companyId();
+        $this->loadFilterOptions($companyId);
+
+        if (!$companyId) {
+            $this->resetBoardData();
+            return;
+        }
+
         $data = app(ShiftScheduleService::class)
-            ->buildMonthGrid($this->year, $this->month, $this->companyId(), null);
+            ->buildMonthGrid($this->year, $this->month, $companyId, $this->departmentId, $this->shiftTypeId);
 
         $this->year         = $data['year'];
         $this->month        = $data['month'];
@@ -90,6 +107,50 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
         ])->all();
     }
 
+    protected function loadFilterOptions(?int $companyId): void
+    {
+        if (!$companyId) {
+            $this->departments = [];
+            $this->shiftTypes = [];
+            $this->departmentId = null;
+            $this->shiftTypeId = null;
+            return;
+        }
+
+        $this->departments = Department::query()
+            ->where('company_id', $companyId)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray();
+
+        $this->shiftTypes = ShiftType::query()
+            ->where('company_id', $companyId)
+            ->where('is_active', true)
+            ->orderBy('code')
+            ->get(['id', 'code', 'name'])
+            ->mapWithKeys(fn (ShiftType $type) => [$type->id => $type->code . ' - ' . $type->name])
+            ->toArray();
+
+        if ($this->departmentId !== null && !array_key_exists($this->departmentId, $this->departments)) {
+            $this->departmentId = null;
+        }
+        if ($this->shiftTypeId !== null && !array_key_exists($this->shiftTypeId, $this->shiftTypes)) {
+            $this->shiftTypeId = null;
+        }
+    }
+
+    protected function resetBoardData(): void
+    {
+        $this->grid = [];
+        $this->holidays = [];
+        $this->legend = [];
+        $this->employees = [];
+        $this->days_in_month = CarbonImmutable::create($this->year, $this->month, 1)->daysInMonth;
+        $this->first_dow = CarbonImmutable::create($this->year, $this->month, 1)->dayOfWeekIso;
+        $this->month_name = CarbonImmutable::create($this->year, $this->month, 1)->format('F');
+    }
+
     protected function companyId(): ?int
     {
         $selected = session('selected_company_id');
@@ -113,6 +174,39 @@ class ShiftScheduleBoard extends Page implements HasForms, HasActions
         $this->year  = (int) $d->year;
         $this->month = (int) $d->month;
         $this->refreshGrid();
+    }
+
+    public function exportAction(): Action
+    {
+        return Action::make('export')
+            ->label('Export')
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('success')
+            ->action(fn ($livewire) => $livewire->exportSchedule());
+    }
+
+    public function exportSchedule()
+    {
+        $companyId = $this->companyId();
+        if (!$companyId) {
+            return;
+        }
+
+        $gridData = app(ShiftScheduleService::class)
+            ->buildMonthGrid($this->year, $this->month, $companyId, $this->departmentId, $this->shiftTypeId);
+
+        return Excel::download(
+            new ShiftScheduleTemplateExport(
+                year: $this->year,
+                month: $this->month,
+                departmentId: $this->departmentId,
+                companyId: $companyId,
+                prefill: true,
+                shiftTypeId: $this->shiftTypeId,
+                employeeIds: collect($gridData['employees'])->pluck('id')->all(),
+            ),
+            'shift-schedule-' . CarbonImmutable::create($this->year, $this->month, 1)->format('Y-m') . '.xlsx'
+        );
     }
 
     public function uploadAction(): Action

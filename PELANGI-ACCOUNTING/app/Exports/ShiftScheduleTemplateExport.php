@@ -28,6 +28,8 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
         public ?int $departmentId = null,
         public ?int $companyId = null,
         public bool $prefill = false,
+        public ?int $shiftTypeId = null,
+        public ?array $employeeIds = null,
     ) {}
 
     public function title(): string
@@ -54,7 +56,14 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
             ->with(['department'])
             ->where('is_active', true)
             ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
+            ->when($this->employeeIds !== null, fn ($q) => $q->whereIn('id', $this->employeeIds))
             ->when($this->departmentId, fn ($q) => $q->where('department_id', $this->departmentId))
+            ->when($this->shiftTypeId, function ($q) use ($firstDate) {
+                $q->whereHas('shiftSchedules', function ($qq) use ($firstDate) {
+                    $qq->where('shift_type_id', $this->shiftTypeId)
+                        ->whereBetween('date', [$firstDate->toDateString(), $firstDate->endOfMonth()->toDateString()]);
+                });
+            })
             ->orderBy('name')
             ->get();
 
@@ -63,6 +72,7 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
             ShiftSchedule::query()
                 ->whereBetween('date', [$firstDate->toDateString(), $firstDate->endOfMonth()->toDateString()])
                 ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
+                ->when($this->shiftTypeId, fn ($q) => $q->where('shift_type_id', $this->shiftTypeId))
                 ->get()
                 ->each(function ($s) use (&$scheduleMap) {
                     $scheduleMap[$s->employee_id][(int) $s->date->format('j')] = $s->shift_code;
@@ -142,9 +152,7 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
                 $legendStart = $bodyEnd + 2; // 1 baris kosong
                 $types = ShiftType::query()
                     ->where('is_active', true)
-                    ->when($this->companyId, fn ($q) => $q->where(function ($qq) {
-                        $qq->where('company_id', $this->companyId)->orWhereNull('company_id');
-                    }))
+                    ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
                     ->orderBy('code')
                     ->get();
 
@@ -197,10 +205,19 @@ class ShiftScheduleTemplateExport implements FromArray, WithHeadings, WithTitle,
 
     private function rowsCount(): int
     {
+        $firstDate = CarbonImmutable::create($this->year, $this->month, 1);
+
         return Employee::query()
             ->where('is_active', true)
             ->when($this->companyId, fn ($q) => $q->where('company_id', $this->companyId))
+            ->when($this->employeeIds !== null, fn ($q) => $q->whereIn('id', $this->employeeIds))
             ->when($this->departmentId, fn ($q) => $q->where('department_id', $this->departmentId))
+            ->when($this->shiftTypeId, function ($q) use ($firstDate) {
+                $q->whereHas('shiftSchedules', function ($qq) use ($firstDate) {
+                    $qq->where('shift_type_id', $this->shiftTypeId)
+                        ->whereBetween('date', [$firstDate->toDateString(), $firstDate->endOfMonth()->toDateString()]);
+                });
+            })
             ->count();
     }
 }

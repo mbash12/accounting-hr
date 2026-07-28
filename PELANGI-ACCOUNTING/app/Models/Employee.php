@@ -89,6 +89,11 @@ class Employee extends Model
         return $this->belongsTo(Department::class);
     }
 
+    public function shiftSchedules(): HasMany
+    {
+        return $this->hasMany(ShiftSchedule::class);
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
