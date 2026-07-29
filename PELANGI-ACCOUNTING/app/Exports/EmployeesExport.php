@@ -11,11 +11,20 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 
 class EmployeesExport implements FromCollection, WithHeadings, WithTitle
 {
+    protected array $filters;
+
+    public function __construct(array $filters = [])
+    {
+        $this->filters = $filters;
+    }
+
     public function collection(): Collection
     {
         $query = Employee::with('department');
 
         $query = CompanyFilterService::applyCompanyFilter($query);
+
+        $this->applyFilters($query);
 
         return $query->get()->map(function ($employee) {
             return [
@@ -66,5 +75,15 @@ class EmployeesExport implements FromCollection, WithHeadings, WithTitle
     public function title(): string
     {
         return 'Employees Data';
+    }
+
+    protected function applyFilters($query): void
+    {
+        $trashed = $this->filters['trashed']['value'] ?? null;
+        if ($trashed === 'with') {
+            $query->withTrashed();
+        } elseif ($trashed === 'only') {
+            $query->onlyTrashed();
+        }
     }
 }
