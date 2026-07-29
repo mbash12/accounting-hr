@@ -13,7 +13,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class HolidaysTable
@@ -36,7 +35,6 @@ class HolidaysTable
                     ->boolean(),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->toolbarActions([
                 ImportHolidaysAction::make(),

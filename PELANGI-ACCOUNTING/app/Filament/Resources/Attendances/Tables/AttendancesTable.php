@@ -18,7 +18,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class AttendancesTable
@@ -103,7 +102,6 @@ class AttendancesTable
                         $data['value'] ?? null,
                         fn ($q, $source) => $q->whereHas('clocks', fn ($cq) => $cq->where('source', $source))
                     )),
-                TrashedFilter::make(),
             ])
             ->toolbarActions([
                 ImportAttendancesAction::make(),

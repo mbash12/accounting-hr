@@ -15,7 +15,6 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ActionGroup;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class PayrollPeriodsTable
@@ -61,7 +60,6 @@ class PayrollPeriodsTable
                     ->sortable(),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

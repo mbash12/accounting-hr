@@ -12,7 +12,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class PaymentTermsTable
@@ -54,7 +53,6 @@ class PaymentTermsTable
                     ->label(__('Deleted At')),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->recordActions([
                 ActionGroup::make([

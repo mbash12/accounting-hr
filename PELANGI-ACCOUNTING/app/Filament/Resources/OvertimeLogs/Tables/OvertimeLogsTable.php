@@ -12,7 +12,6 @@ use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class OvertimeLogsTable
@@ -76,7 +75,6 @@ class OvertimeLogsTable
                         'approved' => __('Approved'),
                         'rejected' => __('Rejected'),
                     ]),
-                TrashedFilter::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

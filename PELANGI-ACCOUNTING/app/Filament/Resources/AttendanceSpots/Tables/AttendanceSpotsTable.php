@@ -11,7 +11,6 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class AttendanceSpotsTable
@@ -38,7 +37,6 @@ class AttendanceSpotsTable
                     ->boolean(),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -12,7 +12,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class PermitsTable
@@ -73,7 +72,6 @@ class PermitsTable
                     }),
             ])
             ->filters([
-                TrashedFilter::make(),
             ])
             ->toolbarActions([
                 ImportPermitsAction::make(),

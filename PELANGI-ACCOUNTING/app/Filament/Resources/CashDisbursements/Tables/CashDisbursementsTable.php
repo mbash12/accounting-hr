@@ -13,7 +13,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class CashDisbursementsTable
@@ -98,7 +97,6 @@ class CashDisbursementsTable
                             ->preload(),
                     ])
                     ->query(fn($query, array $data) => $query->when($data['from_account_id'] ?? null, fn($q, $id) => $q->where('from_account_id', $id))),
-                TrashedFilter::make(),
             ])
             ->defaultSort('date', 'desc')
             ->recordActions([

@@ -16,7 +16,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -129,7 +128,6 @@ class ReceivablePaymentsTable
                             $q->whereIn('payment_method', $method)
                         )
                     ),
-                TrashedFilter::make(),
             ])
             ->defaultSort('payment_date', 'desc')
             ->recordActions([
