@@ -79,6 +79,10 @@ class EmployeesExport implements FromCollection, WithHeadings, WithTitle
 
     protected function applyFilters($query): void
     {
+        if (!empty($this->filters['department_id']['value'])) {
+            $query->where('department_id', $this->filters['department_id']['value']);
+        }
+
         $trashed = $this->filters['trashed']['value'] ?? null;
         if ($trashed === 'with') {
             $query->withTrashed();
