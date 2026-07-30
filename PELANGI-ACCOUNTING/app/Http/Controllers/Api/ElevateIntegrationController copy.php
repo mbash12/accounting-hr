@@ -15,27 +15,54 @@ class ElevateIntegrationController extends Controller
         protected ElevateIntegrationService $integrationService
     ) {}
 
-
+    /**
+     * POST /api/integration/work-orders
+     *
+     * Receive a completed Work Order from Elevate and automatically:
+     *  1. Find or create the Customer (Contact)
+     *  2. Create a Sales Invoice
+     *  3. Create a Receivable Payment (allocating the full invoice amount)
+     *  4. Execute journal postings (via existing services)
+     *
+     * Fully idempotent: calling with the same work_order_id multiple times
+     * returns the same result without creating duplicate records.
+     *
+     * ── Skenario A: WO dengan rincian material + jasa ──
+     * {
+     *   "work_order_id":     "12345",              // required
+     *   "work_order_number": "WO-202607001",        // required
+     *   "company_id":        1,                    // required
+     *   "billing_amount":    1500000,               // optional — total WO sebagai referensi
+     *   "customer":          { ... },              // required
+     *   "items": [                                 // required jika billing_amount tidak ada
+     *     {
+     *       "product_code": "SVC-001",             // optional (pre-synced)
+     *       "description":  "Jasa Pemasangan",
+     *       "quantity":     1,
+     *       "unit_price":   500000,
+     *       "unit_code":    "JOB"                  // optional
+     *     }
+     *   ],
+     *   "bank_account_id":  3,                     // optional
+     *   "payment_date":     "2026-07-01",           // optional (defaults to today)
+     *   "invoice_date":     "2026-07-01"            // optional (defaults to today)
+     * }
+     *
+     * ── Skenario B: WO jasa only (tanpa rincian item) ──
+     * {
+     *   "work_order_id":     "12345",              // required
+     *   "work_order_number": "WO-202607001",        // required
+     *   "company_id":        1,                    // required
+     *   "billing_amount":    1500000,               // WAJIB jika items kosong
+     *   "customer":          { ... },              // required
+     *   // items tidak perlu dikirim
+     *   "bank_account_id":  3,                     // optional
+     *   "payment_date":     "2026-07-01"            // optional
+     * }
+     */
     public function processWorkOrder(Request $request): JsonResponse
     {
-        $input = $request->all();
-
-        if (isset($input['items']) && is_array($input['items'])) {
-            foreach ($input['items'] as &$item) {
-                if (isset($item['unit_code']) && is_array($item['unit_code'])) {
-                    $extractedCode = null;
-                    foreach ($item['unit_code'] as $key => $val) {
-                        if (is_array($val) && isset($val['code'])) {
-                            $extractedCode = $val['code'];
-                            break;
-                        }
-                    }
-                    $item['unit_code'] = $extractedCode;
-                }
-            }
-            $request->replace($input);
-        }
-
+        // ── Input validation ──────────────────────────────────────────────────
         try {
             $validated = $request->validate([
                 'work_order_id'          => ['required', 'string'],
@@ -46,27 +73,16 @@ class ElevateIntegrationController extends Controller
                 'customer.name'          => ['required', 'string', 'max:255'],
                 'customer.email'         => ['required', 'email', 'max:255'],
                 'customer.phone'         => ['nullable', 'string', 'max:50'],
+                // items opsional — jika kosong, billing_amount wajib ada (WO jasa only)
                 'items'                  => ['nullable', 'array'],
                 'items.*.product_code'   => ['nullable', 'string'],
                 'items.*.description'    => ['nullable', 'string'],
                 'items.*.quantity'       => ['required_with:items.*', 'numeric', 'min:0.0001'],
                 'items.*.unit_price'     => ['required_with:items.*', 'numeric', 'min:0'],
                 'items.*.unit_code'      => ['nullable', 'string'],
-                'items.*.is_material'    => ['nullable', 'boolean'],
-                'items.*.type'           => ['nullable', 'string'],
-                'materials'                => ['nullable', 'array'],
-                'materials.*.product_code' => ['nullable', 'string'],
-                'materials.*.description'  => ['nullable', 'string'],
-                'materials.*.quantity'     => ['required_with:materials.*', 'numeric', 'min:0.0001'],
-                'materials.*.unit_price'   => ['nullable', 'numeric', 'min:0'],
-                'materials.*.cost_price'   => ['nullable', 'numeric', 'min:0'],
-                'materials.*.unit_code'    => ['nullable', 'string'],
-                'materials.*.warehouse_id' => ['nullable', 'integer'],
                 'bank_account_id'        => ['nullable', 'integer'],
                 'payment_date'           => ['nullable', 'date'],
                 'invoice_date'           => ['nullable', 'date'],
-                'delivery_date'          => ['nullable', 'date'],
-                'description'            => ['nullable', 'string', 'max:500'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -76,6 +92,7 @@ class ElevateIntegrationController extends Controller
             ], 422);
         }
 
+        // ── Aturan bisnis: harus ada items ATAU billing_amount ────────────────
         $hasItems         = !empty($validated['items']);
         $hasBillingAmount = isset($validated['billing_amount']) && $validated['billing_amount'] > 0;
 
@@ -89,6 +106,7 @@ class ElevateIntegrationController extends Controller
             ], 422);
         }
 
+        // ── Delegate to service ───────────────────────────────────────────────
         try {
             $result = $this->integrationService->processWorkOrder($validated);
 
@@ -103,6 +121,7 @@ class ElevateIntegrationController extends Controller
             ], $statusCode);
 
         } catch (\InvalidArgumentException $e) {
+            // Business rule violations (missing product, no bank account, etc.)
             Log::warning('[Elevate] Business rule violation', [
                 'work_order_id' => $validated['work_order_id'] ?? null,
                 'error'         => $e->getMessage(),

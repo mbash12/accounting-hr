@@ -10,6 +10,7 @@ class ElevateWorkOrderMapping extends Model
     const STATUS_PENDING           = 'pending';
     const STATUS_CONTACT_RESOLVED  = 'contact_resolved';
     const STATUS_INVOICE_CREATED   = 'invoice_created';
+    const STATUS_DELIVERY_CREATED  = 'delivery_created';
     const STATUS_PAYMENT_CREATED   = 'payment_created';
     const STATUS_COMPLETED         = 'completed';
     const STATUS_FAILED            = 'failed';
@@ -20,6 +21,7 @@ class ElevateWorkOrderMapping extends Model
         'company_id',
         'contact_id',
         'sales_invoice_id',
+        'delivery_document_id',
         'receivable_payment_id',
         'status',
         'error_message',
@@ -33,6 +35,7 @@ class ElevateWorkOrderMapping extends Model
             'company_id'            => 'integer',
             'contact_id'            => 'integer',
             'sales_invoice_id'      => 'integer',
+            'delivery_document_id'  => 'integer',
             'receivable_payment_id' => 'integer',
         ];
     }
@@ -51,6 +54,11 @@ class ElevateWorkOrderMapping extends Model
     public function salesInvoice(): BelongsTo
     {
         return $this->belongsTo(SalesInvoice::class);
+    }
+
+    public function deliveryDocument(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryDocument::class);
     }
 
     public function receivablePayment(): BelongsTo
