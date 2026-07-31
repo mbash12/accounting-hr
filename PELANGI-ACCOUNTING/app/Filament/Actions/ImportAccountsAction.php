@@ -18,14 +18,14 @@ class ImportAccountsAction extends Action
             ->form([
                 FileUpload::make('file')
                     ->label('Account Data File')
-                    ->helperText('Upload Excel file (.xlsx) with account data including columns: code, name, description, classification_type, is_header, is_cash_bank, is_active, level, parent_code')
+                    ->helperText('Upload Excel file (.xlsx) with account data including columns: code, name, description, classification_type, account_type, is_header, is_cash_bank, is_active, level, parent_code')
                     ->acceptedFileTypes(['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'])
                     ->maxSize(1024) // 1MB
                     ->required()
                     ->reactive(),
             ])
             ->modalHeading('Import Accounts')
-            ->modalDescription('Upload Excel file with account information. You can download the template below to see the expected format. Expected columns: code, name, description, classification_type, is_header, is_cash_bank, is_active, level, parent_code.')
+            ->modalDescription('Upload Excel file with account information. You can download the template below to see the expected format. Expected columns: code, name, description, classification_type, account_type, is_header, is_cash_bank, is_active, level, parent_code.')
             ->extraModalActions([
                 \Filament\Actions\Action::make('download_template')
                     ->label('Download Template')

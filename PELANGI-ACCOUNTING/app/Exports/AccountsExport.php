@@ -51,6 +51,7 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             'name',
             'description',
             'classification_type',
+            'account_type',
             'is_header',
             'is_cash_bank',
             'is_active',
@@ -67,6 +68,7 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             $account->name,
             $account->description,
             $this->classificationTypeForImport($account),
+            $this->accountTypeForImport($account),
             $account->is_header ? 'yes' : 'no',
             $account->is_cash_bank ? 'yes' : 'no',
             $account->is_active ? 'yes' : 'no',
@@ -86,5 +88,18 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
         }
 
         return 'asset';
+    }
+
+    private function accountTypeForImport(Account $account): string
+    {
+        if (in_array($account->account_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
+            return $account->account_type;
+        }
+
+        return match ($this->classificationTypeForImport($account)) {
+            'asset' => 'current_asset',
+            'liability' => 'current_liability',
+            default => $this->classificationTypeForImport($account),
+        };
     }
 }

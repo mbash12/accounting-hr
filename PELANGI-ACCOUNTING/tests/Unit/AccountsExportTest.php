@@ -1,6 +1,7 @@
 <?php
 
 use App\Exports\AccountsExport;
+use App\Exports\AccountsTemplateExport;
 use App\Imports\AccountsImport;
 use App\Models\Account;
 
@@ -12,6 +13,7 @@ test('COA export uses the exact import template headings', function () {
         'name',
         'description',
         'classification_type',
+        'account_type',
         'is_header',
         'is_cash_bank',
         'is_active',
@@ -27,6 +29,7 @@ test('COA export maps rows in the exact import template shape', function () {
         'name' => 'Cash',
         'description' => 'Petty cash',
         'classification_type' => 'asset',
+        'account_type' => 'current_asset',
         'is_header' => false,
         'is_cash_bank' => true,
         'is_active' => true,
@@ -40,6 +43,7 @@ test('COA export maps rows in the exact import template shape', function () {
         'Cash',
         'Petty cash',
         'asset',
+        'current_asset',
         'no',
         'yes',
         'yes',
@@ -74,3 +78,26 @@ test('COA export normalizes internal classifications to values accepted by the i
     'legacy COGS classification' => ['cogs', 'cost_of_goods_sold', 'cost_of_goods_sold'],
     'missing classification' => [null, 'current_liability', 'current_liability'],
 ]);
+
+test('COA import template includes an importable account type column', function () {
+    $template = new AccountsTemplateExport();
+    $row = $template->collection()->first();
+    $mappedRow = array_combine($template->headings(), $template->map($row));
+    $invalidRows = $template->collection()
+        ->map(fn (array $templateRow) => array_combine($template->headings(), $template->map($templateRow)))
+        ->filter(fn (array $templateRow) => validator($templateRow, (new AccountsImport())->rules())->fails());
+
+    expect($template->headings())->toBe([
+        'code',
+        'name',
+        'description',
+        'classification_type',
+        'account_type',
+        'is_header',
+        'is_cash_bank',
+        'is_active',
+        'level',
+        'parent_code',
+    ])->and($mappedRow['account_type'])->toBe('current_asset')
+        ->and($invalidRows)->toBeEmpty();
+});
