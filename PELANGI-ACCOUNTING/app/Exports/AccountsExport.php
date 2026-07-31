@@ -15,7 +15,7 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
         $query = Account::select([
             'code', 'name', 'description', 'classification_type', 'is_header',
             'is_cash_bank', 'is_active', 'level', 'parent_id'
-        ]);
+        ])->with('parent:id,code');
 
         // Only get accounts that belong to the selected company (exclude shared records)
         $selectedCompanyId = session('selected_company_id', 'all');
@@ -24,33 +24,27 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             $query = $query->where('company_id', $selectedCompanyId);
         }
 
-        return $query->get();
+        return $query->orderBy('code')->get();
     }
 
     public function headings(): array
     {
         return [
-            'Code',
-            'Name',
-            'Description',
-            'Classification Type',
-            'Is Header',
-            'Is Cash/Bank',
-            'Is Active',
-            'Level',
-            'Parent Code',
+            'code',
+            'name',
+            'description',
+            'classification_type',
+            'is_header',
+            'is_cash_bank',
+            'is_active',
+            'level',
+            'parent_code',
         ];
     }
 
     public function map($account): array
     {
         // Get parent code if exists
-        $parentCode = null;
-        if ($account->parent_id) {
-            $parent = Account::find($account->parent_id);
-            $parentCode = $parent ? $parent->code : null;
-        }
-
         return [
             $account->code,
             $account->name,
@@ -60,7 +54,7 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             $account->is_cash_bank ? 'yes' : 'no',
             $account->is_active ? 'yes' : 'no',
             $account->level,
-            $parentCode,
+            $account->parent?->code,
         ];
     }
 }
