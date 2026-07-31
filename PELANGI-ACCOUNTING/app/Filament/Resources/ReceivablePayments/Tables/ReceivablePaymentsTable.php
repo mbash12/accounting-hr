@@ -63,7 +63,12 @@ class ReceivablePaymentsTable
                     ->label(__("Reference No."))
                     ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: false),
+                TextColumn::make("description")
+                    ->label(__("Description"))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make("created_at")
                     ->label(__("Created At"))
                     ->dateTime()

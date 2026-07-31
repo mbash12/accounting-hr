@@ -61,6 +61,8 @@ class ElevateIntegrationService
         try {
             DB::transaction(function () use ($mapping, $payload, $workOrderId, $workOrderNumber, $companyId) {
 
+                $locationInfo = $this->buildLocationInfo($payload);
+
                 if (!$mapping->contact_id) {
                     $contact = $this->findOrCreateContact($payload['customer'], $companyId);
                     $mapping->update([
@@ -82,7 +84,8 @@ class ElevateIntegrationService
                         $companyId,
                         $payload['invoice_date'] ?? now()->toDateString(),
                         isset($payload['billing_amount']) ? (float) $payload['billing_amount'] : null,
-                        $payload['description'] ?? null
+                        $payload['description'] ?? null,
+                        $locationInfo
                     );
 
                     $mapping->update([
@@ -137,7 +140,8 @@ class ElevateIntegrationService
                             $materials,
                             $companyId,
                             $payload['delivery_date'] ?? $payload['invoice_date'] ?? now()->toDateString(),
-                            $payload['description'] ?? null
+                            $payload['description'] ?? null,
+                            $locationInfo
                         );
 
                         $mapping->update([
@@ -165,7 +169,9 @@ class ElevateIntegrationService
                         $workOrderNumber,
                         $bankAccountId,
                         $companyId,
-                        $payload['payment_date'] ?? now()->toDateString()
+                        $payload['payment_date'] ?? now()->toDateString(),
+                        $locationInfo,
+                        $payload['description'] ?? null
                     );
 
                     $mapping->update([
@@ -348,7 +354,8 @@ class ElevateIntegrationService
         int    $companyId,
         string $invoiceDate,
         ?float $billingAmount = null,
-        ?string $woDescription = null
+        ?string $woDescription = null,
+        ?string $locationInfo = null
     ): SalesInvoice {
         $existing = SalesInvoice::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
@@ -357,15 +364,22 @@ class ElevateIntegrationService
             return $existing;
         }
 
-
         $totals = $this->calculateInvoiceTotals($items);
+
+        $desc = 'Work Order: ' . $workOrderNumber;
+        if ($locationInfo) {
+            $desc .= ' (' . $locationInfo . ')';
+        }
+        if ($woDescription) {
+            $desc .= ' - ' . $woDescription;
+        }
 
         $invoice = SalesInvoice::create([
             'invoice_number'     => null,          
             'date'               => $invoiceDate,
             'due_date'           => $invoiceDate,  
             'reference_no'       => $workOrderNumber,
-            'description'        => 'Work Order: ' . $workOrderNumber,
+            'description'        => $desc,
             'customer_id'        => $contactId,
             'company_id'         => $companyId,
             'subtotal'           => $totals['subtotal'],
@@ -383,7 +397,7 @@ class ElevateIntegrationService
         ]);
 
         foreach ($items as $item) {
-            $product   = $this->resolveProduct($item['product_code'] ?? null, 'Jasa '.$item['description'] ?? 'Item', $companyId);
+            $product   = $this->resolveProduct($item['product_code'] ?? null, 'Jasa '.($item['description'] ?? 'Item'), $companyId);
             $unit      = $this->resolveUnit($item['unit_code'] ?? null, $companyId);
             $qty       = (float) ($item['quantity']   ?? 1);
             $price     = (float) ($item['unit_price'] ?? 0);
@@ -431,7 +445,9 @@ class ElevateIntegrationService
         string       $workOrderNumber,
         int          $bankAccountId,
         int          $companyId,
-        string       $paymentDate
+        string       $paymentDate,
+        ?string      $locationInfo = null,
+        ?string      $woDescription = null
     ): ReceivablePayment {
         $existing = ReceivablePayment::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
@@ -442,11 +458,20 @@ class ElevateIntegrationService
 
         $totalAmount = (float) $invoice->total_amount;
 
+        $desc = 'Payment for Work Order: ' . $workOrderNumber;
+        if ($locationInfo) {
+            $desc .= ' (' . $locationInfo . ')';
+        }
+        if ($woDescription) {
+            $desc .= ' - ' . $woDescription;
+        }
+
         $payment = ReceivablePayment::create([
             'payment_number'     => null,          
             'payment_date'       => $paymentDate,
             'reference_no'       => $workOrderNumber,
-            'description'        => 'Payment for Work Order: ' . $workOrderNumber,
+            'description'        => $desc,
+            'transaction_notes'  => $locationInfo ? ('WO ' . $workOrderNumber . ' - ' . $locationInfo) : null,
             'customer_id'        => $contactId,
             'bank_account_id'    => $bankAccountId,
             'total_payment'      => $totalAmount,
@@ -584,13 +609,34 @@ class ElevateIntegrationService
         return $fallback->id;
     }
 
+    protected function buildLocationInfo(array $payload): ?string
+    {
+        $tower = $payload['tower'] ?? $payload['customer']['tower'] ?? null;
+        $floor = $payload['floor'] ?? $payload['lantai'] ?? $payload['customer']['floor'] ?? $payload['customer']['lantai'] ?? null;
+        $unit  = $payload['unit']  ?? $payload['customer']['unit']  ?? null;
+
+        $parts = [];
+        if (!empty($tower)) {
+            $parts[] = "Tower {$tower}";
+        }
+        if (!empty($floor)) {
+            $parts[] = "Lantai {$floor}";
+        }
+        if (!empty($unit)) {
+            $parts[] = "Unit {$unit}";
+        }
+
+        return !empty($parts) ? implode(', ', $parts) : null;
+    }
+
     protected function createSalesDelivery(
         int    $contactId,
         string $workOrderNumber,
         array  $materials,
         int    $companyId,
         string $deliveryDate,
-        ?string $woDescription = null
+        ?string $woDescription = null,
+        ?string $locationInfo = null
     ): DeliveryDocument {
         $existing = DeliveryDocument::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
@@ -599,11 +645,19 @@ class ElevateIntegrationService
             return $existing;
         }
 
+        $desc = 'Sales Delivery for Work Order: ' . $workOrderNumber;
+        if ($locationInfo) {
+            $desc .= ' (' . $locationInfo . ')';
+        }
+        if ($woDescription) {
+            $desc .= ' - ' . $woDescription;
+        }
+
         $delivery = DeliveryDocument::create([
             'delivery_number'    => null,
             'date'               => $deliveryDate,
             'reference_no'       => $workOrderNumber,
-            'description'        => 'Sales Delivery for Work Order: ' . $workOrderNumber,
+            'description'        => $desc,
             'customer_id'        => $contactId,
             'company_id'         => $companyId,
             'status'             => 'draft',

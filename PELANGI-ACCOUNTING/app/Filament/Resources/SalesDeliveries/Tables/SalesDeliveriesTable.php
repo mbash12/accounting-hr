@@ -42,6 +42,11 @@ class SalesDeliveriesTable
                     ->label(__("Customer"))
                     ->searchable()
                     ->sortable(),
+                TextColumn::make("reference_no")
+                    ->label(__("Reference No."))
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
                 TextColumn::make("status")
                     ->label(__("Status"))
                     ->searchable()
