@@ -108,7 +108,22 @@ class ElevateIntegrationService
                     $materials = $payload['materials'];
                 } elseif (!empty($payload['items']) && is_array($payload['items'])) {
                     foreach ($payload['items'] as $item) {
-                        if (!empty($item['is_material']) || ($item['type'] ?? '') === 'material') {
+                        $code = strtoupper(trim($item['product_code'] ?? ''));
+                        $isMatFlag = !empty($item['is_material']) || ($item['type'] ?? '') === 'material';
+                        $isMatCode = str_starts_with($code, 'MAT');
+
+                        $product = null;
+                        if (!empty($item['product_code'])) {
+                            $product = Product::where('code', $item['product_code'])
+                                ->where(function ($q) use ($companyId) {
+                                    $q->where('company_id', $companyId)->orWhereNull('company_id');
+                                })
+                                ->first();
+                        }
+
+                        $isGoodType = $product && ($product->product_type === 'good' || $product->product_type !== 'service');
+
+                        if ($isMatFlag || $isMatCode || $isGoodType) {
                             $materials[] = $item;
                         }
                     }
@@ -142,7 +157,7 @@ class ElevateIntegrationService
                 }
 
                 if (!$mapping->receivable_payment_id) {
-                    $bankAccountId = 3042; //Tri Harmoni No. Rek  377988787-8
+                    $bankAccountId = 3539; //Tri Harmoni No. Rek  377988787-8 BNI
 
                     $payment = $this->createReceivablePayment(
                         $invoice,
@@ -503,9 +518,12 @@ class ElevateIntegrationService
                 'company_id'   => $companyId,
             ]);
 
+            $productType = str_starts_with(strtoupper($productCode), 'MAT') ? 'good' : 'service';
+
             $product = Product::create([
                 'code'               => $productCode,
                 'name'               => $productName,
+                'product_type'       => $productType,
                 'is_active'          => true,
                 'company_id'         => $companyId,
                 'unit_id'            => 26,
