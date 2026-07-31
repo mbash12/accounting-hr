@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Account;
 use App\Models\Contact;
 use App\Models\Department;
+use App\Models\DeliveryDocument;
+use App\Models\DeliveryDocumentItem;
 use App\Models\ElevateWorkOrderMapping;
 use App\Models\JournalEntry;
 use App\Models\Product;
@@ -97,9 +99,48 @@ class ElevateIntegrationService
                 }
 
                 $invoice = SalesInvoice::findOrFail($mapping->sales_invoice_id);
+                $invoice->createJournalEntry();
                 $this->postSalesInvoiceJournal($invoice);
 
-        
+                // Check materials for Sales Delivery creation
+                $materials = [];
+                if (!empty($payload['materials']) && is_array($payload['materials'])) {
+                    $materials = $payload['materials'];
+                } elseif (!empty($payload['items']) && is_array($payload['items'])) {
+                    foreach ($payload['items'] as $item) {
+                        if (!empty($item['is_material']) || ($item['type'] ?? '') === 'material') {
+                            $materials[] = $item;
+                        }
+                    }
+                }
+
+                if (!empty($materials)) {
+                    if (!$mapping->delivery_document_id) {
+                        $delivery = $this->createSalesDelivery(
+                            $mapping->contact_id,
+                            $workOrderNumber,
+                            $materials,
+                            $companyId,
+                            $payload['delivery_date'] ?? $payload['invoice_date'] ?? now()->toDateString(),
+                            $payload['description'] ?? null
+                        );
+
+                        $mapping->update([
+                            'delivery_document_id' => $delivery->id,
+                            'status'               => ElevateWorkOrderMapping::STATUS_DELIVERY_CREATED,
+                        ]);
+
+                        Log::info('[Elevate] Sales Delivery created (draft)', [
+                            'work_order_id'   => $workOrderId,
+                            'delivery_id'     => $delivery->id,
+                            'delivery_number' => $delivery->delivery_number,
+                        ]);
+                    }
+
+                    $delivery = DeliveryDocument::findOrFail($mapping->delivery_document_id);
+                    $this->postSalesDeliveryJournal($delivery);
+                }
+
                 if (!$mapping->receivable_payment_id) {
                     $bankAccountId = 3042; //Tri Harmoni No. Rek  377988787-8
 
@@ -184,6 +225,42 @@ class ElevateIntegrationService
 
         $invoice->update([
             'status'             => 'posted',
+            'updated_by_user_id' => $this->getSystemUserId(),
+        ]);
+    }
+
+    protected function postSalesDeliveryJournal(DeliveryDocument $delivery): void
+    {
+        $journalEntry = JournalEntry::where('reference_type', DeliveryDocument::class)
+            ->where('reference_id', $delivery->id)
+            ->where('sub_module', 'delivery_document')
+            ->first();
+
+        if (!$journalEntry) {
+            $delivery->createJournalEntry();
+            $journalEntry = JournalEntry::where('reference_type', DeliveryDocument::class)
+                ->where('reference_id', $delivery->id)
+                ->where('sub_module', 'delivery_document')
+                ->first();
+        }
+
+        if (!$journalEntry) {
+            Log::warning('[Elevate] No draft journal entry found for Sales Delivery — skipping posting', [
+                'delivery_id' => $delivery->id,
+            ]);
+        } else {
+            $journalEntry->update([
+                'is_posted'          => true,
+                'status'             => 'posted',
+                'posted_by_user_id'  => $this->getSystemUserId(),
+                'posted_at'          => now(),
+                'updated_by_user_id' => $this->getSystemUserId(),
+            ]);
+        }
+
+        $delivery->update([
+            'status'             => 'delivered',
+            'is_locked'          => true,
             'updated_by_user_id' => $this->getSystemUserId(),
         ]);
     }
@@ -489,6 +566,71 @@ class ElevateIntegrationService
         return $fallback->id;
     }
 
+    protected function createSalesDelivery(
+        int    $contactId,
+        string $workOrderNumber,
+        array  $materials,
+        int    $companyId,
+        string $deliveryDate,
+        ?string $woDescription = null
+    ): DeliveryDocument {
+        $existing = DeliveryDocument::where('reference_no', $workOrderNumber)
+            ->where('company_id', $companyId)
+            ->first();
+        if ($existing) {
+            return $existing;
+        }
+
+        $delivery = DeliveryDocument::create([
+            'delivery_number'    => null,
+            'date'               => $deliveryDate,
+            'reference_no'       => $workOrderNumber,
+            'description'        => 'Sales Delivery for Work Order: ' . $workOrderNumber,
+            'customer_id'        => $contactId,
+            'company_id'         => $companyId,
+            'status'             => 'draft',
+            'is_locked'          => false,
+            'created_by_user_id' => $this->getSystemUserId(),
+            'updated_by_user_id' => $this->getSystemUserId(),
+        ]);
+
+        foreach ($materials as $mat) {
+            $productCode = $mat['product_code'] ?? null;
+            $description = $mat['description'] ?? 'Material ' . ($productCode ?? 'Item');
+            
+            $product = $this->resolveProduct($productCode, $description, $companyId);
+
+            $costPrice = isset($mat['cost_price']) ? (float) $mat['cost_price'] : (isset($mat['unit_price']) ? (float) $mat['unit_price'] : 0);
+            if ($product && $costPrice > 0 && ($product->cost_price <= 0 || isset($mat['cost_price']))) {
+                $product->update(['cost_price' => $costPrice]);
+            }
+
+            $unit = $this->resolveUnit($mat['unit_code'] ?? null, $companyId);
+            if (!$unit) {
+                $unit = Unit::where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)->orWhereNull('company_id');
+                })->first();
+            }
+
+            $qty = (float) ($mat['quantity'] ?? 1);
+            $warehouseId = $mat['warehouse_id'] ?? null;
+
+            DeliveryDocumentItem::create([
+                'delivery_document_id' => $delivery->id,
+                'product_id'           => $product?->id,
+                'unit_id'              => $unit?->id,
+                'description'          => $description,
+                'quantity'             => $qty,
+                'total_quantity'       => (string) $qty,
+                'warehouse_id'         => $warehouseId,
+            ]);
+        }
+
+        $delivery->createJournalEntry();
+
+        return $delivery;
+    }
+
     protected function getSystemUserId(): int
     {
         return (int) config('elevate.system_user_id', 1);
@@ -498,6 +640,10 @@ class ElevateIntegrationService
     {
         $invoice = $mapping->sales_invoice_id
             ? SalesInvoice::find($mapping->sales_invoice_id)
+            : null;
+
+        $delivery = $mapping->delivery_document_id
+            ? DeliveryDocument::find($mapping->delivery_document_id)
             : null;
 
         $payment = $mapping->receivable_payment_id
@@ -511,6 +657,8 @@ class ElevateIntegrationService
             'contact_id'             => $mapping->contact_id,
             'sales_invoice_id'       => $mapping->sales_invoice_id,
             'sales_invoice_number'   => $invoice?->invoice_number,
+            'delivery_document_id'   => $mapping->delivery_document_id,
+            'delivery_number'        => $delivery?->delivery_number,
             'receivable_payment_id'  => $mapping->receivable_payment_id,
             'payment_number'         => $payment?->payment_number,
             'total_amount'           => $invoice?->total_amount,
