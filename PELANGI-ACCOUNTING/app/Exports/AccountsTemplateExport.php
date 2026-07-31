@@ -44,7 +44,6 @@ class AccountsTemplateExport implements FromCollection, WithHeadings, WithMappin
             'name',
             'description',
             'classification_type',
-            'account_type',
             'is_header',
             'is_cash_bank',
             'is_active',
@@ -60,7 +59,6 @@ class AccountsTemplateExport implements FromCollection, WithHeadings, WithMappin
             $row['name'],
             $row['description'],
             $this->classificationTypeForImport($row['classification_type']),
-            $this->accountTypeForImport($row['classification_type']),
             $row['is_header'],
             $row['is_cash_bank'],
             $row['is_active'],
@@ -72,31 +70,16 @@ class AccountsTemplateExport implements FromCollection, WithHeadings, WithMappin
     private function classificationTypeForImport(string $classificationType): string
     {
         return match ($classificationType) {
-            'asset', 'current_asset', 'cash_bank', 'account_receivable', 'inventory',
-            'fixed_asset', 'accumulated_depreciation', 'other_asset' => 'asset',
-            'liability', 'current_liability', 'account_payable', 'long_term_liability' => 'liability',
-            'equity' => 'equity',
-            'revenue', 'other_revenue' => 'revenue',
-            'expense', 'cogs', 'other_expense' => 'expense',
-            default => 'asset',
-        };
-    }
-
-    private function accountTypeForImport(string $classificationType): string
-    {
-        return match ($classificationType) {
-            'asset', 'current_asset', 'cash_bank', 'account_receivable', 'inventory' => 'current_asset',
-            'fixed_asset', 'accumulated_depreciation' => 'fixed_asset',
-            'other_asset' => 'other_asset',
-            'liability', 'current_liability', 'account_payable' => 'current_liability',
-            'long_term_liability' => 'long_term_liability',
-            'equity' => 'equity',
-            'revenue' => 'revenue',
+            'asset', 'liability', 'equity', 'revenue', 'expense',
+            'current_asset', 'fixed_asset', 'other_asset',
+            'current_liability', 'long_term_liability',
+            'other_income', 'other_expense', 'other_income_expense' => $classificationType,
+            'cash_bank', 'account_receivable', 'inventory' => 'current_asset',
+            'accumulated_depreciation' => 'fixed_asset',
+            'account_payable' => 'current_liability',
             'other_revenue' => 'other_income',
             'cogs' => 'cost_of_goods_sold',
-            'other_expense' => 'other_expense',
-            'expense' => 'expense',
-            default => 'current_asset',
+            default => 'asset',
         };
     }
 }

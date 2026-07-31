@@ -51,7 +51,6 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             'name',
             'description',
             'classification_type',
-            'account_type',
             'is_header',
             'is_cash_bank',
             'is_active',
@@ -68,7 +67,6 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             $account->name,
             $account->description,
             $this->classificationTypeForImport($account),
-            $this->accountTypeForImport($account),
             $account->is_header ? 'yes' : 'no',
             $account->is_cash_bank ? 'yes' : 'no',
             $account->is_active ? 'yes' : 'no',
@@ -79,27 +77,67 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
 
     private function classificationTypeForImport(Account $account): string
     {
-        if (in_array($account->classification_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
+        $legacyClassification = $this->classificationTypeFromStandardCode($account);
+
+        if ($legacyClassification !== null) {
+            return $legacyClassification;
+        }
+
+        if (
+            $account->parent_id === null
+            && in_array($account->classification_type, [
+                'asset',
+                'liability',
+                'equity',
+                'revenue',
+                'expense',
+            ], true)
+        ) {
             return $account->classification_type;
         }
 
         if (in_array($account->account_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
-            return $account->account_type;
+            return match ($account->account_type) {
+                'cost_of_goods_sold', 'other_income_expense' => 'expense',
+                'current_liability' => 'liability',
+                default => $account->account_type,
+            };
+        }
+
+        if (in_array($account->classification_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
+            return $account->classification_type;
         }
 
         return 'asset';
     }
 
-    private function accountTypeForImport(Account $account): string
+    private function classificationTypeFromStandardCode(Account $account): ?string
     {
-        if (in_array($account->account_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
-            return $account->account_type;
+        $code = trim((string) $account->code);
+
+        if (
+            $account->classification_type === 'asset'
+            && $account->account_type === 'current_asset'
+        ) {
+            return match (true) {
+                $code === '12' => 'current_asset',
+                $code === '12.02' || str_starts_with($code, '12.02.') => 'fixed_asset',
+                $code === '14' || str_starts_with($code, '14.') => 'fixed_asset',
+                default => null,
+            };
         }
 
-        return match ($this->classificationTypeForImport($account)) {
-            'asset' => 'current_asset',
-            'liability' => 'current_liability',
-            default => $this->classificationTypeForImport($account),
-        };
+        if (
+            $account->classification_type === 'expense'
+            && $account->account_type === 'expense'
+        ) {
+            return match (true) {
+                $code === '60' || $code === '60.01' || str_starts_with($code, '60.01.') => 'other_income',
+                $code === '60.02' || str_starts_with($code, '60.02.') => 'other_expense',
+                default => null,
+            };
+        }
+
+        return null;
     }
 }
