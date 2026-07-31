@@ -1,6 +1,7 @@
 <?php
 
 use App\Exports\AccountsExport;
+use App\Imports\AccountsImport;
 use App\Models\Account;
 
 uses(Tests\TestCase::class);
@@ -46,3 +47,30 @@ test('COA export maps rows in the exact import template shape', function () {
         '1000',
     ]);
 });
+
+test('COA export normalizes internal classifications to values accepted by the importer', function (
+    ?string $classificationType,
+    string $accountType,
+    string $expectedClassificationType,
+) {
+    $account = Account::make([
+        'code' => '5000',
+        'name' => 'Importable Account',
+        'classification_type' => $classificationType,
+        'account_type' => $accountType,
+        'is_header' => false,
+        'is_cash_bank' => false,
+        'is_active' => true,
+        'level' => 1,
+    ]);
+
+    $export = new AccountsExport();
+    $row = array_combine($export->headings(), $export->map($account));
+    $validator = validator($row, (new AccountsImport())->rules());
+
+    expect($row['classification_type'])->toBe($expectedClassificationType)
+        ->and($validator->passes())->toBeTrue();
+})->with([
+    'legacy COGS classification' => ['cogs', 'cost_of_goods_sold', 'cost_of_goods_sold'],
+    'missing classification' => [null, 'current_liability', 'current_liability'],
+]);

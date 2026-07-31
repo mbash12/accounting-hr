@@ -10,10 +10,27 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 
 class AccountsExport implements FromCollection, WithHeadings, WithMapping
 {
+    private const IMPORT_CLASSIFICATION_TYPES = [
+        'asset',
+        'liability',
+        'equity',
+        'revenue',
+        'expense',
+        'current_asset',
+        'fixed_asset',
+        'other_asset',
+        'current_liability',
+        'long_term_liability',
+        'cost_of_goods_sold',
+        'other_income',
+        'other_expense',
+        'other_income_expense',
+    ];
+
     public function collection()
     {
         $query = Account::select([
-            'code', 'name', 'description', 'classification_type', 'is_header',
+            'code', 'name', 'description', 'classification_type', 'account_type', 'is_header',
             'is_cash_bank', 'is_active', 'level', 'parent_id'
         ])->with('parent:id,code');
 
@@ -49,12 +66,25 @@ class AccountsExport implements FromCollection, WithHeadings, WithMapping
             $account->code,
             $account->name,
             $account->description,
-            $account->classification_type,
+            $this->classificationTypeForImport($account),
             $account->is_header ? 'yes' : 'no',
             $account->is_cash_bank ? 'yes' : 'no',
             $account->is_active ? 'yes' : 'no',
             $account->level,
             $account->parent?->code,
         ];
+    }
+
+    private function classificationTypeForImport(Account $account): string
+    {
+        if (in_array($account->classification_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
+            return $account->classification_type;
+        }
+
+        if (in_array($account->account_type, self::IMPORT_CLASSIFICATION_TYPES, true)) {
+            return $account->account_type;
+        }
+
+        return 'asset';
     }
 }
