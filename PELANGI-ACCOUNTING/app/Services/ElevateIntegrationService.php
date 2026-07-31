@@ -157,7 +157,7 @@ class ElevateIntegrationService
                 }
 
                 if (!$mapping->receivable_payment_id) {
-                    $bankAccountId = 3537; //Tri Harmoni No. Rek  377988787-8
+                    $bankAccountId = 3539; //Tri Harmoni No. Rek  377988787-8 BNI
 
                     $payment = $this->createReceivablePayment(
                         $invoice,
