@@ -105,28 +105,14 @@ class ElevateIntegrationService
                 $invoice->createJournalEntry();
                 $this->postSalesInvoiceJournal($invoice);
 
-                // Check materials for Sales Delivery creation
                 $materials = [];
-                if (!empty($payload['materials']) && is_array($payload['materials'])) {
-                    $materials = $payload['materials'];
-                } elseif (!empty($payload['items']) && is_array($payload['items'])) {
-                    foreach ($payload['items'] as $item) {
-                        $code = strtoupper(trim($item['product_code'] ?? ''));
-                        $isMatFlag = !empty($item['is_material']) || ($item['type'] ?? '') === 'material';
-                        $isMatCode = str_starts_with($code, 'MAT');
+                $rawItems = !empty($payload['materials']) && is_array($payload['materials'])
+                    ? $payload['materials']
+                    : ($payload['items'] ?? []);
 
-                        $product = null;
-                        if (!empty($item['product_code'])) {
-                            $product = Product::where('code', $item['product_code'])
-                                ->where(function ($q) use ($companyId) {
-                                    $q->where('company_id', $companyId)->orWhereNull('company_id');
-                                })
-                                ->first();
-                        }
-
-                        $isGoodType = $product && ($product->product_type === 'good' || $product->product_type !== 'service');
-
-                        if ($isMatFlag || $isMatCode || $isGoodType) {
+                if (is_array($rawItems)) {
+                    foreach ($rawItems as $item) {
+                        if ($this->isMaterialItem($item, $companyId)) {
                             $materials[] = $item;
                         }
                     }
@@ -627,6 +613,39 @@ class ElevateIntegrationService
         }
 
         return !empty($parts) ? implode(', ', $parts) : null;
+    }
+
+    protected function isMaterialItem(array $item, int $companyId): bool
+    {
+        $desc = trim($item['description'] ?? '');
+
+        if (preg_match('/^jasa\b/i', $desc) || preg_match('/^jasa\s+/i', $desc)) {
+            return false;
+        }
+
+        $code = strtoupper(trim($item['product_code'] ?? ''));
+        $isMatFlag = !empty($item['is_material']) || ($item['type'] ?? '') === 'material';
+        $isMatCode = str_starts_with($code, 'MAT');
+
+        $product = null;
+        if (!empty($item['product_code'])) {
+            $product = Product::where('code', $item['product_code'])
+                ->where(function ($q) use ($companyId) {
+                    $q->where('company_id', $companyId)->orWhereNull('company_id');
+                })
+                ->first();
+        }
+
+        if ($product) {
+            if ($product->product_type === 'service') {
+                return false;
+            }
+            if ($product->product_type === 'good') {
+                return true;
+            }
+        }
+
+        return $isMatFlag || $isMatCode;
     }
 
     protected function createSalesDelivery(
