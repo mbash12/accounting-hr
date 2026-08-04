@@ -147,7 +147,7 @@ class ElevateIntegrationService
                 }
 
                 if (!$mapping->receivable_payment_id) {
-                    $bankAccountId = 3539; //Tri Harmoni No. Rek  377988787-8 BNI
+                    $bankAccountId = 3530; //Tri Harmoni No. Rek  377988787-8 BNI
 
                     $payment = $this->createReceivablePayment(
                         $invoice,
@@ -617,16 +617,20 @@ class ElevateIntegrationService
 
     protected function isMaterialItem(array $item, int $companyId): bool
     {
+        $code = strtoupper(trim($item['product_code'] ?? ''));
         $desc = trim($item['description'] ?? '');
 
-        if (preg_match('/^jasa\b/i', $desc) || preg_match('/^jasa\s+/i', $desc)) {
+        // 1. If product_code starts with SVC, SERVICE, or JASA -> NOT material
+        if (str_starts_with($code, 'SVC') || str_starts_with($code, 'SERVICE') || str_starts_with($code, 'JASA')) {
             return false;
         }
 
-        $code = strtoupper(trim($item['product_code'] ?? ''));
-        $isMatFlag = !empty($item['is_material']) || ($item['type'] ?? '') === 'material';
-        $isMatCode = str_starts_with($code, 'MAT');
+        // 2. If item description contains 'Jasa' or 'Service' anywhere -> NOT material
+        if (preg_match('/jasa/i', $desc) || preg_match('/service/i', $desc)) {
+            return false;
+        }
 
+        // 3. Check product in DB if code is provided
         $product = null;
         if (!empty($item['product_code'])) {
             $product = Product::where('code', $item['product_code'])
@@ -637,13 +641,28 @@ class ElevateIntegrationService
         }
 
         if ($product) {
+            $pCode = strtoupper(trim($product->code));
+            $pName = trim($product->name);
+
+            if (str_starts_with($pCode, 'SVC') || str_starts_with($pCode, 'SERVICE') || str_starts_with($pCode, 'JASA')) {
+                return false;
+            }
+
             if ($product->product_type === 'service') {
                 return false;
             }
+
+            if (preg_match('/jasa/i', $pName) || preg_match('/service/i', $pName)) {
+                return false;
+            }
+
             if ($product->product_type === 'good') {
                 return true;
             }
         }
+
+        $isMatFlag = !empty($item['is_material']) || ($item['type'] ?? '') === 'material';
+        $isMatCode = str_starts_with($code, 'MAT');
 
         return $isMatFlag || $isMatCode;
     }
@@ -686,6 +705,10 @@ class ElevateIntegrationService
         ]);
 
         foreach ($materials as $mat) {
+            if (!$this->isMaterialItem($mat, $companyId)) {
+                continue;
+            }
+
             $productCode = $mat['product_code'] ?? null;
             $description = $mat['description'] ?? 'Material ' . ($productCode ?? 'Item');
             
