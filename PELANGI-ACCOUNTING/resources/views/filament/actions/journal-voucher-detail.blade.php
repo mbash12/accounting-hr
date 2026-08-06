@@ -31,6 +31,47 @@
                 <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Reference Number') }}</div>
                 <div style="font-size: 14px; font-weight: 600; color: #111827;">{{ $journalEntry->reference_no ?? '-' }}</div>
             </div>
+            @php
+                $sourceUrl = \App\Support\ReportDrilldown::sourceDocumentUrl($journalEntry, 'edit');
+                $sourceLabel = \App\Support\ReportDrilldown::sourceDocumentLabel($journalEntry);
+                $relatedOrderUrl = \App\Support\ReportDrilldown::relatedOrderUrl($journalEntry);
+                $relatedOrderLabel = \App\Support\ReportDrilldown::relatedOrderLabel($journalEntry);
+                $isInvoiceWithOrder = filled($relatedOrderLabel);
+            @endphp
+            @if($sourceUrl && $sourceUrl !== '#')
+            <div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Source Document') }}</div>
+                <a
+                    href="{{ $sourceUrl }}"
+                    target="_blank"
+                    style="display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #2563eb; text-decoration: none;"
+                >
+                    <svg style="width: 16px; height: 16px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                    {{ $sourceLabel ?? __('Open Document') }}
+                </a>
+            </div>
+            @endif
+            @if($isInvoiceWithOrder)
+            <div>
+                <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Related Order') }}</div>
+                @if($relatedOrderUrl && $relatedOrderUrl !== '#')
+                <a
+                    href="{{ $relatedOrderUrl }}"
+                    target="_blank"
+                    style="display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: #2563eb; text-decoration: none;"
+                >
+                    <svg style="width: 16px; height: 16px; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                    </svg>
+                    {{ $relatedOrderLabel }}
+                </a>
+                @else
+                <div style="font-size: 14px; color: #6b7280;">{{ __('No related :order.', ['order' => $relatedOrderLabel]) }}</div>
+                @endif
+            </div>
+            @endif
             <div>
                 <div style="font-size: 12px; font-weight: 500; color: #6b7280; margin-bottom: 4px;">{{ __('Status') }}</div>
                 <span style="display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; 

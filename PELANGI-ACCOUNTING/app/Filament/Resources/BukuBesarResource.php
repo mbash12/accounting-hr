@@ -180,47 +180,7 @@ class BukuBesarResource extends Resource
 
     public static function resolveSourceUrl(JournalEntryItem $record, string $type = 'edit'): string
     {
-        $journalEntry = $record->journalEntry;
-        if (!$journalEntry) {
-            return '#';
-        }
-
-        $referenceType = $journalEntry->reference_type;
-        $referenceId = $journalEntry->reference_id;
-
-        $resourceMap = [
-            'App\Models\SalesInvoice' => \App\Filament\Resources\SalesInvoices\SalesInvoiceResource::class,
-            'App\Services\SalesInvoice' => \App\Filament\Resources\SalesInvoices\SalesInvoiceResource::class,
-            'App\Models\PayablePayment' => \App\Filament\Resources\PayablePayments\PayablePaymentResource::class,
-            'App\Models\ReceivablePayment' => \App\Filament\Resources\ReceivablePayments\ReceivablePaymentResource::class,
-            'App\Models\CashReceipt' => \App\Filament\Resources\CashReceipts\CashReceiptResource::class,
-            'App\Models\CashDisbursement' => \App\Filament\Resources\CashDisbursements\CashDisbursementResource::class,
-            'App\Models\CashTransfer' => \App\Filament\Resources\CashTransfers\CashTransferResource::class,
-            'App\Models\PurchaseInvoice' => \App\Filament\Resources\PurchaseInvoices\PurchaseInvoiceResource::class,
-            'App\Models\PurchaseOrder' => \App\Filament\Resources\PurchaseOrders\PurchaseOrderResource::class,
-            'App\Models\SalesOrder' => \App\Filament\Resources\SalesOrders\SalesOrderResource::class,
-            'App\Models\GoodsReceipt' => \App\Filament\Resources\GoodsReceipts\GoodsReceiptResource::class,
-            'App\Models\SalesDelivery' => \App\Filament\Resources\SalesDeliveries\SalesDeliveryResource::class,
-            'App\Models\PurchaseReturn' => \App\Filament\Resources\PurchaseReturns\PurchaseReturnResource::class,
-            'App\Models\SalesReturn' => \App\Filament\Resources\SalesReturns\SalesReturnResource::class,
-            'App\Models\AdvanceReceipt' => \App\Filament\Resources\AdvanceReceipts\AdvanceReceiptResource::class,
-            'App\Models\AdvanceDisbursement' => \App\Filament\Resources\AdvanceDisbursements\AdvanceDisbursementResource::class,
-        ];
-
-        if ($referenceType && isset($resourceMap[$referenceType])) {
-            $resource = $resourceMap[$referenceType];
-            try {
-                $page = ($type === 'view') ? 'view' : 'edit';
-                return $resource::getUrl($page, ['record' => $referenceId]);
-            } catch (\Exception $e) {
-                try {
-                    return $resource::getUrl('edit', ['record' => $referenceId]);
-                } catch (\Exception $e2) {
-                }
-            }
-        }
-
-        return \App\Filament\Resources\JournalEntries\JournalEntryResource::getUrl('edit', ['record' => $journalEntry->id]);
+        return \App\Support\ReportDrilldown::sourceDocumentUrlForItem($record, $type);
     }
 
     public static function getEloquentQuery(): Builder

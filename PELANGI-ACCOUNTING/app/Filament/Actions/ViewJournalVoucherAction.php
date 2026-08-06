@@ -24,12 +24,13 @@ class ViewJournalVoucherAction
                 }
 
                 $journalEntry->load([
-                    'items.account', 
-                    'items.costCenter', 
-                    'department', 
-                    'company', 
+                    'items.account',
+                    'items.costCenter',
+                    'department',
+                    'company',
                     'postedByUser',
-                    'createdByUser'
+                    'createdByUser',
+                    'reference',
                 ]);
 
                 return view('filament.actions.journal-voucher-detail', [

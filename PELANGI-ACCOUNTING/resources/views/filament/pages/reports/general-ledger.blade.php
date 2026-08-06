@@ -143,12 +143,25 @@
             min-width: 250px;
         }
 
-        a.report-drill-link {
+        a.report-drill-link,
+        button.report-drill-link {
             color: #000000;
             text-decoration: none;
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            text-align: left;
         }
 
-        a.report-drill-link:hover {
+        td.num button.report-drill-link {
+            text-align: right;
+            width: 100%;
+        }
+
+        a.report-drill-link:hover,
+        button.report-drill-link:hover {
             text-decoration: underline;
         }
 
@@ -267,19 +280,52 @@
                 </tr>
 
                 @forelse($rows as $row)
+                @php
+                    $canOpenVoucher = ! empty($row['journal_entry_id']);
+                    $voucherClick = $canOpenVoucher
+                        ? "mountAction('viewJournalVoucher', { journalEntryId: ".(int) $row['journal_entry_id'].' })'
+                        : null;
+                @endphp
                 <tr>
                     <td>{{ $row['date'] }}</td>
                     <td>
-                        @if(!empty($row['source_url']) && $row['source_url'] !== '#')
-                        <a href="{{ $row['source_url'] }}" class="report-drill-link" title="View source document">{{ $row['source_no'] }}</a>
+                        @if($canOpenVoucher)
+                        <button
+                            type="button"
+                            wire:click="{{ $voucherClick }}"
+                            class="report-drill-link"
+                            title="View journal voucher"
+                        >{{ $row['source_no'] }}</button>
                         @else
                         {{ $row['source_no'] }}
                         @endif
                     </td>
                     <td>{{ $row['check_no'] }}</td>
                     <td class="desc-col">{{ $row['description'] }}</td>
-                    <td class="num">{{ $fmt($row['debit']) }}</td>
-                    <td class="num">{{ $fmt($row['credit']) }}</td>
+                    <td class="num">
+                        @if($canOpenVoucher && (float) $row['debit'] != 0)
+                        <button
+                            type="button"
+                            wire:click="{{ $voucherClick }}"
+                            class="report-drill-link"
+                            title="View journal voucher"
+                        >{{ $fmt($row['debit']) }}</button>
+                        @else
+                        {{ $fmt($row['debit']) }}
+                        @endif
+                    </td>
+                    <td class="num">
+                        @if($canOpenVoucher && (float) $row['credit'] != 0)
+                        <button
+                            type="button"
+                            wire:click="{{ $voucherClick }}"
+                            class="report-drill-link"
+                            title="View journal voucher"
+                        >{{ $fmt($row['credit']) }}</button>
+                        @else
+                        {{ $fmt($row['credit']) }}
+                        @endif
+                    </td>
                     <td class="num">{{ $fmtBalance($row['balance']) }}</td>
                     <td class="center">{{ $row['reconciled'] }}</td>
                 </tr>

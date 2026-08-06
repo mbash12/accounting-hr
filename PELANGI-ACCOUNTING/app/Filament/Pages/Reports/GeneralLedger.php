@@ -4,10 +4,12 @@ namespace App\Filament\Pages\Reports;
 
 use App\Models\Account;
 use App\Models\Company;
+use App\Models\JournalEntry;
 use App\Models\JournalEntryItem;
 use BackedEnum;
 use Barryvdh\DomPDF\Facade\Pdf;
 use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -125,6 +127,38 @@ class GeneralLedger extends Page implements HasForms
     public function filterReport(): void
     {
         $this->validate();
+    }
+
+    public function viewJournalVoucherAction(): Action
+    {
+        return Action::make('viewJournalVoucher')
+            ->modalHeading(__('Journal Voucher'))
+            ->modalWidth('6xl')
+            ->modalSubmitAction(false)
+            ->modalCancelActionLabel(__('Close'))
+            ->modalContent(function (array $arguments) {
+                $journalEntry = JournalEntry::query()
+                    ->with([
+                        'items.account',
+                        'items.costCenter',
+                        'department',
+                        'company',
+                        'postedByUser',
+                        'createdByUser',
+                        'reference',
+                    ])
+                    ->find($arguments['journalEntryId'] ?? null);
+
+                if (! $journalEntry) {
+                    return view('filament.actions.no-journal-voucher', [
+                        'message' => __('No journal voucher found for this transaction. Journal voucher will be created when the transaction is posted.'),
+                    ]);
+                }
+
+                return view('filament.actions.journal-voucher-detail', [
+                    'journalEntry' => $journalEntry,
+                ]);
+            });
     }
 
     public function downloadPdf()
@@ -278,7 +312,7 @@ class GeneralLedger extends Page implements HasForms
                 $rows->push([
                     'date' => $item->journalEntry->date->format('d M Y'),
                     'source_no' => $item->journalEntry->entry_number ?? $item->journalEntry->reference_no,
-                    'source_url' => \App\Support\ReportDrilldown::sourceDocumentUrl($item->journalEntry),
+                    'journal_entry_id' => $item->journalEntry->id,
                     'check_no' => '',
                     'description' => $item->notes ?? $item->journalEntry->description,
                     'debit' => $debit,
