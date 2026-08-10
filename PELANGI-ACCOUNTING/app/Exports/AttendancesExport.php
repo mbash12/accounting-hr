@@ -2,8 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Attendance;
-use App\Services\CompanyFilterService;
+use App\Filament\Resources\Attendances\AttendanceResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
@@ -23,7 +22,7 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
 
     public function collection(): Collection
     {
-        $query = $this->query ?? Attendance::query();
+        $query = $this->query ?? AttendanceResource::getEloquentQuery();
 
         $query->select([
             'employee_id',
@@ -43,9 +42,9 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
                 'employee.department:id,name',
             ]);
 
+        $this->applyFilters($query);
+
         if ($this->query === null) {
-            $query = CompanyFilterService::applyCompanyFilter($query);
-            $this->applyFilters($query);
             $query->orderBy('date', 'desc');
         }
 

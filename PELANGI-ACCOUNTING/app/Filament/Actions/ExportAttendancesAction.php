@@ -22,16 +22,35 @@ class ExportAttendancesAction extends Action
                     // loaded the application's PHP configuration file.
                     ini_set('memory_limit', '512M');
 
-                    if (! $livewire instanceof HasTable) {
+                    $tableLivewire = $action->getTable()?->getLivewire() ?? $livewire;
+
+                    if (! $tableLivewire instanceof HasTable) {
                         throw new \RuntimeException('Attendance export must be run from the attendance table.');
                     }
 
-                    // Reuse Filament's export query so the PDF contains exactly
-                    // the records matching the active table filters/search.
-                    $export = new AttendancesExport(query: $livewire->getTableQueryForExport());
+                    $filters = [];
+                    foreach (['date_range', 'employee_id', 'department_id', 'clock_source'] as $filterName) {
+                        $filters[$filterName] = $tableLivewire->getTableFilterState($filterName) ?? [];
+                    }
+
+                    $expectedRecordCount = $tableLivewire->getAllTableRecordsCount();
+                    $records = (new AttendancesExport(
+                        filters: $filters,
+                        query: $tableLivewire->getTableQueryForExport(),
+                    ))->collection();
+
+                    // The fallback uses the same resource scope as the table.
+                    // Never download an unfiltered file if the two counts differ.
+                    if ($records->count() !== $expectedRecordCount) {
+                        $records = (new AttendancesExport($filters))->collection();
+                    }
+
+                    if ($records->count() !== $expectedRecordCount) {
+                        throw new \RuntimeException('The attendance export does not match the active table filters. Please refresh the table and try again.');
+                    }
 
                     $pdf = Pdf::loadView('filament.pages.attendance-export-pdf', [
-                        'records' => $export->collection(),
+                        'records' => $records,
                         'generatedAt' => now(),
                     ])->setPaper('a4', 'landscape')
                         ->setOption('isHtml5ParserEnabled', false);
