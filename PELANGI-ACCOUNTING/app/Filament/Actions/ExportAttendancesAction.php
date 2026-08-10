@@ -6,6 +6,8 @@ use App\Exports\AttendancesExport;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use Filament\Tables\Contracts\HasTable;
+use Livewire\Component;
 
 class ExportAttendancesAction extends Action
 {
@@ -14,23 +16,19 @@ class ExportAttendancesAction extends Action
         return parent::make($name ?? 'export')
             ->label('Export PDF')
             ->icon('heroicon-o-arrow-down-tray')
-            ->action(function (\Filament\Actions\Action $action) {
+            ->action(function (Action $action, Component $livewire) {
                 try {
                     // Keep PDF exports working on deployments that have not yet
                     // loaded the application's PHP configuration file.
                     ini_set('memory_limit', '512M');
 
-                    // Reuse Filament's export query so the PDF contains exactly
-                    // the records matching the active table filters/search.
-                    $filters = [];
-                    $livewire = $action->getLivewire();
-                    if ($livewire && property_exists($livewire, 'tableFilters')) {
-                        $filters = $livewire->tableFilters ?? [];
+                    if (! $livewire instanceof HasTable) {
+                        throw new \RuntimeException('Attendance export must be run from the attendance table.');
                     }
 
-                    $export = ($livewire && method_exists($livewire, 'getTableQueryForExport'))
-                        ? new AttendancesExport(query: $livewire->getTableQueryForExport())
-                        : new AttendancesExport($filters);
+                    // Reuse Filament's export query so the PDF contains exactly
+                    // the records matching the active table filters/search.
+                    $export = new AttendancesExport(query: $livewire->getTableQueryForExport());
 
                     $pdf = Pdf::loadView('filament.pages.attendance-export-pdf', [
                         'records' => $export->collection(),
