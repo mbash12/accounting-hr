@@ -12,7 +12,7 @@
         .page-section { width: 100%; }
         .page-break { height: 0; page-break-after: always; }
         .row { display: table; width: 100%; table-layout: fixed; }
-        .cell { display: table-cell; padding: 4px 3px; border: 1px solid #cbd5e1; vertical-align: top; word-wrap: break-word; }
+        .cell { display: table-cell; box-sizing: border-box; padding: 4px 3px; border: 1px solid #cbd5e1; vertical-align: top; word-wrap: break-word; }
         .head .cell { background-color: #1e3a8a; color: white; font-size: 7px; font-weight: bold; }
         .id { width: 8%; }
         .name { width: 12%; }
