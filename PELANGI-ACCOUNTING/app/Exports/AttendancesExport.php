@@ -20,7 +20,24 @@ class AttendancesExport implements FromCollection, WithHeadings, WithTitle
 
     public function collection(): Collection
     {
-        $query = Attendance::with(['employee.department', 'company']);
+        $query = Attendance::query()
+            ->select([
+                'employee_id',
+                'date',
+                'check_in',
+                'check_out',
+                'late_minutes',
+                'early_departure_minutes',
+                'status',
+                'notes',
+                'notes_in',
+                'notes_out',
+                'company_id',
+            ])
+            ->with([
+                'employee:id,employee_id,name,department_id',
+                'employee.department:id,name',
+            ]);
 
         $query = CompanyFilterService::applyCompanyFilter($query);
 

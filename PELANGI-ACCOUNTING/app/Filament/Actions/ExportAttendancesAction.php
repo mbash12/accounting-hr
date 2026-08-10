@@ -16,6 +16,10 @@ class ExportAttendancesAction extends Action
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function (\Filament\Actions\Action $action) {
                 try {
+                    // Keep PDF exports working on deployments that have not yet
+                    // loaded the application's PHP configuration file.
+                    ini_set('memory_limit', '512M');
+
                     // Get active table filters from Livewire component
                     $filters = [];
                     $livewire = $action->getLivewire();
@@ -26,12 +30,13 @@ class ExportAttendancesAction extends Action
                     $pdf = Pdf::loadView('filament.pages.attendance-export-pdf', [
                         'records' => (new AttendancesExport($filters))->collection(),
                         'generatedAt' => now(),
-                    ])->setPaper('a4', 'landscape');
+                    ])->setPaper('a4', 'landscape')
+                        ->setOption('isHtml5ParserEnabled', false);
 
                     return response()->streamDownload(function () use ($pdf) {
                         echo $pdf->output();
                     }, 'attendance-' . date('Y-m-d') . '.pdf');
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     Notification::make()
                         ->danger()
                         ->title('Export Failed')
