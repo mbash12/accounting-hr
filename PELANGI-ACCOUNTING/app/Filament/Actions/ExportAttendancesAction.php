@@ -3,16 +3,16 @@
 namespace App\Filament\Actions;
 
 use App\Exports\AttendancesExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ExportAttendancesAction extends Action
 {
     public static function make(?string $name = null): static
     {
         return parent::make($name ?? 'export')
-            ->label('Export')
+            ->label('Export PDF')
             ->icon('heroicon-o-arrow-down-tray')
             ->action(function (\Filament\Actions\Action $action) {
                 try {
@@ -23,10 +23,14 @@ class ExportAttendancesAction extends Action
                         $filters = $livewire->tableFilters ?? [];
                     }
 
-                    return Excel::download(
-                        new AttendancesExport($filters),
-                        'attendance-' . date('Y-m-d') . '.xlsx'
-                    );
+                    $pdf = Pdf::loadView('filament.pages.attendance-export-pdf', [
+                        'records' => (new AttendancesExport($filters))->collection(),
+                        'generatedAt' => now(),
+                    ])->setPaper('a4', 'landscape');
+
+                    return response()->streamDownload(function () use ($pdf) {
+                        echo $pdf->output();
+                    }, 'attendance-' . date('Y-m-d') . '.pdf');
                 } catch (\Exception $e) {
                     Notification::make()
                         ->danger()
