@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Models\Attendance;
 use App\Services\CompanyFilterService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -12,38 +13,43 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 class AttendancesExport implements FromCollection, WithHeadings, WithTitle
 {
     protected array $filters;
+    protected ?Builder $query;
 
-    public function __construct(array $filters = [])
+    public function __construct(array $filters = [], ?Builder $query = null)
     {
         $this->filters = $filters;
+        $this->query = $query;
     }
 
     public function collection(): Collection
     {
-        $query = Attendance::query()
-            ->select([
-                'employee_id',
-                'date',
-                'check_in',
-                'check_out',
-                'late_minutes',
-                'early_departure_minutes',
-                'status',
-                'notes',
-                'notes_in',
-                'notes_out',
-                'company_id',
-            ])
+        $query = $this->query ?? Attendance::query();
+
+        $query->select([
+            'employee_id',
+            'date',
+            'check_in',
+            'check_out',
+            'late_minutes',
+            'early_departure_minutes',
+            'status',
+            'notes',
+            'notes_in',
+            'notes_out',
+            'company_id',
+        ])
             ->with([
                 'employee:id,employee_id,name,department_id',
                 'employee.department:id,name',
             ]);
 
-        $query = CompanyFilterService::applyCompanyFilter($query);
+        if ($this->query === null) {
+            $query = CompanyFilterService::applyCompanyFilter($query);
+            $this->applyFilters($query);
+            $query->orderBy('date', 'desc');
+        }
 
-        $this->applyFilters($query);
-
-        return $query->orderBy('date', 'desc')->get()->map(function ($attendance) {
+        return $query->get()->map(function ($attendance) {
             return [
                 'employee_id'              => $attendance->employee?->employee_id,
                 'employee_name'            => $attendance->employee?->name,

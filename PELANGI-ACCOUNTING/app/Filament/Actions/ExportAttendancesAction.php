@@ -20,15 +20,20 @@ class ExportAttendancesAction extends Action
                     // loaded the application's PHP configuration file.
                     ini_set('memory_limit', '512M');
 
-                    // Get active table filters from Livewire component
+                    // Reuse Filament's export query so the PDF contains exactly
+                    // the records matching the active table filters/search.
                     $filters = [];
                     $livewire = $action->getLivewire();
                     if ($livewire && property_exists($livewire, 'tableFilters')) {
                         $filters = $livewire->tableFilters ?? [];
                     }
 
+                    $export = ($livewire && method_exists($livewire, 'getTableQueryForExport'))
+                        ? new AttendancesExport(query: $livewire->getTableQueryForExport())
+                        : new AttendancesExport($filters);
+
                     $pdf = Pdf::loadView('filament.pages.attendance-export-pdf', [
-                        'records' => (new AttendancesExport($filters))->collection(),
+                        'records' => $export->collection(),
                         'generatedAt' => now(),
                     ])->setPaper('a4', 'landscape')
                         ->setOption('isHtml5ParserEnabled', false);
