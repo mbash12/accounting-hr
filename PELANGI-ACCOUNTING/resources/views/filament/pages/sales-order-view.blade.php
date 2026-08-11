@@ -31,8 +31,8 @@
         }
 
         @page {
-            size: A4;
-            margin: 10mm;
+            size: 210mm 148mm;
+            margin: 0;
         }
     </style>
     <script>
@@ -575,4 +575,5 @@
 
         </div>
     </div>
+    @include('filament.pages.partials.compact-document-print')
 </x-filament-panels::page>
