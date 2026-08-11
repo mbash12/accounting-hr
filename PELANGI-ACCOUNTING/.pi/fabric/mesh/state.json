@@ -1,0 +1,118 @@
+{
+  "format": 1,
+  "entries": {
+    "topology/hosts/6553cd3fa0d4b4e7369b30268588ed325e56e61c2c0d9e8b93f6aedb3005672b": {
+      "key": "topology/hosts/6553cd3fa0d4b4e7369b30268588ed325e56e61c2c0d9e8b93f6aedb3005672b",
+      "value": {
+        "format": 1,
+        "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "rootId": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "identity": {
+          "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+          "name": "main",
+          "kind": "main",
+          "sessionId": "019fd52e-f664-7302-a058-72274b0ee9fa"
+        },
+        "startedAt": 1785988052838,
+        "updatedAt": 1785990769633,
+        "expiresAt": 1785990784633
+      },
+      "version": 936,
+      "updatedAt": 1785990769634,
+      "updatedBy": {
+        "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "name": "main",
+        "kind": "main",
+        "sessionId": "019fd52e-f664-7302-a058-72274b0ee9fa"
+      }
+    },
+    "sessions/019fd52e-f664-7302-a058-72274b0ee9fa": {
+      "key": "sessions/019fd52e-f664-7302-a058-72274b0ee9fa",
+      "value": {
+        "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "name": "Peer 019fd52e",
+        "kind": "peer",
+        "status": "idle",
+        "runner": "pi",
+        "transport": "host",
+        "cwd": "/mnt/Data/WORK/OFFICE/NEW_ACC/ACCHR/PELANGI-ACCOUNTING",
+        "sessionId": "019fd52e-f664-7302-a058-72274b0ee9fa",
+        "model": "cursor/cursor-grok-4.5-fast",
+        "thinking": "low",
+        "startedAt": 1785988052838,
+        "updatedAt": 1785990769633,
+        "pendingMessages": false,
+        "local": false
+      },
+      "version": 936,
+      "updatedAt": 1785990769636,
+      "updatedBy": {
+        "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "name": "main",
+        "kind": "main",
+        "sessionId": "019fd52e-f664-7302-a058-72274b0ee9fa"
+      }
+    },
+    "topology/participants/6553cd3fa0d4b4e7369b30268588ed325e56e61c2c0d9e8b93f6aedb3005672b": {
+      "key": "topology/participants/6553cd3fa0d4b4e7369b30268588ed325e56e61c2c0d9e8b93f6aedb3005672b",
+      "value": {
+        "format": 1,
+        "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "kind": "root",
+        "rootId": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "ownerHostId": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "ownerIdentityId": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "name": "main",
+        "status": "idle",
+        "runner": "pi",
+        "transport": "host",
+        "capabilities": [
+          "steer",
+          "followUp",
+          "fabric"
+        ],
+        "cwd": "/mnt/Data/WORK/OFFICE/NEW_ACC/ACCHR/PELANGI-ACCOUNTING",
+        "sessionId": "019fd52e-f664-7302-a058-72274b0ee9fa",
+        "model": "cursor/cursor-grok-4.5-fast",
+        "thinking": "low",
+        "startedAt": 1785988052838,
+        "updatedAt": 1785990769633,
+        "pendingMessages": false,
+        "controlProtocol": "v1"
+      },
+      "version": 936,
+      "updatedAt": 1785990769638,
+      "updatedBy": {
+        "id": "session:019fd52e-f664-7302-a058-72274b0ee9fa",
+        "name": "main",
+        "kind": "main",
+        "sessionId": "019fd52e-f664-7302-a058-72274b0ee9fa"
+      }
+    }
+  },
+  "versions": {
+    "topology/hosts/6c97867c6317795f67094dad6590bbe05dd7df48da1bf58bf6efd14a7cca43f3": 493,
+    "sessions/019fd511-e2ec-7d11-8204-6aa50ca6f03e": 490,
+    "topology/participants/6c97867c6317795f67094dad6590bbe05dd7df48da1bf58bf6efd14a7cca43f3": 493,
+    "topology/hosts/650867b75a403aa6af3719846d7041647bb13623119234b96b18c5cb0aa6de5b": 15,
+    "sessions/019fd522-bb57-70e2-bd91-351342b129ef": 14,
+    "topology/participants/650867b75a403aa6af3719846d7041647bb13623119234b96b18c5cb0aa6de5b": 15,
+    "topology/hosts/4ea23f5ed385d1c5b1e1d6d890e43e284a7c8998fd249a968f9fe0de37f6a1c5": 4,
+    "sessions/019fd52c-1b60-7b20-9706-8939aa4ff174": 3,
+    "topology/participants/4ea23f5ed385d1c5b1e1d6d890e43e284a7c8998fd249a968f9fe0de37f6a1c5": 4,
+    "topology/hosts/6553cd3fa0d4b4e7369b30268588ed325e56e61c2c0d9e8b93f6aedb3005672b": 936,
+    "sessions/019fd52e-f664-7302-a058-72274b0ee9fa": 936,
+    "topology/participants/6553cd3fa0d4b4e7369b30268588ed325e56e61c2c0d9e8b93f6aedb3005672b": 936
+  },
+  "tombstoneOrder": [
+    "sessions/019fd522-bb57-70e2-bd91-351342b129ef",
+    "topology/participants/650867b75a403aa6af3719846d7041647bb13623119234b96b18c5cb0aa6de5b",
+    "topology/hosts/650867b75a403aa6af3719846d7041647bb13623119234b96b18c5cb0aa6de5b",
+    "sessions/019fd52c-1b60-7b20-9706-8939aa4ff174",
+    "topology/participants/4ea23f5ed385d1c5b1e1d6d890e43e284a7c8998fd249a968f9fe0de37f6a1c5",
+    "topology/hosts/4ea23f5ed385d1c5b1e1d6d890e43e284a7c8998fd249a968f9fe0de37f6a1c5",
+    "sessions/019fd511-e2ec-7d11-8204-6aa50ca6f03e",
+    "topology/participants/6c97867c6317795f67094dad6590bbe05dd7df48da1bf58bf6efd14a7cca43f3",
+    "topology/hosts/6c97867c6317795f67094dad6590bbe05dd7df48da1bf58bf6efd14a7cca43f3"
+  ]
+}
