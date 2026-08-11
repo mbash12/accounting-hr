@@ -27,6 +27,7 @@ Route::prefix('master')->middleware([Api::class])->group(function () {
     Route::get('/customers', [MasterDataController::class, 'customers']);
     Route::get('/companies', [MasterDataController::class, 'companies']);
     Route::post('/products', [MasterDataController::class, 'syncProducts']);
+    Route::post('/sync-vendors', [MasterDataController::class, 'syncVendor']);
     Route::post('/sync-uom', [MasterDataController::class, 'syncUom']);
     Route::post('/sync-uom-categories', [MasterDataController::class, 'syncUomCategories']);
     Route::post('/sync-uom-conversions', [MasterDataController::class, 'syncUomConversions']);

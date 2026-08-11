@@ -58,6 +58,7 @@ class MasterDataController extends Controller
 
         $query = \App\Models\Contact::whereRaw('is_supplier is true')
             ->where('company_id', $request->company_id)
+            ->where('is_active', true)
             ->with('paymentTerm');
 
         $query = $this->applySearch($query, $request->search, ['name', 'contact_code', 'email', 'phone']);
@@ -69,6 +70,102 @@ class MasterDataController extends Controller
             'message' => 'get vendor success',
             'data'    => $data,
         ]);
+    }
+
+    public function syncVendor(Request $request)
+    {
+        if (empty($request->company_id)) {
+            return response()->json(['code' => 400, 'message' => 'company_id is mandatory'], 400);
+        }
+
+        if (empty($request->name)) {
+            return response()->json(['code' => 400, 'message' => 'name is mandatory'], 400);
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $paymentTermId = null;
+            if ($request->payment_term_id) {
+                $paymentTermId = $request->payment_term_id;
+            } elseif ($request->payment_term_code) {
+                $pt = \App\Models\PaymentTerm::where('company_id', $request->company_id)
+                    ->whereRaw("LOWER(code) = ?", [strtolower($request->payment_term_code)])
+                    ->first();
+                $paymentTermId = $pt ? $pt->id : null;
+            }
+
+            // Find existing contact by contact_code or name within company
+            $contact = null;
+            if (!empty($request->contact_code)) {
+                $contact = \App\Models\Contact::where('company_id', $request->company_id)
+                    ->whereRaw("LOWER(contact_code) = ?", [strtolower($request->contact_code)])
+                    ->withTrashed()
+                    ->first();
+            }
+
+            if (!$contact) {
+                $contact = \App\Models\Contact::where('company_id', $request->company_id)
+                    ->whereRaw("LOWER(name) = ?", [strtolower($request->name)])
+                    ->withTrashed()
+                    ->first();
+            }
+
+            if (!$contact) {
+                $contact = new \App\Models\Contact();
+                $contact->company_id = $request->company_id;
+                if (!empty($request->contact_code)) {
+                    $contact->contact_code = $request->contact_code;
+                }
+            } else if (isset($request->update_existing) && !$request->update_existing) {
+                \Illuminate\Support\Facades\DB::rollBack();
+                return response()->json(['code' => 200, 'message' => 'Vendor exists and update_existing is false', 'data' => $contact]);
+            }
+
+            $contact->name = $request->name;
+            $contact->is_supplier = true;
+            if ($request->has('email')) $contact->email = $request->email;
+            if ($request->has('phone')) $contact->phone = $request->phone;
+            if ($request->has('contact_person')) $contact->contact_person = $request->contact_person;
+            if ($request->has('tax')) $contact->tax = $request->tax;
+            if ($request->has('is_pkp')) $contact->is_pkp = filter_var($request->is_pkp, FILTER_VALIDATE_BOOLEAN);
+            if ($request->has('credit_limit')) $contact->credit_limit = $request->credit_limit;
+            if ($request->has('billing_address_line_1')) $contact->billing_address_line_1 = $request->billing_address_line_1;
+            if ($request->has('billing_address_line_2')) $contact->billing_address_line_2 = $request->billing_address_line_2;
+            if ($request->has('billing_city')) $contact->billing_city = $request->billing_city;
+            if ($request->has('billing_state')) $contact->billing_state = $request->billing_state;
+            if ($request->has('billing_postal_code')) $contact->billing_postal_code = $request->billing_postal_code;
+            if ($request->has('billing_country')) $contact->billing_country = $request->billing_country;
+
+            if ($paymentTermId) {
+                $contact->payment_term_id = $paymentTermId;
+            }
+
+            if (isset($request->is_active)) {
+                $contact->is_active = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
+            } else {
+                $contact->is_active = true;
+            }
+
+            $contact->save();
+
+            if ($contact->trashed() && $contact->is_active) {
+                $contact->restore();
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'code'    => 200,
+                'message' => 'Vendor synced successfully',
+                'data'    => $contact,
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            \Illuminate\Support\Facades\Log::error("Vendor Sync Error: " . $e->getMessage());
+            return response()->json(['code' => 500, 'message' => 'Internal Server Error: ' . $e->getMessage()], 500);
+        }
     }
 
     public function itemmaster(Request $request)
