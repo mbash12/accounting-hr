@@ -58,6 +58,12 @@ class CreateSalesOrder extends CreateRecord
         );
         $items = $data['items'] ?? [];
 
+        if (empty($items)) {
+            throw ValidationException::withMessages([
+                'items' => __('At least one item is required.'),
+            ]);
+        }
+
         $subtotal = 0.0;
         $taxTotal = 0.0;
 
