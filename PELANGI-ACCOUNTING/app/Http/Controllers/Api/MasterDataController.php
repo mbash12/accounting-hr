@@ -124,6 +124,7 @@ class MasterDataController extends Controller
 
             $contact->name = $request->name;
             $contact->is_supplier = true;
+            $contact->created_by_user_id = 1;
             if ($request->has('email')) $contact->email = $request->email;
             if ($request->has('phone')) $contact->phone = $request->phone;
             if ($request->has('contact_person')) $contact->contact_person = $request->contact_person;
