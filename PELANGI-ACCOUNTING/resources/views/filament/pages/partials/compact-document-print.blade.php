@@ -1,7 +1,12 @@
+@php
+    $printPaper = request()->query('paper', 'a4');
+    $printPageSize = $printPaper === 'a5' ? '210mm 148mm' : '210mm 297mm';
+@endphp
+
 <style>
-    /* Compact document previews: half A4, with enough room for half F4 paper. */
+    /* A4 portrait paper with a compact landscape A5 document at the top. */
     @page {
-        size: 210mm 148mm;
+        size: {{ $printPageSize }};
         margin: 0;
     }
 

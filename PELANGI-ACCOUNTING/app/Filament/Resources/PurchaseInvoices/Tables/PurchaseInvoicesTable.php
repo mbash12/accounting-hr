@@ -237,11 +237,17 @@ class PurchaseInvoicesTable
                         ->label('View')
                         ->icon('heroicon-o-eye')
                         ->url(fn ($record) => PurchaseInvoiceResource::getUrl('view', ['record' => $record])),
-                    Action::make('print')
-                        ->label('Print')
+                    Action::make('printA4')
+                        ->label('Print A4 - Portrait')
                         ->icon('heroicon-o-printer')
                         ->color('gray')
-                        ->url(fn ($record) => PurchaseInvoiceResource::getUrl('view', ['record' => $record]) . '?print=1')
+                        ->url(fn ($record) => PurchaseInvoiceResource::getUrl('view', ['record' => $record]) . '?print=1&paper=a4')
+                        ->openUrlInNewTab(),
+                    Action::make('printA5')
+                        ->label('Print A5 - Landscape')
+                        ->icon('heroicon-o-printer')
+                        ->color('gray')
+                        ->url(fn ($record) => PurchaseInvoiceResource::getUrl('view', ['record' => $record]) . '?print=1&paper=a5')
                         ->openUrlInNewTab(),
                     EditAction::make(),
                     RegenerateJournalEntry::make('regenerateJournalEntry')

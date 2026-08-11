@@ -25,7 +25,7 @@
                 print-color-adjust: exact;
             }
             @page {
-                size: 210mm 148mm;
+                size: {{ request()->query('paper') === 'a5' ? '210mm 148mm' : '210mm 297mm' }};
                 margin: 0;
             }
         </style>
