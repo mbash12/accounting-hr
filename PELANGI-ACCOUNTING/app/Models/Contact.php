@@ -136,7 +136,7 @@ class Contact extends Model
             ['table' => 'purchase_returns', 'foreignKey' => 'supplier_id', 'label' => 'purchase returns'],
             ['table' => 'receivable_payments', 'foreignKey' => 'customer_id', 'label' => 'receivable payments'],
             ['table' => 'payable_payments', 'foreignKey' => 'supplier_id', 'label' => 'payable payments'],
-            ['table' => 'projects', 'foreignKey' => 'contact_id', 'label' => 'projects'],
+            ['table' => 'projects', 'foreignKey' => 'customer_id', 'label' => 'projects'],
         ];
     }
 }
