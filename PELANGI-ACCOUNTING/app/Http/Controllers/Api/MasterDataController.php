@@ -116,6 +116,8 @@ class MasterDataController extends Controller
                 $contact->company_id = $request->company_id;
                 if (!empty($request->contact_code)) {
                     $contact->contact_code = $request->contact_code;
+                } else {
+                    $contact->contact_code = $contact->generateAndSaveCode();
                 }
             } else if (isset($request->update_existing) && !$request->update_existing) {
                 \Illuminate\Support\Facades\DB::rollBack();
