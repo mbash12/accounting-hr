@@ -157,6 +157,16 @@ class GenerateDocumentNumberingsForCompanies extends Command
                 'format' => '{CODE}{NUMBER}',
                 'format_components' => ['prefix', 'number'],
             ],
+            'supplier' => [
+                'prefix' => 'SP-',
+                'format' => '{CODE}{NUMBER}',
+                'format_components' => ['prefix', 'number'],
+            ],
+            'customer' => [
+                'prefix' => 'CP-',
+                'format' => '{CODE}{NUMBER}',
+                'format_components' => ['prefix', 'number'],
+            ],
             'bank' => [
                 'prefix' => 'BK',
                 'format' => '{CODE}{NUMBER}',

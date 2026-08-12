@@ -114,6 +114,7 @@ class MasterDataController extends Controller
             if (!$contact) {
                 $contact = new \App\Models\Contact();
                 $contact->company_id = $request->company_id;
+                $contact->is_supplier = true;
                 if (!empty($request->contact_code)) {
                     $contact->contact_code = $request->contact_code;
                 } else {

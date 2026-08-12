@@ -83,16 +83,21 @@ class CodeGeneratorService
                 'business_type' => 'BT',
                 'payment_term' => 'PT',
                 'payable_payment' => 'PP',
+                'supplier' => 'SP-',
+                'customer' => 'CP-',
             ];
             $defaultPrefix = $prefixMap[$documentType] ?? Str::upper(Str::substr($documentType, 0, 2));
 
             $maxNumber = $this->getMaxNumberFromExistingRecords($documentType, $companyId, $defaultPrefix);
 
+            $format = in_array($documentType, ['contact', 'supplier', 'customer']) ? '{CODE}{NUMBER}' : '{CODE}{YYYY}{NUMBER}';
+            $components = in_array($documentType, ['contact', 'supplier', 'customer']) ? ['prefix', 'number'] : ['prefix', 'year_full', 'number'];
+
             $record = DocumentNumbering::create([
                 'document_type' => $documentType,
                 'prefix' => $defaultPrefix,
-                'format' => '{CODE}{YYYY}{NUMBER}',
-                'format_components' => ['prefix', 'year_full', 'number'],
+                'format' => $format,
+                'format_components' => $components,
                 'next_number' => $maxNumber,
                 'reset_period' => 'never',
                 'is_active' => true,
@@ -139,6 +144,8 @@ class CodeGeneratorService
             'advance_disbursement' => ['model' => \App\Models\AdvanceDisbursement::class, 'field' => 'disbursement_number'],
             'cash_transfer' => ['model' => \App\Models\CashTransfer::class, 'field' => 'transfer_number'],
             'employee' => ['model' => \App\Models\Employee::class, 'field' => 'employee_id'],
+            'supplier' => ['model' => \App\Models\Contact::class, 'field' => 'contact_code'],
+            'customer' => ['model' => \App\Models\Contact::class, 'field' => 'contact_code'],
         ];
 
         if (!isset($modelMap[$documentType])) {
@@ -160,6 +167,12 @@ class CodeGeneratorService
                     $q->where('company_id', $companyId)
                       ->orWhereNull('company_id');
                 });
+            }
+
+            if ($documentType === 'supplier') {
+                $query->where('is_supplier', true);
+            } elseif ($documentType === 'customer') {
+                $query->where('is_customer', true);
             }
 
             $currentYear = now()->format('Y');

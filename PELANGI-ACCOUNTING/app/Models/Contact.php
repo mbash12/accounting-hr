@@ -35,6 +35,12 @@ class Contact extends Model
 
     protected function getDocumentType(): string
     {
+        if ($this->is_supplier) {
+            return 'supplier';
+        }
+        if ($this->is_customer) {
+            return 'customer';
+        }
         return 'contact';
     }
 
