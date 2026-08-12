@@ -102,7 +102,7 @@ class CodeGeneratorService
                 'reset_period' => 'never',
                 'is_active' => true,
                 'company_id' => $companyId ?: null,
-                'created_by_user_id' => auth()->id(),
+                'created_by_user_id' => auth()->id() ?? 1,
             ]);
         } else {
             $maxNumber = $this->getMaxNumberFromExistingRecords($documentType, $companyId, $record->prefix);

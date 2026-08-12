@@ -444,8 +444,8 @@ class ManageReferenceNumbers extends Page implements HasForms
                                 DocumentNumbering::create(array_merge($updateData, [
                                     'document_type' => $item['document_type'],
                                     'company_id' => $selectedCompanyId,
-                                    'created_by_user_id' => auth()->id(),
-                                ]));
+                                    'created_by_user_id' => auth()->id() ?? 1,
+                                    ]));
                             } else {
                                 $documentNumbering->update($updateData);
                             }
@@ -455,7 +455,7 @@ class ManageReferenceNumbers extends Page implements HasForms
                     DocumentNumbering::create(array_merge($updateData, [
                         'document_type' => $item['document_type'],
                         'company_id' => $selectedCompanyId,
-                        'created_by_user_id' => auth()->id(),
+                        'created_by_user_id' => auth()->id() ?? 1,
                     ]));
                 }
             }

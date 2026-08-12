@@ -107,7 +107,7 @@ class Company extends Model
                 'reset_period' => 'never',
                 'is_active' => true,
                 'company_id' => $this->id,
-                'created_by_user_id' => $this->created_by_user_id,
+                'created_by_user_id' => $this->created_by_user_id ?? Auth::id() ?? 1,
             ]);
         }
     }
