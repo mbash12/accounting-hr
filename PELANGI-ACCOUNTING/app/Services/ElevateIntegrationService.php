@@ -85,7 +85,8 @@ class ElevateIntegrationService
                         $payload['invoice_date'] ?? now()->toDateString(),
                         isset($payload['billing_amount']) ? (float) $payload['billing_amount'] : null,
                         $payload['description'] ?? null,
-                        $locationInfo
+                        $locationInfo,
+                        $payload['attachments'] ?? null
                     );
 
                     $mapping->update([
@@ -341,7 +342,8 @@ class ElevateIntegrationService
         string $invoiceDate,
         ?float $billingAmount = null,
         ?string $woDescription = null,
-        ?string $locationInfo = null
+        ?string $locationInfo = null,
+        ?array  $attachments = null
     ): SalesInvoice {
         $existing = SalesInvoice::where('reference_no', $workOrderNumber)
             ->where('company_id', $companyId)
@@ -366,6 +368,7 @@ class ElevateIntegrationService
             'due_date'           => $invoiceDate,  
             'reference_no'       => $workOrderNumber,
             'description'        => $desc,
+            'attachments'        => $attachments,
             'customer_id'        => $contactId,
             'company_id'         => $companyId,
             'subtotal'           => $totals['subtotal'],

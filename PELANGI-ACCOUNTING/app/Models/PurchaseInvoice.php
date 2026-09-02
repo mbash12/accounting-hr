@@ -77,6 +77,7 @@ class PurchaseInvoice extends Model
         'is_locked',
         'reference_no',
         'description',
+        'attachments',
         'other_charges',
         'discount',
         'discount_percentage',
@@ -108,6 +109,7 @@ class PurchaseInvoice extends Model
     {
         return [
             'id' => 'integer',
+            'attachments' => 'array',
             'date' => 'date',
             'due_date' => 'date',
             'is_paid' => 'boolean',

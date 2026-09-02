@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\ElevateIntegrationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -75,6 +76,7 @@ class ElevateIntegrationController extends Controller
                 'invoice_date'           => ['nullable', 'date'],
                 'delivery_date'          => ['nullable', 'date'],
                 'description'            => ['nullable', 'string', 'max:500'],
+                'attachments'            => ['nullable', 'array', 'max:20'],
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -98,6 +100,21 @@ class ElevateIntegrationController extends Controller
         }
 
         try {
+            $attachmentPaths = [];
+            foreach ((array) $request->file('attachments', []) as $file) {
+                if ($file instanceof UploadedFile && $file->isValid()) {
+                    $attachmentPaths[] = $file->store('invoices');
+                }
+            }
+            foreach ((array) $request->input('attachments', []) as $entry) {
+                if (is_string($entry) && trim($entry) !== '') {
+                    $attachmentPaths[] = trim($entry);
+                }
+            }
+            if (!empty($attachmentPaths)) {
+                $validated['attachments'] = $attachmentPaths;
+            }
+
             $result = $this->integrationService->processWorkOrder($validated);
 
             $statusCode = $result['action'] === 'already_processed' ? 200 : 201;

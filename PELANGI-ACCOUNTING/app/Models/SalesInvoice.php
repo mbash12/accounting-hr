@@ -89,6 +89,7 @@ class SalesInvoice extends Model
         'is_paid',
         'reference_no',
         'description',
+        'attachments',
         'other_charges',
         'discount',
         'subtotal',
@@ -120,6 +121,7 @@ class SalesInvoice extends Model
     {
         return [
             'id' => 'integer',
+            'attachments' => 'array',
             'date' => 'date',
             'due_date' => 'date',
             'is_paid' => 'boolean',
