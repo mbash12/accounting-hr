@@ -49,7 +49,7 @@ class ImportShiftScheduleAction extends Action
                                 new ShiftScheduleTemplateExport(
                                     year:         $year,
                                     month:        $month,
-                                    departmentId: $dept ? (int) $dept : null,
+                                    departmentIds: $dept ? [(int) $dept] : [],
                                     companyId:    $companyId,
                                     prefill:      false,
                                 ),
