@@ -131,7 +131,7 @@ class IncomeStatement extends Page implements HasForms
             ];
         }
 
-        $accounts = Account::withTrashed()->where('company_id', $companyId)
+        $accounts = Account::where('company_id', $companyId)
             ->whereIn('account_type', array_merge(Account::REVENUE_TYPES, Account::EXPENSE_TYPES, [Account::OTHER_INCOME_EXPENSE]))
             ->orderBy('code')
             ->get();

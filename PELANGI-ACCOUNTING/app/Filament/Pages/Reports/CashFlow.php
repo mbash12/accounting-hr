@@ -110,7 +110,7 @@ class CashFlow extends Page implements HasForms
         }
 
         $company = Company::find($companyId);
-        $allAccounts = Account::withTrashed()->where('company_id', $companyId)->get();
+        $allAccounts = Account::where('company_id', $companyId)->orderBy('code')->get();
         $hasPostedOpeningJournal = \App\Models\JournalEntry::query()
             ->where('company_id', $companyId)
             ->where('sub_module', 'opening_balance')

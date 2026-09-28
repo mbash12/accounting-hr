@@ -119,8 +119,7 @@ class TrialBalance extends Page implements HasForms
         }
 
         $company = Company::find($companyId);
-        $allAccounts = Account::withTrashed()
-            ->where('company_id', $companyId)
+        $allAccounts = Account::where('company_id', $companyId)
             ->orderBy('code')
             ->get();
 

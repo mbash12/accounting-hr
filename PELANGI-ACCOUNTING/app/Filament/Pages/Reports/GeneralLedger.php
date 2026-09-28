@@ -215,9 +215,9 @@ class GeneralLedger extends Page implements HasForms
         $company = Company::find($companyId);
 
         if ($selectAll) {
-            $accounts = Account::withTrashed()->where('company_id', $companyId)->where('is_header', false)->orderBy('code')->get();
+            $accounts = Account::where('company_id', $companyId)->where('is_header', false)->orderBy('code')->get();
         } else {
-            $accounts = Account::withTrashed()->where('company_id', $companyId)
+            $accounts = Account::where('company_id', $companyId)
                 ->where('is_header', false)
                 ->whereIn('id', $accountIds)
                 ->orderBy('code')

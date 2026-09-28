@@ -121,7 +121,7 @@ class BalanceSheet extends Page implements HasForms
             ];
         }
 
-        $accounts = Account::withTrashed()->where('company_id', $companyId)
+        $accounts = Account::where('company_id', $companyId)
             ->orderBy('code')
             ->get();
 

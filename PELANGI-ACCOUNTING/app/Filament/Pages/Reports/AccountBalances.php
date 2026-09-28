@@ -117,7 +117,7 @@ class AccountBalances extends Page implements HasForms
             return collect();
         }
 
-        $query = Account::withTrashed()->where('company_id', $companyId);
+        $query = Account::where('company_id', $companyId)->orderBy('code');
 
         // First get all accounts without eager loading children to avoid circular references
         $allAccounts = $query->get();
@@ -194,7 +194,7 @@ class AccountBalances extends Page implements HasForms
             $children = $grouped->get($item->id, collect());
             $item->children = $children->filter(function ($child) use ($item) {
                 return $child->id !== $item->id;
-            });
+            })->sortBy('code')->values();
         });
 
         $roots = $accounts->whereNull('parent_id');
