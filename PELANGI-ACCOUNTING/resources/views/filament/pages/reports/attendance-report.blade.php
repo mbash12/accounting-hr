@@ -60,7 +60,7 @@
                 <h2 class="text-xl font-bold uppercase">{{ $reportData['company']?->name }}</h2>
                 <h1 class="text-2xl font-bold text-blue-900">{{ __('LAPORAN REKAPITULASI KEHADIRAN') }}</h1>
                 <p class="text-gray-600 font-semibold uppercase">
-                    {{ __('Bulan') }}: {{ __($reportData['month_name']) }} {{ $reportData['year'] }}
+                    {{ __('Periode') }}: {{ \Carbon\Carbon::parse($reportData['start_date'])->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($reportData['end_date'])->format('d/m/Y') }}
                     @if($reportData['department']) | {{ __('Department') }}: {{ $reportData['department']->name }} @endif
                 </p>
             </div>

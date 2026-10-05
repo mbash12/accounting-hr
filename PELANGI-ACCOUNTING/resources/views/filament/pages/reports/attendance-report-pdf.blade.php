@@ -19,7 +19,7 @@
         <div class="company-name">{{ $company?->name }}</div>
         <div class="report-title">LAPORAN REKAPITULASI KEHADIRAN</div>
         <div class="report-meta">
-            Month: {{ $month_name }} {{ $year }}
+            {{ __('Periode') }}: {{ \Carbon\Carbon::parse($start_date)->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($end_date)->format('d/m/Y') }}
             @if($department) | Department: {{ $department->name }} @endif
         </div>
     </div>

@@ -10,7 +10,9 @@ use App\Models\Permit;
 use Filament\Pages\Page;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Illuminate\Support\Facades\Validator;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -47,8 +49,8 @@ class AttendanceReport extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
-            'month' => now()->month,
-            'year' => now()->year,
+            'start_date' => now()->startOfMonth()->format('Y-m-d'),
+            'end_date' => now()->endOfMonth()->format('Y-m-d'),
         ]);
     }
 
@@ -56,20 +58,15 @@ class AttendanceReport extends Page implements HasForms
     {
         return $schema
             ->components([
-                Select::make('month')
-                    ->label(__('Month'))
-                    ->options([
-                        1 => __('January'), 2 => __('February'), 3 => __('March'), 4 => __('April'),
-                        5 => __('May'), 6 => __('June'), 7 => __('July'), 8 => __('August'),
-                        9 => __('September'), 10 => __('October'), 11 => __('November'), 12 => __('December'),
-                    ])
+                DatePicker::make('start_date')
+                    ->label(__('Tanggal Mulai'))
                     ->required()
                     ->live(),
-                
-                Select::make('year')
-                    ->label(__('Year'))
-                    ->options(array_combine(range(now()->year - 2, now()->year + 1), range(now()->year - 2, now()->year + 1)))
+
+                DatePicker::make('end_date')
+                    ->label(__('Tanggal Akhir'))
                     ->required()
+                    ->afterOrEqual('start_date')
                     ->live(),
 
                 Select::make('department_id')
@@ -99,8 +96,8 @@ class AttendanceReport extends Page implements HasForms
 
     protected function getRawData(): array
     {
-        $month = $this->data['month'] ?? now()->month;
-        $year = $this->data['year'] ?? now()->year;
+        $startDate = $this->data['start_date'] ?? null;
+        $endDate = $this->data['end_date'] ?? null;
         $deptId = $this->data['department_id'] ?? null;
         $companyId = session('selected_company_id');
 
@@ -112,16 +109,34 @@ class AttendanceReport extends Page implements HasForms
             ];
         }
 
+        $validator = Validator::make([
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ], [
+            'start_date' => ['required', 'date_format:Y-m-d'],
+            'end_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:start_date'],
+        ], [], [
+            'start_date' => __('Tanggal Mulai'),
+            'end_date' => __('Tanggal Akhir'),
+        ]);
+
+        if ($validator->fails()) {
+            return [
+                'records' => collect(),
+                'company' => null,
+                'error' => $validator->errors()->first(),
+            ];
+        }
+
         $employeesQuery = Employee::where('company_id', $companyId)->where('is_active', true);
         if ($deptId) {
             $employeesQuery->where('department_id', $deptId);
         }
         $employees = $employeesQuery->get();
 
-        $records = $employees->map(function ($employee) use ($month, $year) {
+        $records = $employees->map(function ($employee) use ($startDate, $endDate) {
             $attendances = Attendance::where('employee_id', $employee->id)
-                ->whereMonth('date', $month)
-                ->whereYear('date', $year)
+                ->whereBetween('date', [$startDate, $endDate])
                 ->get();
 
             return [
@@ -138,8 +153,8 @@ class AttendanceReport extends Page implements HasForms
         return [
             'records' => $records,
             'company' => Company::find($companyId),
-            'month_name' => date("F", mktime(0, 0, 0, $month, 10)),
-            'year' => $year,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
             'department' => $deptId ? Department::find($deptId) : null,
         ];
     }
@@ -153,6 +168,6 @@ class AttendanceReport extends Page implements HasForms
 
         return response()->streamDownload(function () use ($pdf) {
             echo $pdf->output();
-        }, 'Attendance_Report_' . $data['month_name'] . '_' . $data['year'] . '.pdf');
+        }, 'Attendance_Report_' . $data['start_date'] . '_' . $data['end_date'] . '.pdf');
     }
 }
