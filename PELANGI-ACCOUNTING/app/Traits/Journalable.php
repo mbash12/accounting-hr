@@ -133,11 +133,8 @@ trait Journalable
             ->where('reference_id', $this->id)
             ->first(['status', 'is_posted']);
 
-        if ($existingEntry?->is_posted) {
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'status' => __('A posted journal cannot be regenerated. Reverse it first.'),
-            ]);
-        }
+        // TEMP: posted-journal guard disabled for bulk regeneration (Kemayoran accounting).
+        // Re-enable: throw ValidationException when $existingEntry?->is_posted.
 
         // Delete existing journal entry
         $this->deleteJournalEntry();
